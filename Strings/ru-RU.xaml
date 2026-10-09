@@ -116,6 +116,7 @@
     <sys:String x:Key="Str_Theme_Sepulchre">Гробница</sys:String>
     <sys:String x:Key="Str_Theme_Delirium">Бред</sys:String>
     <sys:String x:Key="Str_Theme_Mourning">Траур</sys:String>
+    <sys:String x:Key="Str_Theme_FilmGrain">Зернистость плёнки</sys:String>
 
     <!-- About overlay -->
     <sys:String x:Key="Str_About_Version">ВЕРСИЯ</sys:String>

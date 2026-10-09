@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ## [1.8.1] - Unreleased
 
+### Added
+- Added a Film Grain switch to the theme menu. It is on by default, and turning it off removes the grain texture from every surface.
+
 ### Fixed
 - Scan History view buttons and context-menu choices use normal capitalization in every language.
 

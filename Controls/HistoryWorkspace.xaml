@@ -37,6 +37,7 @@
     </UserControl.Resources>
     <Grid>
         <Border IsHitTestVisible="False" Background="{DynamicResource GrainTileBrush}" Opacity="0.20"
+                Visibility="{DynamicResource FilmGrainVisibility}"
                 CornerRadius="{DynamicResource PaneGrainCornerRadius}" Panel.ZIndex="-1"/>
         <Grid>
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>

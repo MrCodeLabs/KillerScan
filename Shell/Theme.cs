@@ -25,6 +25,13 @@ namespace KillerScan.Shell
         private bool _syncingThemeRadios;
         private ContextMenu? _themeContextMenu;
 
+        // Film Grain on or off for every surface (Services/FilmGrain.cs). The menu stays open, the
+        // same as a theme pick, so the change can be compared straight away.
+        private void FilmGrainCheck_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox check) FilmGrain.Set(check.IsChecked == true);
+        }
+
         private void ThemeRadio_Checked(object sender, RoutedEventArgs e)
         {
             if (_syncingThemeRadios) return;
@@ -108,6 +115,7 @@ namespace KillerScan.Shell
         {
             if (FindName("ThemeRadios") is not Panel panel) return;
             string current = ThemeManager.Current.ToString();
+            if (FindName("FilmGrainCheck") is CheckBox filmGrain) filmGrain.IsChecked = FilmGrain.Enabled;
             _syncingThemeRadios = true;
             try
             {

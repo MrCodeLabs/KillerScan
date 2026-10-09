@@ -143,6 +143,7 @@ namespace KillerScan
 
             // Restore the saved theme before building the main window.
             Services.ThemeManager.Initialize();
+            Services.FilmGrain.Initialize();   // after the theme, before the window is built
             ShutdownMode = ShutdownMode.OnLastWindowClose;
             MainWindow = new Shell.MainWindow(uiScanTarget, startUiScan);
             MainWindow.Show();

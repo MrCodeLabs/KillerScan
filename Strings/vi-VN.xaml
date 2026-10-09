@@ -95,6 +95,7 @@
     <sys:String x:Key="Str_Theme_Sepulchre">Lăng mộ</sys:String>
     <sys:String x:Key="Str_Theme_Delirium">Mê sảng</sys:String>
     <sys:String x:Key="Str_Theme_Mourning">Tang tóc</sys:String>
+    <sys:String x:Key="Str_Theme_FilmGrain">Hạt phim</sys:String>
     <sys:String x:Key="Str_About_Version">PHIÊN BẢN</sys:String>
     <sys:String x:Key="Str_About_Publisher">NHÀ PHÁT HÀNH</sys:String>
     <sys:String x:Key="Str_About_Thumbprint">VÂN TAY CHỨNG THƯ</sys:String>

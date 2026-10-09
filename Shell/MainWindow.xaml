@@ -210,6 +210,10 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         <!-- Named rows, not dots: twelve swatches do not fit, and a dot for a
                              grunge palette would be an invented color. Tag carries the Theme enum
                              name, so one handler serves every row and adding a theme is one line.
@@ -252,6 +256,25 @@
                                 <Button x:Name="AccentStripDot7" Grid.Row="7" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0" Click="AccentSwatch_Click"/>
                             </Grid>
                         </Grid>
+                        <!-- Film Grain: one switch for the grain texture on every surface
+                             (Services/FilmGrain.cs). Its own row under both columns, so the
+                             accent strip still runs the height of the theme list only. -->
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                            <Border Height="1" Margin="0,0,9,8" Opacity="0.18" IsHitTestVisible="False"
+                                    Background="{DynamicResource TextBrush}">
+                                <Border.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="Transparent" Offset="0"/>
+                                        <GradientStop Color="Black" Offset="0.15"/>
+                                        <GradientStop Color="Black" Offset="0.85"/>
+                                        <GradientStop Color="Transparent" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.OpacityMask>
+                            </Border>
+                            <CheckBox x:Name="FilmGrainCheck" Content="{DynamicResource Str_Theme_FilmGrain}"
+                                      Style="{StaticResource ThemeCheck}" Margin="0"
+                                      Click="FilmGrainCheck_Click"/>
+                        </StackPanel>
                     </Grid>
                 </Grid>
             </Border>
