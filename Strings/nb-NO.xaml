@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Endret</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Første skanning av dette målet. Alle enheter er nye.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} lagt til, {1} mangler, {2} endret</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ENDRINGER</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">ALLE ENHETER</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Endringer</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Alle enheter</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} enheter i denne skanningen</sys:String>
     <sys:String x:Key="Str_TT_Topology">Slå nettverkstopologi av eller på</sys:String>
     <sys:String x:Key="Str_Topology_Network">Lokalt nettverk</sys:String>

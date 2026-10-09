@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Өзгертілді</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Бұл нысанның алғашқы сканерлеуі. Барлық құрылғы жаңа.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} қосылды, {1} жоқ, {2} өзгертілді</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ӨЗГЕРІСТЕР</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">БАРЛЫҚ ҚҰРЫЛҒЫ</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Өзгерістер</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Барлық құрылғы</sys:String>
     <sys:String x:Key="Str_History_AllSummary">Бұл сканерлеуде {0} құрылғы</sys:String>
     <sys:String x:Key="Str_TT_Topology">Желі топологиясын көрсету немесе жасыру</sys:String>
     <sys:String x:Key="Str_Topology_Network">Жергілікті желі</sys:String>

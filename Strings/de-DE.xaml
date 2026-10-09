@@ -37,8 +37,8 @@
     <sys:String x:Key="Str_History_Changed">Geändert</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Erster Scan dieses Ziels. Alle Geräte sind neu.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} hinzugefügt, {1} fehlen, {2} geändert</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ÄNDERUNGEN</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">ALLE GERÄTE</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Änderungen</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Alle Geräte</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} Geräte in diesem Scan</sys:String>
     <sys:String x:Key="Str_TT_Topology">Netzwerktopologie umschalten</sys:String>
     <sys:String x:Key="Str_Topology_Network">Lokales Netzwerk</sys:String>

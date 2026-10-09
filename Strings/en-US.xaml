@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Changed</sys:String>
     <sys:String x:Key="Str_History_FirstScan">First scan of this target. All devices are new.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} added, {1} missing, {2} changed</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">CHANGES</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">ALL DEVICES</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Changes</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">All Devices</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} devices in this scan</sys:String>
     <sys:String x:Key="Str_TT_Topology">Toggle network topology</sys:String>
     <sys:String x:Key="Str_Topology_Network">Local network</sys:String>

@@ -36,8 +36,8 @@
     <sys:String x:Key="Str_History_Changed">Zmieniono</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Pierwszy skan tego celu. Wszystkie urządzenia są nowe.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} dodano, {1} brak, {2} zmieniono</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ZMIANY</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">WSZYSTKIE URZĄDZENIA</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Zmiany</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Wszystkie urządzenia</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} urządzeń w tym skanowaniu</sys:String>
     <sys:String x:Key="Str_TT_Topology">Przełącz topologię sieci</sys:String>
     <sys:String x:Key="Str_Topology_Network">Sieć lokalna</sys:String>

@@ -37,8 +37,8 @@
     <sys:String x:Key="Str_History_Changed">Modificado</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Primer análisis de este destino. Todos los dispositivos son nuevos.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} añadidos, {1} ausentes, {2} modificados</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">CAMBIOS</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">TODOS LOS DISPOSITIVOS</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Cambios</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Todos los dispositivos</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} dispositivos en este escaneo</sys:String>
     <sys:String x:Key="Str_TT_Topology">Alternar topología de red</sys:String>
     <sys:String x:Key="Str_Topology_Network">Red local</sys:String>

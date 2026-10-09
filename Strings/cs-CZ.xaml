@@ -43,8 +43,8 @@
     <sys:String x:Key="Str_History_Changed">Změněno</sys:String>
     <sys:String x:Key="Str_History_FirstScan">První sken tohoto cíle. Všechna zařízení jsou nová.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} přidáno, {1} chybí, {2} změněno</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ZMĚNY</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">VŠECHNA ZAŘÍZENÍ</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Změny</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Všechna zařízení</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} zařízení v tomto skenu</sys:String>
     <sys:String x:Key="Str_TT_Topology">Přepnout topologii sítě</sys:String>
     <sys:String x:Key="Str_Topology_Network">Místní síť</sys:String>

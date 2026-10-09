@@ -234,9 +234,23 @@ internal static partial class HistoryUiTests
         foreach (string locale in Enum.GetNames(localeType))
         {
             Locale(locale); history.RefreshLocale(); menu.RaiseEvent(new RoutedEventArgs(ContextMenu.OpenedEvent));
+            Render(root, 1200, 780);
+            SaveMenu(menu, app, Path.Combine(output, "History-menu-" + locale + ".png"));
             Require(Identity().Contains("192.0.2.0/24") && Identity().Contains(time.ToString("g")) && Identity().Contains(time.AddHours(1).ToString("g")) && !comparison.Text.StartsWith("Str_"), locale + ": target and both dates remain identified.");
             Require(Equals(grid.Columns[0].Header, app.FindResource("Str_History_Change")) && Equals(all.Columns[0].Header, app.FindResource("Str_Col_Ip")), locale + ": both grid headings change language.");
             Require(menu.Items.OfType<MenuItem>().All(item => item.Header is string text && text.Length > 0 && !text.StartsWith("Str_")), locale + ": menu labels resolve.");
+            foreach (var view in new[] { ("changes", "Str_History_ViewChanges", "HistoryChangesViewButton", "Changes"),
+                ("all", "Str_History_ViewAll", "HistoryAllViewButton", "All Devices") })
+            {
+                string label = (string)app.FindResource(view.Item2);
+                var button = (Button)history.FindName(view.Item3);
+                var choice = menu.Items.OfType<MenuItem>().Single(item => Equals(item.Tag, view.Item1));
+                Require(Equals(button.Content, label) && Equals(choice.Header, label), locale + ": view buttons and menu share the localized label: " + button.Content + " / " + choice.Header + " / " + label);
+                Require(!label.Any(char.IsUpper) || label.Any(char.IsLower), locale + ": cased view labels use normal capitalization.");
+                Require(Equals(button.ToolTip, "Ctrl+Shift+H") && choice.InputGestureText == "Ctrl+Shift+H",
+                    locale + ": normal-case labels preserve the view shortcut.");
+                if (locale == "EnUS") Require(label == view.Item4, "English view labels use the established casing.");
+            }
             foreach (double scale in new[] { 1.0, 1.5, 2.5 })
             {
                 Call(window, "ApplyAppScale", scale, false); Render(root, 1200, 780);

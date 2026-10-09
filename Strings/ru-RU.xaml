@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Изменено</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Первое сканирование этой цели. Все устройства новые.</sys:String>
     <sys:String x:Key="Str_History_Summary">Добавлено: {0}, отсутствует: {1}, изменено: {2}</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ИЗМЕНЕНИЯ</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">ВСЕ УСТРОЙСТВА</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Изменения</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Все устройства</sys:String>
     <sys:String x:Key="Str_History_AllSummary">Устройств в этом сканировании: {0}</sys:String>
     <sys:String x:Key="Str_TT_Topology">Показать или скрыть топологию сети</sys:String>
     <sys:String x:Key="Str_Topology_Network">Локальная сеть</sys:String>

@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Змінено</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Перше сканування цієї цілі. Усі пристрої нові.</sys:String>
     <sys:String x:Key="Str_History_Summary">Додано: {0}, зникло: {1}, змінено: {2}</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ЗМІНИ</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">УСІ ПРИСТРОЇ</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Зміни</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Усі пристрої</sys:String>
     <sys:String x:Key="Str_History_AllSummary">Пристроїв у цьому скануванні: {0}</sys:String>
     <sys:String x:Key="Str_TT_Topology">Показати або сховати топологію мережі</sys:String>
     <sys:String x:Key="Str_Topology_Network">Локальна мережа</sys:String>

@@ -37,8 +37,8 @@
     <sys:String x:Key="Str_History_Changed">Modifié</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Première analyse de cette cible. Tous les appareils sont nouveaux.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} ajoutés, {1} absents, {2} modifiés</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">CHANGEMENTS</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">TOUS LES APPAREILS</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Changements</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Tous les appareils</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} appareils dans ce scan</sys:String>
     <sys:String x:Key="Str_TT_Topology">Afficher ou masquer la topologie du réseau</sys:String>
     <sys:String x:Key="Str_Topology_Network">Réseau local</sys:String>

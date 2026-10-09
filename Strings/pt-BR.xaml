@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Alterado</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Primeira verificação deste destino. Todos os dispositivos são novos.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} adicionado(s), {1} ausente(s), {2} alterado(s)</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">ALTERAÇÕES</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">TODOS OS DISPOSITIVOS</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Alterações</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Todos os dispositivos</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} dispositivos nesta verificação</sys:String>
     <sys:String x:Key="Str_TT_Topology">Alternar topologia da rede</sys:String>
     <sys:String x:Key="Str_Topology_Network">Rede local</sys:String>

@@ -40,8 +40,8 @@
     <sys:String x:Key="Str_History_Changed">Đã thay đổi</sys:String>
     <sys:String x:Key="Str_History_FirstScan">Đây là lần quét đầu tiên của mục tiêu này. Tất cả thiết bị đều mới.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} đã thêm, {1} bị thiếu, {2} đã thay đổi</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">THAY ĐỔI</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">TẤT CẢ THIẾT BỊ</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Thay đổi</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Tất cả thiết bị</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} thiết bị trong lần quét này</sys:String>
     <sys:String x:Key="Str_TT_Topology">Bật hoặc tắt sơ đồ mạng</sys:String>
     <sys:String x:Key="Str_Topology_Network">Mạng cục bộ</sys:String>

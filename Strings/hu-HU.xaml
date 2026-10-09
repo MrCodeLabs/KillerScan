@@ -51,8 +51,8 @@
     <sys:String x:Key="Str_History_Changed">Módosítva</sys:String>
     <sys:String x:Key="Str_History_FirstScan">A cél első vizsgálata. Minden eszköz új.</sys:String>
     <sys:String x:Key="Str_History_Summary">{0} hozzáadva, {1} hiányzik, {2} módosítva</sys:String>
-    <sys:String x:Key="Str_History_ViewChanges">VÁLTOZÁSOK</sys:String>
-    <sys:String x:Key="Str_History_ViewAll">MINDEN ESZKÖZ</sys:String>
+    <sys:String x:Key="Str_History_ViewChanges">Változások</sys:String>
+    <sys:String x:Key="Str_History_ViewAll">Minden eszköz</sys:String>
     <sys:String x:Key="Str_History_AllSummary">{0} eszköz ebben a vizsgálatban</sys:String>
     <sys:String x:Key="Str_TT_Topology">Hálózati topológia megjelenítése</sys:String>
     <sys:String x:Key="Str_Topology_Network">Helyi hálózat</sys:String>
