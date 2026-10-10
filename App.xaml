@@ -464,7 +464,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="border"
+                            <Grid><Border x:Name="borderRing" IsHitTestVisible="False" CornerRadius="{Binding CornerRadius, ElementName=border}" BorderThickness="{Binding BorderThickness, ElementName=border}" BorderBrush="{Binding Background, ElementName=border}" Margin="{Binding Margin, ElementName=border}" Visibility="{Binding Visibility, ElementName=border}" Opacity="{Binding Opacity, ElementName=border}"/><Border x:Name="border"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -481,7 +481,7 @@
                                     <ContentPresenter Margin="{TemplateBinding Padding}"
                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Grid>
-                            </Border>
+                            </Border></Grid>
                             <ControlTemplate.Triggers>
                                 <!-- Hover fills with the outline color; press uses the matched
                                      selection fill and foreground.
@@ -619,7 +619,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Grid>
-                                <Border x:Name="border" Background="{TemplateBinding Background}"
+                                <Border x:Name="borderRing" IsHitTestVisible="False" CornerRadius="{Binding CornerRadius, ElementName=border}" BorderThickness="{Binding BorderThickness, ElementName=border}" BorderBrush="{Binding Background, ElementName=border}" Margin="{Binding Margin, ElementName=border}" Visibility="{Binding Visibility, ElementName=border}" Opacity="{Binding Opacity, ElementName=border}"/><Border x:Name="border" Background="{TemplateBinding Background}"
                                         BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                         CornerRadius="{DynamicResource ControlCornerRadius}" Padding="{TemplateBinding Padding}">
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -1459,11 +1459,11 @@
                              An Ellipse cannot be squared, which is why KillerNotes' AccentDot is
                              built this way too. -->
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="dot"
+                            <Grid><Border x:Name="dotRing" IsHitTestVisible="False" CornerRadius="{Binding CornerRadius, ElementName=dot}" BorderThickness="{Binding BorderThickness, ElementName=dot}" BorderBrush="{Binding Background, ElementName=dot}" Margin="{Binding Margin, ElementName=dot}" Visibility="{Binding Visibility, ElementName=dot}" Opacity="{Binding Opacity, ElementName=dot}"/><Border x:Name="dot"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="{DynamicResource AccentSwatchCornerRadius}"/>
+                                    CornerRadius="{DynamicResource AccentSwatchCornerRadius}"/></Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="dot" Property="BorderThickness" Value="2"/>
