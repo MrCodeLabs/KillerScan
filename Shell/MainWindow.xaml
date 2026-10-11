@@ -99,7 +99,7 @@
                                FontFamily="Segoe UI" FontWeight="Bold" FontSize="11"
                                Foreground="{DynamicResource ChromeTextBrush}"/>
                     <!-- Typewriter wordmark with KillerPDF-style soft shadow: a blurred dark copy behind the
-                         crisp text, faded by IconShadowOpacity (0 in light mode = no shadow).
+                         crisp text, faded by WordmarkShadowOpacity (off on 98SE).
                          Rolling the wheel over it drives the app-wide size (AppScale.cs). The
                          hit-test opt-in that lets the wheel reach it also takes it out of
                          WindowChrome's native caption, so drag and double-click-maximize are
@@ -112,7 +112,7 @@
                           MouseLeftButtonDown="LogoBar_MouseLeftButtonDown"
                           ToolTip="{DynamicResource Str_TT_AppSize}">
                         <Grid.RenderTransform><TranslateTransform Y="-5"/></Grid.RenderTransform>
-                        <StackPanel Orientation="Horizontal" Margin="1,2,0,0" Opacity="{DynamicResource IconShadowOpacity}">
+                        <StackPanel Orientation="Horizontal" Margin="1,2,0,0" Opacity="{DynamicResource WordmarkShadowOpacity}">
                             <StackPanel.Effect><BlurEffect Radius="3"/></StackPanel.Effect>
                             <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="#D8000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="#D8000000"/></TextBlock>
                         </StackPanel>
@@ -919,7 +919,7 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <Grid Margin="0,0,0,4" HorizontalAlignment="Left">
                                         <TextBlock FontFamily="{DynamicResource WordmarkFont}" Margin="1,2,0,0" IsHitTestVisible="False"
-                                                   Opacity="{DynamicResource IconShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="2"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="#C0000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#C0000000"/></TextBlock>
+                                                   Opacity="{DynamicResource WordmarkShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="2"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="#C0000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#C0000000"/></TextBlock>
                                         <TextBlock FontFamily="{DynamicResource WordmarkFont}" Margin="1,2,0,0" IsHitTestVisible="False"
                                                    Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="Transparent"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#D8000000"/></TextBlock>
                                         <TextBlock FontFamily="{DynamicResource WordmarkFont}"><Run Text="Killer" FontSize="17.21" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
