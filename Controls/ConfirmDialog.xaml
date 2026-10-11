@@ -47,7 +47,7 @@
                         <!-- The app icon leads the caption, as it does in the main title bar. -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="6,0,0,0"
                                     Visibility="{DynamicResource InputDialogWordmarkVisibility}">
-                        <icons:AppIcon x:Name="TitleIcon" Width="25" Height="25"
+                        <icons:AppIcon x:Name="TitleIcon" Width="27" Height="27"
                                VerticalAlignment="Center" Margin="0,0,7,0"
                                RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                         <Grid VerticalAlignment="Center" Margin="0,-18,0,-22">

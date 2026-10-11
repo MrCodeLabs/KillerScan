@@ -84,10 +84,10 @@ namespace KillerScan.Shell
             if (FindName("SubtitleText") is UIElement st) st.Visibility = wordmark;
             if (FindName("PlainTitle")   is UIElement pt) pt.Visibility = plain;
 
-            // The icon shrinks with the bar; 25px does not fit a 22px caption.
+            // The icon shrinks with the bar; 27px does not fit a 22px caption.
             if (FindName("TitleIcon") is FrameworkElement icon)
             {
-                icon.Width = icon.Height = flat ? 16 : 25;
+                icon.Width = icon.Height = flat ? 16 : 27;
                 icon.Margin = new Thickness(0, 0, flat ? 5 : 7, 0);
             }
 
