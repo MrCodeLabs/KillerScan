@@ -14,6 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ### Fixed
 - Scan History view buttons and context-menu choices use normal capitalization in every language.
+- Dialog title wordmarks keep the main window's dark halo behind the app name on the Light theme's Yellow accent, so the yellow no longer fades into the title bar.
 
 ## [1.8.0] - 2026-10-08
 
