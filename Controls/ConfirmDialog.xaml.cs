@@ -69,6 +69,7 @@ namespace KillerScan.Controls
         // notice with a single button. The amber darkens on a light card so it keeps its contrast.
         private void ApplyNotice()
         {
+            FitHeading();
             bool confirmation = CancelButton.Visibility == Visibility.Visible;
             System.Windows.Media.Brush brush;
             if (confirmation)
@@ -86,6 +87,31 @@ namespace KillerScan.Controls
             NoticeGlyph.Text = confirmation ? "!" : "i";
             NoticeGlyph.Foreground = brush;
             NoticeRing.BorderBrush = brush;
+        }
+
+        // A heading is one short line. Text after its first line break moves into the detail, and
+        // a first line too long for a heading stays body-sized instead of shouting.
+        private void FitHeading()
+        {
+            string text = HeadingText.Text ?? "";
+            int lineBreak = text.IndexOf('\n');
+            if (lineBreak >= 0)
+            {
+                string rest = text.Substring(lineBreak + 1).Trim();
+                HeadingText.Text = text.Substring(0, lineBreak).TrimEnd('\r');
+                if (rest.Length > 0)
+                {
+                    string existing = DetailText.Visibility == Visibility.Visible ? DetailText.Text : "";
+                    DetailText.Text = string.IsNullOrEmpty(existing) ? rest : rest + "\n\n" + existing;
+                    DetailText.Visibility = Visibility.Visible;
+                }
+            }
+            if ((HeadingText.Text ?? "").Length > 90)
+            {
+                HeadingText.ClearValue(System.Windows.Controls.TextBlock.FontFamilyProperty);
+                HeadingText.ClearValue(System.Windows.Media.TextOptions.TextFormattingModeProperty);
+                HeadingText.FontSize = 13;
+            }
         }
 
         internal static void ShowNotice(string message, Window? owner = null)
