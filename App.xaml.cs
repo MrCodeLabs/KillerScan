@@ -59,6 +59,7 @@ namespace KillerScan
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            KillerFamily.Accessibility.AccessibleControls.Initialize();
             base.OnStartup(e);
             // Every window (dialogs, tools, pickers) takes the family UI face from the active theme
             // unless it sets its own, so no dialog falls back to the system Segoe UI.
@@ -87,8 +88,7 @@ namespace KillerScan
             if (e.Args.Length > 0 &&
                 string.Equals(e.Args[0], "/silent", StringComparison.OrdinalIgnoreCase))
             {
-                DoSilentInstall();
-                Shutdown(0);
+                Shutdown(DoSilentInstall());
                 return;
             }
 
@@ -362,10 +362,11 @@ namespace KillerScan
         // Silent (machine-wide) install -- used by winget / choco / RMM
         // ============================================================
 
-        private static void DoSilentInstall()
+        private static int DoSilentInstall()
         {
             try
             {
+                using var installLease = KillerFamily.Deployment.InstallerExitCodes.Acquire(AppName);
                 string installDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), AppName);
                 string installExe = Path.Combine(installDir, ExeName);
@@ -403,12 +404,12 @@ namespace KillerScan
                     key.SetValue("NoModify",             1);
                     key.SetValue("NoRepair",             1);
                 }
+                return KillerFamily.Deployment.InstallerExitCodes.Success;
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Silent install failed: {ex.Message}");
-                int error = Marshal.GetHRForException(ex) & 0xffff;
-                Environment.Exit(error == 0 ? 1 : error);
+                return KillerFamily.Deployment.InstallerExitCodes.FromException(ex);
             }
         }
 
