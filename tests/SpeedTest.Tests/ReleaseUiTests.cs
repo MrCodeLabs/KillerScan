@@ -56,6 +56,7 @@ internal static class ReleaseUiTests
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+        context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
         var manager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
         var themeType = assembly.GetType("KillerScan.Services.Theme", true)!;

@@ -87,6 +87,7 @@ internal static partial class HistoryUiTests
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+        context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(PreserveMenuGlyphReferences(dictionary), context);
         assembly.GetType("KillerScan.Services.DemoData", true)!.GetField("Enabled", Static)!.SetValue(null, true);
         var themeManager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
