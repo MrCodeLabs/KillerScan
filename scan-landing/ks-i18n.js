@@ -195,7 +195,7 @@ var I18N = {
   "f_actions_t": "Быстрые действия",
   "f_classify_d": "Взвешенная система очков объединяет имя узла, производителя, открытые порты, баннеры, mDNS и SSDP в наиболее вероятный тип:<br>маршрутизатор, коммутатор/точка доступа, NAS, принтер, камера, гипервизор, телефон, IoT и другие.",
   "f_classify_t": "Классификация устройств",
-  "f_cli_d": "Сканируйте несколько сетей, глубоко зондируйте один узел, изучайте активную сеть или определяйте производителя по MAC офлайн. Фильтруйте и сортируйте результаты, выбирайте порты и типы устройств, задавайте лимиты и тайм-ауты, показывайте прогресс и выводите таблицу, CSV, JSON или HTML с темами - с надежными кодами завершения для автоматизации. <a href=\"technical.html#command-line\">Полный список команд.</a>",
+  "f_cli_d": "Сканируйте несколько сетей, глубоко зондируйте один узел, изучайте активную сеть или определяйте производителя по MAC офлайн. Фильтруйте и сортируйте результаты, выбирайте порты и типы устройств, задавайте лимиты и тайм-ауты, показывайте прогресс и выводите таблицу, CSV, JSON или HTML с темами - с надежными кодами завершения для автоматизации. <a href=\"help.html#command-line\">Полный список команд.</a>",
   "f_cli_t": "Готов к командной строке",
   "f_discover_d": "KillerScan читает ARP-кэш, выполняет параллельные ICMP-запросы с резервной проверкой TCP и снова читает ARP, находя устройства, которые блокируют ping, но отвечают по ARP. Брандмауэры, спящие устройства и изоляция сети могут мешать обнаружению.",
   "f_discover_t": "Обнаружение узлов",
@@ -868,7 +868,7 @@ var I18N = {
   "f_actions_t": "Azioni rapide",
   "f_classify_d": "Un sistema a punteggio ponderato combina nome host, produttore, porte aperte, banner, mDNS e SSDP in un tipo più probabile:<br>router, switch/AP, NAS, stampante, telecamera, hypervisor, telefono, IoT e altro.",
   "f_classify_t": "Classificazione dei dispositivi",
-  "f_cli_d": "Scansiona più reti, esamina a fondo un host, ispeziona la rete attiva o risolvi un produttore MAC offline. Filtra e ordina i risultati, seleziona porte e tipi di dispositivo, imposta limiti e timeout, mostra l'avanzamento ed emetti output in tabella, CSV, JSON o HTML a tema con codici di uscita affidabili per l'automazione. <a href=\"technical.html#command-line\">Vedi tutti i comandi.</a>",
+  "f_cli_d": "Scansiona più reti, esamina a fondo un host, ispeziona la rete attiva o risolvi un produttore MAC offline. Filtra e ordina i risultati, seleziona porte e tipi di dispositivo, imposta limiti e timeout, mostra l'avanzamento ed emetti output in tabella, CSV, JSON o HTML a tema con codici di uscita affidabili per l'automazione. <a href=\"help.html#command-line\">Vedi tutti i comandi.</a>",
   "f_cli_t": "Pronto per la riga di comando",
   "f_discover_d": "KillerScan legge la cache ARP, esegue sonde ICMP parallele con un controllo TCP alternativo e rilegge ARP per trovare dispositivi che bloccano il ping ma rispondono ad ARP. Firewall, dispositivi in sospensione e isolamento della rete possono impedirne il rilevamento.",
   "f_discover_t": "Rilevamento degli host",
@@ -1680,7 +1680,7 @@ var I18N = {
   "f_export_t": "Exportálás",
   "f_export_d": "Az Exportálás eszköz-CSV-t vagy interaktív HTML-t, szolgáltatás-CSV-t, topológia-PNG/JPG-t vagy SVG-s HTML-t, Keep Alive CSV/HTML/PNG-t és a visszagörgethető előzményeket is tartalmazó terminálszöveget kínál.",
   "f_cli_t": "A parancssor készen áll",
-  "f_cli_d": "Telepítse, nyisson meg egy új terminált, és futtassa a <code>killerscan /scan 192.168.50.0/24</code> parancsot. A teljes szkenner fej nélkül fut gyors és csendes módokkal, CSV- vagy HTML-exporttal, Ctrl+C törléssel, valamint megbízható kilépési kódokkal a szkriptekhez, ütemezett feladatokhoz és RMM-eszközökhöz. <a href=\"technical.html#command-line\">Tekintse meg az összes parancsot.</a>",
+  "f_cli_d": "Telepítse, nyisson meg egy új terminált, és futtassa a <code>killerscan /scan 192.168.50.0/24</code> parancsot. A teljes szkenner fej nélkül fut gyors és csendes módokkal, CSV- vagy HTML-exporttal, Ctrl+C törléssel, valamint megbízható kilépési kódokkal a szkriptekhez, ütemezett feladatokhoz és RMM-eszközökhöz. <a href=\"help.html#command-line\">Tekintse meg az összes parancsot.</a>",
   "f_themes_t": "Témák és beállítások",
   "f_themes_d": "Tizenhárom téma, mindegyik kapcsolható élőben, egyenként nyolc kiemelő színnel a sötét, világos, fekete és 98SE színekhez - összesen 41 kinézet - plusz témánkénti eszköztípusú színezés. A KillerScan megjegyzi a témát, az akcentust, a nyelvet és az alkalmazás méretét a futtatások között.",
   "f_install_t": "Telepítse vagy futtassa a hordozható eszközt",
@@ -2354,7 +2354,7 @@ var I18N = {
   "f_export_t": "Eksport",
   "f_export_d": "Eksport oferuje CSV urządzeń lub interaktywny HTML, CSV usług, topologię PNG/JPG lub HTML z SVG, Keep Alive CSV/HTML/PNG oraz tekst terminala wraz z historią przewijania.",
   "f_cli_t": "Gotowy na wiersz poleceń",
-  "f_cli_d": "Zainstaluj go, otwórz nowy terminal i uruchom <code>killerscan /scan 192.168.50.0/24</code>. Pełny skaner działa bez okna, z trybem szybkim i cichym, eksportem do CSV lub HTML, anulowaniem przez Ctrl+C i niezawodnymi kodami wyjścia dla skryptów, zaplanowanych zadań i narzędzi RMM. <a href=\"technical.html#command-line\">Zobacz wszystkie polecenia.</a>",
+  "f_cli_d": "Zainstaluj go, otwórz nowy terminal i uruchom <code>killerscan /scan 192.168.50.0/24</code>. Pełny skaner działa bez okna, z trybem szybkim i cichym, eksportem do CSV lub HTML, anulowaniem przez Ctrl+C i niezawodnymi kodami wyjścia dla skryptów, zaplanowanych zadań i narzędzi RMM. <a href=\"help.html#command-line\">Zobacz wszystkie polecenia.</a>",
   "f_themes_t": "Motywy i ustawienia",
   "f_themes_d": "Trzynaście motywów przełączanych na żywo, po osiem kolorów akcentu dla motywów Dark, Light, Black i 98SE (łącznie 41 wyglądów) oraz kolorowanie typów urządzeń zależne od motywu. KillerScan pamięta Twój motyw, akcent, język i rozmiar aplikacji między uruchomieniami.",
   "f_install_t": "Instalacja lub tryb przenośny",
@@ -3027,7 +3027,7 @@ var I18N = {
   "f_export_t": "Export",
   "f_export_d": "Export nabízí CSV zařízení nebo interaktivní HTML, CSV služeb, topologii PNG/JPG nebo HTML s SVG, Keep Alive CSV/HTML/PNG a text terminálu včetně historie posouvání.",
   "f_cli_t": "Připraven na příkazový řádek",
-  "f_cli_d": "Nainstalujte jej, otevřete nový terminál a spusťte <code>killerscan /scan 192.168.50.0/24</code>. Plný skener běží bez okna, s rychlým a tichým režimem, exportem do CSV nebo HTML, rušením přes Ctrl+C a spolehlivými návratovými kódy pro skripty, naplánované úlohy a nástroje RMM. <a href=\"technical.html#command-line\">Podívejte se na všechny příkazy.</a>",
+  "f_cli_d": "Nainstalujte jej, otevřete nový terminál a spusťte <code>killerscan /scan 192.168.50.0/24</code>. Plný skener běží bez okna, s rychlým a tichým režimem, exportem do CSV nebo HTML, rušením přes Ctrl+C a spolehlivými návratovými kódy pro skripty, naplánované úlohy a nástroje RMM. <a href=\"help.html#command-line\">Podívejte se na všechny příkazy.</a>",
   "f_themes_t": "Motivy a nastavení",
   "f_themes_d": "Třináct motivů přepínatelných za běhu, po osmi akcentových barvách pro Dark, Light, Black a 98SE (celkem 41 vzhledů) a obarvení typů zařízení podle motivu. KillerScan si mezi spuštěními pamatuje motiv, akcent, jazyk a velikost aplikace.",
   "f_install_t": "Instalace nebo přenosný běh",
@@ -3700,7 +3700,7 @@ var I18N = {
   "f_export_t": "Exportar",
   "f_export_d": "Exportar ofrece CSV de dispositivos o HTML interactivo, CSV de servicios, topología PNG/JPG o HTML con SVG, Keep Alive CSV/HTML/PNG y texto del terminal con su historial.",
   "f_cli_t": "Listo para la línea de comandos",
-  "f_cli_d": "Instálalo, abre un terminal nuevo y ejecuta <code>killerscan /scan 192.168.50.0/24</code>. El escáner completo funciona sin ventana, con modos rápido y silencioso, exportación a CSV o HTML, cancelación con Ctrl+C y códigos de salida fiables para scripts, tareas programadas y herramientas RMM. <a href=\"technical.html#command-line\">Consulta todos los comandos.</a>",
+  "f_cli_d": "Instálalo, abre un terminal nuevo y ejecuta <code>killerscan /scan 192.168.50.0/24</code>. El escáner completo funciona sin ventana, con modos rápido y silencioso, exportación a CSV o HTML, cancelación con Ctrl+C y códigos de salida fiables para scripts, tareas programadas y herramientas RMM. <a href=\"help.html#command-line\">Consulta todos los comandos.</a>",
   "f_themes_t": "Temas &amp; ajustes",
   "f_themes_d": "Trece temas, todos cambiables en vivo, con ocho colores de acento para cada uno de Dark, Light, Black y 98SE (41 aspectos en total) y coloración de dispositivos por tema. KillerScan recuerda el tema, el acento, el idioma y el tamaño de la aplicación.",
   "f_install_t": "Instalar o ejecutar portable",
@@ -4373,7 +4373,7 @@ var I18N = {
   "f_export_t": "Exportieren",
   "f_export_d": "Export bietet Geräte-CSV oder interaktives HTML, Dienst-CSV, Topologie als PNG/JPG oder HTML mit SVG, Keep Alive als CSV/HTML/PNG und Terminaltext einschließlich Scrollverlauf.",
   "f_cli_t": "Bereit für die Befehlszeile",
-  "f_cli_d": "Installiere es, öffne ein neues Terminal und führe <code>killerscan /scan 192.168.50.0/24</code> aus. Der volle Scanner läuft ohne Fenster, mit schnellem und stillem Modus, CSV- oder HTML-Export, Abbruch per Strg+C und verlässlichen Exit-Codes für Skripte, geplante Aufgaben und RMM-Tools. <a href=\"technical.html#command-line\">Alle Befehle ansehen.</a>",
+  "f_cli_d": "Installiere es, öffne ein neues Terminal und führe <code>killerscan /scan 192.168.50.0/24</code> aus. Der volle Scanner läuft ohne Fenster, mit schnellem und stillem Modus, CSV- oder HTML-Export, Abbruch per Strg+C und verlässlichen Exit-Codes für Skripte, geplante Aufgaben und RMM-Tools. <a href=\"help.html#command-line\">Alle Befehle ansehen.</a>",
   "f_themes_t": "Themes &amp; Einstellungen",
   "f_themes_d": "Dreizehn live umschaltbare Themes, je acht Akzentfarben für Dark, Light, Black und 98SE (41 Looks insgesamt) sowie gerätetypbezogene Farben. KillerScan merkt sich Theme, Akzent, Sprache und App-Größe.",
   "f_install_t": "Installieren oder portabel ausführen",
@@ -5046,7 +5046,7 @@ var I18N = {
   "f_export_t": "Exporter",
   "f_export_d": "Exportez les appareils en CSV ou HTML interactif, les services en CSV, la topologie en PNG/JPG ou HTML avec SVG, Keep Alive en CSV/HTML/PNG et le texte du terminal avec son historique de défilement.",
   "f_cli_t": "Prêt pour la ligne de commande",
-  "f_cli_d": "Installez-le, ouvrez un nouveau terminal et lancez <code>killerscan /scan 192.168.50.0/24</code>. Le scanner complet fonctionne sans fenêtre, avec des modes rapide et silencieux, l'export en CSV ou HTML, l'annulation par Ctrl+C et des codes de sortie fiables pour les scripts, les tâches planifiées et les outils RMM. <a href=\"technical.html#command-line\">Voir toutes les commandes.</a>",
+  "f_cli_d": "Installez-le, ouvrez un nouveau terminal et lancez <code>killerscan /scan 192.168.50.0/24</code>. Le scanner complet fonctionne sans fenêtre, avec des modes rapide et silencieux, l'export en CSV ou HTML, l'annulation par Ctrl+C et des codes de sortie fiables pour les scripts, les tâches planifiées et les outils RMM. <a href=\"help.html#command-line\">Voir toutes les commandes.</a>",
   "f_themes_t": "Thèmes &amp; réglages",
   "f_themes_d": "Treize thèmes commutables en direct, huit couleurs d'accent pour chacun de Dark, Light, Black et 98SE (41 apparences en tout) et une coloration des appareils par thème. KillerScan mémorise le thème, l'accent, la langue et la taille de l'application.",
   "f_install_t": "Installer ou exécuter en portable",
@@ -5719,7 +5719,7 @@ var I18N = {
   "f_export_t": "Dışa aktar",
   "f_export_d": "Dışa Aktar ile cihaz CSV'si veya etkileşimli HTML, hizmet CSV'si, topoloji PNG/JPG'si veya SVG içeren HTML, Keep Alive CSV/HTML/PNG'si ve kaydırma geçmişi dahil terminal metni alın.",
   "f_cli_t": "Komut satırına hazır",
-  "f_cli_d": "Kurun, yeni bir terminal açın ve <code>killerscan /scan 192.168.50.0/24</code> komutunu çalıştırın. Tam tarayıcı penceresiz çalışır; hızlı ve sessiz modlar, CSV veya HTML dışa aktarma, Ctrl+C ile iptal ve betikler, zamanlanmış görevler ile RMM araçları için güvenilir çıkış kodları sunar. <a href=\"technical.html#command-line\">Tüm komutları görün.</a>",
+  "f_cli_d": "Kurun, yeni bir terminal açın ve <code>killerscan /scan 192.168.50.0/24</code> komutunu çalıştırın. Tam tarayıcı penceresiz çalışır; hızlı ve sessiz modlar, CSV veya HTML dışa aktarma, Ctrl+C ile iptal ve betikler, zamanlanmış görevler ile RMM araçları için güvenilir çıkış kodları sunar. <a href=\"help.html#command-line\">Tüm komutları görün.</a>",
   "f_themes_t": "Temalar &amp; ayarlar",
   "f_themes_d": "Canlı değiştirilebilen on üç tema, Dark, Light, Black ve 98SE için sekizer vurgu rengi (toplam 41 görünüm) ve tema başına cihaz renklendirmesi. KillerScan tema, vurgu, dil ve uygulama boyutunu hatırlar.",
   "f_install_t": "Kur veya taşınabilir çalıştır",
@@ -6392,7 +6392,7 @@ var I18N = {
   "f_export_t": "匯出",
   "f_export_d": "使用匯出功能取得裝置 CSV 或互動式 HTML、服務 CSV、拓撲 PNG/JPG 或含 SVG 的 HTML、Keep Alive CSV/HTML/PNG，以及包含回捲歷史的終端機文字。",
   "f_cli_t": "命令列就緒",
-  "f_cli_d": "安裝後開啟新的終端機，執行 <code>killerscan /scan 192.168.50.0/24</code>。完整的掃描器可無視窗執行，提供快速與安靜模式、CSV 或 HTML 匯出、Ctrl+C 取消，以及供指令碼、排程工作與 RMM 工具使用的可靠結束代碼。<a href=\"technical.html#command-line\">查看所有命令。</a>",
+  "f_cli_d": "安裝後開啟新的終端機，執行 <code>killerscan /scan 192.168.50.0/24</code>。完整的掃描器可無視窗執行，提供快速與安靜模式、CSV 或 HTML 匯出、Ctrl+C 取消，以及供指令碼、排程工作與 RMM 工具使用的可靠結束代碼。<a href=\"help.html#command-line\">查看所有命令。</a>",
   "f_themes_t": "主題與設定",
   "f_themes_d": "十三種可即時切換的主題，Dark、Light、Black 與 98SE 各提供八種強調色（共 41 種外觀），並有各主題的裝置類型著色。KillerScan 會記住主題、強調色、語言與應用程式大小。",
   "f_install_t": "安裝或以可攜方式執行",
@@ -7065,7 +7065,7 @@ var I18N = {
   "f_export_t": "导出",
   "f_export_d": "使用导出功能获取设备 CSV 或交互式 HTML、服务 CSV、拓扑 PNG/JPG 或含 SVG 的 HTML、Keep Alive CSV/HTML/PNG，以及包含回滚历史的终端文本。",
   "f_cli_t": "命令行就绪",
-  "f_cli_d": "安装后打开新的终端，运行 <code>killerscan /scan 192.168.50.0/24</code>。完整的扫描器可无窗口运行，提供快速与安静模式、CSV 或 HTML 导出、Ctrl+C 取消，以及供脚本、计划任务与 RMM 工具使用的可靠退出代码。<a href=\"technical.html#command-line\">查看所有命令。</a>",
+  "f_cli_d": "安装后打开新的终端，运行 <code>killerscan /scan 192.168.50.0/24</code>。完整的扫描器可无窗口运行，提供快速与安静模式、CSV 或 HTML 导出、Ctrl+C 取消，以及供脚本、计划任务与 RMM 工具使用的可靠退出代码。<a href=\"help.html#command-line\">查看所有命令。</a>",
   "f_themes_t": "主题与设置",
   "f_themes_d": "十三种可即时切换的主题，Dark、Light、Black 与 98SE 各提供八种强调色（共 41 种外观），并有各主题的设备类型着色。KillerScan 会记住主题、强调色、语言和应用程序大小。",
   "f_install_t": "安装或以便携方式运行",
@@ -7738,7 +7738,7 @@ var I18N = {
   "f_export_t": "এক্সপোর্ট",
   "f_export_d": "এক্সপোর্ট থেকে ডিভাইসের CSV বা ইন্টার‌্যাক্টিভ HTML, সেবার CSV, টপোলজির PNG/JPG বা SVG-সহ HTML, Keep Alive-এর CSV/HTML/PNG এবং স্ক্রলব্যাকসহ টার্মিনালের লেখা সংরক্ষণ করুন।",
   "f_cli_t": "কমান্ড লাইনের জন্য প্রস্তুত",
-  "f_cli_d": "ইনস্টল করুন, একটি নতুন টার্মিনাল খুলুন এবং <code>killerscan /scan 192.168.50.0/24</code> চালান। পূর্ণ স্ক্যানারটি হেডলেস চলে - দ্রুত ও নীরব মোড, CSV বা HTML রপ্তানি, Ctrl+C দিয়ে বাতিল, এবং স্ক্রিপ্ট, শিডিউল করা টাস্ক ও RMM টুলের জন্য নির্ভরযোগ্য এক্সিট কোড সহ। <a href=\"technical.html#command-line\">সব কমান্ড দেখুন।</a>",
+  "f_cli_d": "ইনস্টল করুন, একটি নতুন টার্মিনাল খুলুন এবং <code>killerscan /scan 192.168.50.0/24</code> চালান। পূর্ণ স্ক্যানারটি হেডলেস চলে - দ্রুত ও নীরব মোড, CSV বা HTML রপ্তানি, Ctrl+C দিয়ে বাতিল, এবং স্ক্রিপ্ট, শিডিউল করা টাস্ক ও RMM টুলের জন্য নির্ভরযোগ্য এক্সিট কোড সহ। <a href=\"help.html#command-line\">সব কমান্ড দেখুন।</a>",
   "f_themes_t": "থিম ও সেটিংস",
   "f_themes_d": "লাইভ পরিবর্তনযোগ্য তেরোটি থিম, Dark, Light, Black ও 98SE-এর জন্য আটটি অ্যাকসেন্ট রঙ এবং প্রতি-থিম ডিভাইস রঙায়ন। KillerScan থিম, অ্যাকসেন্ট, ভাষা ও অ্যাপের আকার মনে রাখে।",
   "f_install_t": "ইনস্টল করুন বা পোর্টেবল চালান",
@@ -8411,7 +8411,7 @@ var I18N = {
   "f_export_t": "エクスポート",
   "f_export_d": "エクスポートでデバイスの CSV または対話型 HTML、サービスの CSV、トポロジーの PNG/JPG または SVG 付き HTML、Keep Alive の CSV/HTML/PNG、スクロール履歴を含むターミナルテキストを保存できます。",
   "f_cli_t": "コマンドラインにも対応",
-  "f_cli_d": "インストールして新しいターミナルを開き、<code>killerscan /scan 192.168.50.0/24</code> を実行します。フルのスキャナーがヘッドレスで動作し、クイックモードとクワイエットモード、CSV または HTML へのエクスポート、Ctrl+C による中断、そしてスクリプト、スケジュールされたタスク、RMM ツール向けの信頼できる終了コードを備えています。<a href=\"technical.html#command-line\">すべてのコマンドを見る。</a>",
+  "f_cli_d": "インストールして新しいターミナルを開き、<code>killerscan /scan 192.168.50.0/24</code> を実行します。フルのスキャナーがヘッドレスで動作し、クイックモードとクワイエットモード、CSV または HTML へのエクスポート、Ctrl+C による中断、そしてスクリプト、スケジュールされたタスク、RMM ツール向けの信頼できる終了コードを備えています。<a href=\"help.html#command-line\">すべてのコマンドを見る。</a>",
   "f_themes_t": "テーマと設定",
   "f_themes_d": "ライブで切り替えられる 13 テーマ、Dark・Light・Black・98SE 用にそれぞれ 8 アクセントカラー（合計 41 通り）、テーマ別のデバイス色分け。KillerScan はテーマ、アクセント、言語、アプリサイズを記憶します。",
   "f_install_t": "インストールまたはポータブル実行",
@@ -8945,7 +8945,7 @@ var I18N = {
   "f_actions_t": "Жылдам әрекеттер",
   "f_classify_d": "Салмақталған есептегіш хост атауын, өндірушіні, ашық порттарды, баннерлерді, mDNS және SSDP деректерін біріктіріп, ең ықтимал түрді анықтайды:<br>Маршрутизатор, коммутатор/AP, NAS, принтер, камера, гипервизор, телефон, IoT және басқалары.",
   "f_classify_t": "Құрылғыларды жіктеу",
-  "f_cli_d": "Бірнеше желіні сканерлеңіз, бір хостты терең зондтаңыз, белсенді желіні қараңыз немесе MAC өндірушісін офлайн анықтаңыз. Нәтижелерді сүзіп, сұрыптаңыз, порттар мен құрылғы түрлерін таңдаңыз, шектеулер мен күту уақыттарын орнатыңыз, барысын көрсетіңіз және сенімді автоматтандыру шығу кодтарымен кесте, CSV, JSON немесе тақырыппен безендірілген HTML шығысын алыңыз. <a href=\"technical.html#command-line\">Барлық пәрменді қараңыз.</a>",
+  "f_cli_d": "Бірнеше желіні сканерлеңіз, бір хостты терең зондтаңыз, белсенді желіні қараңыз немесе MAC өндірушісін офлайн анықтаңыз. Нәтижелерді сүзіп, сұрыптаңыз, порттар мен құрылғы түрлерін таңдаңыз, шектеулер мен күту уақыттарын орнатыңыз, барысын көрсетіңіз және сенімді автоматтандыру шығу кодтарымен кесте, CSV, JSON немесе тақырыппен безендірілген HTML шығысын алыңыз. <a href=\"help.html#command-line\">Барлық пәрменді қараңыз.</a>",
   "f_cli_t": "Пәрмен жолына дайын",
   "f_discover_d": "KillerScan ARP кэшін оқиды, қосалқы TCP тексеруі бар қатар ICMP сұрауларын орындайды, содан кейін ping-ті бұғаттап, ARP-ге жауап беретін құрылғыларды табу үшін ARP-ді қайта оқиды. Брандмауэрлер, ұйқыдағы құрылғылар және желіні оқшаулау анықтауға кедергі келтіруі мүмкін.",
   "f_discover_t": "Хосттарды табу",
@@ -9618,7 +9618,7 @@ var I18N = {
   "f_actions_t": "Hành động nhanh",
   "f_classify_d": "Một bộ điểm có trọng số kết hợp hostname, nhà cung cấp, cổng mở, banner, mDNS và SSDP thành một loại ước lượng tốt nhất:<br>Router, switch/AP, NAS, máy in, camera, hypervisor, điện thoại, IoT và nhiều loại khác.",
   "f_classify_t": "Phân loại thiết bị",
-  "f_cli_d": "Quét nhiều mạng, thăm dò sâu một máy chủ, kiểm tra mạng đang hoạt động, hoặc giải quyết nhà cung cấp MAC ngoại tuyến. Lọc và sắp xếp kết quả, chọn cổng và loại thiết bị, đặt giới hạn và thời gian chờ, hiển thị tiến trình, và xuất bảng, CSV, JSON hoặc HTML theo chủ đề với các mã thoát tự động đáng tin cậy. <a href=\"technical.html#command-line\">Xem tất cả lệnh.</a>",
+  "f_cli_d": "Quét nhiều mạng, thăm dò sâu một máy chủ, kiểm tra mạng đang hoạt động, hoặc giải quyết nhà cung cấp MAC ngoại tuyến. Lọc và sắp xếp kết quả, chọn cổng và loại thiết bị, đặt giới hạn và thời gian chờ, hiển thị tiến trình, và xuất bảng, CSV, JSON hoặc HTML theo chủ đề với các mã thoát tự động đáng tin cậy. <a href=\"help.html#command-line\">Xem tất cả lệnh.</a>",
   "f_cli_t": "Dòng lệnh đã sẵn sàng",
   "f_discover_d": "KillerScan đọc bộ nhớ cache ARP, chạy các truy vấn ICMP song song với phương án dự phòng TCP, và đọc ARP một lần nữa để tìm các thiết bị chặn ping nhưng trả lời ARP. Tường lửa, các thiết bị đang ở chế độ ngủ và việc cô lập mạng có thể ngăn cản việc phát hiện.",
   "f_discover_t": "Khám phá các chủ nhà",
@@ -10305,7 +10305,7 @@ I18N.uk = {
  "f_actions_t": "Швидкі дії",
  "f_classify_d": "Зважена система балів поєднує ім'я вузла, виробника, відкриті порти, банери, mDNS і SSDP у найімовірніший тип:<br>маршрутизатор, комутатор/точка доступу, NAS, принтер, камера, гіпервізор, телефон, IoT та інші.",
  "f_classify_t": "Класифікація пристроїв",
- "f_cli_d": "Скануйте кілька мереж, глибоко зондуйте один вузол, вивчайте активну мережу або визначайте виробника за MAC офлайн. Фільтруйте та сортуйте результати, вибирайте порти й типи пристроїв, задавайте ліміти й тайм-аути, показуйте прогрес і виводьте таблицю, CSV, JSON або HTML з темами - з надійними кодами завершення для автоматизації. <a href=\"technical.html#command-line\">Повний список команд.</a>",
+ "f_cli_d": "Скануйте кілька мереж, глибоко зондуйте один вузол, вивчайте активну мережу або визначайте виробника за MAC офлайн. Фільтруйте та сортуйте результати, вибирайте порти й типи пристроїв, задавайте ліміти й тайм-аути, показуйте прогрес і виводьте таблицю, CSV, JSON або HTML з темами - з надійними кодами завершення для автоматизації. <a href=\"help.html#command-line\">Повний список команд.</a>",
  "f_cli_t": "Готовий до командного рядка",
  "f_discover_d": "KillerScan читає ARP-кеш, виконує паралельні ICMP-запити з резервною перевіркою TCP і знову читає ARP, знаходячи пристрої, що блокують ping, але відповідають за ARP. Брандмауери, сплячі пристрої та ізоляція мережі можуть заважати виявленню.",
  "f_discover_t": "Виявлення вузлів",
@@ -11031,7 +11031,7 @@ I18N.nb = {
  "f_actions_t": "Hurtighandlinger",
  "f_classify_d": "En vektet poengsetter kombinerer vertsnavn, produsent, åpne porter, bannere, mDNS og SSDP til en beste gjetning på type:<br>Ruter, svitsj/AP, NAS, skriver, kamera, hypervisor, telefon, IoT og mer.",
  "f_classify_t": "Enhetsklassifisering",
- "f_cli_d": "Skann flere nettverk, dypprobe én vert, undersøk det aktive nettverket, eller slå opp en MAC-produsent frakoblet. Filtrer og sorter resultatene, velg porter og enhetstyper, sett grenser og tidsavbrudd, vis fremdrift, og skriv ut tabell-, CSV-, JSON- eller temabasert HTML-utdata med pålitelige avslutningskoder for automatisering. <a href=\"technical.html#command-line\">Se alle kommandoene.</a>",
+ "f_cli_d": "Skann flere nettverk, dypprobe én vert, undersøk det aktive nettverket, eller slå opp en MAC-produsent frakoblet. Filtrer og sorter resultatene, velg porter og enhetstyper, sett grenser og tidsavbrudd, vis fremdrift, og skriv ut tabell-, CSV-, JSON- eller temabasert HTML-utdata med pålitelige avslutningskoder for automatisering. <a href=\"help.html#command-line\">Se alle kommandoene.</a>",
  "f_cli_t": "Klar for kommandolinjen",
  "f_discover_d": "KillerScan leser ARP-bufferen, kjører parallelle ICMP-prober med en TCP-reserve, og leser ARP på nytt for å finne enheter som blokkerer ping, men svarer på ARP. Brannmurer, enheter i dvale og nettverksisolasjon kan hindre oppdagelse.",
  "f_discover_t": "Finn verter",
@@ -11757,7 +11757,7 @@ I18N.pt = {
  "f_actions_t": "Ações rápidas",
  "f_classify_d": "Um pontuador ponderado combina hostname, fabricante, portas abertas, banners, mDNS e SSDP em um palpite de tipo:<br>roteador, switch/AP, NAS, impressora, câmera, hypervisor, celular, IoT e mais.",
  "f_classify_t": "Classificação de dispositivos",
- "f_cli_d": "Escaneie várias redes, sonde um host a fundo, inspecione a rede ativa ou resolva um fabricante de MAC offline. Filtre e ordene os resultados, selecione portas e tipos de dispositivo, defina limites e tempos limite, mostre o progresso e emita saída em tabela, CSV, JSON ou HTML com tema, com códigos de saída confiáveis para automação. <a href=\"technical.html#command-line\">Veja todos os comandos.</a>",
+ "f_cli_d": "Escaneie várias redes, sonde um host a fundo, inspecione a rede ativa ou resolva um fabricante de MAC offline. Filtre e ordene os resultados, selecione portas e tipos de dispositivo, defina limites e tempos limite, mostre o progresso e emita saída em tabela, CSV, JSON ou HTML com tema, com códigos de saída confiáveis para automação. <a href=\"help.html#command-line\">Veja todos os comandos.</a>",
  "f_cli_t": "Pronto para a linha de comando",
  "f_discover_d": "O KillerScan lê o cache ARP, executa sondas ICMP paralelas com um recurso alternativo por TCP e lê o ARP de novo para achar dispositivos que bloqueiam o ping, mas respondem ao ARP. Firewalls, dispositivos em repouso e isolamento de rede podem impedir a descoberta.",
  "f_discover_t": "Descobrir hosts",
@@ -12290,4 +12290,96 @@ I18N.pt = {
 if (I18N["uk"]) Object.assign(I18N["uk"], {
  "ui_accent_yellow": "Жовтий",
  "ui_accent_magenta": "Пурпуровий"
+});
+
+// Current release site facts.
+Object.assign(I18N["ru"], {
+  "tk_4": "Требуется .NET Framework 4.8 (x64). Остальные зависимости приложения включены в один исполняемый файл.",
+  "tk_20_p2": "Запускайте .exe напрямую или используйте кнопку установки. По умолчанию установка выполняется для текущего пользователя; установка для всех требует прав администратора. Нужен .NET Framework 4.8. Отдельные диалоги установки и удаления используют черно-оранжевые цвета KillerScan.",
+  "f_themes_d": "Тринадцать тем, все переключаются на лету, с восемью акцентными цветами для каждой из тем Темная, Светлая, Черная и 98SE - всего 41 вариант оформления - плюс раскраска типов устройств для каждой темы. KillerScan запоминает тему, акцент, язык и размер приложения между запусками. В меню тем можно включить или выключить зернистость плёнки."
+});
+Object.assign(I18N["it"], {
+  "tk_4": "Richiede .NET Framework 4.8 (x64). Le altre dipendenze dell'app sono incluse in un unico eseguibile.",
+  "tk_20_p2": "Avvia direttamente il .exe o usa il pulsante Installa. L'installazione per utente è predefinita; quella per tutti gli utenti richiede l'autorizzazione dell'amministratore. È necessario .NET Framework 4.8. Le finestre autonome di installazione e disinstallazione usano i colori nero/arancione di KillerScan.",
+  "f_themes_d": "Tredici temi, tutti attivabili al volo, con otto colori d'accento ciascuno per Scuro, Chiaro, Nero e 98SE - 41 aspetti in tutto - più la colorazione dei tipi di dispositivo per tema. KillerScan ricorda tema, accento, lingua e dimensione dell'app tra un avvio e l'altro. Il menu dei temi permette di attivare o disattivare la grana della pellicola."
+});
+Object.assign(I18N["hu"], {
+  "tk_4": ".NET Framework 4.8 (x64) szükséges. Az alkalmazás többi függősége egyetlen futtatható fájlban van.",
+  "tk_20_p2": "Futtasd közvetlenül az .exe-t vagy használd a Telepítés gombot. Alapértelmezés a felhasználónkénti telepítés; az összes felhasználóhoz rendszergazdai engedély kell. .NET Framework 4.8 szükséges. A különálló telepítési és eltávolítási ablakok a KillerScan fekete/narancssárga színeit használják.",
+  "f_themes_d": "Tizenhárom téma, mindegyik kapcsolható élőben, egyenként nyolc kiemelő színnel a sötét, világos, fekete és 98SE színekhez - összesen 41 kinézet - plusz témánkénti eszköztípusú színezés. A KillerScan megjegyzi a témát, az akcentust, a nyelvet és az alkalmazás méretét a futtatások között. A témamenüben be- és kikapcsolható a filmszemcsézettség."
+});
+Object.assign(I18N["pl"], {
+  "tk_4": "Wymaga .NET Framework 4.8 (x64). Pozostałe zależności aplikacji są zawarte w jednym pliku wykonywalnym.",
+  "tk_20_p2": "Uruchom .exe bezpośrednio lub użyj przycisku Instaluj. Domyślna instalacja dotyczy bieżącego użytkownika; instalacja dla wszystkich wymaga zgody administratora. Wymagany jest .NET Framework 4.8. Samodzielne okna instalacji i odinstalowania mają czarno-pomarańczowe kolory KillerScan.",
+  "f_themes_d": "Trzynaście motywów przełączanych na żywo, po osiem kolorów akcentu dla motywów Dark, Light, Black i 98SE (łącznie 41 wyglądów) oraz kolorowanie typów urządzeń zależne od motywu. KillerScan pamięta Twój motyw, akcent, język i rozmiar aplikacji między uruchomieniami. Menu motywów pozwala włączyć lub wyłączyć ziarno filmowe."
+});
+Object.assign(I18N["cs"], {
+  "tk_4": "Vyžaduje .NET Framework 4.8 (x64). Ostatní závislosti aplikace jsou zabalené v jednom spustitelném souboru.",
+  "tk_20_p2": "Spusťte .exe přímo nebo použijte tlačítko Instalovat. Výchozí je instalace pro aktuálního uživatele; instalace pro všechny vyžaduje souhlas správce. Je nutný .NET Framework 4.8. Samostatné dialogy instalace a odinstalace používají černé/oranžové barvy KillerScanu.",
+  "f_themes_d": "Třináct motivů přepínatelných za běhu, po osmi akcentových barvách pro Dark, Light, Black a 98SE (celkem 41 vzhledů) a obarvení typů zařízení podle motivu. KillerScan si mezi spuštěními pamatuje motiv, akcent, jazyk a velikost aplikace. Nabídka motivů umožňuje zapnout nebo vypnout filmové zrno."
+});
+Object.assign(I18N["es"], {
+  "tk_4": "Requiere .NET Framework 4.8 (x64). Las demás dependencias de la aplicación se incluyen en un único ejecutable.",
+  "tk_20_p2": "Ejecuta el .exe directamente o usa su botón Instalar. La instalación por usuario es la predeterminada; instalar para todos requiere permiso de administrador. Se necesita .NET Framework 4.8. Los diálogos independientes de instalación y desinstalación usan los colores negro/naranja de KillerScan.",
+  "f_themes_d": "Trece temas, todos cambiables en vivo, con ocho colores de acento para cada uno de Dark, Light, Black y 98SE (41 aspectos en total) y coloración de dispositivos por tema. KillerScan recuerda el tema, el acento, el idioma y el tamaño de la aplicación. El menú de temas permite activar o desactivar Grano de película."
+});
+Object.assign(I18N["de"], {
+  "tk_4": "Erfordert .NET Framework 4.8 (x64). Die übrigen Abhängigkeiten der App sind in einer ausführbaren Datei enthalten.",
+  "tk_20_p2": "Starte die .exe direkt oder nutze die Schaltfläche Installieren. Standardmäßig wird für den aktuellen Benutzer installiert; die Installation für alle Benutzer benötigt Administratorrechte. .NET Framework 4.8 ist erforderlich. Eigenständige Installations- und Deinstallationsdialoge verwenden die schwarz/orangen Farben von KillerScan.",
+  "f_themes_d": "Dreizehn live umschaltbare Themes, je acht Akzentfarben für Dark, Light, Black und 98SE (41 Looks insgesamt) sowie gerätetypbezogene Farben. KillerScan merkt sich Theme, Akzent, Sprache und App-Größe. Im Themenmenü lässt sich Filmkorn ein- oder ausschalten."
+});
+Object.assign(I18N["fr"], {
+  "tk_4": "Nécessite .NET Framework 4.8 (x64). Les autres dépendances de l'application sont regroupées dans un seul exécutable.",
+  "tk_20_p2": "Lancez directement le .exe ou utilisez son bouton Installer. L'installation par utilisateur est proposée par défaut ; l'installation pour tous nécessite des droits administrateur. .NET Framework 4.8 est requis. Les boîtes de dialogue autonomes d'installation et de désinstallation utilisent les couleurs noir/orange de KillerScan.",
+  "f_themes_d": "Treize thèmes commutables en direct, huit couleurs d'accent pour chacun de Dark, Light, Black et 98SE (41 apparences en tout) et une coloration des appareils par thème. KillerScan mémorise le thème, l'accent, la langue et la taille de l'application. Le menu des thèmes permet d'activer ou de désactiver le grain de film."
+});
+Object.assign(I18N["tr"], {
+  "tk_4": ".NET Framework 4.8 (x64) gerektirir. Uygulamanın diğer bağımlılıkları tek bir yürütülebilir dosyada paketlenir.",
+  "tk_20_p2": ".exe dosyasını doğrudan çalıştırın veya Yükle düğmesini kullanın. Varsayılan kurulum kullanıcıya özeldir; tüm kullanıcılar için kurulum yönetici izni gerektirir. .NET Framework 4.8 gereklidir. Bağımsız kurulum ve kaldırma iletişim kutuları KillerScan'in siyah/turuncu renklerini kullanır.",
+  "f_themes_d": "Canlı değiştirilebilen on üç tema, Dark, Light, Black ve 98SE için sekizer vurgu rengi (toplam 41 görünüm) ve tema başına cihaz renklendirmesi. KillerScan tema, vurgu, dil ve uygulama boyutunu hatırlar. Tema menüsünden Film Tanesi açılıp kapatılabilir."
+});
+Object.assign(I18N["zh"], {
+  "tk_4": "需要 .NET Framework 4.8 (x64)。應用程式的其他相依元件都封裝在單一執行檔中。",
+  "tk_20_p2": "直接執行 .exe 或使用安裝按鈕。預設僅為目前使用者安裝；為所有使用者安裝需要系統管理員權限。須具備 .NET Framework 4.8。獨立的安裝與解除安裝對話方塊使用 KillerScan 的黑色/橘色配色。",
+  "f_themes_d": "十三種可即時切換的主題，Dark、Light、Black 與 98SE 各提供八種強調色（共 41 種外觀），並有各主題的裝置類型著色。KillerScan 會記住主題、強調色、語言與應用程式大小。 主題選單可開啟或關閉膠片顆粒。"
+});
+Object.assign(I18N["zh-cn"], {
+  "tk_4": "需要 .NET Framework 4.8 (x64)。应用的其他依赖组件都封装在单一可执行文件中。",
+  "tk_20_p2": "直接运行 .exe 或使用安装按钮。默认仅为当前用户安装；为所有用户安装需要管理员权限。需要 .NET Framework 4.8。独立的安装与卸载对话框使用 KillerScan 的黑色/橙色配色。",
+  "f_themes_d": "十三种可即时切换的主题，Dark、Light、Black 与 98SE 各提供八种强调色（共 41 种外观），并有各主题的设备类型着色。KillerScan 会记住主题、强调色、语言和应用程序大小。 主题菜单可开启或关闭胶片颗粒。"
+});
+Object.assign(I18N["bn"], {
+  "tk_4": ".NET Framework 4.8 (x64) প্রয়োজন। অ্যাপের অন্য নির্ভরতাগুলো একটি এক্সিকিউটেবল ফাইলে প্যাক করা আছে।",
+  "tk_20_p2": ".exe সরাসরি চালান বা ইনস্টল বোতাম ব্যবহার করুন। ডিফল্টে শুধু বর্তমান ব্যবহারকারীর জন্য ইনস্টল হয়; সবার জন্য ইনস্টলে প্রশাসকের অনুমতি লাগে। .NET Framework 4.8 প্রয়োজন। আলাদা ইনস্টল ও আনইনস্টল ডায়ালগে KillerScan-এর কালো/কমলা রং ব্যবহৃত হয়।",
+  "f_themes_d": "লাইভ পরিবর্তনযোগ্য তেরোটি থিম, Dark, Light, Black ও 98SE-এর জন্য আটটি অ্যাকসেন্ট রঙ এবং প্রতি-থিম ডিভাইস রঙায়ন। KillerScan থিম, অ্যাকসেন্ট, ভাষা ও অ্যাপের আকার মনে রাখে। থিম মেনু থেকে ফিল্ম গ্রেইন চালু বা বন্ধ করা যায়।"
+});
+Object.assign(I18N["ja"], {
+  "tk_4": ".NET Framework 4.8 (x64) が必要です。その他の依存コンポーネントは1つの実行ファイルに同梱されています。",
+  "tk_20_p2": ".exe を直接実行するか、インストールボタンを使用してください。標準は現在のユーザーのみのインストールです。全ユーザーへのインストールには管理者権限が必要です。.NET Framework 4.8 が必要です。独立したインストールとアンインストールのダイアログは KillerScan の黒/オレンジ色を使います。",
+  "f_themes_d": "ライブで切り替えられる 13 テーマ、Dark・Light・Black・98SE 用にそれぞれ 8 アクセントカラー（合計 41 通り）、テーマ別のデバイス色分け。KillerScan はテーマ、アクセント、言語、アプリサイズを記憶します。 テーマメニューでフィルムグレインをオンまたはオフにできます。"
+});
+Object.assign(I18N["kk"], {
+  "tk_4": ".NET Framework 4.8 (x64) қажет. Қолданбаның басқа тәуелділіктері бір орындалатын файлға біріктірілген.",
+  "tk_20_p2": ".exe файлын тікелей іске қосыңыз немесе Орнату түймесін басыңыз. Әдепкіде тек ағымдағы пайдаланушыға орнатылады; барлық пайдаланушыға орнату үшін әкімші рұқсаты қажет. .NET Framework 4.8 керек. Бөлек орнату және жою диалогтары KillerScan-ның қара/қызғылт сары түстерін қолданады.",
+  "f_themes_d": "Он үш тақырып, барлығы қолданба жұмыс істеп тұрғанда ауысады; Dark, Light, Black және 98SE әрқайсысында сегіз акцент түсі бар - барлығы 41 көрініс - оған қоса әр тақырыпқа тән құрылғы түрлерінің түстері. KillerScan тақырыбыңызды, акцентіңізді, тіліңізді және қолданба өлшемін іске қосулар арасында есте сақтайды. Тақырыптар мәзірінде пленка түйіршігін қосуға немесе өшіруге болады."
+});
+Object.assign(I18N["vi"], {
+  "tk_4": "Cần .NET Framework 4.8 (x64). Các thành phần phụ thuộc khác được đóng gói trong một tệp thực thi.",
+  "tk_20_p2": "Chạy trực tiếp file .exe hoặc sử dụng nút Cài đặt của nó. Cài đặt cho từng người dùng là mặc định; Cài đặt cho tất cả người dùng yêu cầu quyền quản trị viên. Yêu cầu .NET Framework 4.8. Các hộp thoại cài đặt và gỡ cài đặt độc lập sử dụng màu đen/cam của KillerScan.",
+  "f_themes_d": "Mười ba chủ đề, tất cả có thể chuyển đổi trực tiếp, với tám màu nhấn cho mỗi Dark, Light, Black và 98SE - tổng cộng 41 giao diện - cùng với việc tô màu theo loại thiết bị cho từng chủ đề. KillerScan ghi nhớ chủ đề, màu nhấn, ngôn ngữ và kích thước ứng dụng của bạn giữa các lần chạy. Menu chủ đề cho phép bật hoặc tắt hạt phim."
+});
+Object.assign(I18N["uk"], {
+  "tk_4": "Потрібен .NET Framework 4.8 (x64). Інші залежності програми входять до одного виконуваного файлу.",
+  "tk_20_p2": "Запускайте .exe напряму або скористайтеся кнопкою встановлення. За замовчуванням установлення виконується для поточного користувача; установлення для всіх потребує прав адміністратора. Потрібен .NET Framework 4.8. Окремі діалоги встановлення та видалення використовують чорно-оранжеві кольори KillerScan.",
+  "f_themes_d": "Тринадцять тем, усі перемикаються на льоту, із вісьмома акцентними кольорами для кожної з тем Темна, Світла, Чорна та 98SE - разом 41 варіант оформлення - плюс розфарбування типів пристроїв для кожної теми. KillerScan запам'ятовує тему, акцент, мову та розмір застосунку між запусками. У меню тем можна ввімкнути або вимкнути зернистість плівки."
+});
+Object.assign(I18N["nb"], {
+  "tk_4": "Krever .NET Framework 4.8 (x64). Appens øvrige avhengigheter er pakket i én kjørbar fil.",
+  "tk_20_p2": "Kjør .exe-filen direkte eller bruk Installer-knappen. Installasjon per bruker er standard; Installer for alle brukere krever administratortillatelse. .NET Framework 4.8 kreves. Frittstående installasjons- og avinstalleringsdialoger bruker KillerScans svarte/oransje farger.",
+  "f_themes_d": "Tretten temaer, alle kan byttes live, med åtte aksentfarger hver for Mørk, Lys, Svart og 98SE - 41 uttrykk til sammen - pluss enhetstypefarger per tema. KillerScan husker tema, aksent, språk og appstørrelse mellom kjøringene. Temamenyen kan slå filmkorn av eller på."
+});
+Object.assign(I18N["pt"], {
+  "tk_4": "Requer .NET Framework 4.8 (x64). As outras dependências do aplicativo estão incluídas em um único executável.",
+  "tk_20_p2": "Execute o .exe diretamente ou use o botão Instalar. A instalação por usuário é o padrão; Instalar para todos os usuários exige permissão de administrador. O .NET Framework 4.8 é necessário. As caixas de diálogo independentes de instalação e desinstalação usam as cores preto/laranja do KillerScan.",
+  "f_themes_d": "Treze temas, todos alternáveis ao vivo, com oito cores de destaque cada para Escuro, Claro, Preto e 98SE - 41 aparências no total - mais coloração de tipos de dispositivo por tema. O KillerScan lembra seu tema, destaque, idioma e tamanho do aplicativo entre execuções. O menu de temas permite ativar ou desativar o grão de filme."
 });

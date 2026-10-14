@@ -160,7 +160,7 @@
 
 <div class="tech-sec" id="stack">
 <h2 data-i18n="tk_3">Tech stack</h2>
-<p data-i18n="tk_4">KillerScan is a native Windows app. There is no Electron, no browser engine, no runtime to install, and no separate scanner program running behind the scenes.</p>
+<p data-i18n="tk_4">Requires .NET Framework 4.8 (x64). The app's other dependencies are packaged in one executable.</p>
 <p data-i18n="tk_4_p2">Everything listed below ships inside a single .exe that runs on its own:</p>
 <table class="spec-table"><tr><th data-i18n="tk_5">Component</th><th data-i18n="tk_6">Detail</th></tr>
 <tr><td data-i18n="tk_7">UI</td><td data-i18n="tk_8">WPF on .NET Framework 4.8 (net48), x64, custom window chrome</td></tr>
@@ -175,7 +175,7 @@
 <div class="tech-sec" id="install">
 <h2 data-i18n="tk_19">Install &amp; data</h2>
 <p data-i18n="tk_20">KillerScan is a single .exe. Put it anywhere and run it as is, or use the built-in installer.</p>
-<p data-i18n="tk_20_p2">By default it installs just for you: the app is copied into your user folder, with a Start Menu shortcut and a normal Windows uninstall entry registered for your account alone, needing no admin rights, no .NET runtime, and nothing else installed. Tick <b>Install for all users</b> in that prompt and it goes to Program Files for every account on the PC instead, which is the one case where Windows asks for permission.</p>
+<p data-i18n="tk_20_p2">Run the .exe directly or use its Install button. Per-user installation is the default; Install for all users requires administrator permission. .NET Framework 4.8 is required. Standalone install and uninstall dialogs use KillerScan's black/orange colors.</p>
 <p data-i18n="tk_20_p3">Installation also adds KillerScan to PATH, so a newly opened terminal can run <code>killerscan</code> from any folder. When you run it from outside its installed location, a <b>PORTABLE</b> badge and an <b>Install KillerScan...</b> button appear in the status bar.</p>
 </div>
 
@@ -492,7 +492,7 @@
 </footer>
 <div class="egg-toast" id="eggToast"></div>
 <div class="dlightbox" id="diagram-lightbox" hidden><div class="dlb-inner"></div></div>
-<script src="ks-i18n.js?v=20"></script>
+<script src="ks-i18n.js?v=21"></script>
 <script src="ks.js?v=20260926-theme-sync"></script>
 <script>
 // COLLAPSIBLE OUTLINE. The page has eleven sections and thirteen subsections, and listing
