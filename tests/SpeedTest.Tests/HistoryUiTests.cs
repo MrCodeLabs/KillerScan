@@ -394,7 +394,7 @@ internal static partial class HistoryUiTests
         foreach (string name in Enum.GetNames(assembly.GetType("KillerScan.Services.Theme", true)!))
         {
             theme(name); Call(window, "ApplyFlatChrome"); Draw();
-            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("WordmarkFont")) &&
+            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("BrandSansFont")) &&
                 group.HorizontalAlignment == HorizontalAlignment.Center && icon.Text == "\uE728" &&
                 Equals(button.Content, icon.Text) && icon.FontFamily.Source == "Segoe MDL2 Assets" && icon.FontSize == 16,
                 name + ": Profiles uses the centered History heading format and the same saved-list glyph as its rail.");
@@ -559,8 +559,8 @@ internal static partial class HistoryUiTests
             var timeOption = (RadioButton)dialog.FindName("TimeMode");
             var countOption = (RadioButton)dialog.FindName("CountMode");
             Rect Bounds(FrameworkElement item) => new Rect(item.TranslatePoint(new Point(), surface), item.RenderSize);
-            Require(caption.FontFamily.Equals((FontFamily)dialog.FindResource("WordmarkFont")) && caption.FontSize == 18,
-                context + ": the caption uses the family typewriter font beside the wordmark.");
+            Require(caption.FontFamily.Equals((FontFamily)dialog.FindResource("BrandSansFont")) && caption.FontSize == 18,
+                context + ": the caption uses the family heading font beside the wordmark.");
             Require(Math.Abs(Bounds(days).X - Bounds(countField).X) < 0.5 &&
                 Math.Abs(Bounds(days).Top + days.ActualHeight / 2 - Bounds(timeOption).Top - timeOption.ActualHeight / 2) <= 0.5 &&
                 Math.Abs(Bounds(countField).Top + countField.ActualHeight / 2 - Bounds(countOption).Top - countOption.ActualHeight / 2) <= 0.5,

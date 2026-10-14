@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script>/* Apply saved theme + accent before first paint to avoid a reload flash */(function(){try{var d=document.documentElement,t=localStorage.getItem('kscan-theme');if(t){d.setAttribute('data-theme',t);if({dark:1,light:1,hc:1}[t]){var v=localStorage.getItem('kscan-av');if(v){var s=v.split('|');d.style.setProperty('--accent',s[0]);d.style.setProperty('--btn',s[1]);}}}}catch(e){}})();</script>
-<link rel="preload" href="brand/KillerScan.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="brand/KillerSans-Regular.ttf" as="font" type="font/ttf" crossorigin><link rel="preload" href="brand/Punktype.ttf" as="font" type="font/ttf" crossorigin><link rel="preload" href="brand/Lacquer-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="darkreader-lock">
 <title data-i18n="page_index_title">KillerScan: Free, open-source network scanner for Windows</title>
@@ -31,14 +31,14 @@
 
 /* Hero */
 .hero { padding: 12px 0 28px; text-align: center; }
-.hero .wm-logo { height: clamp(54px, 10vw, 104px); margin: 0 auto; filter: drop-shadow(0 4px 7px rgba(0,0,0,0.5)); }
+.hero .wm-logo { height: clamp(64px, 11.9vw, 124px); margin: 0 auto; filter: drop-shadow(0 4px 7px rgba(0,0,0,0.5)); }
 .hero .hero-lockup { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 22px); flex-wrap: wrap; }
 .hero .hero-lockup .wm-logo { margin: 0; }
 .hero .hero-icon { height: clamp(120px, 24vw, 230px); width: auto; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)); }
 .hero .tagline { margin: 10px auto 0; max-width: 620px; font-size: 16px; color: var(--text2); }
 
 .hero-blurbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 980px; margin: 30px auto 0; text-align: left; }
-.blurb h3 { font-family: 'KillerScan', 'Courier New', monospace; font-size: 15px; font-weight: normal; letter-spacing: .5px; color: var(--accent); margin-bottom: 7px; text-shadow: 0 2px 5px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.5); }
+.blurb h3 { font-family: var(--kt-font-section); font-size: 15px; font-weight: normal; letter-spacing: .5px; color: var(--accent); margin-bottom: 7px; text-shadow: 0 2px 5px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.5); }
 .blurb p { font-size: 13.5px; color: var(--muted); line-height: 1.55; }
 .blurb-list { list-style: none; }
 .blurb-list li { font-size: 13.5px; color: var(--muted); line-height: 1.5; padding-left: 16px; position: relative; margin-bottom: 5px; }
@@ -60,11 +60,11 @@
 
 /* Features */
 .features { padding: 40px 0 24px; }
-.features h2 { font-family: 'KillerScan', 'Courier New', monospace; font-size: 24px; font-weight: normal; letter-spacing: .5px; color: var(--text); text-align: center; margin-bottom: 26px; }
+.features h2 { font-family: var(--kt-font-card-title); font-size: 24px; font-weight: normal; letter-spacing: .5px; color: var(--text); text-align: center; margin-bottom: 26px; }
 .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 14px; }
 .feature-card { background: var(--modal) url('grain.png') repeat; background-size: 256px 256px; border: 1px solid var(--pane-border); border-top: 2px solid var(--tab-edge); border-radius: 6px; padding: 18px 20px; transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s; }
 .feature-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(0,0,0,0.4); border-right-color: var(--dragline); border-bottom-color: var(--dragline); border-left-color: var(--dragline); border-top-color: var(--accent); }
-.feature-card h3 { font-family: 'KillerScan', 'Courier New', monospace; font-size: 15px; font-weight: normal; letter-spacing: .5px; margin-bottom: 8px; color: var(--accent); text-shadow: 0 2px 5px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.5); }
+.feature-card h3 { font-family: var(--kt-font-section); font-size: 15px; font-weight: normal; letter-spacing: .5px; margin-bottom: 8px; color: var(--accent); text-shadow: 0 2px 5px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.5); }
 html[data-theme="light"] .blurb h3, html[data-theme="light"] .feature-card h3 { text-shadow: none; }
 .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.55; }
 .feature-card code { display: inline-block; margin-top: 4px; background: var(--panel); padding: 2px 7px; border-radius: 4px; font-family: Consolas, monospace; font-size: 12px; color: var(--text); white-space: nowrap; }
@@ -194,7 +194,7 @@ html[data-theme="light"] .blurb h3, html[data-theme="light"] .feature-card h3 { 
 <div class="row"><span class="k" data-i18n="ui_size">size</span>&nbsp;<span class="v">3.05 MB exe</span></div>
 <div class="row"><span class="k" data-i18n="ui_platform">platform</span>&nbsp;<span class="v">Windows 10/11 x64</span></div>
 <div class="row"><span class="k">sha256</span>&nbsp;<span class="v hash">d3acf567ef14aca43887714382b2af61<br>271940809ebf6000c967da172a63a947</span></div>
-<p class="note" data-i18n="hero_note">Install or run portable. Free, open source, GPLv3.<br>No agent, account, subscription, or ads.<br>The app sends no usage analytics. <a href="technical.html#privacy">Network connections explained.</a></p>
+<p class="note" data-i18n="hero_note">Install or run portable. Free, open source, GPLv3.<br>No agent, account, subscription, or ads.<br>The app sends no usage analytics.<br><a href="technical.html#privacy">Network connections explained.</a></p>
 </div>
 </div>
 <div class="hero-blurbs">

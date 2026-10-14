@@ -59,7 +59,7 @@ namespace KillerScan.Shell
         ///     wordmark and subtitle collapse and PlainTitle takes over. This is not cosmetic
         ///     preference: the wordmark's two runs are TextBrush and PrimaryBrush, which on 98SE
         ///     are black and navy - both invisible on the navy caption.
-        ///   - A Win98 caption is 22px, not 36. The row height and WindowChrome.CaptionHeight have
+        ///   - A Win98 caption is 22px, not 32. The row height and WindowChrome.CaptionHeight have
         ///     to move together or the draggable strip stops matching the bar you can see.
         /// </summary>
         private void ApplyFlatChrome()
@@ -84,14 +84,14 @@ namespace KillerScan.Shell
             if (FindName("SubtitleText") is UIElement st) st.Visibility = wordmark;
             if (FindName("PlainTitle")   is UIElement pt) pt.Visibility = plain;
 
-            // The icon shrinks with the bar; 27px does not fit a 22px caption.
+            // The icon shrinks with the bar; 25px does not fit a 22px caption.
             if (FindName("TitleIcon") is FrameworkElement icon)
             {
-                icon.Width = icon.Height = flat ? 16 : 27;
+                icon.Width = icon.Height = flat ? 16 : 25;
                 icon.Margin = new Thickness(0, 0, flat ? 5 : 7, 0);
             }
 
-            double h = flat ? 22 : 36;
+            double h = flat ? 22 : 32;
             if (FindName("RootGrid") is System.Windows.Controls.Grid root && root.RowDefinitions.Count > 0)
                 root.RowDefinitions[0].Height = new GridLength(h);
             var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(this);

@@ -19,6 +19,7 @@
         BorderBrush="Transparent"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
+        FontFamily="{DynamicResource UiFont}"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         PreviewKeyDown="Window_PreviewKeyDown"
@@ -29,7 +30,7 @@
          WindowChrome.cs). The 36px title bar becomes the draggable caption; interactive bits in
          it opt back in with WindowChrome.IsHitTestVisibleInChrome. -->
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="36"
+        <WindowChrome CaptionHeight="32"
                       ResizeBorderThickness="8"
                       CornerRadius="0"
                       GlassFrameThickness="0"
@@ -52,7 +53,7 @@
 
     <Grid x:Name="RootGrid" Opacity="0" Panel.ZIndex="9500" Margin="{DynamicResource WindowFramePadding}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="36"/>     <!-- 0: title bar -->
+            <RowDefinition Height="32"/>     <!-- 0: title bar -->
             <RowDefinition Height="Auto"/>   <!-- 1: scan toolbar -->
             <RowDefinition Height="*"/>      <!-- 2: devices pane -->
             <RowDefinition Height="24"/>     <!-- 3: footer / status bar (24px + 11.5/10.5 type, family standard) -->
@@ -65,7 +66,8 @@
              onto navy was the alternative and it does not work: "Killer" is TextBrush (black
              there) and "Scan" is PrimaryBrush (navy by default there). Same answer KillerShell
              reached. Theme.cs drives the visibilities. -->
-        <Border Grid.Row="0" Background="{DynamicResource TitleBarBrush}">
+        <!-- ZIndex 1 so the wordmark's drips can hang into the top of the toolbar row below. -->
+        <Border Grid.Row="0" Background="{DynamicResource TitleBarBrush}" Panel.ZIndex="1">
             <Grid>
                 <!-- Film grain over the bar (behind content) -->
                 <Border IsHitTestVisible="False" Opacity="{DynamicResource GrainOpacity}" Margin="0,0,0,1">
@@ -75,7 +77,7 @@
                     </Border.Background>
                 </Border>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{DynamicResource ScanTitleBarPadding}">
-                    <icons:AppIcon x:Name="TitleIcon" Width="27" Height="27"
+                    <icons:AppIcon x:Name="TitleIcon" Width="25" Height="25"
                             VerticalAlignment="Center" Margin="0,0,7,0"
                             WindowChrome.IsHitTestVisibleInChrome="True"
                             MouseWheel="LogoBar_MouseWheel"
@@ -102,24 +104,30 @@
                          hit-test opt-in that lets the wheel reach it also takes it out of
                          WindowChrome's native caption, so drag and double-click-maximize are
                          restored by hand in AppScale.cs. The website link lives in About. -->
-                    <Grid x:Name="LogoBar" VerticalAlignment="Center" Background="Transparent"
+                    <!-- Negative margins keep Lacquer's deep descent out of the layout so the bar never
+                         clips the drips; the 2px imbalance and the lift match KillerPDF. -->
+                    <Grid x:Name="LogoBar" VerticalAlignment="Center" Background="Transparent" Margin="0,-18,0,-22"
                           WindowChrome.IsHitTestVisibleInChrome="True"
                           MouseWheel="LogoBar_MouseWheel"
                           MouseLeftButtonDown="LogoBar_MouseLeftButtonDown"
                           ToolTip="{DynamicResource Str_TT_AppSize}">
+                        <Grid.RenderTransform><TranslateTransform Y="-5"/></Grid.RenderTransform>
                         <StackPanel Orientation="Horizontal" Margin="1,2,0,0" Opacity="{DynamicResource IconShadowOpacity}">
                             <StackPanel.Effect><BlurEffect Radius="3"/></StackPanel.Effect>
-                            <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="#D8000000"/><Run Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" FontWeight="Bold" Foreground="#D8000000"/></TextBlock>
+                            <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="#D8000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="#D8000000"/></TextBlock>
                         </StackPanel>
                         <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"
                                    Margin="1,2,0,0" Opacity="{DynamicResource WordmarkAccentShadowOpacity}" IsHitTestVisible="False">
                             <TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect>
-                            <Run Text="Killer" Foreground="Transparent"/><Run Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" FontWeight="Bold" Foreground="#D8000000"/>
+                            <Run Text="Killer" Foreground="Transparent"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="#D8000000"/>
                         </TextBlock>
-                        <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="{DynamicResource TextBrush}"/><Run Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" FontWeight="Bold" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
+                        <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
                     </Grid>
+                    <!-- On the wordmark baseline in Killer Sans, like KillerPDF's titlebar filename. -->
                     <TextBlock x:Name="SubtitleText" Text="{DynamicResource Str_Subtitle}" Foreground="{DynamicResource MutedTextBrush}"
-                               FontFamily="Consolas" FontSize="11" VerticalAlignment="Center" Margin="10,2,0,0"/>
+                               FontFamily="{DynamicResource FileNameFont}" FontSize="{DynamicResource FileNameFontSize}"
+                               RenderTransform="{DynamicResource FileNameTransform}" TextOptions.TextFormattingMode="Ideal"
+                               VerticalAlignment="Center" Margin="16,0,0,0"/>
                 </StackPanel>
 
                 <!-- The shortcuts, language and theme buttons used to sit here, left of the
@@ -311,7 +319,7 @@
                     <TextBlock x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
                                Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="SidebarHeading" Text="{DynamicResource Str_History_Title}" TextAlignment="Center"
-                               Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource WordmarkFont}"
+                               Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource BrandSansFont}"
                                FontSize="20" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 </DockPanel>
                 <ListBox x:Name="HistoryList" Grid.Row="1" Background="Transparent" BorderThickness="0"
@@ -615,8 +623,8 @@
                     <!-- No fixed MaxWidth: FitFooterStatus measures the room up to the badge. -->
                     <TextBlock x:Name="StatusText" Text="Ready" TextTrimming="CharacterEllipsis"
                                Margin="{DynamicResource FooterCellPadding}" HorizontalAlignment="Left"
-                               Foreground="{DynamicResource MutedTextBrush}" FontFamily="Consolas"
-                               FontSize="11.5" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedTextBrush}" FontFamily="{DynamicResource BrandSansFont}"
+                               FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center"
                                ToolTip=" " ToolTipOpening="StatusText_ToolTipOpening"
                                ToolTipService.ShowDuration="30000" ToolTipService.InitialShowDelay="400"/>
                     <StackPanel x:Name="DeviceCountFooter" Orientation="Horizontal" VerticalAlignment="Center"/>
@@ -661,14 +669,14 @@
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock x:Name="NetworkFooterIcon" FontSize="10" FontFamily="Segoe MDL2 Assets"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="NetworkFooter" FontSize="10" FontFamily="Consolas"
+                            <TextBlock x:Name="NetworkFooter" FontSize="10" FontFamily="{DynamicResource UiFont}"
                                        Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
                             <!-- Adapter and link speed, each whole or not at all. No trimming: an
                                  ellipsis mid-adapter reads as damage rather than as a fit, so the
                                  speed goes first when the bar tightens and the adapter follows. -->
-                            <TextBlock x:Name="NetworkFooterAdapter" FontSize="10" FontFamily="Consolas"
+                            <TextBlock x:Name="NetworkFooterAdapter" FontSize="10" FontFamily="{DynamicResource UiFont}"
                                        Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="NetworkFooterSpeed" FontSize="10" FontFamily="Consolas"
+                            <TextBlock x:Name="NetworkFooterSpeed" FontSize="10" FontFamily="{DynamicResource UiFont}"
                                        Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -678,13 +686,13 @@
                                  Background="{DynamicResource CardBorderBrush}"
                                  Visibility="Collapsed" Margin="0,0,12,0"/>
                     <TextBlock x:Name="VersionLabel" Text="v1.5.2"
-                               Foreground="{DynamicResource TextFooter}" FontFamily="Consolas"
-                               FontSize="10" VerticalAlignment="Center" Margin="0,0,12,0"
+                               Foreground="{DynamicResource TextFooter}" FontFamily="{DynamicResource BrandSansFont}"
+                               FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center" Margin="0,0,12,0"
                                Cursor="Hand" ToolTip="{DynamicResource Str_TT_About}"
                                MouseLeftButtonUp="VersionLabel_Click"/>
                     <!-- 14px trailing margin keeps the copyright clear of the corner grip (family standard) -->
-                    <TextBlock FontSize="10" VerticalAlignment="Center"
-                               FontFamily="Consolas" Margin="0,0,14,0">
+                    <TextBlock FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center"
+                               FontFamily="{DynamicResource BrandSansFont}" Margin="0,0,14,0">
                         <Run Text="&#x00A9; 2026 " Foreground="{DynamicResource TextFooter}"/>
                         <Hyperlink NavigateUri="https://thekiller.net"
                                    RequestNavigate="Hyperlink_RequestNavigate"
@@ -804,7 +812,7 @@
                                             Content="{DynamicResource Str_KS_ViewKeyboard}"
                                             Click="ShortcutMapView_Click"/>
                                 </StackPanel>
-                                <TextBlock Grid.Column="2" FontFamily="Consolas" FontSize="11" Margin="12,0,24,0" MaxWidth="210"
+                                <TextBlock Grid.Column="2" FontFamily="{DynamicResource UiFont}" FontSize="11" Margin="12,0,24,0" MaxWidth="210"
                                            HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap">
                                     <Hyperlink Click="OnlineHelp_Click" Focusable="True" Foreground="{DynamicResource PrimaryBrush}"
                                                ToolTip="https://killerscan.net/help.html#shortcuts"><Run Text="{DynamicResource Str_KS_OnlineHelp}"/></Hyperlink>
@@ -911,10 +919,10 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <Grid Margin="0,0,0,4" HorizontalAlignment="Left">
                                         <TextBlock FontFamily="{DynamicResource WordmarkFont}" Margin="1,2,0,0" IsHitTestVisible="False"
-                                                   Opacity="{DynamicResource IconShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="2"/></TextBlock.Effect><Run Text="Killer" FontSize="22" Foreground="#C0000000"/><Run Text="Scan" FontSize="28.6" FontWeight="Bold" Foreground="#C0000000"/></TextBlock>
+                                                   Opacity="{DynamicResource IconShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="2"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="#C0000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#C0000000"/></TextBlock>
                                         <TextBlock FontFamily="{DynamicResource WordmarkFont}" Margin="1,2,0,0" IsHitTestVisible="False"
-                                                   Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect><Run Text="Killer" FontSize="22" Foreground="Transparent"/><Run Text="Scan" FontSize="28.6" FontWeight="Bold" Foreground="#D8000000"/></TextBlock>
-                                        <TextBlock FontFamily="{DynamicResource WordmarkFont}"><Run Text="Killer" FontSize="22" Foreground="{DynamicResource TextBrush}"/><Run Text="Scan" FontSize="28.6" FontWeight="Bold" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
+                                                   Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="Transparent"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#D8000000"/></TextBlock>
+                                        <TextBlock FontFamily="{DynamicResource WordmarkFont}"><Run Text="Killer" FontSize="17.21" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
                                     </Grid>
                                     <TextBlock FontSize="12" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"><Run Text="{DynamicResource Str_About_DescA}"/><Run Text="GPLv3 "/><Hyperlink NavigateUri="https://killertools.net" RequestNavigate="AboutLink_Navigate" Foreground="{DynamicResource PrimaryBrush}" TextDecorations="None">Killer Tools</Hyperlink><Run Text="{DynamicResource Str_About_DescB}"/></TextBlock>
                                 </StackPanel>
@@ -955,22 +963,22 @@
                                         CornerRadius="{DynamicResource ControlCornerRadius}" Padding="14,12,14,4">
                                     <StackPanel>
                                         <StackPanel Margin="0,0,0,10">
-                                            <TextBlock Text="{DynamicResource Str_About_Version}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="10"/>
+                                            <TextBlock Text="{DynamicResource Str_About_Version}" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="10"/>
                                             <!-- One row, two ends: version accent left, release date muted and
                                                  italic hard right. Bottom-aligned so the two sizes share a
                                                  baseline. Only the version text is clickable. -->
                                             <Grid Margin="0,1,0,0">
                                                 <TextBlock x:Name="AboutVersionBlock" Foreground="{DynamicResource PrimaryBrush}"
-                                                           FontFamily="Consolas" FontSize="13" Cursor="Hand"
+                                                           FontFamily="{DynamicResource UiFont}" FontSize="13" Cursor="Hand"
                                                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                                            MouseLeftButtonUp="AboutVersion_Click"/>
                                                 <TextBlock x:Name="AboutReleaseDateBlock" Foreground="{DynamicResource MutedTextBrush}"
-                                                           FontFamily="Consolas" FontSize="11" FontStyle="Italic"
+                                                           FontFamily="{DynamicResource UiFont}" FontSize="11" FontStyle="Italic"
                                                            HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                                             </Grid>
                                         </StackPanel>
                                         <StackPanel Margin="0,0,0,10">
-                                            <TextBlock Text="{DynamicResource Str_About_Publisher}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="10"/>
+                                            <TextBlock Text="{DynamicResource Str_About_Publisher}" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="10"/>
                                             <TextBlock x:Name="AboutPublisherBlock" Foreground="{DynamicResource TextBrush}" FontSize="12" Margin="0,1,0,0"/>
                                             <!-- Shown only on an exe signed by Steve. The alias is an accent link to
                                                  thekiller.net; "AKA" stays muted so the eye lands on the name. -->
@@ -978,20 +986,20 @@
                                                        FontSize="11" Margin="0,3,0,0"><Run Text="{DynamicResource Str_About_Aka}"/><Hyperlink NavigateUri="https://thekiller.net" RequestNavigate="AboutLink_Navigate" Foreground="{DynamicResource PrimaryBrush}" TextDecorations="None" ToolTip="thekiller.net"><Run x:Name="AboutAkaRun"/></Hyperlink></TextBlock>
                                         </StackPanel>
                                         <StackPanel Margin="0,0,0,10">
-                                            <TextBlock Text="{DynamicResource Str_About_Thumbprint}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="10"/>
-                                            <TextBlock x:Name="AboutThumbprintBlock" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,1,0,0"/>
+                                            <TextBlock Text="{DynamicResource Str_About_Thumbprint}" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="10"/>
+                                            <TextBlock x:Name="AboutThumbprintBlock" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="11" TextWrapping="Wrap" Margin="0,1,0,0"/>
                                         </StackPanel>
                                         <StackPanel Margin="0,0,0,10">
-                                            <TextBlock Text="{DynamicResource Str_About_Sha}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="10"/>
-                                            <TextBlock x:Name="AboutSha256Block" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="11" TextWrapping="NoWrap" Margin="0,1,0,0"/>
+                                            <TextBlock Text="{DynamicResource Str_About_Sha}" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="10"/>
+                                            <TextBlock x:Name="AboutSha256Block" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="11" TextWrapping="NoWrap" Margin="0,1,0,0"/>
                                         </StackPanel>
                                         <StackPanel Margin="0,0,0,10">
-                                            <TextBlock Text="{DynamicResource Str_About_Db}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="10"/>
-                                            <TextBlock x:Name="AboutDbBlock" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,1,0,0"/>
-                                            <TextBlock FontFamily="Consolas" FontSize="11" Margin="0,2,0,0">
+                                            <TextBlock Text="{DynamicResource Str_About_Db}" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="10"/>
+                                            <TextBlock x:Name="AboutDbBlock" Foreground="{DynamicResource TextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="11" TextWrapping="Wrap" Margin="0,1,0,0"/>
+                                            <TextBlock FontFamily="{DynamicResource UiFont}" FontSize="11" Margin="0,2,0,0">
                                                 <Hyperlink x:Name="AboutDbUpdateLink" Click="AboutDbUpdate_Click" Foreground="{DynamicResource PrimaryBrush}"><Run Text="{DynamicResource Str_About_DbUpdate}"/></Hyperlink>
                                             </TextBlock>
-                                            <TextBlock x:Name="AboutDbStatus" Foreground="{DynamicResource DimTextBrush}" FontFamily="Consolas" FontSize="10.5" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                            <TextBlock x:Name="AboutDbStatus" Foreground="{DynamicResource DimTextBrush}" FontFamily="{DynamicResource UiFont}" FontSize="10.5" TextWrapping="Wrap" Margin="0,3,0,0"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>

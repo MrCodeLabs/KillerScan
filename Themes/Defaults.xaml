@@ -62,7 +62,7 @@
          98SE palette overrides the hover to the gray face (never transparent -
          transparent lets the navy caption show through and the X reads blue). -->
     <sys:Double x:Key="CaptionButtonWidth">44</sys:Double>
-    <sys:Double x:Key="CaptionButtonHeight">36</sys:Double>
+    <sys:Double x:Key="CaptionButtonHeight">32</sys:Double>
     <Thickness x:Key="CaptionButtonMargin">0</Thickness>
     <Thickness x:Key="CaptionCloseGap">0</Thickness>
     <Thickness x:Key="CaptionButtonsMargin">0</Thickness>
@@ -87,10 +87,10 @@
 
     <!-- KillerScan title placement. Separate names prevent the shared contract from
          overwriting this app's optical alignment. -->
-    <Thickness x:Key="ScanTitleBarPadding">14,0</Thickness>
+    <Thickness x:Key="ScanTitleBarPadding">5,4,0,0</Thickness>
     <Thickness x:Key="ScanCaptionButtonsMargin">0</Thickness>
     <Thickness x:Key="DialogHaloMargin">10</Thickness>
-    <sys:Double x:Key="DialogTitleBarHeight">36</sys:Double>
+    <sys:Double x:Key="DialogTitleBarHeight">32</sys:Double>
     <sys:Double x:Key="FlyoutShadowOpacity">0.6</sys:Double>
     <SolidColorBrush x:Key="InputDialogTitleBrush" Color="#00000000" po:Freeze="True"/>
     <Visibility x:Key="InputDialogWordmarkVisibility">Visible</Visibility>

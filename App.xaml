@@ -37,8 +37,12 @@
             <controls:VendorConverter x:Key="VendorLoc"/>
             <controls:TrustMarkConverter x:Key="TrustMark"/>
 
-            <!-- Typewriter wordmark font (bundled in Fonts/). -->
-            <FontFamily x:Key="WordmarkFont">/KillerScan;component/Fonts/#Typewriter - a602 (dead postman 2004)</FontFamily>
+            <!-- Family brand faces, bundled in Fonts/ with their licenses beside them: Punktype
+                 (commercial license) for "Killer", Lacquer (OFL) for the app name, and Killer Sans
+                 (OFL) for headings and the footer. -->
+            <FontFamily x:Key="WordmarkFont">/KillerScan;component/Fonts/#Punktype</FontFamily>
+            <FontFamily x:Key="WordmarkAccentFont">/KillerScan;component/Fonts/#Lacquer</FontFamily>
+            <FontFamily x:Key="BrandSansFont">/KillerScan;component/Fonts/#Killer Sans</FontFamily>
 
             <!-- Global themed tooltip (replaces the plain system box). Implicit (no key) so every
                  tooltip app-wide picks it up; brushes are DynamicResource so it follows theme + accent. -->
@@ -48,7 +52,7 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource MenuBorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Padding" Value="8,4"/>
-                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="HasDropShadow" Value="False"/>
                 <Setter Property="Template">
@@ -509,7 +513,7 @@
             <Style x:Key="TabButton" TargetType="Button">
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
-                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
                 <Setter Property="FontSize" Value="11.5"/>
                 <Setter Property="Margin" Value="0,4,3,0"/>
                 <Setter Property="Template">
@@ -1137,7 +1141,7 @@
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
-                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
                 <Setter Property="FontSize" Value="10"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="Padding" Value="2,2,8,2"/>
@@ -1318,7 +1322,7 @@
                  ================================================================ -->
             <Style x:Key="ThemeRadio" TargetType="RadioButton">
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Margin" Value="0,0,0,6"/>
                 <Setter Property="Cursor" Value="Hand"/>
@@ -1386,7 +1390,7 @@
             <!-- ThemeRadio's square sibling for on/off switches in the theme flyout (Film Grain): the same row, hover and accent, with a box and checkmark in place of the ring and dot. Derived from this file's ThemeRadio, as KillerPDF's ThemeCheck is from its own. -->
             <Style x:Key="ThemeCheck" TargetType="CheckBox">
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Margin" Value="0,0,0,6"/>
                 <Setter Property="Cursor" Value="Hand"/>

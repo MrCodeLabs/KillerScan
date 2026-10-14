@@ -60,6 +60,13 @@ namespace KillerScan
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            // Every window (dialogs, tools, pickers) takes the family UI face from the active theme
+            // unless it sets its own, so no dialog falls back to the system Segoe UI.
+            EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent, new RoutedEventHandler((s, _) =>
+            {
+                if (s is Window w && DependencyPropertyHelper.GetValueSource(w, Control.FontFamilyProperty).BaseValueSource == BaseValueSource.Default)
+                    w.SetResourceReference(Control.FontFamilyProperty, "UiFont");
+            }));
             Services.EngineHost.Configure();
             Shell.MainWindow.PublishGrainTile();   // install and uninstall dialogs open before any main window
             // Startup prompts can close before the main window exists.

@@ -31,6 +31,9 @@ namespace KillerScan.Services
     /// </summary>
     internal static class ThemeManager
     {
+        /// <summary>Killer Sans UI (Killer Sans scaled to Segoe UI proportions) with the Segoe fallback stack.</summary>
+        internal static readonly FontFamily KillerSansUiStack = new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Killer Sans UI, Segoe UI, Microsoft JhengHei UI, Nirmala UI");
+        internal static readonly FontFamily KillerSansFont = new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Killer Sans");
         private static Theme _current = Theme.Black;
         // Dark, Light, and Black each remember their own accent independently.
         private static Accent _darkAccent  = Accent.Orange;
@@ -240,10 +243,21 @@ namespace KillerScan.Services
             Complete("ButtonBevelDarkThickness", newDict["BevelDarkThickness"]);
             Complete("SurfaceButtonEdgeBrush", newDict.Contains("ButtonEdgeBrush") ? newDict["ButtonEdgeBrush"] : newDict["CardBorderBrush"]);
             Complete("FileDialogPaneBrush", newDict["PaneBrush"]);
-            Complete("MenuFontFamily", new FontFamily("Segoe UI"));
+            Complete("MenuFontFamily", KillerSansUiStack);
             Complete("MenuFontSize", 12.0);
             Complete("MenuItemPadding", new Thickness(8, 6, 10, 6));
             bool compactDialogCaption = newDict.Contains("UseDialogCaption") && newDict["UseDialogCaption"] is true;
+            // The UI face: Killer Sans UI over the Segoe stack; a classic caption theme keeps its menu font.
+            Complete("UiFont", compactDialogCaption ? newDict["MenuFontFamily"] : KillerSansUiStack);
+            // The titlebar subtitle sits on the wordmark baseline in Killer Sans, as KillerPDF's filename does.
+            Complete("FileNameFont", compactDialogCaption ? newDict["MenuFontFamily"] : KillerSansFont);
+            Complete("FileNameFontSize", compactDialogCaption ? 11.0 : 18.0);
+            if (!newDict.Contains("FileNameTransform"))
+            {
+                var fileNameShift = new TranslateTransform(0, compactDialogCaption ? 0 : 1);
+                fileNameShift.Freeze();
+                newDict["FileNameTransform"] = fileNameShift;
+            }
             Complete("DialogCloseWidth", compactDialogCaption ? newDict["CaptionButtonWidth"] : 28.0);
             Complete("DialogCloseHeight", compactDialogCaption ? newDict["CaptionButtonHeight"] : 26.0);
             Complete("DialogCaptionButtonsMargin", new Thickness(0, 0,

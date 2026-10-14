@@ -48,20 +48,26 @@
                 </Grid.RowDefinitions>
 
 
-                <Border x:Name="DialogTitleBar" Grid.Row="0" Height="{DynamicResource DialogTitleBarHeight}"
+                <Border x:Name="DialogTitleBar" Grid.Row="0" Height="{DynamicResource DialogTitleBarHeight}" Panel.ZIndex="1"
                         Background="{DynamicResource InputDialogTitleBrush}"
                         MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                     <Grid>
 
-                        <Grid HorizontalAlignment="Left" VerticalAlignment="Center" Margin="14,0,0,0"
-                              Visibility="{DynamicResource InputDialogWordmarkVisibility}">
+                        <!-- The app icon leads the caption and the wordmark sits on the main title bar's geometry. -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="6,0,0,0"
+                                    Visibility="{DynamicResource InputDialogWordmarkVisibility}">
+                        <kui:AppIcon Width="25" Height="25" VerticalAlignment="Center" Margin="0,0,7,0"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        <Grid VerticalAlignment="Center" Margin="0,-18,0,-22">
+                            <Grid.RenderTransform><TranslateTransform Y="-5"/></Grid.RenderTransform>
                             <StackPanel Orientation="Horizontal" Margin="1,2,0,0"
                                         Opacity="{DynamicResource IconShadowOpacity}">
                                 <StackPanel.Effect><BlurEffect Radius="3"/></StackPanel.Effect>
-                                <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="15"><Run Text="Killer" Foreground="#D8000000"/><Run Text="Scan" FontSize="19.5" FontWeight="Bold" Foreground="#D8000000"/></TextBlock>
+                                <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="#D8000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="#D8000000"/></TextBlock>
                             </StackPanel>
-                            <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="15"><Run Text="Killer" Foreground="{DynamicResource TextBrush}"/><Run Text="Scan" FontSize="19.5" FontWeight="Bold" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
+                            <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
                         </Grid>
+                        </StackPanel>
                         <TextBlock Text="{DynamicResource Str_Term_Font}" Margin="6,0,0,0" VerticalAlignment="Center"
                                    Visibility="{DynamicResource InputDialogPlainTitleVisibility}"
                                    FontFamily="Tahoma" FontSize="11" FontWeight="Bold"
