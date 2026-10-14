@@ -18,13 +18,14 @@ namespace KillerScan.Shell
 
         /// <summary>
         /// Screen pixels, so the panel keeps a constant on-screen width under app zoom. Opens
-        /// narrow by default: the entries are short and the pane beside them is the point.
+        /// just wide enough for the longest saved-scan date, so no entry is trimmed by default.
         /// </summary>
-        private double _sidebarBaseWidth = SidebarMinPx;
+        private double _sidebarBaseWidth = SidebarDefaultPx;
 
         private const double RailW = 24;
         private const double PanelMinLogical = 140;
         private const double SidebarMinPx = 170;
+        private const double SidebarDefaultPx = 210;
         private const double SidebarMaxPx = 480;
 
         private double ExpandedLogicalWidth(double scale) =>

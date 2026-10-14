@@ -14,6 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Confirm, install and uninstall dialogs use the family setup dialog layout, with a notice icon, a larger Killer Sans heading and evenly sized buttons, so the Uninstall button is no longer cut off.
 
 ### Fixed
+- The Scan History sidebar opens wide enough to show the full date of every saved scan instead of trimming it.
 - Silent installs return specific Windows error codes and reject a second concurrent install instead of reporting a general failure.
 - Icon-only buttons give screen readers the name from their tooltip, and controls reached with the keyboard show a dotted focus outline.
 - Scan History view buttons and context-menu choices use normal capitalization in every language.
