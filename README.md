@@ -45,8 +45,8 @@ Part of [killertools.net](https://killertools.net).
 
 <table>
 <tr>
-<td width="50%"><img src="scan-landing/screenshots/01.png" alt="KillerScan device list with the scan history sidebar and the theme picker open"><br><sub>A completed scan with IP addresses, hostnames, MAC vendors, device classifications and open ports in one sortable view, beside the scan history and the theme picker.</sub></td>
-<td width="50%"><img src="scan-landing/screenshots/07.png" alt="KillerScan network topology with its settings and export menus open"><br><sub>Topology draws the same devices as a map you can rearrange and tune, and exports the arranged view as a transparent PNG, a JPG or an HTML page with SVG.</sub></td>
+<td width="50%"><img src="scan-landing/screenshots/01.png" alt="KillerScan device list with the scan history sidebar open"><br><sub>A completed scan with IP addresses, hostnames, MAC vendors, device classifications and open ports in one sortable view, beside the scan history.</sub></td>
+<td width="50%"><img src="scan-landing/screenshots/03.png" alt="KillerScan network topology with its export menu open"><br><sub>Topology draws the same devices as a map you can rearrange and tune, and exports the arranged view as a transparent PNG, a JPG or an HTML page with SVG.</sub></td>
 </tr>
 </table>
 
