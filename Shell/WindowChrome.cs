@@ -7,6 +7,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using KillerFamily.Windowing;
 using KillerScan.Controls;
 
 namespace KillerScan.Shell
@@ -22,6 +23,9 @@ namespace KillerScan.Shell
         {
             var hwnd = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(hwnd)?.AddHook(WndProc);
+            // Windows 11 snap layouts flyout on the maximize button. Added after WindowChrome's
+            // hook, so it answers WM_NCHITTEST first.
+            SnapLayouts.Attach(this, MaximizeBtn);
             SyncWindowCorners();
             ApplyThemeBorder(this);
             ApplyWindowIcon(hwnd);
