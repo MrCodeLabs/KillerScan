@@ -17,10 +17,16 @@ namespace KillerScan.Shell
         private bool _sidebarCollapsed = true;
 
         /// <summary>
-        /// Screen pixels, so the panel keeps a constant on-screen width under app zoom. Opens
-        /// just wide enough for the longest saved-scan date, so no entry is trimmed by default.
+        /// Screen pixels, so a width the user dragged to keeps its on-screen size under app zoom.
         /// </summary>
         private double _sidebarBaseWidth = SidebarDefaultPx;
+
+        /// <summary>
+        /// False until the user drags the panel. Until then the default width is held in logical
+        /// units, so it grows with app zoom along with the text and the longest saved-scan date
+        /// still fits at any zoom.
+        /// </summary>
+        private bool _sidebarWidthSaved;
 
         private const double RailW = 24;
         private const double PanelMinLogical = 140;
@@ -29,14 +35,17 @@ namespace KillerScan.Shell
         private const double SidebarMaxPx = 480;
 
         private double ExpandedLogicalWidth(double scale) =>
-            Math.Max(_sidebarBaseWidth / scale, PanelMinLogical);
+            _sidebarWidthSaved ? Math.Max(_sidebarBaseWidth / scale, PanelMinLogical) : SidebarDefaultPx;
 
         private void InitSidebar()
         {
             _sidebarCollapsed = App.GetSetting("HistorySidebarOpen") != "1";
             if (double.TryParse(App.GetSetting("HistorySidebarWidth"), NumberStyles.Float,
                     CultureInfo.InvariantCulture, out double width))
+            {
                 _sidebarBaseWidth = Math.Min(SidebarMaxPx, Math.Max(SidebarMinPx, width));
+                _sidebarWidthSaved = true;
+            }
             ApplySidebarState();
         }
 
@@ -190,6 +199,7 @@ namespace KillerScan.Shell
             double next = Math.Min(SidebarMaxPx, Math.Max(SidebarMinPx,
                 (SidebarCol.ActualWidth - RailW + e.HorizontalChange) * scale));
             _sidebarBaseWidth = next;
+            _sidebarWidthSaved = true;
             SidebarCol.BeginAnimation(ColumnDefinition.WidthProperty, null);
             SidebarCol.Width = new GridLength(next / scale + RailW);
         }
