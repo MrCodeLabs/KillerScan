@@ -21,6 +21,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Open Ports gets the same share of the device table as Vendor, so its port list is no longer cut off at the edge, and long hostnames and vendor names end with an ellipsis and show in full on hover.
 - While a scan runs, the footer drops the adapter and link speed to make room for the progress bar instead of running into the PORTABLE badge, and the progress bar uses the theme accent.
 - The footer's device count and network details use the same Killer Sans size as the status line and version.
+- Ctrl+C in the Terminal stops a running command even when KillerScan was started by a program that ignores Ctrl+C.
 - The Scan History sidebar opens wide enough to show the full date of every saved scan at any app zoom instead of trimming it.
 - Scan History view buttons and context-menu choices use normal capitalization in every language.
 - Active and hovered sidebar rail icons show the yellow accent with a dark halo on the Light theme's Yellow accent, instead of near-black.
