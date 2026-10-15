@@ -12,6 +12,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The Scan History and Scan Profiles lists fade out at the top or bottom while more entries lie past that edge.
 
 ### Changed
+- Refreshed the bundled MAC vendor database to 58,526 assignments.
 - The wordmarks use Punktype and Lacquer, and the interface text, headings and footers use Killer Sans, in place of the typewriter font in the app and on the website.
 - Confirm, install and uninstall dialogs use the family setup dialog layout, with a notice icon, a larger Killer Sans heading and evenly sized buttons, so the Uninstall button is no longer cut off.
 
