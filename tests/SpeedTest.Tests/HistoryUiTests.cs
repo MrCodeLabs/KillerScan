@@ -414,7 +414,7 @@ internal static partial class HistoryUiTests
         foreach (string name in Enum.GetNames(assembly.GetType("KillerScan.Services.Theme", true)!))
         {
             theme(name); Call(window, "ApplyFlatChrome"); Draw();
-            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("BrandSansFont")) &&
+            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("HeadingFont")) &&
                 group.HorizontalAlignment == HorizontalAlignment.Center && icon.Text == "\uE728" &&
                 Equals(button.Content, icon.Text) && icon.FontFamily.Source == "Segoe MDL2 Assets" && icon.FontSize == 16,
                 name + ": Profiles uses the centered History heading format and the same saved-list glyph as its rail.");
