@@ -16,6 +16,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Confirm, install and uninstall dialogs use the family setup dialog layout, with a notice icon, a larger Killer Sans heading and evenly sized buttons, so the Uninstall button is no longer cut off.
 
 ### Fixed
+- On the 98SE theme, dialog captions use Microsoft Sans Serif like the rest of the interface, as in KillerPDF, instead of Tahoma.
 - Silent installs refuse an exe without a valid signature, return specific Windows error codes and reject a second concurrent install instead of reporting a general failure.
 - The Scan History sidebar opens wide enough to show the full date of every saved scan at any app zoom instead of trimming it.
 - Icon-only buttons give screen readers the name from their tooltip, and controls reached with the keyboard show a dotted focus outline.
