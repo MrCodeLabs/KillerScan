@@ -16,16 +16,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Confirm, install and uninstall dialogs use the family setup dialog layout, with a notice icon, a larger Killer Sans heading and evenly sized buttons, so the Uninstall button is no longer cut off.
 
 ### Fixed
-- On the 98SE theme, dialog captions use Microsoft Sans Serif like the rest of the interface, as in KillerPDF, instead of Tahoma.
 - Silent installs refuse an exe without a valid signature, return specific Windows error codes and reject a second concurrent install instead of reporting a general failure.
+- Screen readers announce every button by its name, including buttons with a detailed tooltip, and read Scan History and Scan Profiles rows by date or name and target. Controls reached with the keyboard show a dotted focus outline, drawn around small icon buttons instead of over them.
+- Open Ports gets the same share of the device table as Vendor, so its port list is no longer cut off at the edge, and long hostnames and vendor names end with an ellipsis and show in full on hover.
+- While a scan runs, the footer drops the adapter and link speed to make room for the progress bar instead of running into the PORTABLE badge, and the progress bar uses the theme accent.
+- The footer's device count and network details use the same Killer Sans size as the status line and version.
 - The Scan History sidebar opens wide enough to show the full date of every saved scan at any app zoom instead of trimming it.
-- Icon-only buttons give screen readers the name from their tooltip, and controls reached with the keyboard show a dotted focus outline.
 - Scan History view buttons and context-menu choices use normal capitalization in every language.
-- Dialog title wordmarks keep the main window's dark halo behind the app name on the Light theme's Yellow accent, so the yellow no longer fades into the title bar.
 - Active and hovered sidebar rail icons show the yellow accent with a dark halo on the Light theme's Yellow accent, instead of near-black.
+- Dialog title wordmarks keep the main window's dark halo behind the app name on the Light theme's Yellow accent, so the yellow no longer fades into the title bar.
 - The wordmark has a soft shadow on the Light theme too, so it no longer looks thin on the light title bar, and the dark themes use the same lighter shadow as the rest of the Killer Tools family.
-- The title bar icon is 27px and has its own 27px image, so it is a little larger and sharper.
 - Button gradients start at the outline color and darken toward the bottom, so a hovered button no longer looks darker than its border.
+- On the 98SE theme, dialog captions use Microsoft Sans Serif like the rest of the interface, as in KillerPDF, instead of Tahoma.
+- The title bar icon is 27px and has its own 27px image, so it is a little larger and sharper.
 - Centered website logos with space above and below and corrected current features, runtime requirements and documentation.
 
 ## [1.8.0] - 2026-10-08
