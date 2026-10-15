@@ -327,7 +327,7 @@
                     </Border.Background>
                 </Border>
 
-                <DataGrid Grid.Row="0" x:Name="ResultsGrid"
+                <DataGrid Grid.Row="0" x:Name="ResultsGrid" AutomationProperties.Name="{DynamicResource Str_View_Devices}"
                           Margin="0"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
