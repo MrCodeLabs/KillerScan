@@ -58,5 +58,19 @@ namespace KillerScan.Controls
             catch { /* best-effort */ }
         }
 
+        /// <summary>
+        /// Lets a trimmed cell's tooltip open only when the text was actually cut, so a value
+        /// that fits is not repeated back on hover.
+        /// </summary>
+        private void TrimmedCell_ToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            if (sender is not TextBlock block || string.IsNullOrEmpty(block.Text)) { e.Handled = true; return; }
+            var typeface = new System.Windows.Media.Typeface(block.FontFamily, block.FontStyle, block.FontWeight, block.FontStretch);
+            var text = new System.Windows.Media.FormattedText(block.Text, System.Globalization.CultureInfo.CurrentCulture,
+                block.FlowDirection, typeface, block.FontSize, System.Windows.Media.Brushes.Black,
+                System.Windows.Media.VisualTreeHelper.GetDpi(block).PixelsPerDip);
+            double room = block.ActualWidth - block.Padding.Left - block.Padding.Right;
+            if (text.WidthIncludingTrailingWhitespace <= room + 0.5) e.Handled = true;
+        }
     }
 }
