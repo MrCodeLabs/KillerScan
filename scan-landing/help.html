@@ -404,15 +404,16 @@ html[data-theme="light"] .kbmap { --kc-scan:#d1105a; --kc-view:#a316b5; --kc-dev
 <button data-kblayer="ctrlshift">CTRL+SHIFT</button>
 <button data-kblayer="shift">SHIFT</button>
 <button data-kblayer="ctrlalt">CTRL+ALT</button>
+<button data-kblayer="altshift">ALT+SHIFT</button>
 <span class="kbmap-hint" data-i18n="hp_kb_hint">Hold Ctrl, Shift or Alt to preview that layer - hover a lit key for its action</span>
 </div>
 <div class="kbmap-scroll"><div class="kbmap-board" id="kbmapBoard"></div></div>
 <div class="kbmap-detail" id="kbmapDetail">&nbsp;</div>
 </div>
-<script src="shortcuts.generated.js?v=1"></script>
+<script src="shortcuts.generated.js?v=2"></script>
 <script>
 (function(){
-var KBL = {base:{},ctrl:{},ctrlshift:{},shift:{},ctrlalt:{}};
+var KBL = {base:{},ctrl:{},ctrlshift:{},shift:{},ctrlalt:{},altshift:{}};
 var categoryIds={Views:'view',Scan:'scan',Device:'device',Topology:'view',Toolbar:'tools',App:'file'};
 KS_SHORTCUTS.forEach(function(row,index){
   var parts=row.gesture.replace(/ /g,'').split('+'), key=parts.pop(), layer='base';
@@ -420,6 +421,7 @@ KS_SHORTCUTS.forEach(function(row,index){
   if(key==='-') key='Minus';
   if(/^[0-9]$/.test(key)) key='D'+key;
   if(parts.indexOf('Ctrl')>=0) layer=parts.indexOf('Shift')>=0?'ctrlshift':parts.indexOf('Alt')>=0?'ctrlalt':'ctrl';
+  else if(parts.indexOf('Alt')>=0 && parts.indexOf('Shift')>=0) layer='altshift';
   else if(parts.indexOf('Shift')>=0) layer='shift';
   var existing=KBL[layer][key];
   if(existing) existing[1].push(index); else KBL[layer][key]=[categoryIds[row.category],[index]];
@@ -460,7 +462,7 @@ var KBROWS = [
 [['Caps','Caps',1.8],['A','A',1],['S','S',1],['D','D',1],['F','F',1],['G','G',1],['H','H',1],['J','J',1],['K','K',1],['L','L',1],['Semi',';',1],['Quote','\'',1],['Enter','Enter',2.2]],
 [['Shift','Shift',2.3],['Z','Z',1],['X','X',1],['C','C',1],['V','V',1],['B','B',1],['N','N',1],['M','M',1],['Comma',',',1],['Period','.',1],['Slash','/',1],['RShift','Shift',2.7],['',1.6],['Up','↑',1]],
 [['Ctrl','Ctrl',1.5],['Win','Win',1.2],['Alt','Alt',1.5],['Space','',6.8],['RAlt','Alt',1.5],['Menu','☰',1],['RCtrl','Ctrl',1.5],['',0.6],['Left','←',1],['Down','↓',1],['Right','→',1]]];
-var MODS = { base:[], ctrl:['Ctrl','RCtrl'], ctrlshift:['Ctrl','RCtrl','Shift','RShift'], shift:['Shift','RShift'], ctrlalt:['Ctrl','RCtrl','Alt','RAlt'] };
+var MODS = { base:[], ctrl:['Ctrl','RCtrl'], ctrlshift:['Ctrl','RCtrl','Shift','RShift'], shift:['Shift','RShift'], ctrlalt:['Ctrl','RCtrl','Alt','RAlt'], altshift:['Alt','RAlt','Shift','RShift'] };
 var U = 46, board = document.getElementById('kbmapBoard'), detail = document.getElementById('kbmapDetail');
 var layer = 'base', keys = {}, hover = null;
 function startMarquee(h){   // a cut-off caption scrolls, marquee-style
@@ -518,7 +520,7 @@ document.querySelectorAll('.kbmap-layers button').forEach(function(b){
   b.addEventListener('click', function(){ layer = b.getAttribute('data-kblayer'); paint(); });
 });
 function sync(e){
-  var l = e.ctrlKey && e.shiftKey ? 'ctrlshift' : e.ctrlKey && e.altKey ? 'ctrlalt' : e.ctrlKey ? 'ctrl' : e.shiftKey ? 'shift' : 'base';
+  var l = e.ctrlKey && e.shiftKey ? 'ctrlshift' : e.ctrlKey && e.altKey ? 'ctrlalt' : e.ctrlKey ? 'ctrl' : e.altKey && e.shiftKey ? 'altshift' : e.shiftKey ? 'shift' : 'base';
   if (l !== layer) { layer = l; paint(); }
 }
 window.addEventListener('keydown', sync);

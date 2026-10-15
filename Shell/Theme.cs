@@ -32,6 +32,13 @@ namespace KillerScan.Shell
             if (sender is CheckBox check) FilmGrain.Set(check.IsChecked == true);
         }
 
+        // Alt+Shift+G: Film Grain on or off, kept in step with the theme menu's check box.
+        private void ToggleFilmGrain()
+        {
+            FilmGrain.Set(!FilmGrain.Enabled);
+            if (FindName("FilmGrainCheck") is CheckBox filmGrain) filmGrain.IsChecked = FilmGrain.Enabled;
+        }
+
         private void ThemeRadio_Checked(object sender, RoutedEventArgs e)
         {
             if (_syncingThemeRadios) return;
@@ -117,7 +124,11 @@ namespace KillerScan.Shell
         {
             if (FindName("ThemeRadios") is not Panel panel) return;
             string current = ThemeManager.Current.ToString();
-            if (FindName("FilmGrainCheck") is CheckBox filmGrain) filmGrain.IsChecked = FilmGrain.Enabled;
+            if (FindName("FilmGrainCheck") is CheckBox filmGrain)
+            {
+                filmGrain.IsChecked = FilmGrain.Enabled;
+                filmGrain.ToolTip = $"{Loc("Str_Theme_FilmGrain")} (Alt+Shift+G)";
+            }
             _syncingThemeRadios = true;
             try
             {
