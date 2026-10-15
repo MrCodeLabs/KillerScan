@@ -320,7 +320,8 @@
                         Height="{DynamicResource ScanPaneBandSize}" Background="{DynamicResource ScanPaneBottomBrush}"/>
 
 
-                <Border Grid.RowSpan="1" IsHitTestVisible="False" Opacity="0.20" Panel.ZIndex="-1" CornerRadius="{DynamicResource PaneGrainCornerRadius}">
+                <Border Grid.RowSpan="1" IsHitTestVisible="False" Opacity="0.20" Panel.ZIndex="-1" CornerRadius="{DynamicResource PaneGrainCornerRadius}"
+                        Visibility="{DynamicResource FilmGrainVisibility}">
                     <Border.Background>
                         <ImageBrush x:Name="GrainBrush" TileMode="Tile"
                                     ViewportUnits="Absolute" Viewport="0,0,256,256" Stretch="None"/>
