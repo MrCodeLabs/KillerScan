@@ -774,7 +774,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <RepeatButton x:Name="ArrowUp" Grid.Row="0" Grid.Column="1"
-                                              Command="ScrollBar.LineUpCommand" Focusable="False" IsTabStop="False"
+                                              Command="ScrollBar.LineUpCommand" Focusable="False" IsTabStop="False" AutomationProperties.Name="{DynamicResource Str_Scroll_Up}"
                                               Width="{DynamicResource ScrollArrowSize}" Height="{DynamicResource ScrollArrowSize}"
                                               Content="5" FontFamily="Marlett" FontSize="10"
                                               TextOptions.TextRenderingMode="Aliased"
@@ -793,7 +793,7 @@
                                 </RepeatButton>
 
                                 <RepeatButton x:Name="ArrowDown" Grid.Row="2" Grid.Column="1"
-                                              Command="ScrollBar.LineDownCommand" Focusable="False" IsTabStop="False"
+                                              Command="ScrollBar.LineDownCommand" Focusable="False" IsTabStop="False" AutomationProperties.Name="{DynamicResource Str_Scroll_Down}"
                                               Width="{DynamicResource ScrollArrowSize}" Height="{DynamicResource ScrollArrowSize}"
                                               Content="6" FontFamily="Marlett" FontSize="10"
                                               TextOptions.TextRenderingMode="Aliased"
@@ -889,10 +889,12 @@
                                     <Setter TargetName="ArrowUp" Property="Grid.Column" Value="0"/>
                                     <Setter TargetName="ArrowUp" Property="Content" Value="3"/>
                                     <Setter TargetName="ArrowUp" Property="Command" Value="ScrollBar.LineLeftCommand"/>
+                                    <Setter TargetName="ArrowUp" Property="AutomationProperties.Name" Value="{DynamicResource Str_Scroll_Left}"/>
                                     <Setter TargetName="ArrowDown" Property="Grid.Row" Value="1"/>
                                     <Setter TargetName="ArrowDown" Property="Grid.Column" Value="2"/>
                                     <Setter TargetName="ArrowDown" Property="Content" Value="4"/>
                                     <Setter TargetName="ArrowDown" Property="Command" Value="ScrollBar.LineRightCommand"/>
+                                    <Setter TargetName="ArrowDown" Property="AutomationProperties.Name" Value="{DynamicResource Str_Scroll_Right}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

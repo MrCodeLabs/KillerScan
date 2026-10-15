@@ -114,7 +114,7 @@
                                FontSize="{DynamicResource MenuFontSize}" FontWeight="Bold"
                                Foreground="{DynamicResource ChromeTextBrush}"
                                VerticalAlignment="Center" IsHitTestVisible="False"/>
-                    <Button x:Name="CaptionCloseButton" Content="&#xE8BB;" Click="Cancel_Click"
+                    <Button x:Name="CaptionCloseButton" Content="&#xE8BB;" Click="Cancel_Click" AutomationProperties.Name="{DynamicResource Str_Sys_Close}"
                             HorizontalAlignment="Right" VerticalAlignment="Top"
                             Width="{DynamicResource DialogCloseWidth}" Height="{DynamicResource DialogCloseHeight}"
                             Margin="{DynamicResource DialogCaptionButtonsMargin}"

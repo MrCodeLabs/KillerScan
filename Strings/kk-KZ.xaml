@@ -532,4 +532,8 @@
     <sys:String x:Key="Str_History_SaveFailed">Тарих параметрлерін сақтау мүмкін болмады: {0}</sys:String>
     <sys:String x:Key="Str_History_ComparisonIdentity">Сканерлеулерді салыстыру: {0} / {1}</sys:String>
     <sys:String x:Key="Str_History_Delete">Сканерлеулерді жою</sys:String>
+    <sys:String x:Key="Str_Scroll_Up">Жоғары айналдыру</sys:String>
+    <sys:String x:Key="Str_Scroll_Down">Төмен айналдыру</sys:String>
+    <sys:String x:Key="Str_Scroll_Left">Солға айналдыру</sys:String>
+    <sys:String x:Key="Str_Scroll_Right">Оңға айналдыру</sys:String>
 </ResourceDictionary>

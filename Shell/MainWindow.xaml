@@ -322,7 +322,7 @@
                                Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource BrandSansFont}"
                                FontSize="20" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 </DockPanel>
-                <ListBox x:Name="HistoryList" Grid.Row="1" Background="Transparent" BorderThickness="0"
+                <ListBox x:Name="HistoryList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_History_Title}" Background="Transparent" BorderThickness="0"
                          Margin="14,0,8,0" HorizontalContentAlignment="Stretch"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          SelectionChanged="HistoryList_SelectionChanged">
@@ -391,7 +391,7 @@
                 </ListBox>
 
                 <!-- Second section, sharing the row so the two cross-fade in place. -->
-                <ListBox x:Name="ProfilesList" Grid.Row="1" Background="Transparent" BorderThickness="0"
+                <ListBox x:Name="ProfilesList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_Profiles_Title}" Background="Transparent" BorderThickness="0"
                          Margin="14,0,8,0" HorizontalContentAlignment="Stretch" Visibility="Collapsed"
                          PreviewMouseRightButtonDown="ProfileList_RightClick"
                          PreviewMouseLeftButtonUp="ProfileList_Activate"
@@ -780,7 +780,7 @@
                         <!-- Glyph is a named TextBlock recolored by TargetName. Setting Foreground
                              on the Button would be a local value and would outrank the trigger, so
                              the hover would never take - the same trap the About overlay documents. -->
-                        <Button Content="{DynamicResource AboutCloseGlyph}" Click="ShortcutsClose_Click"
+                        <Button Content="{DynamicResource AboutCloseGlyph}" Click="ShortcutsClose_Click" AutomationProperties.Name="{DynamicResource Str_Sys_Close}"
                                 Style="{StaticResource OverlayCloseButton}" HorizontalAlignment="Right"
                                 VerticalAlignment="Top" Width="{DynamicResource AboutCloseWidth}"
                                 Height="{DynamicResource AboutCloseHeight}" Margin="{DynamicResource AboutCloseMargin}"
@@ -894,7 +894,7 @@
 
                         <!-- Close X: just the glyph turns red on hover (no filled square), like KillerPDF.
                              Foreground is a Style setter (not a local value) so the hover trigger can win. -->
-                        <Button Content="{DynamicResource AboutCloseGlyph}" Click="AboutClose_Click"
+                        <Button Content="{DynamicResource AboutCloseGlyph}" Click="AboutClose_Click" AutomationProperties.Name="{DynamicResource Str_Sys_Close}"
                                 Style="{StaticResource OverlayCloseButton}" HorizontalAlignment="Right"
                                 VerticalAlignment="Top" Width="{DynamicResource AboutCloseWidth}"
                                 Height="{DynamicResource AboutCloseHeight}" Margin="{DynamicResource AboutCloseMargin}"

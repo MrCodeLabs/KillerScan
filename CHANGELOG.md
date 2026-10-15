@@ -17,7 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ### Fixed
 - Silent installs refuse an exe without a valid signature, return specific Windows error codes and reject a second concurrent install instead of reporting a general failure.
-- Screen readers announce every button by its name, including buttons with a detailed tooltip, and read Scan History and Scan Profiles rows by date or name and target. Controls reached with the keyboard show a dotted focus outline, drawn around small icon buttons instead of over them.
+- Screen readers announce every button by its name, including buttons with a detailed tooltip, the subnet box, the scroll arrows and the close buttons on dialogs, and read the Scan History and Scan Profiles lists and their rows by date or name and target. Controls reached with the keyboard show a dotted focus outline, drawn around small icon buttons instead of over them.
 - Open Ports gets the same share of the device table as Vendor, so its port list is no longer cut off at the edge, and long hostnames and vendor names end with an ellipsis and show in full on hover.
 - While a scan runs, the footer drops the adapter and link speed to make room for the progress bar instead of running into the PORTABLE badge, and the progress bar uses the theme accent.
 - The footer's device count and network details use the same Killer Sans size as the status line and version.
