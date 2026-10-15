@@ -43,6 +43,7 @@ namespace KillerScan.Shell
                 UpdateAccentStrip(animate: true);
                 RefreshWorkspaceLocale();
                 UpdateSidebarFades();
+                RefreshSidebarWidth();   // a theme's font can need a wider panel for the dates
             }
         }
 

@@ -319,6 +319,60 @@ internal static partial class HistoryUiTests
             Equals(texts[1].Foreground, app.FindResource("MutedTextBrush")),
             "The larger accented date is first and the smaller muted target is below it.");
         Console.WriteLine("SIDEBAR: rowHeight=" + firstRow.ActualHeight + " visibleRows=" + Math.Floor(historyList.ActualHeight / firstRow.ActualHeight));
+
+        // The sidebar must show the widest date in full in every theme: at the default width, and at
+        // the narrowest width the resize grip allows, at normal and large app zoom.
+        var widest = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
+        widest.Add(Entry(new DateTimeOffset(2026, 12, 28, 22, 58, 0, TimeSpan.Zero)));
+        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { widest });
+        Call(window, "RefreshHistoryList");
+        var widthSaved = window.GetType().GetField("_sidebarWidthSaved", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var baseWidth = window.GetType().GetField("_sidebarBaseWidth", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        double narrowest = (double)window.GetType().GetField("SidebarMinPx", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+        double defaultWidth = (double)baseWidth.GetValue(window)!;
+        // An animated open freezes the panel at its open width until the tween completes, which never
+        // happens offscreen. Release it so the panel follows its column as it does on screen.
+        sidebar.ClearValue(FrameworkElement.WidthProperty);
+        sidebar.HorizontalAlignment = HorizontalAlignment.Stretch;
+        foreach (var (label, saved, scale) in new[] { ("default", false, 1.0), ("narrowest", true, 1.0), ("narrowest", true, 2.5) })
+        {
+            widthSaved.SetValue(window, saved);
+            baseWidth.SetValue(window, saved ? narrowest : defaultWidth);
+            Call(window, "ApplyAppScale", scale, false);
+            foreach (string name in Enum.GetNames(themeType))
+            {
+                Theme(name); Call(window, "ApplyFlatChrome"); Call(window, "ApplySidebarState", false); Render(root, 1200, 780);
+                var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
+                var date = VisualChildren<TextBlock>(row).First();
+                var face = new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch);
+                double needed = new FormattedText(date.Text, System.Globalization.CultureInfo.CurrentCulture, date.FlowDirection,
+                    face, date.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(date).PixelsPerDip).WidthIncludingTrailingWhitespace;
+                Require(needed <= date.ActualWidth + 0.5, name + ": the widest date (" + date.Text + ") fits the " + label + " sidebar at " +
+                    (scale * 100) + "% zoom (" + needed.ToString("0.#") + " needed, " + date.ActualWidth.ToString("0.#") + " available).");
+            }
+        }
+        // A wider row font must widen the panel rather than trim the date. This runner cannot load
+        // Killer Sans UI, so Courier New stands in for a font wider than the fallback.
+        Call(window, "ApplyAppScale", 1.0, false);
+        Theme("Black"); Call(window, "ApplyFlatChrome");
+        widthSaved.SetValue(window, true);
+        baseWidth.SetValue(window, narrowest);
+        historyList.FontFamily = new FontFamily("Courier New");
+        Call(window, "ApplySidebarState", false); Render(root, 1200, 780);
+        {
+            var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
+            var date = VisualChildren<TextBlock>(row).First();
+            var face = new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch);
+            double needed = new FormattedText(date.Text, System.Globalization.CultureInfo.CurrentCulture, date.FlowDirection,
+                face, date.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(date).PixelsPerDip).WidthIncludingTrailingWhitespace;
+            Require(date.FontFamily.Source == "Courier New" && needed <= date.ActualWidth + 0.5,
+                "A wide row font widens the narrowest sidebar to fit the date (" + needed.ToString("0.#") + " needed, " +
+                date.ActualWidth.ToString("0.#") + " available).");
+        }
+        historyList.ClearValue(Control.FontFamilyProperty);
+        widthSaved.SetValue(window, false);
+        baseWidth.SetValue(window, defaultWidth);
+        Call(window, "ApplySidebarState", false);
         historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { entries });
         Call(window, "RefreshHistoryList"); Call(window, "ShowHistoryEntry");
         Console.WriteLine("RENDERED: " + output);

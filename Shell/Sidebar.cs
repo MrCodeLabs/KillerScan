@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using KillerScan.Controls;
 
@@ -35,7 +36,55 @@ namespace KillerScan.Shell
         private const double SidebarMaxPx = 480;
 
         private double ExpandedLogicalWidth(double scale) =>
-            _sidebarWidthSaved ? Math.Max(_sidebarBaseWidth / scale, PanelMinLogical) : SidebarDefaultPx;
+            Math.Max(_sidebarWidthSaved ? Math.Max(_sidebarBaseWidth / scale, PanelMinLogical) : SidebarDefaultPx,
+                DateFitLogicalWidth());
+
+        /// <summary>
+        /// The narrowest panel, in logical units, that shows the widest possible saved-scan date in
+        /// full. Measured with the font the rows actually draw in, so it holds in every theme and
+        /// at every app zoom, and no width the user drags to can trim a date.
+        /// </summary>
+        private double DateFitLogicalWidth()
+        {
+            string widest = new DateTimeOffset(2026, 12, 28, 22, 58, 0, TimeSpan.Zero)
+                .ToString("g", CultureInfo.CurrentCulture);
+            var row = HistoryList.Items.Count > 0
+                ? HistoryList.ItemContainerGenerator.ContainerFromIndex(0) as ListBoxItem
+                : null;
+            TextBlock? date = row == null ? null : FirstTextBlock(row);
+            var face = date != null
+                ? new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch)
+                : new Typeface(HistoryList.FontFamily, FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
+            double size = date?.FontSize ?? 13;
+            double text = new FormattedText(widest, CultureInfo.CurrentCulture, FlowDirection, face, size,
+                Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace;
+            // Row padding (9 each side), the list's own margins and border, and the scrollbar when
+            // a long history shows one.
+            double scrollbar = FirstScrollBar(HistoryList) is { Visibility: Visibility.Visible } bar ? bar.ActualWidth : 0;
+            return Math.Ceiling(text + 18 + HistoryList.Margin.Left + HistoryList.Margin.Right + 4 + scrollbar);
+        }
+
+        private static TextBlock? FirstTextBlock(DependencyObject parent)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is TextBlock text) return text;
+                if (FirstTextBlock(child) is TextBlock found) return found;
+            }
+            return null;
+        }
+
+        private static ScrollBar? FirstScrollBar(DependencyObject parent)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is ScrollBar { Orientation: Orientation.Vertical } bar) return bar;
+                if (FirstScrollBar(child) is ScrollBar found) return found;
+            }
+            return null;
+        }
 
         private void InitSidebar()
         {
@@ -196,7 +245,7 @@ namespace KillerScan.Shell
         {
             // Driven straight off the pointer with no tween; a tween here reads as lag.
             double scale = _appScale <= 0 ? 1 : _appScale;
-            double next = Math.Min(SidebarMaxPx, Math.Max(SidebarMinPx,
+            double next = Math.Min(SidebarMaxPx, Math.Max(Math.Max(SidebarMinPx, DateFitLogicalWidth() * scale),
                 (SidebarCol.ActualWidth - RailW + e.HorizontalChange) * scale));
             _sidebarBaseWidth = next;
             _sidebarWidthSaved = true;
