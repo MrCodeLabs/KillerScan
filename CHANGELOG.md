@@ -11,6 +11,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ### Changed
 - Dialog headings, the history sidebar heading and the history detail header use Lacquer, the wordmark's app-name face, in place of Killer Sans. 98SE keeps Killer Sans.
+- The history detail header is the same size as the Scan History heading.
 - Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
 - The Light theme draws a softer shadow under the toolbars.
 

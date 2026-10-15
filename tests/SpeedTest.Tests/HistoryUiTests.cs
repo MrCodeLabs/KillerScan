@@ -152,6 +152,9 @@ internal static partial class HistoryUiTests
         var grid = (DataGrid)history.FindName("HistoryChangesGrid");
         var all = (DataGrid)history.FindName("HistoryAllGrid");
         var title = (TextBlock)history.FindName("HistoryIdentity");
+        var sidebarTitle = (TextBlock)window.FindName("SidebarHeading");
+        Require(title.FontSize == sidebarTitle.FontSize && Equals(title.FontFamily, sidebarTitle.FontFamily),
+            "The history table header is the same size and face as the Scan History heading.");
         string Identity() => string.Concat(title.Inlines.OfType<Run>().Select(run => run.Text));
         var header = (TextBlock)history.FindName("HistorySummary");
         var metadata = (TextBlock)history.FindName("HistoryEntryContext");
