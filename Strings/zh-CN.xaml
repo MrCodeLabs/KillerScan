@@ -226,6 +226,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">下载并安装 {0} {1}？</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">应用将关闭并自动重新打开。</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">以后再说</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">启动时检查更新</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} 已发布</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">是否立即下载并安装？应用将关闭并自动重新打开。</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">启动时始终检查更新</sys:String>
     <sys:String x:Key="Str_Conflict_Title">安装冲突</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan 已安装两次。现在删除另一个当前用户的副本吗？
 

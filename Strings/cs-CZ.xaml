@@ -224,6 +224,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Stáhnout a nainstalovat {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Aplikace se zavře a znovu se automaticky spustí.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Aktualizovat</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">Teď ne</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">Kontrolovat aktualizace při spuštění</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">Je k dispozici {0} {1}</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">Chcete jej nyní stáhnout a nainstalovat? Aplikace se zavře a automaticky znovu otevře.</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">Vždy kontrolovat aktualizace při spuštění</sys:String>
     <sys:String x:Key="Str_Conflict_Title">konflikt instalace</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan je nainstalován dvakrát. Odebrat nyní druhou kopii pro tohoto uživatele?
 

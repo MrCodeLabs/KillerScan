@@ -241,6 +241,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Завантажити й установити {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Застосунок закриється та відкриється знову автоматично.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Оновити</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">Не зараз</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">Перевіряти оновлення під час запуску</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">Доступний {0} {1}</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">Завантажити та встановити зараз? Програма закриється та відкриється знову автоматично.</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">Завжди перевіряти під час запуску</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->

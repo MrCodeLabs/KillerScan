@@ -237,6 +237,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} をダウンロードしてインストールしますか?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">アプリは終了し、自動的に再起動します。</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">後で</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">起動時に更新を確認する</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} が利用可能です</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">今すぐダウンロードしてインストールしますか？アプリは終了し、自動的に再起動します。</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">起動時に常に更新を確認する</sys:String>
     <sys:String x:Key="Str_Conflict_Title">インストールの競合</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan が二重にインストールされています。もう一方のユーザー単位のコピーを今すぐ削除しますか?
 

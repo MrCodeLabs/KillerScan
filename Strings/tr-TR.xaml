@@ -226,6 +226,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} indirilip yüklensin mi?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Uygulama kapanacak ve otomatik olarak yeniden açılacak.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Güncelle</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">Şimdi değil</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">Başlangıçta güncellemeleri denetle</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} kullanılabilir</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">Şimdi indirip yüklemek ister misiniz? Uygulama kapanacak ve otomatik olarak yeniden açılacak.</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">Başlangıçta her zaman güncellemeleri denetle</sys:String>
     <sys:String x:Key="Str_Conflict_Title">yükleme çakışması</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan iki kez yüklü. Diğer kullanıcıya özel kopya şimdi kaldırılsın mı?
 

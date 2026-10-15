@@ -241,6 +241,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Загрузить и установить {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Приложение автоматически закроется и снова откроется.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Обновить</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">Не сейчас</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">Проверять обновления при запуске</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">Доступен {0} {1}</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">Хотите скачать и установить его сейчас? Приложение закроется и снова откроется автоматически.</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">Всегда проверять обновления при запуске</sys:String>
 
     <!-- Install conflict, uninstall -->
     <sys:String x:Key="Str_Conflict_Title">конфликт установки</sys:String>

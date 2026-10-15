@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ## [1.8.2] - Unreleased
 
+### Added
+- KillerScan checks for updates on startup and offers a newer release in a dialog with an Always check on startup box. A Check for updates on startup checkbox on the About card turns the check back on.
+
 ### Changed
 - Dialog headings, the history sidebar heading and the history detail header use Lacquer, the wordmark's app-name face, in place of Killer Sans. 98SE keeps Killer Sans.
 - Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.

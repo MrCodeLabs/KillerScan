@@ -94,6 +94,10 @@
                         <LineBreak/>
                         <Run Text="{DynamicResource Str_Install_BulletArp}"/>
                     </TextBlock>
+                    <!-- Optional choice for a reused dialog, such as the startup update prompt's
+                         "Always check on startup". Hidden on the install prompt. -->
+                    <CheckBox x:Name="Check1" Visibility="Collapsed" Margin="0,16,0,0"
+                              Foreground="{StaticResource TextBrush}" FontSize="12"/>
 
                     <!-- All-users install: routes to the same machine-wide path winget and choco
                          already use (Program Files + HKLM), by re-running the app elevated with

@@ -226,6 +226,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} ডাউনলোড করে ইনস্টল করবেন?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">অ্যাপটি বন্ধ হয়ে স্বয়ংক্রিয়ভাবে আবার চালু হবে।</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">আপডেট</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">এখন নয়</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">অ্যাপ চালু হলে আপডেট পরীক্ষা করুন</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} উপলব্ধ</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">এখনই এটি ডাউনলোড করে ইনস্টল করবেন? অ্যাপটি বন্ধ হয়ে স্বয়ংক্রিয়ভাবে আবার খুলবে।</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">অ্যাপ চালু হলে সর্বদা আপডেট পরীক্ষা করুন</sys:String>
     <sys:String x:Key="Str_Conflict_Title">ইনস্টলেশন দ্বন্দ্ব</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan দুইবার ইনস্টল করা আছে। অন্য ব্যবহারকারী-ভিত্তিক কপিটি এখন সরাবেন?
 

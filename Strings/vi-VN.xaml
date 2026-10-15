@@ -205,6 +205,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Tải xuống và cài đặt {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Ứng dụng sẽ tự động đóng và mở lại.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Cập nhật</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">Để sau</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">Kiểm tra cập nhật khi khởi động</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">Phiên bản {0} {1} đã có sẵn</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">Bạn có muốn tải xuống và cài đặt ngay bây giờ không? Ứng dụng sẽ tự động đóng và mở lại.</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">Luôn kiểm tra khi khởi động</sys:String>
     <sys:String x:Key="Str_Conflict_Title">xung đột cài đặt</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan được cài hai lần. Xóa bản dành cho người dùng kia ngay bây giờ?
 

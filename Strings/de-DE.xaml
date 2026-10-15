@@ -226,6 +226,11 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} herunterladen und installieren?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Die App wird geschlossen und automatisch neu gestartet.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Aktualisieren</sys:String>
+    <sys:String x:Key="Str_Upd_NotNow">Nicht jetzt</sys:String>
+    <sys:String x:Key="Str_Upd_StartupCheck">Beim Start nach Updates suchen</sys:String>
+    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} ist verfügbar</sys:String>
+    <sys:String x:Key="Str_Upd_StartupBody">Möchten Sie diese Version jetzt herunterladen und installieren? Die App wird geschlossen und automatisch neu geöffnet.</sys:String>
+    <sys:String x:Key="Str_Upd_AlwaysCheck">Beim Start immer nach Updates suchen</sys:String>
     <sys:String x:Key="Str_Conflict_Title">Installationskonflikt</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan ist zweimal installiert. Die andere benutzerbezogene Kopie jetzt entfernen?
 
