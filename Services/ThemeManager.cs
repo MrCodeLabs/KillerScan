@@ -33,6 +33,7 @@ namespace KillerScan.Services
     {
         /// <summary>Killer Sans UI (Killer Sans scaled to Segoe UI proportions) with the Segoe fallback stack.</summary>
         internal static readonly FontFamily KillerSansUiStack = new(new Uri("pack://application:,,,/"), "./Fonts/#Killer Sans UI, Segoe UI, Microsoft JhengHei UI, Nirmala UI");
+        internal static readonly FontFamily LacquerHeadingStack = new(new Uri("pack://application:,,,/"), "./Fonts/#Lacquer, ./Fonts/#Killer Sans UI, Segoe UI, Microsoft JhengHei UI, Nirmala UI");
         internal static readonly FontFamily KillerSansFont = new(new Uri("pack://application:,,,/"), "./Fonts/#Killer Sans");
         private static Theme _current = Theme.Black;
         // Dark, Light, and Black each remember their own accent independently.
@@ -250,6 +251,10 @@ namespace KillerScan.Services
             Complete("UiFont", compactDialogCaption ? newDict["MenuFontFamily"] : KillerSansUiStack);
             // The titlebar subtitle sits on the wordmark baseline in Killer Sans, as KillerPDF's filename does.
             Complete("FileNameFont", compactDialogCaption ? newDict["MenuFontFamily"] : KillerSansFont);
+            // Primary headings (dialog headings, page and period titles): Lacquer, the app-name face of
+            // the wordmark, falling back to Killer Sans UI for scripts Lacquer does not cover. 98SE keeps
+            // Killer Sans. Secondary headings, the footer and the interface stay Killer Sans.
+            Complete("HeadingFont", compactDialogCaption ? KillerSansFont : LacquerHeadingStack);
             Complete("FileNameFontSize", compactDialogCaption ? 11.0 : 18.0);
             if (!newDict.Contains("FileNameTransform"))
             {

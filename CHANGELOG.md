@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ## [1.8.2] - Unreleased
 
+### Changed
+- Dialog headings and the history detail header use Lacquer, the wordmark's app-name face, in place of Killer Sans. 98SE keeps Killer Sans.
+- Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
+
 ### Fixed
 - Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.
 
@@ -40,7 +44,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Centered website logos with space above and below and corrected current features, runtime requirements and documentation.
 - Menu separators draw their divider line instead of leaving an empty gap.
 - The About card's update button uses the family outline button instead of a solid dark block.
-- Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
 
 ## [1.8.0] - 2026-10-08
 
