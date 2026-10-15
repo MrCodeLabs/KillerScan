@@ -42,6 +42,7 @@ namespace KillerScan.Shell
                 ApplyFlatChrome();
                 UpdateAccentStrip(animate: true);
                 RefreshWorkspaceLocale();
+                UpdateSidebarFades();
             }
         }
 

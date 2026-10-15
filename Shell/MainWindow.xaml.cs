@@ -48,6 +48,7 @@ namespace KillerScan.Shell
 
             InitializeWorkspace();
             InitSidebar();
+            InitSidebarFades();
 
             RestoreWindowPlacement();                               // window size/position from previous run
             InitAppScale();                                         // AppScale.cs (restore app-wide size)
