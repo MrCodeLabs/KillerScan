@@ -354,6 +354,22 @@ internal static partial class HistoryUiTests
             Render(root, width, 780); Call(window, "FitToolbarViews");
             return Render(root, width, 780);
         }
+        var historyType = assembly.GetType("KillerScan.Services.ScanHistory", true)!;
+        var entryType = assembly.GetType("KillerScan.Services.ScanHistoryEntry", true)!;
+        var reference = Activator.CreateInstance(entryType)!;
+        entryType.GetProperty("ScannedAt")!.SetValue(reference, new DateTimeOffset(2026, 10, 8, 12, 0, 0, TimeSpan.Zero));
+        entryType.GetProperty("Target")!.SetValue(reference, "192.0.2.0/24");
+        var seeded = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
+        seeded.Add(reference);
+        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { seeded });
+        Call(window, "RefreshHistoryList");
+        double HistoryRowHeight()
+        {
+            Call(window, "SetSidebarSection", "history", false); Draw();
+            double height = ((ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0)).ActualHeight;
+            Call(window, "SetSidebarSection", "profiles", false); Draw();
+            return height;
+        }
         Call(window, "SetSidebarSection", "profiles", false);
         Call(window, "OpenSidebar"); Call(window, "ApplySidebarState", false); Draw();
         ListBoxItem Row(object item) => (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(item);
@@ -401,11 +417,14 @@ internal static partial class HistoryUiTests
                 name + ": Profiles uses the centered History heading format and the same saved-list glyph as its rail.");
             Require(ReferenceEquals(list.ItemContainerStyle, historyList.ItemContainerStyle) && list.Margin == historyList.Margin,
                 name + ": profile rows use the actual History container style and insets.");
+            double historyRow = HistoryRowHeight();
             var texts = VisualChildren<TextBlock>(Row(work)).ToArray();
             Require(texts[0].Text == "Work" && texts[0].FontSize == 13 && texts[0].FontWeight == FontWeights.SemiBold &&
                 Equals(texts[0].Foreground, Application.Current.FindResource("PrimaryBrush")) && texts[1].FontSize == 11 && texts[1].Margin == new Thickness() &&
-                Equals(texts[1].Foreground, Application.Current.FindResource("MutedTextBrush")) && Math.Abs(Row(work).ActualHeight - 34) < 0.5,
+                Equals(texts[1].Foreground, Application.Current.FindResource("MutedTextBrush")),
                 name + ": the unselected name and target match History primary and secondary formatting.");
+            Require(historyRow > 0 && Math.Abs(Row(work).ActualHeight - historyRow) < 0.5,
+                name + ": a profile row is exactly as tall as a History row (" + Row(work).ActualHeight + " and " + historyRow + ").");
             var selectedTexts = VisualChildren<TextBlock>(Row(home)).ToArray();
             Require(Equals(selectedTexts[0].Foreground, Application.Current.FindResource("SelectionFg")) &&
                 Equals(selectedTexts[1].Foreground, Application.Current.FindResource("SelectionFg")) && selectedTexts[1].Opacity == 0.78,
