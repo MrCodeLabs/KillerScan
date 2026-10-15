@@ -667,22 +667,22 @@
                             MouseLeftButtonUp="NetworkFooter_Click"
                             ToolTip="{DynamicResource Str_TT_FooterNetwork}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock x:Name="NetworkFooterIcon" FontSize="10" FontFamily="Segoe MDL2 Assets"
+                            <TextBlock x:Name="NetworkFooterIcon" FontSize="13" FontFamily="Segoe MDL2 Assets"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="NetworkFooter" FontSize="10" FontFamily="{DynamicResource UiFont}"
+                            <TextBlock x:Name="NetworkFooter" FontSize="16" FontFamily="{DynamicResource BrandSansFont}" TextOptions.TextFormattingMode="Ideal"
                                        Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
                             <!-- Adapter and link speed, each whole or not at all. No trimming: an
                                  ellipsis mid-adapter reads as damage rather than as a fit, so the
                                  speed goes first when the bar tightens and the adapter follows. -->
-                            <TextBlock x:Name="NetworkFooterAdapter" FontSize="10" FontFamily="{DynamicResource UiFont}"
+                            <TextBlock x:Name="NetworkFooterAdapter" FontSize="16" FontFamily="{DynamicResource BrandSansFont}" TextOptions.TextFormattingMode="Ideal"
                                        Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="NetworkFooterSpeed" FontSize="10" FontFamily="{DynamicResource UiFont}"
+                            <TextBlock x:Name="NetworkFooterSpeed" FontSize="16" FontFamily="{DynamicResource BrandSansFont}" TextOptions.TextFormattingMode="Ideal"
                                        Foreground="{DynamicResource DimTextBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                     <ProgressBar x:Name="ScanProgress"
                                  Width="80" Height="4" VerticalAlignment="Center"
-                                 Foreground="{DynamicResource PrimaryBrush}"
+                                 Foreground="{DynamicResource HeaderLineBrush}"
                                  Background="{DynamicResource CardBorderBrush}"
                                  Visibility="Collapsed" Margin="0,0,12,0"/>
                     <TextBlock x:Name="VersionLabel" Text="v1.5.2"

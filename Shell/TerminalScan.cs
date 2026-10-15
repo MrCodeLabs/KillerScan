@@ -22,6 +22,12 @@ namespace KillerScan.Shell
         private void InitializeTerminalScanToolbar(TextBox scanTarget)
         {
             _terminalDeviceCount.SetResourceReference(TextBlock.ForegroundProperty, "DimTextBrush");
+            // Same type as the scan view's count beside the status line.
+            _terminalDeviceCount.FontSize = 16;
+            _terminalDeviceCount.Margin = new Thickness(8, 0, 0, 0);
+            _terminalDeviceCount.VerticalAlignment = VerticalAlignment.Center;
+            _terminalDeviceCount.SetResourceReference(TextBlock.FontFamilyProperty, "BrandSansFont");
+            System.Windows.Media.TextOptions.SetTextFormattingMode(_terminalDeviceCount, System.Windows.Media.TextFormattingMode.Ideal);
             DeviceCountFooter.Children.Add(_terminalDeviceCount);
             var bar = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(8, 0, 0, 0) };
             var target = new TextBox

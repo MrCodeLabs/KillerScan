@@ -129,13 +129,17 @@ namespace KillerScan.Shell
                 UpdateScanLight();
                 FooterBar.SizeChanged += (_, _) => { FitFooterNetwork(); FitFooterStatus(); };
                 PortableBadge.IsVisibleChanged += (_, _) => { FitFooterNetwork(); FitFooterStatus(); };
+                ScanProgress.IsVisibleChanged += (_, _) => FitFooterNetwork();
                 NetworkFooter.SizeChanged += (_, _) => FitFooterNetwork();
                 FitFooterNetwork();
                 FitFooterStatus();
                 var count = (TextBlock)_scanWorkspace.FindName("DeviceCount");
                 ((Panel)count.Parent).Children.Remove(count);
                 count.Margin = new Thickness(8, 0, 0, 0);
-                count.FontSize = 10;
+                // The footer's own type, so the count reads as part of the status line.
+                count.FontSize = 16;
+                count.SetResourceReference(TextBlock.FontFamilyProperty, "BrandSansFont");
+                TextOptions.SetTextFormattingMode(count, TextFormattingMode.Ideal);
                 DeviceCountFooter.Children.Add(count);
                 // Export lives on the rail with the other app actions rather than on the view bar.
                 // It is one step at the end of a scan, and the bar belongs to the views and to the
@@ -251,31 +255,39 @@ namespace KillerScan.Shell
             double footer = FooterBar.ActualWidth;
             if (footer <= 0) return;
 
-            // Half the bar, less half the badge, is where the right cell has to stop. With no
-            // badge showing the only limit is the bar itself.
+            // Half the bar, plus half the badge and a little air, is where the right cell has to
+            // stop. The whole cell is measured rather than added up from its parts, so the
+            // copyright, the margins and the scan progress bar (shown only while a scan runs)
+            // all count.
             double badge = PortableBadge.Visibility == Visibility.Visible ? PortableBadge.ActualWidth : 0;
-            double budget = footer / 2 - badge / 2 - FooterNetworkGap
-                          - VersionLabel.ActualWidth - NetworkFooter.ActualWidth - NetworkFooterIcon.ActualWidth;
-
-            // Measured at their natural width, because each one is shown whole or not at all.
-            var free = new Size(double.PositiveInfinity, double.PositiveInfinity);
-            NetworkFooterAdapter.Measure(free);
-            NetworkFooterSpeed.Measure(free);
-            double adapter = NetworkFooterAdapter.DesiredSize.Width;
-            double speed = NetworkFooterSpeed.DesiredSize.Width;
+            double limit = footer / 2 + badge / 2 + FooterBadgeGap;
+            double cellRight = VersionCell.TranslatePoint(new Point(VersionCell.ActualWidth, 0), FooterBar).X
+                             + VersionCell.Margin.Right;
+            double room = cellRight - limit;
 
             // The speed is the first to go: it is the least useful of the three and the shortest,
             // so dropping it usually buys enough room to keep the adapter name intact. Trimming
             // either one to an ellipsis looks like damage rather than a fit.
-            bool showAdapter = adapter > 0 && budget >= adapter;
-            bool showSpeed = showAdapter && speed > 0 && budget >= adapter + speed;
+            bool showAdapter = !string.IsNullOrEmpty(NetworkFooterAdapter.Text);
+            bool showSpeed = showAdapter && !string.IsNullOrEmpty(NetworkFooterSpeed.Text);
+            if (showSpeed && FooterCellWidth(true, true) > room) showSpeed = false;
+            if (showAdapter && !showSpeed && FooterCellWidth(true, false) > room) showAdapter = false;
 
             NetworkFooterAdapter.Visibility = showAdapter ? Visibility.Visible : Visibility.Collapsed;
             NetworkFooterSpeed.Visibility = showSpeed ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        /// <summary>Padding and cell margins the budget above cannot measure directly.</summary>
-        private const double FooterNetworkGap = 52;
+        /// <summary>The right cell's full width, margins included, with the given parts shown.</summary>
+        private double FooterCellWidth(bool adapter, bool speed)
+        {
+            NetworkFooterAdapter.Visibility = adapter ? Visibility.Visible : Visibility.Collapsed;
+            NetworkFooterSpeed.Visibility = speed ? Visibility.Visible : Visibility.Collapsed;
+            VersionCell.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return VersionCell.DesiredSize.Width;
+        }
+
+        /// <summary>Breathing room between the right cell and the portable badge.</summary>
+        private const double FooterBadgeGap = 8;
 
         /// <summary>
         /// The same problem on the left of the bar. The status line had a fixed 230px cap so it
