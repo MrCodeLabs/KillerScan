@@ -241,11 +241,12 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Download and install {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">The app will close and reopen automatically.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Update</sys:String>
-    <sys:String x:Key="Str_Upd_NotNow">Not now</sys:String>
-    <sys:String x:Key="Str_Upd_StartupCheck">Check for updates on startup</sys:String>
-    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} is available</sys:String>
-    <sys:String x:Key="Str_Upd_StartupBody">Would you like to download and install it now? The app will close and reopen automatically.</sys:String>
-    <sys:String x:Key="Str_Upd_AlwaysCheck">Always check on startup</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Check for updates on startup</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} is available</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Would you like to download and install it now? The app will close and reopen automatically.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Update</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Not now</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Always check on startup</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->

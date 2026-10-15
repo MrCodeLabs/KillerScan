@@ -226,11 +226,12 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">下載並安裝 {0} {1}？</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">應用程式將關閉並自動重新開啟。</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
-    <sys:String x:Key="Str_Upd_NotNow">稍後再說</sys:String>
-    <sys:String x:Key="Str_Upd_StartupCheck">啟動時檢查更新</sys:String>
-    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} 已推出</sys:String>
-    <sys:String x:Key="Str_Upd_StartupBody">要立即下載並安裝嗎？應用程式將關閉並自動重新開啟。</sys:String>
-    <sys:String x:Key="Str_Upd_AlwaysCheck">啟動時一律檢查更新</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">啟動時檢查更新</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} 已推出</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">要立即下載並安裝嗎？應用程式將關閉並自動重新開啟。</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">更新</sys:String>
+    <sys:String x:Key="Str_About_NotNow">稍後再說</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">啟動時一律檢查更新</sys:String>
     <sys:String x:Key="Str_Conflict_Title">安裝衝突</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan 已安裝兩次。現在移除另一個目前使用者的複本嗎？
 

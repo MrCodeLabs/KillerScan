@@ -241,11 +241,12 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} жүктеп орнату керек пе?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">Қолданба автоматты түрде жабылып, қайта ашылады.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Жаңарту</sys:String>
-    <sys:String x:Key="Str_Upd_NotNow">Қазір емес</sys:String>
-    <sys:String x:Key="Str_Upd_StartupCheck">Іске қосылғанда жаңартуларды тексеру</sys:String>
-    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} қолжетімді</sys:String>
-    <sys:String x:Key="Str_Upd_StartupBody">Оны қазір жүктеп, орнатқыңыз келе ме? Қолданба автоматты түрде жабылып, қайта ашылады.</sys:String>
-    <sys:String x:Key="Str_Upd_AlwaysCheck">Іске қосылғанда жаңартуларды әрдайым тексеру</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Іске қосылғанда жаңартуларды тексеру</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} қолжетімді</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Оны қазір жүктеп, орнатқыңыз келе ме? Қолданба автоматты түрде жабылып, қайта ашылады.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Жаңарту</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Қазір емес</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Іске қосылғанда жаңартуларды әрдайым тексеру</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->

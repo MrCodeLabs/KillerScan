@@ -241,11 +241,12 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Baixar e instalar {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">O app será fechado e reaberto automaticamente.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Atualizar</sys:String>
-    <sys:String x:Key="Str_Upd_NotNow">Agora não</sys:String>
-    <sys:String x:Key="Str_Upd_StartupCheck">Verificar atualizações ao iniciar</sys:String>
-    <sys:String x:Key="Str_Upd_StartupHead">O {0} {1} está disponível</sys:String>
-    <sys:String x:Key="Str_Upd_StartupBody">Deseja baixá-lo e instalá-lo agora? O aplicativo será fechado e reaberto automaticamente.</sys:String>
-    <sys:String x:Key="Str_Upd_AlwaysCheck">Sempre verificar ao iniciar</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Verificar atualizações ao iniciar</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">O {0} {1} está disponível</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Deseja baixá-lo e instalá-lo agora? O aplicativo será fechado e reaberto automaticamente.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Atualizar</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Agora não</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Sempre verificar ao iniciar</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->

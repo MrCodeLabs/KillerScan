@@ -226,11 +226,12 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Télécharger et installer {0} {1} ?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">L'application se fermera et redémarrera automatiquement.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Mettre à jour</sys:String>
-    <sys:String x:Key="Str_Upd_NotNow">Pas maintenant</sys:String>
-    <sys:String x:Key="Str_Upd_StartupCheck">Rechercher les mises à jour au démarrage</sys:String>
-    <sys:String x:Key="Str_Upd_StartupHead">{0} {1} est disponible</sys:String>
-    <sys:String x:Key="Str_Upd_StartupBody">Voulez-vous le télécharger et l'installer maintenant ? L'application se fermera et rouvrira automatiquement.</sys:String>
-    <sys:String x:Key="Str_Upd_AlwaysCheck">Toujours rechercher les mises à jour au démarrage</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Rechercher les mises à jour au démarrage</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} est disponible</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Voulez-vous le télécharger et l'installer maintenant ? L'application se fermera et rouvrira automatiquement.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Mettre à jour</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Pas maintenant</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Toujours rechercher les mises à jour au démarrage</sys:String>
     <sys:String x:Key="Str_Conflict_Title">conflit d'installation</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan est installé deux fois. Supprimer maintenant l'autre copie par utilisateur ?
 

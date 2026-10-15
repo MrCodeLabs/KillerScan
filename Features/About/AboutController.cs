@@ -52,10 +52,10 @@ namespace KillerScan.Features.About
             // Never stack the prompt on a dialog the user already has open.
             if (!_host.Window.IsVisible || _host.Window.OwnedWindows.Count > 0) return;
             var dlg = new ConfirmDialog(
-                string.Format(_host.Loc("Str_Upd_StartupHead"), AppInfo.DisplayName, tag),
-                _host.Loc("Str_Upd_StartupBody"),
-                _host.Loc("Str_Upd_ConfirmBtn"), _host.Loc("Str_Upd_NotNow"),
-                _host.Loc("Str_Upd_AlwaysCheck"), StartupCheckEnabled) { Owner = _host.Window };
+                string.Format(_host.Loc("Str_About_StartupUpdateHeading"), AppInfo.DisplayName, tag),
+                _host.Loc("Str_About_StartupUpdateDetail"),
+                _host.Loc("Str_About_UpdateNow"), _host.Loc("Str_About_NotNow"),
+                _host.Loc("Str_About_AlwaysCheckOnStartup"), StartupCheckEnabled) { Owner = _host.Window };
             dlg.ShowDialog();
             SetStartupCheck(dlg.Check1Checked);
             if (dlg.Confirmed) await InstallAsync(tag);

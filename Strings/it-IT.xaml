@@ -253,11 +253,12 @@
     <sys:String x:Key="Str_Upd_ConfirmHead">Scaricare e installare {0} {1}?</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBody">L'app si chiuderà e si riaprirà automaticamente.</sys:String>
     <sys:String x:Key="Str_Upd_ConfirmBtn">Aggiorna</sys:String>
-    <sys:String x:Key="Str_Upd_NotNow">Non ora</sys:String>
-    <sys:String x:Key="Str_Upd_StartupCheck">All'avvio cerca aggiornamenti</sys:String>
-    <sys:String x:Key="Str_Upd_StartupHead">È disponibile {0} {1}</sys:String>
-    <sys:String x:Key="Str_Upd_StartupBody">Vuoi scaricarlo e installarlo ora? L'app si chiuderà e si riaprirà automaticamente.</sys:String>
-    <sys:String x:Key="Str_Upd_AlwaysCheck">All'avvio controlla sempre aggiornamenti</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">All'avvio cerca aggiornamenti</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">È disponibile {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Vuoi scaricarlo e installarlo ora? L'app si chiuderà e si riaprirà automaticamente.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Aggiorna</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Non ora</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">All'avvio controlla sempre aggiornamenti</sys:String>
     <sys:String x:Key="Str_Conflict_Title">conflitto di installazione</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan è installato due volte. Rimuovere ora l'altra copia per utente?
 
