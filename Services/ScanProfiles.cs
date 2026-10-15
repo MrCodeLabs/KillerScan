@@ -8,6 +8,9 @@ namespace KillerScan.Services
         public string Name { get; set; } = string.Empty;
         public string Target { get; set; } = string.Empty;
         public bool DeepScanAfter { get; set; }
+
+        /// <summary>What a screen reader announces for the profile's row in the profiles list.</summary>
+        public override string ToString() => Name + ", " + Target;
     }
 
     internal static class ScanProfiles

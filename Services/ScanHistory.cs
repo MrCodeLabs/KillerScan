@@ -8,6 +8,10 @@ namespace KillerScan.Services
         public DateTimeOffset ScannedAt { get; set; }
         public string Target { get; set; } = string.Empty;
         public List<HistoricalDevice> Devices { get; set; } = [];
+
+        /// <summary>What a screen reader announces for the entry's row in the history list.</summary>
+        public override string ToString() =>
+            ScannedAt.ToString("g", System.Globalization.CultureInfo.CurrentCulture) + ", " + Target;
     }
 
     internal sealed class HistoricalDevice
