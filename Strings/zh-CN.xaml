@@ -221,11 +221,10 @@
     <sys:String x:Key="Str_Db_Updated">已更新至 {0} 条记录。</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">无法保存数据库：{0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">更新失败：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">有可用更新：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">正在下载...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">下载并安装 {0} {1}？</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">应用将关闭并自动重新打开。</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">有可用更新：{0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">正在下载...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">下载并安装 {0} {1}？</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">应用将关闭并自动重新打开。</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateCheck">启动时检查更新</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} 已发布</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateDetail">是否立即下载并安装？应用将关闭并自动重新打开。</sys:String>

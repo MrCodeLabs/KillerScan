@@ -236,11 +236,10 @@
     <sys:String x:Key="Str_Db_Failed">Не вдалося оновити: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Доступне оновлення: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Завантаження...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Завантажити й установити {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Застосунок закриється та відкриється знову автоматично.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Оновити</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Доступне оновлення: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Завантаження...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Завантажити й установити {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Застосунок закриється та відкриється знову автоматично.</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateCheck">Перевіряти оновлення під час запуску</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateHeading">Доступний {0} {1}</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateDetail">Завантажити та встановити зараз? Програма закриється та відкриється знову автоматично.</sys:String>

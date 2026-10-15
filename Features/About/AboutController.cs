@@ -46,7 +46,7 @@ namespace KillerScan.Features.About
             if (tag is null || _updating) return;
 
             _updateTag          = tag;
-            _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+            _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
             _host.UpdateVisible = true;
 
             // Never stack the prompt on a dialog the user already has open.
@@ -175,7 +175,7 @@ namespace KillerScan.Features.About
             if (tag is null || _updating) return;
 
             _updateTag          = tag;
-            _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+            _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
             _host.UpdateVisible = true;
         }
 
@@ -188,9 +188,9 @@ namespace KillerScan.Features.About
             if (string.IsNullOrEmpty(tag) || _updating) return;
 
             var dlg = new ConfirmDialog(
-                string.Format(_host.Loc("Str_Upd_ConfirmHead"), AppInfo.DisplayName, tag),
-                _host.Loc("Str_Upd_ConfirmBody"),
-                _host.Loc("Str_Upd_ConfirmBtn"),
+                string.Format(_host.Loc("Str_About_UpdateHeading"), AppInfo.DisplayName, tag),
+                _host.Loc("Str_About_UpdateDetail"),
+                _host.Loc("Str_About_UpdateNow"),
                 _host.Loc("Str_Btn_Cancel")) { Owner = _host.Window };
             dlg.ShowDialog();
             if (!dlg.Confirmed) return;
@@ -202,7 +202,7 @@ namespace KillerScan.Features.About
             if (_updating) return;
             _updating           = true;
             _host.UpdateEnabled = false;
-            _host.UpdateText    = _host.Loc("Str_Upd_Downloading");
+            _host.UpdateText    = _host.Loc("Str_About_Downloading");
 
             string? newExe;
             try
@@ -215,7 +215,7 @@ namespace KillerScan.Features.About
                 // releases page so the user can update by hand.
                 _updating           = false;
                 _host.UpdateEnabled = true;
-                _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+                _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
                 WebLink.Open(UpdateService.ReleasesUrl);
                 return;
             }
@@ -232,7 +232,7 @@ namespace KillerScan.Features.About
                 UpdateService.DiscardDownload(newExe);
                 _updating           = false;
                 _host.UpdateEnabled = true;
-                _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+                _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
             }
         }
     }

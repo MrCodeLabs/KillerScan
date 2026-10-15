@@ -232,11 +232,10 @@
     <sys:String x:Key="Str_Db_Updated">{0} 件に更新しました。</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">データベースを保存できませんでした: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">更新に失敗しました: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">更新が利用可能: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">ダウンロード中...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} をダウンロードしてインストールしますか?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">アプリは終了し、自動的に再起動します。</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">更新が利用可能: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">ダウンロード中...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} をダウンロードしてインストールしますか?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">アプリは終了し、自動的に再起動します。</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateCheck">起動時に更新を確認する</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} が利用可能です</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateDetail">今すぐダウンロードしてインストールしますか？アプリは終了し、自動的に再起動します。</sys:String>

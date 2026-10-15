@@ -221,11 +221,10 @@
     <sys:String x:Key="Str_Db_Updated">Auf {0} Einträge aktualisiert.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Die Datenbank konnte nicht gespeichert werden: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Aktualisierung fehlgeschlagen: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Update verfügbar: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Wird heruntergeladen...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} herunterladen und installieren?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Die App wird geschlossen und automatisch neu gestartet.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Aktualisieren</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Update verfügbar: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Wird heruntergeladen...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} herunterladen und installieren?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Die App wird geschlossen und automatisch neu gestartet.</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateCheck">Beim Start nach Updates suchen</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} ist verfügbar</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateDetail">Möchten Sie diese Version jetzt herunterladen und installieren? Die App wird geschlossen und automatisch neu geöffnet.</sys:String>

@@ -221,11 +221,10 @@
     <sys:String x:Key="Str_Db_Updated">已更新至 {0} 筆記錄。</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">無法儲存資料庫：{0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">更新失敗：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">有可用更新：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">正在下載...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">下載並安裝 {0} {1}？</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">應用程式將關閉並自動重新開啟。</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">有可用更新：{0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">正在下載...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">下載並安裝 {0} {1}？</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">應用程式將關閉並自動重新開啟。</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateCheck">啟動時檢查更新</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} 已推出</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateDetail">要立即下載並安裝嗎？應用程式將關閉並自動重新開啟。</sys:String>
