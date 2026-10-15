@@ -30,6 +30,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - On the 98SE theme, dialog captions use Microsoft Sans Serif like the rest of the interface, as in KillerPDF, instead of Tahoma.
 - The title bar icon is 27px and has its own 27px image, so it is a little larger and sharper.
 - Centered website logos with space above and below and corrected current features, runtime requirements and documentation.
+- Menu separators draw their divider line instead of leaving an empty gap.
 
 ## [1.8.0] - 2026-10-08
 

@@ -1110,8 +1110,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Separator">
                             <Border Background="{TemplateBinding Background}"
-                                    Height="{TemplateBinding Height}"
-                                    Margin="{TemplateBinding Margin}"/>
+                                    Height="{TemplateBinding Height}"/>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
