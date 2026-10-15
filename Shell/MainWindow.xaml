@@ -1,6 +1,7 @@
 <Window x:Class="KillerScan.Shell.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:a11y="clr-namespace:KillerFamily.Accessibility"
         xmlns:icons="clr-namespace:KillerScan.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -316,7 +317,7 @@
                      gets the width beside the glyph and wraps to a second centered line when the
                      language needs it; short titles still size to their text and stay centered. -->
                 <DockPanel x:Name="HistorySidebarHeader" Grid.Row="0" HorizontalAlignment="Center" Margin="8,0,8,6">
-                    <TextBlock x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
+                    <a11y:Glyph x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
                                Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="SidebarHeading" Text="{DynamicResource Str_History_Title}" TextAlignment="Center"
                                Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource HeadingFont}"
@@ -403,18 +404,18 @@
                                 <StackPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Run}" InputGestureText="Enter" Click="ProfileRun_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE768;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE768;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Load}" InputGestureText="Ctrl+L" Click="ProfileLoad_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8E5;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8E5;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Deep}" IsCheckable="True"
                                                   InputGestureText="Ctrl+Alt+D" IsChecked="{Binding DeepScanAfter, Mode=OneWay}" Click="ProfileDeep_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <Separator/>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Delete}" InputGestureText="Delete" Click="ProfileDelete_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE74D;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE74D;"/></MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
                                 </StackPanel.ContextMenu>
@@ -509,7 +510,7 @@
                     <ContextMenu>
                         <MenuItem Header="{DynamicResource Str_History_Settings}" InputGestureText="Ctrl+Alt+R"
                                   Click="HistorySettings_Click">
-                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE81C;"/></MenuItem.Icon>
+                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE81C;"/></MenuItem.Icon>
                         </MenuItem>
                     </ContextMenu>
                 </Button.ContextMenu>
@@ -667,7 +668,7 @@
                             MouseLeftButtonUp="NetworkFooter_Click"
                             ToolTip="{DynamicResource Str_TT_FooterNetwork}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock x:Name="NetworkFooterIcon" FontSize="13" FontFamily="Segoe MDL2 Assets"
+                            <a11y:Glyph x:Name="NetworkFooterIcon" FontSize="13" FontFamily="Segoe MDL2 Assets"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="NetworkFooter" FontSize="16" FontFamily="{DynamicResource BrandSansFont}" TextOptions.TextFormattingMode="Ideal"
                                        Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>

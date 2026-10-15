@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using KillerScan.Controls;
+using KillerFamily.Accessibility;
 
 namespace KillerScan.Shell
 {
@@ -71,7 +72,7 @@ namespace KillerScan.Shell
                 _ => "\uE756"
             };
             var content = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
-            content.Children.Add(new TextBlock
+            content.Children.Add(new Glyph
             {
                 Text = glyph, FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
                 FontSize = 14, HorizontalAlignment = HorizontalAlignment.Center
@@ -179,7 +180,7 @@ namespace KillerScan.Shell
                 button.Padding = under ? new Thickness(6, 4, 6, 4) : new Thickness(8, 5, 8, 5);
                 var panel = new StackPanel { Orientation = under ? Orientation.Vertical : Orientation.Horizontal,
                     HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                if (!only) panel.Children.Add(new TextBlock { Text = entry.Value.Glyph,
+                if (!only) panel.Children.Add(new Glyph { Text = entry.Value.Glyph,
                     FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"), FontSize = large ? 20 : 14,
                     HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
                 if (!none)

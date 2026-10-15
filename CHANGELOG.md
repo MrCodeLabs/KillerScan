@@ -16,11 +16,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The Light theme draws a softer shadow under the toolbars.
 
 ### Fixed
+- Screen readers no longer read toolbar, menu, tab and title bar icons as unreadable symbols.
 - Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.
 - The Scan History sidebar can no longer be dragged or zoomed narrower than its dates, so a saved scan's date and time are never cut off.
 - The website top bar no longer leaves extra space under the wordmark and buttons.
-
 - Theme and language radio buttons and the Film Grain checkbox line up with their labels again.
+
 ## [1.8.1] - 2026-10-14
 
 ### Added
