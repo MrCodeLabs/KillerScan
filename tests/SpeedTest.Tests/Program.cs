@@ -484,9 +484,9 @@ internal static class Program
                     "One sidebar rail serves every theme, including 98SE");
                 var updateButton = (XmlElement)windowXml.SelectSingleNode("//*[@x:Name='AboutUpdateButton']", ns)!;
                 var updateText = (XmlElement)updateButton.SelectSingleNode(".//*[@x:Name='AboutUpdateText']", ns)!;
-                Require(updateButton.GetAttribute("Style") == "{StaticResource PrimaryButton}" &&
-                    updateText.GetAttribute("Foreground") == "{DynamicResource OnPrimaryBrush}",
-                    "About update button uses the shared primary-button contrast");
+                Require(updateButton.GetAttribute("Style") == "{StaticResource OutlineButton}" &&
+                    updateText.GetAttribute("Foreground") == "{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}",
+                    "About update button is the family outline button, as in KillerPDF");
                 var confirmXml = new XmlDocument();
                 confirmXml.Load(Path.Combine(directory.FullName, "Controls", "ConfirmDialog.xaml"));
                 Require(confirmXml.OuterXml.Contains("Background=\"{DynamicResource InputDialogTitleBrush}\"") &&
