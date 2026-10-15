@@ -486,7 +486,7 @@ internal static class Program
                 var updateText = (XmlElement)updateButton.SelectSingleNode(".//*[@x:Name='AboutUpdateText']", ns)!;
                 Require(updateButton.GetAttribute("Style") == "{StaticResource OutlineButton}" &&
                     updateText.GetAttribute("Foreground") == "{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}",
-                    "About update button is the family outline button, as in KillerPDF");
+                    "About update button is the family outline button");
                 var confirmXml = new XmlDocument();
                 confirmXml.Load(Path.Combine(directory.FullName, "Controls", "ConfirmDialog.xaml"));
                 Require(confirmXml.OuterXml.Contains("Background=\"{DynamicResource InputDialogTitleBrush}\"") &&

@@ -29,11 +29,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Dialog title wordmarks keep the main window's dark halo behind the app name on the Light theme's Yellow accent, so the yellow no longer fades into the title bar.
 - The wordmark has a soft shadow on the Light theme too, so it no longer looks thin on the light title bar, and the dark themes use the same lighter shadow as the rest of the Killer Tools family.
 - Button gradients start at the outline color and darken toward the bottom, so a hovered button no longer looks darker than its border.
-- On the 98SE theme, dialog captions use Microsoft Sans Serif like the rest of the interface, as in KillerPDF, instead of Tahoma.
+- On the 98SE theme, dialog captions use Microsoft Sans Serif like the rest of the interface instead of Tahoma.
 - The title bar icon is 27px and has its own 27px image, so it is a little larger and sharper.
 - Centered website logos with space above and below and corrected current features, runtime requirements and documentation.
 - Menu separators draw their divider line instead of leaving an empty gap.
-- The About card's update button uses the family outline button, as in KillerPDF, instead of a solid dark block.
+- The About card's update button uses the family outline button instead of a solid dark block.
 
 ## [1.8.0] - 2026-10-08
 
