@@ -17,7 +17,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Adapter és kapcsolati sebesség megjelenítése vagy elrejtése</sys:String>
     <sys:String x:Key="Str_Light_Idle">Még nincs vizsgálat</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Vizsgálat folyamatban</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan folyamatban</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Mély vizsgálat folyamatban</sys:String>
     <sys:String x:Key="Str_Light_Done">A vizsgálat kész</sys:String>
     <sys:String x:Key="Str_TT_Export">Exportálás</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">TÉMA</sys:String>
@@ -25,7 +25,7 @@
 
     <!-- Scan bar -->
     <sys:String x:Key="Str_Lbl_Subnet">Alhálózat</sys:String>
-    <sys:String x:Key="Str_Btn_Scan">Scan</sys:String>
+    <sys:String x:Key="Str_Btn_Scan">Vizsgálat</sys:String>
     <sys:String x:Key="Str_Btn_DeepScanAll">Mély vizsgálat</sys:String>
     <sys:String x:Key="Str_Lbl_Local">Helyi</sys:String>
     <sys:String x:Key="Str_Lbl_Gateway">Átjáró</sys:String>
@@ -96,7 +96,7 @@
     <!-- SSH username prompt ({0} is the device, filled in by the app) -->
     <sys:String x:Key="Str_Ssh_Head">Csatlakozzon a következőhöz: {0} SSH-n keresztül</sys:String>
     <sys:String x:Key="Str_Ssh_Detail">A bejelentkezéshez használt fiók. A KillerScan megjegyzi ezt az eszközt, így csak egyszer kérdezik meg. Hagyja üresen, hogy az SSH-kliens dönthessen.</sys:String>
-    <sys:String x:Key="Str_Ssh_User">USERNAME</sys:String>
+    <sys:String x:Key="Str_Ssh_User">FELHASZNÁLÓNÉV</sys:String>
     <sys:String x:Key="Str_Ssh_Connect">Csatlakozás</sys:String>
     <sys:String x:Key="Str_Btn_Cancel">Mégse</sys:String>
 
@@ -129,7 +129,7 @@
     <sys:String x:Key="Str_About_DbEntries">{0} bejegyzés</sys:String>
     <sys:String x:Key="Str_About_DbRefreshed">frissítve: {0}</sys:String>
     <sys:String x:Key="Str_About_DbBundled">az alkalmazással együtt</sys:String>
-    <sys:String x:Key="Str_About_DescA" xml:space="preserve">ARP + IP sweep szállítókereséssel, eszközosztályozással és tematikus, rendezhető HTML-exporttal. A </sys:String>
+    <sys:String x:Key="Str_About_DescA" xml:space="preserve">ARP + IP pásztázás szállítókereséssel, eszközosztályozással és tematikus, rendezhető HTML-exporttal. A </sys:String>
     <sys:String x:Key="Str_About_DescB" xml:space="preserve"> hasznosság.</sys:String>
 
     <!-- Status bar messages (composed in code - {0}/{1} are filled in by the app) -->

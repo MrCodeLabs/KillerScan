@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Mostrar u ocultar el adaptador y la velocidad de enlace</sys:String>
     <sys:String x:Key="Str_Light_Idle">Todavía no se ha escaneado nada</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Escaneando</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan en curso</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Escaneo profundo en curso</sys:String>
     <sys:String x:Key="Str_Light_Done">Escaneo completado</sys:String>
     <sys:String x:Key="Str_TT_Export">Exportar</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">TEMA</sys:String>

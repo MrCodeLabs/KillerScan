@@ -11973,7 +11973,7 @@ I18N.pt = {
  "tk_52": "MQTT: brokers de mensagens de casa inteligente",
  "tk_53": "WSD: Web Services for Devices",
  "tk_54": "Synology DSM / AFP: caixas NAS",
- "tk_55": "VMware ESXi / Proxmox: hypervisors",
+ "tk_55": "VMware ESXi / Proxmox: hipervisores",
  "tk_56": "Home Assistant",
  "tk_57": "Servidor de mídia Plex",
  "tk_58": "SNMP: switches gerenciáveis, impressoras, equipamentos de rede",

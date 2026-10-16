@@ -17,7 +17,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Адаптер мен байланыс жылдамдығын көрсету немесе жасыру</sys:String>
     <sys:String x:Key="Str_Light_Idle">Әзірге ештеңе сканерленбеді</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Сканерлеу жүріп жатыр</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan орындалуда</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Терең сканерлеу орындалуда</sys:String>
     <sys:String x:Key="Str_Light_Done">Сканерлеу аяқталды</sys:String>
     <sys:String x:Key="Str_TT_Export">Экспорттау</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">ТАҚЫРЫП</sys:String>
@@ -216,7 +216,7 @@
     <!-- ==== DIALOGS, UPDATES AND ERRORS ==== -->
     <sys:String x:Key="Str_About_Title">KillerScan туралы</sys:String>
     <sys:String x:Key="Str_TT_About">KillerScan туралы</sys:String>
-    <sys:String x:Key="Str_About_Aka" xml:space="preserve">AKA </sys:String>
+    <sys:String x:Key="Str_About_Aka" xml:space="preserve">ЛАҚАП АТЫ </sys:String>
     <sys:String x:Key="Str_About_Unsigned">(қол қойылмаған немесе тізбек расталмады)</sys:String>
     <sys:String x:Key="Str_About_Computing">есептелуде...</sys:String>
     <sys:String x:Key="Str_Ssh_Title">SSH тіркелгісі</sys:String>

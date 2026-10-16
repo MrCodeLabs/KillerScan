@@ -182,7 +182,7 @@
     <sys:String x:Key="Str_KS_Device">DISPOSITIVOS</sys:String>
     <sys:String x:Key="Str_KS_Topology">TOPOLOGIA</sys:String>
     <sys:String x:Key="Str_KS_Toolbar">BARRA DE FERRAMENTAS</sys:String>
-    <sys:String x:Key="Str_KS_App">APP</sys:String>
+    <sys:String x:Key="Str_KS_App">APLICATIVO</sys:String>
     <sys:String x:Key="Str_Sc_Scan">Iniciar ou parar uma verificação</sys:String>
     <sys:String x:Key="Str_Sc_Cancel">Cancelar a verificação ou fechar isto</sys:String>
     <sys:String x:Key="Str_Sc_Rescan">Refazer a verificação profunda dos hosts selecionados</sys:String>
@@ -216,7 +216,7 @@
     <!-- ==== DIALOGS, UPDATES AND ERRORS ==== -->
     <sys:String x:Key="Str_About_Title">Sobre o KillerScan</sys:String>
     <sys:String x:Key="Str_TT_About">Sobre o KillerScan</sys:String>
-    <sys:String x:Key="Str_About_Aka" xml:space="preserve">AKA </sys:String>
+    <sys:String x:Key="Str_About_Aka" xml:space="preserve">ALIAS </sys:String>
     <sys:String x:Key="Str_About_Unsigned">(não assinado ou falha na cadeia)</sys:String>
     <sys:String x:Key="Str_About_Computing">calculando...</sys:String>
     <sys:String x:Key="Str_Ssh_Title">Conta SSH</sys:String>

@@ -161,7 +161,7 @@
     <sys:String x:Key="Str_Sc_Export">Lưu thiết bị dạng CSV</sys:String>
     <sys:String x:Key="Str_Sc_Browser">Mở thiết bị đã chọn trong trình duyệt</sys:String>
     <sys:String x:Key="Str_Sc_Ping">Ping thiết bị đã chọn</sys:String>
-    <sys:String x:Key="Str_Sc_Rdp">Mở Remote Desktop tới thiết bị đã chọn</sys:String>
+    <sys:String x:Key="Str_Sc_Rdp">Mở Máy tính Từ xa tới thiết bị đã chọn</sys:String>
     <sys:String x:Key="Str_Sc_Ssh">Kết nối với thiết bị đã chọn qua SSH</sys:String>
     <sys:String x:Key="Str_Sc_SshAs">Chọn tài khoản SSH và kết nối</sys:String>
     <sys:String x:Key="Str_Sc_CopyIp">Sao chép địa chỉ IP đã chọn</sys:String>

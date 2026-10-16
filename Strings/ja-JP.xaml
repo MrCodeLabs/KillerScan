@@ -16,7 +16,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">アダプターとリンク速度の表示を切り替え</sys:String>
     <sys:String x:Key="Str_Light_Idle">まだスキャンしていません</sys:String>
     <sys:String x:Key="Str_Light_Scanning">スキャン中</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan 実行中</sys:String>
+    <sys:String x:Key="Str_Light_Deep">詳細スキャン実行中</sys:String>
     <sys:String x:Key="Str_Light_Done">スキャン完了</sys:String>
     <sys:String x:Key="Str_TT_Export">エクスポート</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">テーマ</sys:String>

@@ -9,7 +9,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Pokaż lub ukryj kartę sieciową i szybkość łącza</sys:String>
     <sys:String x:Key="Str_Light_Idle">Nic jeszcze nie przeskanowano</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Skanowanie</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Trwa Deep Scan</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Trwa skanowanie dogłębne</sys:String>
     <sys:String x:Key="Str_Light_Done">Skanowanie zakończone</sys:String>
     <sys:String x:Key="Str_TT_Export">Eksportuj</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">MOTYW</sys:String>

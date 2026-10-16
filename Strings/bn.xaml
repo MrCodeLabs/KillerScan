@@ -211,7 +211,7 @@
     <sys:String x:Key="Str_Ssh_Title">SSH অ্যাকাউন্ট</sys:String>
     <sys:String x:Key="Str_Btn_Install">ইনস্টল করুন</sys:String>
     <sys:String x:Key="Str_Install_BulletShortcut">- স্টার্ট মেনু শর্টকাট</sys:String>
-    <sys:String x:Key="Str_Install_BulletArp">- Add/Remove Programs তালিকায় দেখা যাবে</sys:String>
+    <sys:String x:Key="Str_Install_BulletArp">- প্রোগ্রাম যোগ/সরান তালিকায় দেখা যাবে</sys:String>
     <sys:String x:Key="Str_Db_Checking">নতুন ভেন্ডর ডেটা খোঁজা হচ্ছে...</sys:String>
     <sys:String x:Key="Str_Db_Downloading">ভেন্ডর ডেটা ডাউনলোড হচ্ছে...</sys:String>
     <sys:String x:Key="Str_Db_Fallback">বিকল্প উৎস চেষ্টা করা হচ্ছে...</sys:String>

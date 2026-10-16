@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Bağdaştırıcıyı ve bağlantı hızını göster veya gizle</sys:String>
     <sys:String x:Key="Str_Light_Idle">Henüz tarama yapılmadı</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Taranıyor</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan çalışıyor</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Derin tarama çalışıyor</sys:String>
     <sys:String x:Key="Str_Light_Done">Tarama tamamlandı</sys:String>
     <sys:String x:Key="Str_TT_Export">Dışa aktar</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">TEMA</sys:String>

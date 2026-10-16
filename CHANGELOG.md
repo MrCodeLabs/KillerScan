@@ -17,6 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The Light theme draws a softer shadow under the toolbars.
 
 ### Fixed
+- The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
 - On the Light theme's Yellow accent, buttons, links, tabs and accent icons stay yellow with a dark shadow behind yellow text and icons, instead of turning near-black.
 - Screen readers no longer read toolbar, menu, tab and title bar icons as unreadable symbols.
 - Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.

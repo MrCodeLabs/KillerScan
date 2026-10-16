@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">显示或隐藏网卡和链路速度</sys:String>
     <sys:String x:Key="Str_Light_Idle">尚未扫描</sys:String>
     <sys:String x:Key="Str_Light_Scanning">正在扫描</sys:String>
-    <sys:String x:Key="Str_Light_Deep">正在执行 Deep Scan</sys:String>
+    <sys:String x:Key="Str_Light_Deep">正在执行深度扫描</sys:String>
     <sys:String x:Key="Str_Light_Done">扫描完成</sys:String>
     <sys:String x:Key="Str_TT_Export">导出</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">主题</sys:String>
