@@ -103,17 +103,17 @@
     <!-- Theme names, shown in the rail's theme flyout. Shared with KillerShell and KillerNotes
          key for key, so the same thirteen themes read the same way across the family. SE98 is
          listed here ahead of the theme itself landing, because the name is not translated. -->
-    <sys:String x:Key="Str_Theme_Dark">Темная</sys:String>
+    <sys:String x:Key="Str_Theme_Dark">Тёмная</sys:String>
     <sys:String x:Key="Str_Theme_Light">Светлая</sys:String>
-    <sys:String x:Key="Str_Theme_Black">Черная</sys:String>
+    <sys:String x:Key="Str_Theme_Black">Чёрная</sys:String>
     <sys:String x:Key="Str_Theme_SE98">98SE</sys:String>
     <sys:String x:Key="Str_Theme_Blood">Кровь</sys:String>
     <sys:String x:Key="Str_Theme_Greed">Алчность</sys:String>
     <sys:String x:Key="Str_Theme_Cyanotic">Цианоз</sys:String>
     <sys:String x:Key="Str_Theme_Ectoplasm">Эктоплазма</sys:String>
     <sys:String x:Key="Str_Theme_Decay">Распад</sys:String>
-    <sys:String x:Key="Str_Theme_Malaise">Недуг</sys:String>
-    <sys:String x:Key="Str_Theme_Sepulchre">Гробница</sys:String>
+    <sys:String x:Key="Str_Theme_Malaise">Недомогание</sys:String>
+    <sys:String x:Key="Str_Theme_Sepulchre">Склеп</sys:String>
     <sys:String x:Key="Str_Theme_Delirium">Бред</sys:String>
     <sys:String x:Key="Str_Theme_Mourning">Траур</sys:String>
     <sys:String x:Key="Str_Theme_FilmGrain">Зернистость плёнки</sys:String>

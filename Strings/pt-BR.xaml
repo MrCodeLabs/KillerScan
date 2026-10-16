@@ -437,7 +437,7 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Workspace_NewScan">Nova verificação</sys:String>
     <sys:String x:Key="Str_View_Devices">Dispositivos</sys:String>
     <sys:String x:Key="Str_View_Topology">Topologia</sys:String>
-    <sys:String x:Key="Str_View_KeepAlive">Keep Alive</sys:String>
+    <sys:String x:Key="Str_View_KeepAlive">Monitoramento de conexão</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Terminal</sys:String>
     <sys:String x:Key="Str_Term_Copy">Copiar</sys:String>
     <sys:String x:Key="Str_Term_Paste">Colar</sys:String>

@@ -90,9 +90,9 @@
     <sys:String x:Key="Str_Theme_Greed">Tham lam</sys:String>
     <sys:String x:Key="Str_Theme_Cyanotic">Tím tái</sys:String>
     <sys:String x:Key="Str_Theme_Ectoplasm">Ngoại chất</sys:String>
-    <sys:String x:Key="Str_Theme_Decay">Phân rã</sys:String>
-    <sys:String x:Key="Str_Theme_Malaise">Mệt mỏi</sys:String>
-    <sys:String x:Key="Str_Theme_Sepulchre">Lăng mộ</sys:String>
+    <sys:String x:Key="Str_Theme_Decay">Mục rữa</sys:String>
+    <sys:String x:Key="Str_Theme_Malaise">Uể oải</sys:String>
+    <sys:String x:Key="Str_Theme_Sepulchre">Hầm mộ</sys:String>
     <sys:String x:Key="Str_Theme_Delirium">Mê sảng</sys:String>
     <sys:String x:Key="Str_Theme_Mourning">Tang tóc</sys:String>
     <sys:String x:Key="Str_Theme_FilmGrain">Hạt phim</sys:String>
@@ -375,7 +375,7 @@ Cài đặt của bạn sẽ không bị xóa.</sys:String>
     <sys:String x:Key="Str_Workspace_NewScan">Lần quét mới</sys:String>
     <sys:String x:Key="Str_View_Devices">Thiết bị</sys:String>
     <sys:String x:Key="Str_View_Topology">Sơ đồ</sys:String>
-    <sys:String x:Key="Str_View_KeepAlive">Keep Alive</sys:String>
+    <sys:String x:Key="Str_View_KeepAlive">Giám sát kết nối</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Terminal</sys:String>
     <sys:String x:Key="Str_Term_Copy">Sao chép</sys:String>
     <sys:String x:Key="Str_Term_Paste">Dán</sys:String>

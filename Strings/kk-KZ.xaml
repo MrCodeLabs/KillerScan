@@ -104,18 +104,18 @@
          key for key, so the same thirteen themes read the same way across the family. SE98 is
          listed here ahead of the theme itself landing, because the name is not translated. -->
     <sys:String x:Key="Str_Theme_Dark">Қараңғы</sys:String>
-    <sys:String x:Key="Str_Theme_Light">Жарық</sys:String>
+    <sys:String x:Key="Str_Theme_Light">Ашық</sys:String>
     <sys:String x:Key="Str_Theme_Black">Қара</sys:String>
     <sys:String x:Key="Str_Theme_SE98">98SE</sys:String>
     <sys:String x:Key="Str_Theme_Blood">Қан</sys:String>
     <sys:String x:Key="Str_Theme_Greed">Ашкөздік</sys:String>
-    <sys:String x:Key="Str_Theme_Cyanotic">Цианозды</sys:String>
+    <sys:String x:Key="Str_Theme_Cyanotic">Цианоз</sys:String>
     <sys:String x:Key="Str_Theme_Ectoplasm">Эктоплазма</sys:String>
     <sys:String x:Key="Str_Theme_Decay">Ыдырау</sys:String>
-    <sys:String x:Key="Str_Theme_Malaise">Әлсіздік</sys:String>
-    <sys:String x:Key="Str_Theme_Sepulchre">Қабірхана</sys:String>
-    <sys:String x:Key="Str_Theme_Delirium">Делирий</sys:String>
-    <sys:String x:Key="Str_Theme_Mourning">Жоқтау</sys:String>
+    <sys:String x:Key="Str_Theme_Malaise">Науқастық</sys:String>
+    <sys:String x:Key="Str_Theme_Sepulchre">Кесене</sys:String>
+    <sys:String x:Key="Str_Theme_Delirium">Сандырақ</sys:String>
+    <sys:String x:Key="Str_Theme_Mourning">Аза</sys:String>
     <sys:String x:Key="Str_Theme_FilmGrain">Пленка түйіршігі</sys:String>
 
     <!-- About overlay -->
