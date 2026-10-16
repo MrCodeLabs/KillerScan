@@ -499,4 +499,8 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Défiler vers le bas</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Défiler vers la gauche</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Défiler vers la droite</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Page vers le haut</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Page vers le bas</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Page vers la gauche</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Page vers la droite</sys:String>
 </ResourceDictionary>

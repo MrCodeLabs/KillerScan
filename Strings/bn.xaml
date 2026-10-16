@@ -499,4 +499,8 @@
     <sys:String x:Key="Str_Scroll_Down">নিচে স্ক্রল করুন</sys:String>
     <sys:String x:Key="Str_Scroll_Left">বাঁয়ে স্ক্রল করুন</sys:String>
     <sys:String x:Key="Str_Scroll_Right">ডানে স্ক্রল করুন</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">এক পৃষ্ঠা উপরে</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">এক পৃষ্ঠা নিচে</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">এক পৃষ্ঠা বাঁয়ে</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">এক পৃষ্ঠা ডানে</sys:String>
 </ResourceDictionary>

@@ -499,4 +499,8 @@
     <sys:String x:Key="Str_Scroll_Down">向下滚动</sys:String>
     <sys:String x:Key="Str_Scroll_Left">向左滚动</sys:String>
     <sys:String x:Key="Str_Scroll_Right">向右滚动</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">向上翻页</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">向下翻页</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">向左翻页</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">向右翻页</sys:String>
 </ResourceDictionary>

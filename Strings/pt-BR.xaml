@@ -541,4 +541,8 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Rolar para baixo</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Rolar para a esquerda</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Rolar para a direita</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Uma página acima</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Uma página abaixo</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Uma página à esquerda</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Uma página à direita</sys:String>
 </ResourceDictionary>

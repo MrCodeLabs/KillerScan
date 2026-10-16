@@ -541,4 +541,8 @@ Innstillingene dine fjernes ikke.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Rull ned</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Rull til venstre</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Rull til høyre</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Side opp</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Side ned</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Side til venstre</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Side til høyre</sys:String>
 </ResourceDictionary>

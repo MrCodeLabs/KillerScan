@@ -480,4 +480,8 @@ Cài đặt của bạn sẽ không bị xóa.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Cuộn xuống</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Cuộn sang trái</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Cuộn sang phải</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Lên một trang</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Xuống một trang</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Sang trái một trang</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Sang phải một trang</sys:String>
 </ResourceDictionary>

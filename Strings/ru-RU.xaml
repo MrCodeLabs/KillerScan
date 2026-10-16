@@ -525,4 +525,8 @@
     <sys:String x:Key="Str_Scroll_Down">Прокрутить вниз</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Прокрутить влево</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Прокрутить вправо</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">На страницу вверх</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">На страницу вниз</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">На страницу влево</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">На страницу вправо</sys:String>
 </ResourceDictionary>

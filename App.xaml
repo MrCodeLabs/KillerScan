@@ -804,14 +804,14 @@
                                         </MultiBinding>
                                     </Track.ViewportSize>
                                     <Track.DecreaseRepeatButton>
-                                        <RepeatButton x:Name="PageBack" Command="ScrollBar.PageUpCommand" Focusable="False" IsTabStop="False">
+                                        <RepeatButton x:Name="PageBack" Command="ScrollBar.PageUpCommand" AutomationProperties.Name="{DynamicResource Str_Scroll_PageUp}" Focusable="False" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
                                             </RepeatButton.Template>
                                         </RepeatButton>
                                     </Track.DecreaseRepeatButton>
                                     <Track.IncreaseRepeatButton>
-                                        <RepeatButton x:Name="PageForward" Command="ScrollBar.PageDownCommand" Focusable="False" IsTabStop="False">
+                                        <RepeatButton x:Name="PageForward" Command="ScrollBar.PageDownCommand" AutomationProperties.Name="{DynamicResource Str_Scroll_PageDown}" Focusable="False" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
                                             </RepeatButton.Template>
@@ -862,7 +862,9 @@
                                 <Trigger Property="Orientation" Value="Horizontal">
                                     <Setter TargetName="PART_Track"   Property="IsDirectionReversed" Value="False"/>
                                     <Setter TargetName="PageBack"     Property="Command" Value="ScrollBar.PageLeftCommand"/>
+                                    <Setter TargetName="PageBack"     Property="AutomationProperties.Name" Value="{DynamicResource Str_Scroll_PageLeft}"/>
                                     <Setter TargetName="PageForward"  Property="Command" Value="ScrollBar.PageRightCommand"/>
+                                    <Setter TargetName="PageForward"  Property="AutomationProperties.Name" Value="{DynamicResource Str_Scroll_PageRight}"/>
                                     <Setter TargetName="ArrowUp" Property="Grid.Row" Value="1"/>
                                     <Setter TargetName="ArrowUp" Property="Grid.Column" Value="0"/>
                                     <Setter TargetName="ArrowUp" Property="Content" Value="3"/>
