@@ -18,6 +18,7 @@ Each language is a single XAML `ResourceDictionary` in the `Strings/` folder, na
 - `Strings/kk-KZ.xaml` - Kazakh
 - `Strings/pl-PL.xaml` - Polish
 - `Strings/ru-RU.xaml` - Russian
+- `Strings/sl-SI.xaml` - Slovenian
 - `Strings/tr-TR.xaml` - Turkish
 - `Strings/nb-NO.xaml` - Norwegian (Bokmål)
 - `Strings/pt-BR.xaml` - Portuguese (Brazil)
@@ -44,7 +45,7 @@ Each language is a single XAML `ResourceDictionary` in the `Strings/` folder, na
 
 - **Never change `x:Key` values.**
 - **Keep acronyms and proper names as-is:** IP, MAC, DNS, RDP, SSH, CSV, HTML, SHA-256, OUI, Wireshark, Killer Tools.
-- **Don't translate device-type names** (Router, NAS, Printer, etc.) - those are matched in code and color-coded in the table; translating them breaks both.
+- **Translate display labels in `Str_Dev_*` resources**, such as Router or Printer. Keep product names and acronyms unchanged. Never translate the underlying `DeviceType` values in models, registry entries, CSS classes, CLI filters or machine-readable exports; `DeviceTypeConverter` maps those stable identifiers to localized labels.
 - **Keep any `{0}` / `{1}` format placeholders** intact and in a sensible order for your language.
 - **Keep XML entities** (`&amp;`, `&#xNNNN;`) as they are.
 - **Use plain hyphens (`-`), never em or en dashes,** even where your language's typography would normally call for one. This is a house style rule applied across every app and every language, so it deliberately overrides local convention. If you think it is wrong for your language, say so in the pull request rather than working around it.
