@@ -60,6 +60,7 @@ namespace KillerScan
         protected override void OnStartup(StartupEventArgs e)
         {
             KillerFamily.Accessibility.AccessibleControls.Initialize();
+            KillerFamily.Theming.AccentShadow.Initialize();
             base.OnStartup(e);
             // Every window (dialogs, tools, pickers) takes the family UI face from the active theme
             // unless it sets its own, so no dialog falls back to the system Segoe UI.

@@ -17,6 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The Light theme draws a softer shadow under the toolbars.
 
 ### Fixed
+- On the Light theme's Yellow accent, buttons, links, tabs and accent icons stay yellow with a dark shadow behind yellow text and icons, instead of turning near-black.
 - Screen readers no longer read toolbar, menu, tab and title bar icons as unreadable symbols.
 - Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.
 - The Scan History sidebar can no longer be dragged or zoomed narrower than its dates, so a saved scan's date and time are never cut off.
