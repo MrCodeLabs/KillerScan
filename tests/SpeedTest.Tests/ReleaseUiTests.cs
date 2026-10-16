@@ -131,6 +131,7 @@ internal static class ReleaseUiTests
         Theme("Black", "Orange");
         var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
         ScanOptionsUiChecks.Run(workspace);
+        InterfaceUiChecks.Run(workspace);
         foreach (string locale in Enum.GetNames(localeType))
         {
             Locale(locale);

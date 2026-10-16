@@ -44,7 +44,8 @@ namespace KillerScan.Shell
                 Loc("Str_Rename_Save"), Loc("Str_Btn_Cancel")) { Owner = this };
             dialog.ShowDialog();
             if (!dialog.Confirmed || string.IsNullOrWhiteSpace(dialog.Value)) return;
-            ScanProfiles.Save(new ScanProfile { Name = dialog.Value, Target = scan.Targets.Trim(), Options = scan.Options });
+            ScanProfiles.Save(new ScanProfile { Name = dialog.Value, Target = scan.Targets.Trim(), Options = scan.Options,
+                InterfaceId = scan.SelectedAdapterId, SourceAddress = scan.SelectedSourceAddress });
             RefreshProfilesList();
         }
 

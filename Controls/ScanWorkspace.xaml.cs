@@ -72,6 +72,8 @@ namespace KillerScan.Controls
             WireSession(_active);
             ScanOptionsMenu.Attach(ScanOptionsButton, () => _active.Options,
                 value => { if (!IsScanning) _active.Options = value; });
+            NetworkInterfaceMenu.Attach(InterfaceSelectionButton, () => SelectedAdapterId,
+                () => SelectedSourceAddress, (id, address) => SelectInterface(id, address));
             ActivateSession();
             StartVendorNoticeTimer();
             RestoreColumnLayout();
@@ -205,6 +207,7 @@ namespace KillerScan.Controls
         internal void LoadProfile(ScanProfile profile)
         {
             if (_disposed || IsScanning) return;
+            SelectInterface(profile.InterfaceId, profile.SourceAddress, updateTarget: false);
             Targets = profile.Target;
             _active.Options = profile.Options ?? new ScanOptions();
         }
