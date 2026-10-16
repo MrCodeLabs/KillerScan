@@ -492,7 +492,7 @@
 </footer>
 <div class="egg-toast" id="eggToast"></div>
 <div class="dlightbox" id="diagram-lightbox" hidden><div class="dlb-inner"></div></div>
-<script src="ks-i18n.js?v=23"></script>
+<script src="ks-i18n.js?v=24"></script>
 <script src="ks.js?v=20261016-accent-text"></script>
 <script>
 // COLLAPSIBLE OUTLINE. The page has eleven sections and thirteen subsections, and listing
@@ -535,6 +535,13 @@
     });
     g.head.appendChild(t);
   });
+  // The section toggles are made after the page strings load, so their label follows the language here.
+  function chevLabels(){
+    var l=document.documentElement.getAttribute('lang')||'en'; l=l==='zh-Hant'?'zh':(l==='zh-Hans'?'zh-cn':l);
+    var d=(window.I18N&&window.I18N[l])||{};
+    document.querySelectorAll('.ol-chev').forEach(function(b){ b.setAttribute('aria-label', d.ui_expand_section||'Expand section'); });
+  }
+  chevLabels(); document.addEventListener('kscan-languagechange', chevLabels);
   // Reading a section opens it. Sections you opened by hand stay open; the rest close, so the
   // sidebar keeps showing where you are rather than growing as you scroll.
   window.knOutlineReveal=function(a){

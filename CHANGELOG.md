@@ -28,6 +28,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Theme and language radio buttons and the Film Grain checkbox line up with their labels again.
 - On the website, text on accent-colored buttons, tabs and highlights switches to white or near-black for contrast, so it is never white on yellow.
 - Theme names and the Keep Alive view name are translated in every language.
+- The website's MCP page, contact cards, carousel and section toggles are translated in every language, the site uses the app's names for Keep Alive and Deep Scan, and text that had lost its accents in several languages is restored.
 
 ## [1.8.1] - 2026-10-14
 
