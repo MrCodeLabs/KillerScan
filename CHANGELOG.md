@@ -26,6 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The Scan History sidebar can no longer be dragged or zoomed narrower than its dates, so a saved scan's date and time are never cut off.
 - The website top bar no longer leaves extra space under the wordmark and buttons.
 - Theme and language radio buttons and the Film Grain checkbox line up with their labels again.
+- On the website, text on accent-colored buttons, tabs and highlights switches to white or near-black for contrast, so it is never white on yellow.
 
 ## [1.8.1] - 2026-10-14
 
