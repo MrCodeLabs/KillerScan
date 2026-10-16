@@ -538,28 +538,6 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="TabCloseBtn" TargetType="Button">
-                <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="Margin" Value="8,0,0,0"/>
-                <Setter Property="Foreground" Value="{DynamicResource DimTextBrush}"/>
-                <Setter Property="FontSize" Value="9"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="cb" Background="Transparent" CornerRadius="{DynamicResource SmallCornerRadius}" Width="15" Height="15">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="cb" Property="Background" Value="#C42B1C"/>
-                                    <Setter Property="Foreground" Value="White"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
             <Style x:Key="TabNewBtn" TargetType="Button">
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Margin" Value="4,4,0,0"/>
