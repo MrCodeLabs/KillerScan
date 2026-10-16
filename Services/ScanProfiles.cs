@@ -9,6 +9,8 @@ namespace KillerScan.Services
         public string Target { get; set; } = string.Empty;
         public bool DeepScanAfter { get; set; }
         public ScanOptions Options { get; set; } = new();
+        public string InterfaceId { get; set; } = "";
+        public string SourceAddress { get; set; } = "";
 
         /// <summary>What a screen reader announces for the profile's row in the profiles list.</summary>
         public override string ToString() => Name + ", " + Target;
@@ -39,6 +41,8 @@ namespace KillerScan.Services
                     item.Name ??= string.Empty;
                     item.Target ??= string.Empty;
                     item.Options ??= new ScanOptions();
+                    item.InterfaceId ??= "";
+                    item.SourceAddress ??= "";
                 }
             }
             catch { _items = []; }

@@ -20,6 +20,11 @@ internal static class Program
             await Run("Disabled probes start no I/O in full, quick or deep mode", ScanOptionsTests.DisabledProbes);
             await Run("Default API behavior and per-scan enrichment isolation", ScanOptionsTests.CompatibilityAndIsolation);
             await Run("Scan options preserve old JSON defaults and immutable choices", ScanOptionsTests.ProfileSerialization);
+            await Run("Explicit interface scope and disconnects fail closed across scan paths", InterfaceBindingTests.ScopeAndDisconnect);
+            await Run("Real loopback TCP/UDP sockets pin source, index and received scope", InterfaceBindingTests.PinnedSockets);
+            await Run("Source-bound native ICMP and per-interface classification", InterfaceBindingTests.BoundIcmpAndClassification);
+            await Run("Bound HTTP fingerprints retain results and never follow redirects", InterfaceBindingTests.BoundHttp);
+            await Run("Bound DNS uses adapter sockets and verifies PTR against A", InterfaceBindingTests.BoundDnsRoundTrip);
             await Run("Full scan preserves HTTP results, manual classification and saved names", EngineBehaviorTests.FullScan);
             await Run("HTTP fingerprint extracts the controlled title and Server header", EngineBehaviorTests.HttpFingerprintResults);
             await Run("Stop cancels a deep probe before device completion", EngineBehaviorTests.DeepProbeCancellation);

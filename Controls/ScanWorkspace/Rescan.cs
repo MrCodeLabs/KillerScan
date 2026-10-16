@@ -15,6 +15,11 @@ namespace KillerScan.Controls
 
         private void UpdateDeepScanButton()
         {
+            if (InterfaceSelectionButton != null)
+            {
+                InterfaceSelectionButton.IsEnabled = !IsScanning;
+                if (IsScanning && InterfaceSelectionButton.ContextMenu != null) InterfaceSelectionButton.ContextMenu.IsOpen = false;
+            }
             if (ScanOptionsButton != null)
             {
                 ScanOptionsButton.IsEnabled = !IsScanning;
@@ -69,7 +74,7 @@ namespace KillerScan.Controls
             ScanProgress.Visibility = Visibility.Visible;
             int done = 0;
             var options = s.Options;
-            if (options.ReverseDns) NetworkScanner.FlushLocalDnsCache();
+            if (options.ReverseDns && scanner.Binding == null) NetworkScanner.FlushLocalDnsCache();
 
             try
             {
@@ -86,6 +91,7 @@ namespace KillerScan.Controls
                         ct.ThrowIfCancellationRequested();
                     }
                     catch (OperationCanceledException) { throw; }
+                    catch (NetworkBindingException) { _rescanCts.Cancel(); throw; }
                     catch { done++; ScanProgress.Value = done * 100.0 / targets.Count; continue; }
 
                     int idx = s.Devices.IndexOf(old);
@@ -97,6 +103,7 @@ namespace KillerScan.Controls
                 StatusText.Text = string.Format(Loc("Str_St_RescanDone"), targets.Count);
             }
             catch (OperationCanceledException) { if (!_disposed) StatusText.Text = Loc("Str_St_ScanCanceled"); }
+            catch (NetworkBindingException ex) { if (!_disposed) StatusText.Text = ex.Message; }
             finally
             {
                 _rescanCts.Dispose();
@@ -129,7 +136,7 @@ namespace KillerScan.Controls
             UpdateDeepScanButton();
             StateChanged?.Invoke(this, EventArgs.Empty);
             var options = s.Options;
-            if (options.ReverseDns) NetworkScanner.FlushLocalDnsCache();
+            if (options.ReverseDns && scanner.Binding == null) NetworkScanner.FlushLocalDnsCache();
 
             try
             {
@@ -149,6 +156,7 @@ namespace KillerScan.Controls
                         }
                     }
                     catch (OperationCanceledException) { throw; }
+                    catch (NetworkBindingException) { _rescanCts.Cancel(); throw; }
                     catch { }
                     finally
                     {
@@ -170,6 +178,7 @@ namespace KillerScan.Controls
             {
                 if (!_disposed) StatusText.Text = Loc("Str_St_ScanCanceled");
             }
+            catch (NetworkBindingException ex) { if (!_disposed) StatusText.Text = ex.Message; }
             finally
             {
                 _rescanCts.Dispose();

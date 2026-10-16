@@ -138,7 +138,8 @@ namespace KillerScan.Features.Cli
             "/sort", "--sort", "/filter", "--filter", "/type", "--type",
             "/vendor-filter", "--vendor-filter", "/ports", "--ports", "/limit", "--limit",
             "/timeout", "--timeout", "/theme", "--theme", "/count", "--count",
-            "/interval", "--interval", "/max-hops", "--max-hops", "/skip", "--skip"
+            "/interval", "--interval", "/max-hops", "--max-hops", "/skip", "--skip",
+            "/interface", "--interface", "/source-ip", "--source-ip"
         ];
 
         private static readonly string[] FlagOptions =
@@ -163,6 +164,7 @@ namespace KillerScan.Features.Cli
             string? command = args.FirstOrDefault(a => IsHelp(a) || IsVersion(a) ||
                 Eq(a, "/scan") || Eq(a, "--scan") || Eq(a, "/probe") || Eq(a, "--probe") ||
                 Eq(a, "/network") || Eq(a, "--network") || Eq(a, "/vendor") || Eq(a, "--vendor") ||
+                Eq(a, "/interfaces") || Eq(a, "--interfaces") ||
                 Eq(a, "/ping") || Eq(a, "--ping") || Eq(a, "/trace") || Eq(a, "--trace") ||
                 Eq(a, "/diagnose") || Eq(a, "--diagnose") || Eq(a, "/watch") || Eq(a, "--watch") ||
                 Eq(a, "/speedtest") || Eq(a, "--speedtest"));
@@ -186,6 +188,8 @@ namespace KillerScan.Features.Cli
             {
                 var (positionals, options, parseError) = ParseArgs(args, command);
                 if (parseError != null) { err.WriteLine(PaintErr("Error: " + parseError, AnsiBad)); exitCode = 2; }
+                else if (Eq(command, "/interfaces") || Eq(command, "--interfaces"))
+                    exitCode = RunInterfaces(positionals, options, @out, err);
                 else if (Eq(command, "/network") || Eq(command, "--network"))
                     exitCode = RunNetwork(positionals, options, @out, err);
                 else if (Eq(command, "/vendor") || Eq(command, "--vendor"))
@@ -219,6 +223,17 @@ namespace KillerScan.Features.Cli
             @out.WriteLine("SUBNET     " + net.Subnet);
             @out.WriteLine("GATEWAY    " + (net.Gateway.Length == 0 ? "-" : net.Gateway));
             @out.WriteLine("DNS        " + (net.Dns.Length == 0 ? "-" : net.Dns));
+            return 0;
+        }
+
+        private static int RunInterfaces(List<string> positionals, Dictionary<string, string> options, TextWriter output, TextWriter error)
+        {
+            if (positionals.Count > 0 || !Only(options, "/json", "--json")) return Usage(error, "/interfaces accepts only /json.");
+            var interfaces = LocalNetwork.Enumerate().Where(n => n.InterfaceLabel is "Ethernet" or "Wi-Fi").Select(n => new
+            { Id = n.AdapterId, Name = n.AdapterName, Kind = n.InterfaceLabel, Address = n.LocalIp, n.Subnet, Index = n.InterfaceIndex,
+                CanBind = !n.Wireless || n.ConnectionIdentity.Length > 0 }).ToArray();
+            if (Has(options, "/json", "--json")) output.WriteLine(JsonSerializer.Serialize(interfaces));
+            else foreach (var net in interfaces) output.WriteLine(net.Id + "  " + net.Address + "  " + net.Kind + "  " + net.Name + (net.CanBind ? "" : "  [identity unavailable]"));
             return 0;
         }
 
@@ -395,6 +410,16 @@ namespace KillerScan.Features.Cli
             bool terminalProgress = Has(options, "/terminal-progress");
             bool noHeader = Has(options, "/no-header", "--no-header");
             bool failEmpty = Has(options, "/fail-empty", "--fail-empty");
+            ScanBinding? binding = null;
+            string? interfaceId = Value(options, "/interface", "--interface");
+            string? sourceIp = Value(options, "/source-ip", "--source-ip");
+            if ((interfaceId == null) != (sourceIp == null)) return Usage(err, "/interface and /source-ip must be supplied together.");
+            if (interfaceId != null)
+            {
+                if (Has(options, "/demo", "--demo")) return Usage(err, "Demo mode does not accept a real interface.");
+                try { binding = ScanBinding.Resolve(interfaceId, sourceIp!); }
+                catch (NetworkBindingException ex) { return Usage(err, ex.Message, 1); }
+            }
             var scanOptions = new ScanOptions();
             string? skip = Value(options, "/skip", "--skip");
             if (skip != null)
@@ -423,11 +448,15 @@ namespace KillerScan.Features.Cli
             {
                 if (targetText.Length == 0)
                 {
-                    var local = LocalNetwork.Detect();
-                    if (local is null) return Usage(err, "no active IPv4 network was found. Give a target such as /scan 192.168.1.0/24.");
-                    targetText = local.Subnet;
+                    var local = binding == null ? LocalNetwork.Detect() : null;
+                    if (binding != null) targetText = binding.Subnet;
+                    else
+                    {
+                        if (local is null) return Usage(err, "no active IPv4 network was found. Give a target such as /scan 192.168.1.0/24.");
+                        targetText = local.Subnet;
+                    }
                 }
-                else LocalNetwork.Detect();
+                else if (binding == null) LocalNetwork.Detect();
                 parsed = ScanTargets.Parse(targetText);
                 if (!parsed.Ok) return Usage(err, parsed.Error == TargetError.TooLarge
                     ? $"that is {parsed.Detail} addresses; the ceiling is {ScanTargets.MaxAddresses:N0}."
@@ -451,7 +480,7 @@ namespace KillerScan.Features.Cli
             void OnCancel(object? sender, ConsoleCancelEventArgs e) { e.Cancel = true; cts.Cancel(); }
             try { Console.CancelKeyPress += OnCancel; } catch { }
 
-            var scanner = new NetworkScanner();
+            var scanner = binding == null ? new NetworkScanner() : new NetworkScanner(binding);
             if (terminalProgress)
             {
                 int found = 0;
@@ -697,6 +726,7 @@ namespace KillerScan.Features.Cli
             "  /uiscan [targets]      open the interface and begin scanning",
             "  /probe <IPv4>          deep-probe one host, including ports 1-1024",
             "  /network               show the detected interface, subnet, gateway, and DNS",
+            "  /interfaces [/json]    list IPv4 interface IDs and source addresses",
             "  /vendor <MAC>          look up a MAC address in the offline OUI database",
             "  /ping <target>         send a bounded set of ICMP checks",
             "  /trace <target>        trace the network path to an IPv4 target",
@@ -707,6 +737,7 @@ namespace KillerScan.Features.Cli
             "SCAN AND PROBE OPTIONS",
             "  /quick                 discovery only; skip fingerprinting and the full port pass",
             "  /skip <name,name,...>  disable scan/probe operations (also accepts --skip)",
+            "  /interface <id> /source-ip <IPv4>  pin scan/probe to an explicit Windows interface",
             "                         " + string.Join(", ", ScanOptions.Features),
             "  /progress              write status and progress every 5% to stderr",
             "  /timeout <seconds>     cancel the operation after a deadline",

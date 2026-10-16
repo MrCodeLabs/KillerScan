@@ -40,6 +40,8 @@ namespace KillerScan.Controls
             if (_active.Cts != null) { Stop(); return; }
             if (_rescanCts != null) return;
             if (DemoMode) { GenerateDemoScan(); return; }
+            try { PrepareScanner(); }
+            catch (NetworkBindingException ex) { StatusText.Text = ex.Message; return; }
             var targets = ScanTargets.Parse(Targets);
             if (!targets.Ok)
             {

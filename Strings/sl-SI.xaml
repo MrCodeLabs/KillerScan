@@ -554,4 +554,8 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Options_ssh">Pozdrav SSH</sys:String>
     <sys:String x:Key="Str_Options_snmp">Opis SNMP</sys:String>
     <sys:String x:Key="Str_Options_netbios">Ime NetBIOS</sys:String>
+    <sys:String x:Key="Str_Interface_Title">Omrežni vmesnik</sys:String>
+    <sys:String x:Key="Str_Interface_Auto">Samodejno (sistemske poti)</sys:String>
+    <sys:String x:Key="Str_Interface_Unavailable">Izbrani vmesnik ali naslov ni na voljo. Znova izberi vmesnik.</sys:String>
+    <sys:String x:Key="Str_Interface_WifiIdentity">Identiteta omrežja Wi-Fi ni na voljo. Za izrecno vezavo mora Windows dovoliti branje identitete povezave Wi-Fi.</sys:String>
 </ResourceDictionary>

@@ -8,7 +8,7 @@ namespace KillerScan.Models
     internal sealed class ScanSession(string subnet)
     {
         public ObservableCollection<NetworkDevice> Devices { get; } = [];
-        public NetworkScanner Scanner { get; } = new();
+        public NetworkScanner Scanner { get; set; } = new();
         public ScanOptions Options { get; set; } = new();
         public CancellationTokenSource? Cts { get; set; }
 
