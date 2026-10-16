@@ -130,10 +130,26 @@ internal static class ReleaseUiTests
         Require(states == 45, "All 45 default and explicit theme/accent states render.");
         Theme("Black", "Orange");
         var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
+        ScanOptionsUiChecks.Run(workspace);
         foreach (string locale in Enum.GetNames(localeType))
         {
             Locale(locale);
             window.GetType().GetMethod("RefreshWorkspaceLocale", Instance)!.Invoke(window, null);
+            if (locale is "EnUS" or "SlSI")
+            {
+                var options = ((Button)workspace.FindName("ScanOptionsButton")).ContextMenu;
+                foreach (var item in options.Items.OfType<MenuItem>())
+                    if (item.Tag is string) item.IsChecked = true;
+                var entries = options.Items.Cast<UIElement>().ToArray();
+                options.Items.Clear();
+                var surface = new StackPanel { Background = (Brush)app.FindResource("MenuBackgroundBrush") };
+                foreach (var entry in entries) surface.Children.Add(entry);
+                Save(Render(surface, 570, 720), Path.Combine(output, "ScanOptions-" + locale + ".png"));
+                Require(surface.Children.Cast<FrameworkElement>().All(entry => entry.ActualHeight + entry.TranslatePoint(new Point(), surface).Y <= 720),
+                    locale + ": every scan option fits the rendered menu.");
+                surface.Children.Clear();
+                foreach (var entry in entries) options.Items.Add(entry);
+            }
             Require(app.FindResource("Str_Btn_Scan") is string text && text.Length > 0, locale + ": scan label resolves.");
             foreach (var (gridName, keys) in new[]
             {
