@@ -9,12 +9,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ### Added
 - KillerScan checks for updates on startup and offers a newer release in a dialog with an Always check on startup box. A Check for updates on startup checkbox on the About card turns the check back on.
 - Alt+Shift+G turns Film Grain on or off. It is listed in the shortcuts overlay, and the keyboard map has a new Alt+Shift layer for it.
+- The website's top bar has a Microsoft Store button on every page, and the MCP page has a Microsoft Store button for KillerMCP.
 
 ### Changed
 - Dialog headings, the history sidebar heading and the history detail header use Lacquer, the wordmark's app-name face, in place of Killer Sans. 98SE keeps Killer Sans.
 - The history detail header is the same size as the Scan History heading.
 - Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
 - The Light theme draws a softer shadow under the toolbars.
+- The website's top bar Download button uses the same font and height as the other top bar buttons.
 
 ### Fixed
 - The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
@@ -30,6 +32,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - On the website, text on accent-colored buttons, tabs and highlights switches to white or near-black for contrast, so it is never white on yellow.
 - Theme names and the Keep Alive view name are translated in every language.
 - The website's MCP page, contact cards, carousel and section toggles are translated in every language, the site uses the app's names for Keep Alive and Deep Scan, and text that had lost its accents in several languages is restored.
+- On phones, the website's logo and download hash fit the screen instead of making the home page scroll sideways.
 
 ## [1.8.1] - 2026-10-14
 
