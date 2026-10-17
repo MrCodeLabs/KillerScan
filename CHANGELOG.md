@@ -17,6 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
 - The Light theme draws a softer shadow under the toolbars.
 - The website's top bar Download button uses the same font and height as the other top bar buttons.
+- The PATH entry for installed copies now keeps the existing Path value's type and its %variables%, tells open programs about the change, and is removed by the uninstaller.
 
 ### Fixed
 - The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
