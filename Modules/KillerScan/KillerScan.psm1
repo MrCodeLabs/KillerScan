@@ -96,12 +96,16 @@ function scan {
 
         # Disable application-level probes; see killerscan /help for names.
         [ValidateSet('neighbor-cache','arp','icmp','tcp-liveness','dns','mdns','ssdp','ports','http','tls','ssh','snmp','netbios')]
-        [string[]]$Skip
+        [string[]]$Skip,
+        [string]$InterfaceId,
+        [string]$SourceIp
     )
 
     $arguments = @('/scan')
     if ($Target)  { $arguments += ($Target -join ',') }
     if ($Quick)   { $arguments += '/quick' }
+    if ($InterfaceId) { $arguments += @('/interface', $InterfaceId) }
+    if ($SourceIp) { $arguments += @('/source-ip', $SourceIp) }
     if ($Skip)    { $arguments += @('/skip', ($Skip -join ',')) }
     if ($Timeout) { $arguments += @('/timeout', $Timeout) }
     $arguments += @('/json', '/quiet')
@@ -124,10 +128,14 @@ function probe {
         [int]$Timeout,
 
         [ValidateSet('neighbor-cache','arp','icmp','tcp-liveness','dns','mdns','ssdp','ports','http','tls','ssh','snmp','netbios')]
-        [string[]]$Skip
+        [string[]]$Skip,
+        [string]$InterfaceId,
+        [string]$SourceIp
     )
 
     $arguments = @('/probe', $Target)
+    if ($InterfaceId) { $arguments += @('/interface', $InterfaceId) }
+    if ($SourceIp) { $arguments += @('/source-ip', $SourceIp) }
     if ($Skip) { $arguments += @('/skip', ($Skip -join ',')) }
     if ($Timeout) { $arguments += @('/timeout', $Timeout) }
     $arguments += @('/json', '/quiet')

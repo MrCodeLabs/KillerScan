@@ -157,6 +157,7 @@ internal static class ReleaseUiTests
         Save(Render(menuSurface, 450, 420), Path.Combine(output, "LanguageMenu.png"));
         var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
         ScanOptionsUiChecks.Run(workspace);
+        InterfaceUiChecks.Run(workspace);
         Locale("EnUS");
         var scanOptions = ((Button)workspace.FindName("ScanOptionsButton")).ContextMenu;
         foreach (var item in scanOptions.Items.OfType<MenuItem>())

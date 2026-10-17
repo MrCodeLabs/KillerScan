@@ -554,4 +554,8 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Options_ssh">SSH banner</sys:String>
     <sys:String x:Key="Str_Options_snmp">SNMP description</sys:String>
     <sys:String x:Key="Str_Options_netbios">NetBIOS name</sys:String>
+    <sys:String x:Key="Str_Interface_Title">Network interface</sys:String>
+    <sys:String x:Key="Str_Interface_Auto">Automatic (system routing)</sys:String>
+    <sys:String x:Key="Str_Interface_Unavailable">Selected interface/address is unavailable. Choose an interface again.</sys:String>
+    <sys:String x:Key="Str_Interface_WifiIdentity">Wi-Fi network identity is unavailable. Windows must allow reading the connected Wi-Fi identity for explicit binding.</sys:String>
 </ResourceDictionary>

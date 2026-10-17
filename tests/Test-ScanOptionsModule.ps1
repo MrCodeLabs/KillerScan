@@ -18,5 +18,13 @@ $module = Get-Module KillerScan
     }
     try { scan '192.0.2.10' -Skip typo; throw 'Unknown choice was accepted' }
     catch { if ($_.FullyQualifiedErrorId -notlike 'ParameterArgumentValidationError*') { throw } }
+    scan '192.0.2.0/24' -InterfaceId 'fixture-adapter' -SourceIp '192.0.2.20'
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.0/24|/interface|fixture-adapter|/source-ip|192.0.2.20|/json|/quiet') {
+        throw 'scan did not forward its interface and source'
+    }
+    probe '192.0.2.10' -InterfaceId 'fixture-adapter' -SourceIp '192.0.2.20'
+    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/interface|fixture-adapter|/source-ip|192.0.2.20|/json|/quiet') {
+        throw 'probe did not forward its interface and source'
+    }
 }
 Write-Output 'PASS: scan/probe forward choices; unknown names fail before the executable boundary.'
