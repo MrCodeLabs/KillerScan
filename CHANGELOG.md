@@ -21,6 +21,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ### Fixed
 - The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
 - On the Light theme's Yellow accent, buttons, links, tabs and accent icons stay yellow with a thin gray outline around yellow text and icons, instead of turning near-black.
+- Gray, menu and accent text reads at 4.5:1 contrast or better in every theme and accent, and the footer's version and copyright are slightly dimmed.
 - On the website's Light theme with the Yellow accent, links, headings and labels stay yellow with a thin gray outline instead of turning olive brown.
 - The exe's file properties show Steve the Killer as the copyright holder instead of leaving it blank.
 - Screen readers no longer read toolbar, menu, tab and title bar icons as unreadable symbols, and every part of each scroll bar now has a name.
