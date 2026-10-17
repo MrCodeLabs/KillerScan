@@ -139,7 +139,7 @@ namespace KillerScan.Features.Cli
             "/vendor-filter", "--vendor-filter", "/ports", "--ports", "/limit", "--limit",
             "/timeout", "--timeout", "/theme", "--theme", "/count", "--count",
             "/interval", "--interval", "/max-hops", "--max-hops", "/skip", "--skip",
-            "/interface", "--interface", "/source-ip", "--source-ip"
+            "/interface", "--interface", "/source-ip", "--source-ip", "/location", "--location"
         ];
 
         private static readonly string[] FlagOptions =
@@ -165,6 +165,7 @@ namespace KillerScan.Features.Cli
                 Eq(a, "/scan") || Eq(a, "--scan") || Eq(a, "/probe") || Eq(a, "--probe") ||
                 Eq(a, "/network") || Eq(a, "--network") || Eq(a, "/vendor") || Eq(a, "--vendor") ||
                 Eq(a, "/interfaces") || Eq(a, "--interfaces") ||
+                Eq(a, "/locations") || Eq(a, "--locations") ||
                 Eq(a, "/ping") || Eq(a, "--ping") || Eq(a, "/trace") || Eq(a, "--trace") ||
                 Eq(a, "/diagnose") || Eq(a, "--diagnose") || Eq(a, "/watch") || Eq(a, "--watch") ||
                 Eq(a, "/speedtest") || Eq(a, "--speedtest"));
@@ -188,6 +189,8 @@ namespace KillerScan.Features.Cli
             {
                 var (positionals, options, parseError) = ParseArgs(args, command);
                 if (parseError != null) { err.WriteLine(PaintErr("Error: " + parseError, AnsiBad)); exitCode = 2; }
+                else if (Eq(command, "/locations") || Eq(command, "--locations"))
+                    exitCode = RunLocations(positionals, options, @out, err);
                 else if (Eq(command, "/interfaces") || Eq(command, "--interfaces"))
                     exitCode = RunInterfaces(positionals, options, @out, err);
                 else if (Eq(command, "/network") || Eq(command, "--network"))
@@ -223,6 +226,14 @@ namespace KillerScan.Features.Cli
             @out.WriteLine("SUBNET     " + net.Subnet);
             @out.WriteLine("GATEWAY    " + (net.Gateway.Length == 0 ? "-" : net.Gateway));
             @out.WriteLine("DNS        " + (net.Dns.Length == 0 ? "-" : net.Dns));
+            return 0;
+        }
+
+        private static int RunLocations(List<string> positionals, Dictionary<string, string> options, TextWriter output, TextWriter error)
+        {
+            if (positionals.Count > 0 || !Only(options, "/json", "--json")) return Usage(error, "/locations accepts only /json.");
+            if (Has(options, "/json", "--json")) output.WriteLine(JsonSerializer.Serialize(Locations.Catalog.Items));
+            else foreach (var location in Locations.Catalog.Items) output.WriteLine(location.Id + "  " + location.Name);
             return 0;
         }
 
@@ -473,14 +484,22 @@ namespace KillerScan.Features.Cli
             int[]? ports = ParsePorts(Value(options, "/ports", "--ports"));
             if (ports != null && ports.Length == 0) return Usage(err, "/ports must be comma-separated numbers from 1 to 65535.");
 
+            string? locationId = Value(options, "/location", "--location");
+            if (demo && locationId != null) return Usage(err, "Demo mode does not use saved locations.");
+            if (!demo)
+            {
+                locationId ??= Environment.GetEnvironmentVariable("KS_LOCATION_ID") ?? LocationCatalog.LegacyId;
+                if (!LocationCatalog.ValidId(locationId) || !Locations.Catalog.Contains(locationId)) return Usage(err, "Unknown location. Use /locations to list existing IDs.");
+                if (!Locations.TrySelect(locationId, remember: false)) return Usage(err, "Stop the running scan before changing location.");
+            }
+            using var locationRun = demo ? null : Locations.BeginRun();
             OuiLookup.Load();
-            DeviceOverrides.Load();
             using var cts = new CancellationTokenSource();
             if (timeout > 0) cts.CancelAfter(TimeSpan.FromSeconds(timeout));
             void OnCancel(object? sender, ConsoleCancelEventArgs e) { e.Cancel = true; cts.Cancel(); }
             try { Console.CancelKeyPress += OnCancel; } catch { }
 
-            var scanner = binding == null ? new NetworkScanner() : new NetworkScanner(binding);
+            var scanner = demo ? new NetworkScanner() : EngineHost.CreateScanner(binding);
             if (terminalProgress)
             {
                 int found = 0;
@@ -572,7 +591,7 @@ namespace KillerScan.Features.Cli
             // only because the /export extension picked it - the FILE gets that format, but raw
             // CSV on a live console helps nobody. An EXPLICIT /csv, /json or /format choice is
             // honored on stdout as-is (that is the scripting contract), just without colors.
-            string body = Render(format, devices, label, theme, noHeader);
+            string body = Render(format, devices, label, theme, noHeader, demo ? null : Locations.Current);
             bool showTable = _outAnsi && (format == "table" || formatFromExtension);
             if (!quiet)
                 @out.WriteLine(showTable ? Table(devices, !noHeader, ansi: true) : body);
@@ -633,11 +652,11 @@ namespace KillerScan.Features.Cli
         }
 
         private static string Render(string format, List<NetworkDevice> devices, string label,
-                                     string theme, bool noHeader) => format switch
+                                     string theme, bool noHeader, ScanLocation? location = null) => format switch
         {
-            "csv" => Csv(devices, !noHeader),
+            "csv" => location == null ? Csv(devices, !noHeader) : ReportExport.BuildLocationCsv(devices, location, !noHeader),
             "json" => JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true }),
-            "html" => ReportExport.BuildHtml(devices, label, theme.ToLowerInvariant()),
+            "html" => ReportExport.BuildLocationHtml(devices, label, theme.ToLowerInvariant(), location),
             _ => Table(devices, !noHeader),
         };
 
@@ -727,6 +746,7 @@ namespace KillerScan.Features.Cli
             "  /probe <IPv4>          deep-probe one host, including ports 1-1024",
             "  /network               show the detected interface, subnet, gateway, and DNS",
             "  /interfaces [/json]    list IPv4 interface IDs and source addresses",
+            "  /locations [/json]     list explicit saved location IDs and names",
             "  /vendor <MAC>          look up a MAC address in the offline OUI database",
             "  /ping <target>         send a bounded set of ICMP checks",
             "  /trace <target>        trace the network path to an IPv4 target",
@@ -738,6 +758,8 @@ namespace KillerScan.Features.Cli
             "  /quick                 discovery only; skip fingerprinting and the full port pass",
             "  /skip <name,name,...>  disable scan/probe operations (also accepts --skip)",
             "  /interface <id> /source-ip <IPv4>  pin scan/probe to an explicit Windows interface",
+            "  /location <id>         use saved data for that explicit location",
+            "                         GUI terminals inherit it; external CLI defaults to legacy",
             "                         " + string.Join(", ", ScanOptions.Features),
             "  /progress              write status and progress every 5% to stderr",
             "  /timeout <seconds>     cancel the operation after a deadline",

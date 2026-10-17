@@ -45,13 +45,14 @@ namespace KillerScan.Shell
             dialog.ShowDialog();
             if (!dialog.Confirmed || string.IsNullOrWhiteSpace(dialog.Value)) return;
             ScanProfiles.Save(new ScanProfile { Name = dialog.Value, Target = scan.Targets.Trim(), Options = scan.Options,
-                InterfaceId = scan.SelectedAdapterId, SourceAddress = scan.SelectedSourceAddress });
+                InterfaceId = scan.SelectedAdapterId, SourceAddress = scan.SelectedSourceAddress, LocationId = scan.LocationId });
             RefreshProfilesList();
         }
 
         private void ProfileLoad_Click(object sender, RoutedEventArgs e)
         {
             if (ProfileFor(sender) is not { } profile) return;
+            if (profile.LocationId != Locations.Current.Id) return;
             // Loading a saved target also reveals its input without starting a scan.
             NewScan(profile.Target).LoadProfile(profile);
         }
@@ -67,6 +68,7 @@ namespace KillerScan.Shell
         private void ProfileRun_Click(object sender, RoutedEventArgs e)
         {
             if (ProfileFor(sender) is not { } profile) return;
+            if (profile.LocationId != Locations.Current.Id) return;
             var scan = ActiveScan;
             if (scan == null || scan.IsScanning) scan = NewScan(profile.Target);
             scan.RunProfile(profile);

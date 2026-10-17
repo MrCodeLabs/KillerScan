@@ -1,4 +1,6 @@
 $ErrorActionPreference = 'Stop'
+$previousLocation = $env:KS_LOCATION_ID
+$env:KS_LOCATION_ID = $null
 Import-Module (Join-Path $PSScriptRoot '../Modules/KillerScan/KillerScan.psm1') -Force
 $module = Get-Module KillerScan
 & $module {
@@ -27,4 +29,16 @@ $module = Get-Module KillerScan
         throw 'probe did not forward its interface and source'
     }
 }
+& $module {
+    scan '192.0.2.10' -LocationId '11111111111111111111111111111111'
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.10|/location|11111111111111111111111111111111|/json|/quiet') { throw 'scan did not forward location identity' }
+    probe '192.0.2.10' -LocationId '22222222222222222222222222222222'
+    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/location|22222222222222222222222222222222|/json|/quiet') { throw 'probe did not forward location identity' }
+    $device = ConvertTo-KsDevice ([pscustomobject]@{LocationId='fixture'; LocationName='Fixture A'})
+    if ($device.LocationId -ne 'fixture' -or $device.LocationName -ne 'Fixture A') { throw 'device projection lost location metadata' }
+    $env:KS_LOCATION_ID = '33333333333333333333333333333333'
+    scan '192.0.2.10'
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.10|/location|33333333333333333333333333333333|/json|/quiet') { throw 'module did not inherit the GUI terminal location' }
+}
+$env:KS_LOCATION_ID = $previousLocation
 Write-Output 'PASS: scan/probe forward choices; unknown names fail before the executable boundary.'

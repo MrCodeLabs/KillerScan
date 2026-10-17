@@ -158,6 +158,7 @@ internal static class ReleaseUiTests
         var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
         ScanOptionsUiChecks.Run(workspace);
         InterfaceUiChecks.Run(workspace);
+        LocationUiChecks.Run(window, workspace, () => Save(Render(root, 1200, 780), Path.Combine(output, "Location.png")));
         Locale("EnUS");
         var scanOptions = ((Button)workspace.FindName("ScanOptionsButton")).ContextMenu;
         foreach (var item in scanOptions.Items.OfType<MenuItem>())
