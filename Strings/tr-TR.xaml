@@ -402,7 +402,7 @@ Ayarlarınız silinmeyecek.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Tümünü seç</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Tümünü kopyala</sys:String>
     <sys:String x:Key="Str_Term_Clear">Temizle</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Durdurmak icin Esc</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Durdurmak için Esc</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Bölmeleri ayır</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Diğer bölmeye taşı</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Sekmeyi kapat</sys:String>

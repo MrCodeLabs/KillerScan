@@ -17,7 +17,7 @@ if (I18N.uk) Object.assign(I18N.uk, {
 if (I18N.nb) Object.assign(I18N.nb, {
  "mcp_hero": "Undersøk nettverket fra agenten din.",
  "mcp_install_intro": "KillerMCP inneholder alle 81 KillerTools-verktøy pluss verktøy fra støttede Killer-apper i én lokal tilkobling. Installasjonsprogrammet oppdager KillerScan og registrerer den delte tilkoblingen hos støttede agentklienter.",
- "mcp_step_2": "<strong>La oppsettet koble til agenten din.</strong> Det registrerer KillerMCP hos Codex, Claude Code, Claude Desktop, Cursor, GitHub Copilot, Gemini CLI og Windsurf når det finner dem. Du trenger ingen kildekode, Node-installasjon eller manuell kommandoliste.",
+ "mcp_step_2": "<strong>La oppsettet koble til agenten din.</strong>",
  "mcp_step_3": "<strong>Åpne en ny agentsamtale og spør.</strong> Tilgjengelige verktøy oppdages automatisk.",
  "mcp_examples_intro": "<code>killer</code> er den korteste formen. Agenten din kan utlede KillerScan fra en tydelig nettverksforespørsel. Bruk <code>killerscan</code> når du vil gjøre appen eksplisitt.",
  "mcp_tools_intro": "KillerMCP eksponerer alle ni hodeløse KillerScan-kommandoer."
@@ -570,7 +570,7 @@ if (I18N["zh"]) Object.assign(I18N["zh"], {
   "mcp_tool_8_title": "監視主機",
   "mcp_tool_8_body": "取樣最多 16 個 IPv4 位址的可達性和延遲。",
   "mcp_tool_9_title": "執行 KillerSpeed",
-  "mcp_tool_9_body": "透過 speed.killerscan.net 測量下載、上傳、延遲和抖動。"
+  "mcp_tool_9_body": "執行 KillerSpeed 並回報下載、上傳、延遲和抖動。"
 });
 if (I18N["zh-cn"]) Object.assign(I18N["zh-cn"], {
   "mcp_hero": "直接在代理中检查网络。",
@@ -624,7 +624,7 @@ if (I18N["zh-cn"]) Object.assign(I18N["zh-cn"], {
   "mcp_tool_8_title": "监视主机",
   "mcp_tool_8_body": "采样最多 16 个 IPv4 地址的可达性和延迟。",
   "mcp_tool_9_title": "运行 KillerSpeed",
-  "mcp_tool_9_body": "通过 speed.killerscan.net 测量下载、上传、延迟和抖动。"
+  "mcp_tool_9_body": "运行 KillerSpeed 并报告下载、上传、延迟和抖动。"
 });
 if (I18N["bn"]) Object.assign(I18N["bn"], {
   "mcp_hero": "আপনার এজেন্ট থেকেই নেটওয়ার্ক পরীক্ষা করুন।",

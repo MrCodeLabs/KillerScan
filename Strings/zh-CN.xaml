@@ -100,7 +100,7 @@
     <sys:String x:Key="Str_About_Thumbprint">指纹</sys:String>
     <sys:String x:Key="Str_About_Sha">EXE SHA-256</sys:String>
     <sys:String x:Key="Str_About_Db">厂商数据库</sys:String>
-    <sys:String x:Key="Str_About_DbUpdate">从最新注册表更新</sys:String>
+    <sys:String x:Key="Str_About_DbUpdate">从最新的注册库更新</sys:String>
     <sys:String x:Key="Str_About_DbHint">来自 Wireshark OUI 列表。</sys:String>
     <sys:String x:Key="Str_About_DbEntries">{0} 个条目</sys:String>
     <sys:String x:Key="Str_About_DbRefreshed">更新于 {0}</sys:String>

@@ -121,7 +121,7 @@
     <!-- About overlay -->
     <sys:String x:Key="Str_About_Version">ВЕРСИЯ</sys:String>
     <sys:String x:Key="Str_About_Publisher">ИЗДАТЕЛЬ</sys:String>
-    <sys:String x:Key="Str_About_Thumbprint">ПОДПИСЬ</sys:String>
+    <sys:String x:Key="Str_About_Thumbprint">ОТПЕЧАТОК</sys:String>
     <sys:String x:Key="Str_About_Sha">EXE SHA-256</sys:String>
     <sys:String x:Key="Str_About_Db">БАЗА ПРОИЗВОДИТЕЛЕЙ</sys:String>
     <sys:String x:Key="Str_About_DbUpdate">Обновить из последних реестров</sys:String>

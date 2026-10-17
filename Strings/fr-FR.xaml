@@ -148,7 +148,7 @@
     <sys:String x:Key="Str_St_InstallCanceled">Installation annulée</sys:String>
     <sys:String x:Key="Str_Sys_Restore">Restaurer</sys:String>
     <sys:String x:Key="Str_Sys_Move">Déplacer</sys:String>
-    <sys:String x:Key="Str_Sys_Size">Dimensionner</sys:String>
+    <sys:String x:Key="Str_Sys_Size">Taille</sys:String>
     <sys:String x:Key="Str_Sys_Minimize">Réduire</sys:String>
     <sys:String x:Key="Str_Sys_Maximize">Agrandir</sys:String>
     <sys:String x:Key="Str_Sys_Close">Fermer</sys:String>
@@ -344,7 +344,7 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Profiles_Save">Enregistrer le profil actuel</sys:String>
     <sys:String x:Key="Str_Profiles_Run">Exécuter le profil</sys:String>
     <sys:String x:Key="Str_Profiles_Load">Charger la cible</sys:String>
-    <sys:String x:Key="Str_Profiles_Deep">Analyse approfondie ensuite</sys:String>
+    <sys:String x:Key="Str_Profiles_Deep">Tout analyser en profondeur ensuite</sys:String>
     <sys:String x:Key="Str_Profiles_Delete">Supprimer le profil</sys:String>
     <sys:String x:Key="Str_Watch_Title">Surveillance de connexion</sys:String>
     <sys:String x:Key="Str_Watch_Targets">Adresses IP (16 au maximum, séparées par des virgules)</sys:String>
@@ -402,7 +402,7 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Tout sélectionner</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Tout copier</sys:String>
     <sys:String x:Key="Str_Term_Clear">Effacer</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Esc pour arreter</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Esc pour arrêter</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Diviser les volets</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Déplacer vers l'autre volet</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Fermer l'onglet</sys:String>

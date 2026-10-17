@@ -121,7 +121,7 @@
     <!-- About overlay -->
     <sys:String x:Key="Str_About_Version">VERSIONE</sys:String>
     <sys:String x:Key="Str_About_Publisher">EDITORE</sys:String>
-    <sys:String x:Key="Str_About_Thumbprint">IMPRONTA DIGITALE</sys:String>
+    <sys:String x:Key="Str_About_Thumbprint">IMPRONTA CERTIFICATO</sys:String>
     <sys:String x:Key="Str_About_Sha">SHA-256 DELL'EXE</sys:String>
     <sys:String x:Key="Str_About_Db">DATABASE DEI PRODUTTORI</sys:String>
     <sys:String x:Key="Str_About_DbUpdate">Aggiorna dai registri più recenti</sys:String>

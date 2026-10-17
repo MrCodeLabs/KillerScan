@@ -32,8 +32,8 @@
     <sys:String x:Key="Str_Lbl_Dns">DNS</sys:String>
 
     <!-- Status bar + counts ({0}/{1} are filled in by the app - keep them) -->
-    <sys:String x:Key="Str_Btn_Stop">Állj</sys:String>
-    <sys:String x:Key="Str_Status_Ready">Kész - {0} OUI-szolgáltató betöltve</sys:String>
+    <sys:String x:Key="Str_Btn_Stop">Leállítás</sys:String>
+    <sys:String x:Key="Str_Status_Ready">Kész - {0} OUI-gyártó betöltve</sys:String>
     <sys:String x:Key="Str_Count_Found">{0} eszköz található</sys:String>
     <sys:String x:Key="Str_Count_Shown">{0}/{1} látható</sys:String>
 
@@ -75,9 +75,9 @@
     <sys:String x:Key="Str_Col_Ip">IP-cím</sys:String>
     <sys:String x:Key="Str_Col_Host">Gazdanév</sys:String>
     <sys:String x:Key="Str_Col_Mac">MAC-cím</sys:String>
-    <sys:String x:Key="Str_Col_Vendor">Eladó</sys:String>
-    <sys:String x:Key="Str_Col_Type">Írja be</sys:String>
-    <sys:String x:Key="Str_Col_Ports">Nyissa meg a Portokat</sys:String>
+    <sys:String x:Key="Str_Col_Vendor">Gyártó</sys:String>
+    <sys:String x:Key="Str_Col_Type">Típus</sys:String>
+    <sys:String x:Key="Str_Col_Ports">Nyitott portok</sys:String>
 
     <!-- Right-click device menu -->
     <sys:String x:Key="Str_Ctx_RescanOne">IP újraolvasása</sys:String>
@@ -95,7 +95,7 @@
 
     <!-- SSH username prompt ({0} is the device, filled in by the app) -->
     <sys:String x:Key="Str_Ssh_Head">Csatlakozzon a következőhöz: {0} SSH-n keresztül</sys:String>
-    <sys:String x:Key="Str_Ssh_Detail">A bejelentkezéshez használt fiók. A KillerScan megjegyzi ezt az eszközt, így csak egyszer kérdezik meg. Hagyja üresen, hogy az SSH-kliens dönthessen.</sys:String>
+    <sys:String x:Key="Str_Ssh_Detail">A bejelentkezéshez használt fiók. A KillerScan megjegyzi ehhez az eszközhöz, így csak egyszer kérdezi meg. Hagyja üresen, hogy az SSH-kliens dönthessen.</sys:String>
     <sys:String x:Key="Str_Ssh_User">FELHASZNÁLÓNÉV</sys:String>
     <sys:String x:Key="Str_Ssh_Connect">Csatlakozás</sys:String>
     <sys:String x:Key="Str_Btn_Cancel">Mégse</sys:String>
@@ -104,7 +104,7 @@
          key for key, so the same thirteen themes read the same way across the family. SE98 is
          listed here ahead of the theme itself landing, because the name is not translated. -->
     <sys:String x:Key="Str_Theme_Dark">Sötét</sys:String>
-    <sys:String x:Key="Str_Theme_Light">Fény</sys:String>
+    <sys:String x:Key="Str_Theme_Light">Világos</sys:String>
     <sys:String x:Key="Str_Theme_Black">Fekete</sys:String>
     <sys:String x:Key="Str_Theme_SE98">98SE</sys:String>
     <sys:String x:Key="Str_Theme_Blood">Vér</sys:String>
@@ -123,17 +123,17 @@
     <sys:String x:Key="Str_About_Publisher">KIADÓ</sys:String>
     <sys:String x:Key="Str_About_Thumbprint">ujjlenyomat</sys:String>
     <sys:String x:Key="Str_About_Sha">EXE SHA-256</sys:String>
-    <sys:String x:Key="Str_About_Db">SZÁLLÍTÓI ADATBÁZIS</sys:String>
+    <sys:String x:Key="Str_About_Db">GYÁRTÓI ADATBÁZIS</sys:String>
     <sys:String x:Key="Str_About_DbUpdate">Frissítés a legújabb nyilvántartásokból</sys:String>
     <sys:String x:Key="Str_About_DbHint">A Wireshark OUI listából.</sys:String>
     <sys:String x:Key="Str_About_DbEntries">{0} bejegyzés</sys:String>
     <sys:String x:Key="Str_About_DbRefreshed">frissítve: {0}</sys:String>
     <sys:String x:Key="Str_About_DbBundled">az alkalmazással együtt</sys:String>
     <sys:String x:Key="Str_About_DescA" xml:space="preserve">ARP + IP pásztázás szállítókereséssel, eszközosztályozással és tematikus, rendezhető HTML-exporttal. A </sys:String>
-    <sys:String x:Key="Str_About_DescB" xml:space="preserve"> hasznosság.</sys:String>
+    <sys:String x:Key="Str_About_DescB" xml:space="preserve"> segédprogram.</sys:String>
 
     <!-- Status bar messages (composed in code - {0}/{1} are filled in by the app) -->
-    <sys:String x:Key="Str_St_Discovering">Házigazdák felfedezése itt: {0}...</sys:String>
+    <sys:String x:Key="Str_St_Discovering">Gazdagépek felderítése itt: {0}...</sys:String>
     <sys:String x:Key="Str_St_ResolvingMacs">{0} MAC-cím feloldása...</sys:String>
     <sys:String x:Key="Str_St_Probing">{0} élő gazdagép vizsgálata...</sys:String>
     <sys:String x:Key="Str_St_ResolvingHosts">{0} gazdagép feloldása...</sys:String>
@@ -143,7 +143,7 @@
     <sys:String x:Key="Str_St_Rescanning">Mély vizsgálat {0}...</sys:String>
     <sys:String x:Key="Str_St_RescanDone">Újrakeresés kész - {0} gazdagép frissítve</sys:String>
     <sys:String x:Key="Str_St_Exported">Exportálva ide: {0}</sys:String>
-    <sys:String x:Key="Str_St_OverrideSet">Felülbírálási készlet: {0} = {1}</sys:String>
+    <sys:String x:Key="Str_St_OverrideSet">Felülbírálás beállítva: {0} = {1}</sys:String>
     <sys:String x:Key="Str_St_OverrideCleared">A(z) {0} felülbírálása törölve</sys:String>
     <sys:String x:Key="Str_St_AppSize">Alkalmazás mérete {0}%</sys:String>
     <sys:String x:Key="Str_St_BadTarget">Érvénytelen cél: &quot;{0}&quot; - használja a 192.168.1.0/24, 192.168.1.7 vagy 192.168.1.10-50 kódot, vesszővel elválasztva</sys:String>
@@ -163,7 +163,7 @@
 
     <!-- Themed window system menu (right-click the title bar / Alt+Space) -->
     <sys:String x:Key="Str_Sys_Restore">Visszaállítás</sys:String>
-    <sys:String x:Key="Str_Sys_Move">Mozgás</sys:String>
+    <sys:String x:Key="Str_Sys_Move">Áthelyezés</sys:String>
     <sys:String x:Key="Str_Sys_Size">Méret</sys:String>
     <sys:String x:Key="Str_Sys_Minimize">Minimalizálás</sys:String>
     <sys:String x:Key="Str_Sys_Maximize">Maximalizálás</sys:String>
@@ -326,10 +326,10 @@ A beállítások nem törlődnek.</sys:String>
     <sys:String x:Key="Str_Dlg_Preview">Előnézet</sys:String>
     <sys:String x:Key="Str_Menu_PinPlace">Rögzítés helyekre</sys:String>
     <sys:String x:Key="Str_Menu_UnpinPlace">Távolítsa el a helyekről</sys:String>
-    <sys:String x:Key="Str_QA_Desktop">Asztali</sys:String>
+    <sys:String x:Key="Str_QA_Desktop">Asztal</sys:String>
     <sys:String x:Key="Str_QA_Documents">Dokumentumok</sys:String>
     <sys:String x:Key="Str_QA_Downloads">Letöltések</sys:String>
-    <sys:String x:Key="Str_QA_Home">Otthon</sys:String>
+    <sys:String x:Key="Str_QA_Home">Kezdőmappa</sys:String>
     <sys:String x:Key="Str_QA_Pictures">Képek</sys:String>
     <sys:String x:Key="Str_Sum_Counts">{0} mappa, {1} fájl</sys:String>
     <sys:String x:Key="Str_TT_RecentLocations">Legutóbbi helyszínek</sys:String>
@@ -365,7 +365,7 @@ A beállítások nem törlődnek.</sys:String>
     <sys:String x:Key="Str_Watch_Title">Kapcsolatfigyelés</sys:String>
     <sys:String x:Key="Str_Watch_Targets">IP-címek (legfeljebb 16, vesszővel elválasztva)</sys:String>
     <sys:String x:Key="Str_Watch_Start">Indítás</sys:String>
-    <sys:String x:Key="Str_Watch_Stop">Állj</sys:String>
+    <sys:String x:Key="Str_Watch_Stop">Leállítás</sys:String>
     <sys:String x:Key="Str_Watch_Hint">Két másodpercenként ellenőrzi az ICMP-választ. A válasz hiánya szűrést is jelenthet, nem feltétlenül kiesést.</sys:String>
     <sys:String x:Key="Str_Watch_Invalid">Adjon meg 1 és 16 közötti számú érvényes IP-címet.</sys:String>
     <sys:String x:Key="Str_Watch_Reply">Válasz</sys:String>
@@ -418,7 +418,7 @@ A beállítások nem törlődnek.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Összes kijelölése</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Összes másolása</sys:String>
     <sys:String x:Key="Str_Term_Clear">Törlés</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Esc a leallitashoz</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Esc a leállításhoz</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Panelek felosztása</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Áthelyezés a másik panelre</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Lap bezárása</sys:String>

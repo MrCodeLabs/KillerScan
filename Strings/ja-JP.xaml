@@ -49,7 +49,7 @@
     <sys:String x:Key="Str_History_Removed">不明</sys:String>
     <sys:String x:Key="Str_History_Changed">変更済み</sys:String>
     <sys:String x:Key="Str_History_FirstScan">この対象の最初のスキャンです。すべてのデバイスが新規です。</sys:String>
-    <sys:String x:Key="Str_History_Summary">追加 {0}、不明 {1}、変更 {2}</sys:String>
+    <sys:String x:Key="Str_History_Summary">追加 {0}、未検出 {1}、変更 {2}</sys:String>
     <sys:String x:Key="Str_History_ViewChanges">変更</sys:String>
     <sys:String x:Key="Str_History_ViewAll">すべてのデバイス</sys:String>
     <sys:String x:Key="Str_History_AllSummary">このスキャンのデバイス数: {0}</sys:String>

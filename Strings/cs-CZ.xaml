@@ -368,7 +368,7 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Trace_Timeout">Bez odpovědi</sys:String>
     <sys:String x:Key="Str_Diag_Working">Kontroluje se</sys:String>
     <sys:String x:Key="Str_Diag_Refresh">Zkontrolovat znovu</sys:String>
-    <sys:String x:Key="Str_Diag_Pick">Vyberte kartu a zobrazte podrobnosti.</sys:String>
+    <sys:String x:Key="Str_Diag_Pick">Vyberte kartu a spusťte kontroly pro daný cíl.</sys:String>
     <sys:String x:Key="Str_Watch_Event">{0}: {1}</sys:String>
     <sys:String x:Key="Str_Watch_Stopped">Zastaveno</sys:String>
     <sys:String x:Key="Str_Diag_Title">Diagnostika zařízení</sys:String>
@@ -400,7 +400,7 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Vybrat vše</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Kopírovat vše</sys:String>
     <sys:String x:Key="Str_Term_Clear">Vymazat</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Esc pro zastaveni</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Esc pro zastavení</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Rozdělit panely</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Přesunout do druhého panelu</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Zavřít kartu</sys:String>
