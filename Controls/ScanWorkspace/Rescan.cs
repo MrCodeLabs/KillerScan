@@ -63,6 +63,9 @@ namespace KillerScan.Controls
                 .ToList();
             if (targets.Count == 0) return;
 
+            using var locationRun = Locations.BeginRun();
+            EngineHost.CapturePreferences(_active.Scanner);
+
             var s = _active;
             var scanner = s.Scanner;
             _rescanCts = new CancellationTokenSource();
@@ -120,6 +123,9 @@ namespace KillerScan.Controls
                 return;
             }
             if (_disposed || _active.Cts != null || ActiveDevices.Count == 0) return;
+
+            using var locationRun = Locations.BeginRun();
+            EngineHost.CapturePreferences(_active.Scanner);
 
             var s = _active;
             var scanner = s.Scanner;

@@ -98,6 +98,8 @@ namespace KillerScan.Shell
         {
             if (_terminalControl?.HasShell != true || _terminalControl.HasRunningCommand || _terminalExited || _terminalScanRunning) return;
             var terminal = _terminalControl;
+            using var locationRun = Services.Locations.BeginRun();
+            string locationId = Services.Locations.Current.Id;
             _terminalScanRunning = true;
             var options = _terminalScanOptions;
             string selectedId = _terminalAdapterId, selectedSource = _terminalSourceAddress;
@@ -133,7 +135,7 @@ namespace KillerScan.Shell
                 using var process = new Process { StartInfo = new ProcessStartInfo
                 {
                     FileName = Assembly.GetExecutingAssembly().Location,
-                    Arguments = "/scan " + QuoteArgument(target.Trim()) + " /json /progress /terminal-progress" +
+                    Arguments = "/scan " + QuoteArgument(target.Trim()) + " /json /progress /terminal-progress /location " + QuoteArgument(locationId) +
                         (options.DisabledFeatures.Length == 0 ? "" : " /skip " + options.DisabledFeatures),
                     // Interface choices are values from the same inventory as the GUI picker.
                     UseShellExecute = false, CreateNoWindow = true,
