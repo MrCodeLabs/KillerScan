@@ -38,8 +38,8 @@ namespace KillerScan.Controls
         {
             if ((SelectedAdapterId.Length == 0) != (SelectedSourceAddress.Length == 0))
                 throw new NetworkBindingException("An explicit interface requires both its ID and source IPv4 address.");
-            var scanner = SelectedAdapterId.Length == 0 ? new NetworkScanner() :
-                new NetworkScanner(ScanBinding.Resolve(SelectedAdapterId, SelectedSourceAddress));
+            var scanner = EngineHost.CreateScanner(SelectedAdapterId.Length == 0 ? null :
+                ScanBinding.Resolve(SelectedAdapterId, SelectedSourceAddress));
             _active.Scanner = scanner;
             WireSession(_active);
         }

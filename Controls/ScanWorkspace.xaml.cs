@@ -200,6 +200,7 @@ namespace KillerScan.Controls
         internal void RunProfile(ScanProfile profile)
         {
             if (_disposed || IsScanning) return;
+            if (profile.LocationId != LocationId) return;
             LoadProfile(profile);
             _runDeepAfterScan = profile.DeepScanAfter;
             Scan();
@@ -207,6 +208,7 @@ namespace KillerScan.Controls
         internal void LoadProfile(ScanProfile profile)
         {
             if (_disposed || IsScanning) return;
+            if (profile.LocationId != LocationId) return;
             SelectInterface(profile.InterfaceId, profile.SourceAddress, updateTarget: false);
             Targets = profile.Target;
             _active.Options = profile.Options ?? new ScanOptions();

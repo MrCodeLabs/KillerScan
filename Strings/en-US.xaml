@@ -558,4 +558,12 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Interface_Auto">Automatic (system routing)</sys:String>
     <sys:String x:Key="Str_Interface_Unavailable">Selected interface/address is unavailable. Choose an interface again.</sys:String>
     <sys:String x:Key="Str_Interface_WifiIdentity">Wi-Fi network identity is unavailable. Windows must allow reading the connected Wi-Fi identity for explicit binding.</sys:String>
+    <sys:String x:Key="Str_Location_Title">Location</sys:String>
+    <sys:String x:Key="Str_Location_Busy">Stop the current scan or terminal command before changing location.</sys:String>
+    <sys:String x:Key="Str_Location_Legacy">Legacy data (unassigned)</sys:String>
+    <sys:String x:Key="Str_Location_New">New location...</sys:String>
+    <sys:String x:Key="Str_Location_Rename">Rename location...</sys:String>
+    <sys:String x:Key="Str_Location_Switch">Change location</sys:String>
+    <sys:String x:Key="Str_Location_Explicit">Choose a name yourself. Locations are never inferred from IP ranges or Wi-Fi names.</sys:String>
+    <sys:String x:Key="Str_Location_Clear">Changing location clears current results and closes the idle terminal and monitoring views. Saved data stays in its original location.</sys:String>
 </ResourceDictionary>

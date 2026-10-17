@@ -15,7 +15,7 @@ namespace KillerScan.Engine
         public NetworkScanner(ScanBinding binding) : this(new ScanProbes()) => _binding = binding ?? throw new ArgumentNullException(nameof(binding));
         private ScanProbes ProbesFor(ScanRun run) => _binding == null ? _probes : new BoundProbes(run);
         private string ClassifyForScan(NetworkDevice device) => ClassifyDeviceForNetwork(device,
-            _binding?.Gateway ?? GatewayIp, _binding?.DnsServer ?? DnsIp, ManualTypeLookup);
+            _binding?.Gateway ?? GatewayIp, _binding?.DnsServer ?? DnsIp, ManualTypeResolver ?? ManualTypeLookup);
 
         private static async Task<UdpReceiveResult> ReceiveProbeAsync(UdpClient udp, IPAddress target, int port, ScanRun? run)
         {

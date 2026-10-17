@@ -558,4 +558,12 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Interface_Auto">Samodejno (sistemske poti)</sys:String>
     <sys:String x:Key="Str_Interface_Unavailable">Izbrani vmesnik ali naslov ni na voljo. Znova izberi vmesnik.</sys:String>
     <sys:String x:Key="Str_Interface_WifiIdentity">Identiteta omrežja Wi-Fi ni na voljo. Za izrecno vezavo mora Windows dovoliti branje identitete povezave Wi-Fi.</sys:String>
+    <sys:String x:Key="Str_Location_Title">Lokacija</sys:String>
+    <sys:String x:Key="Str_Location_Busy">Pred menjavo lokacije ustavi trenutni pregled ali ukaz v terminalu.</sys:String>
+    <sys:String x:Key="Str_Location_Legacy">Stari podatki (neuvrščeno)</sys:String>
+    <sys:String x:Key="Str_Location_New">Nova lokacija...</sys:String>
+    <sys:String x:Key="Str_Location_Rename">Preimenuj lokacijo...</sys:String>
+    <sys:String x:Key="Str_Location_Switch">Zamenjaj lokacijo</sys:String>
+    <sys:String x:Key="Str_Location_Explicit">Ime izberi sam. Lokacije se nikoli ne ugotavljajo iz obsega IP ali imena omrežja Wi-Fi.</sys:String>
+    <sys:String x:Key="Str_Location_Clear">Menjava lokacije počisti trenutne rezultate ter zapre nedejavni terminal in poglede nadzora povezave. Shranjeni podatki ostanejo pri prvotni lokaciji.</sys:String>
 </ResourceDictionary>

@@ -20,6 +20,7 @@ internal static class Program
             await Run("Disabled probes start no I/O in full, quick or deep mode", ScanOptionsTests.DisabledProbes);
             await Run("Default API behavior and per-scan enrichment isolation", ScanOptionsTests.CompatibilityAndIsolation);
             await Run("Scan options preserve old JSON defaults and immutable choices", ScanOptionsTests.ProfileSerialization);
+            await Run("Concurrent scanners isolate instance preferences from static location callbacks", LocationHostTests.InstancePreferences);
             await Run("Explicit interface scope and disconnects fail closed across scan paths", InterfaceBindingTests.ScopeAndDisconnect);
             await Run("Real loopback TCP/UDP sockets pin source, index and received scope", InterfaceBindingTests.PinnedSockets);
             await Run("Source-bound native ICMP and per-interface classification", InterfaceBindingTests.BoundIcmpAndClassification);

@@ -82,6 +82,10 @@ namespace KillerScan.Engine
         /// </summary>
         public static Action<NetworkDevice>? DeviceCompleted { get; set; }
 
+        /// <summary>Per-scanner host preferences; unset retains the static API defaults.</summary>
+        public Func<string, string?>? ManualTypeResolver { get; set; }
+        public Action<NetworkDevice>? DeviceFinalizer { get; set; }
+
         // Network-wide service discovery results (collected once per scan, keyed by IP).
         private Dictionary<string, MulticastDiscovery.MdnsInfo> _mdns = [];
         private Dictionary<string, string> _ssdp = [];
@@ -305,7 +309,7 @@ namespace KillerScan.Engine
 
                         // Classify even in quick scan (hostname + OUI, no ports)
                         device.DeviceType = ClassifyForScan(device);
-                        DeviceCompleted?.Invoke(device);
+                        (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
 
                         DeviceFound?.Invoke(device);
                         int done = Interlocked.Increment(ref completed);
@@ -434,7 +438,7 @@ namespace KillerScan.Engine
 
             // Classify device type using weighted scoring over all signals.
             device.DeviceType = ClassifyForScan(device);
-            DeviceCompleted?.Invoke(device);
+            (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
 
             return device;
         }
@@ -532,7 +536,7 @@ namespace KillerScan.Engine
                 device.Hostname = device.NetbiosName;
 
             device.DeviceType = ClassifyForScan(device);
-            DeviceCompleted?.Invoke(device);
+            (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
             return device;
         }
 
