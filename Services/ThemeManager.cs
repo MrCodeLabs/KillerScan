@@ -369,7 +369,8 @@ namespace KillerScan.Services
             if (!newDict.Contains("WordmarkAccentShadowOpacity")) newDict["WordmarkAccentShadowOpacity"] = 0.0;
             if (!hasExplicitComboHighlightText)
                 newDict["ComboHighlightTextBrush"] = newDict["PrimaryBrush"];
-            newDict["PrimaryFillBrush"] = ButtonFill(newDict["PrimaryBrush"], theme == Theme.SE98);
+            // A palette can fill buttons with a deeper shade than its accent text (PrimaryFillBaseBrush).
+            newDict["PrimaryFillBrush"] = ButtonFill(newDict.Contains("PrimaryFillBaseBrush") ? newDict["PrimaryFillBaseBrush"] : newDict["PrimaryBrush"], theme == Theme.SE98);
             newDict["OutlineHoverBrush"] = ButtonFill(newDict["OutlineHoverBrush"], theme == Theme.SE98);
             Publish(newDict);
         }
