@@ -77,6 +77,14 @@
                 </TextBlock.Style>
             </TextBlock>
         </DataTemplate>
+    <!-- Template cells have no text of their own for UI Automation, which otherwise reads them
+         out as the row's type name and a column number. -->
+    <Style x:Key="IpCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Setter Property="AutomationProperties.Name" Value="{Binding IpAddress}"/>
+    </Style>
+    <Style x:Key="DeviceTypeCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Setter Property="AutomationProperties.Name" Value="{Binding DeviceTypeDisplay}"/>
+    </Style>
 </Grid.Resources>
 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 <Grid x:Name="ScanToolbar">
@@ -578,7 +586,8 @@
                              left edge. In the cell rather than a column of its own: a separate
                              column would sit at index 0 and fight the saved column order, and the
                              marker belongs to the row rather than being something to sort by. -->
-                        <DataGridTemplateColumn x:Name="ColIp" Header="{DynamicResource Str_Col_Ip}" Width="Auto" MinWidth="92" SortMemberPath="IpSortKey">
+                        <DataGridTemplateColumn x:Name="ColIp" Header="{DynamicResource Str_Col_Ip}" Width="Auto" MinWidth="92" SortMemberPath="IpSortKey"
+                                                CellStyle="{StaticResource IpCellStyle}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid Margin="-4,0,0,0">
@@ -619,7 +628,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTemplateColumn x:Name="ColType" Header="{DynamicResource Str_Col_Type}" Width="Auto" MinWidth="95" SortMemberPath="DeviceTypeDisplay"
-                                                CellTemplate="{StaticResource DeviceTypeCell}"/>
+                                                CellTemplate="{StaticResource DeviceTypeCell}" CellStyle="{StaticResource DeviceTypeCellStyle}"/>
                         <DataGridTextColumn x:Name="ColPorts" Header="{DynamicResource Str_Col_Ports}" Binding="{Binding OpenPortsDisplay}" Width="*" MinWidth="130">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
@@ -700,7 +709,7 @@
                         <DataGridTextColumn Header="{DynamicResource Str_Col_Ports}" Binding="{Binding Port}" Width="80"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Col_DeviceName}" Binding="{Binding DeviceName}" Width="*"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Col_Ip}" Binding="{Binding IpAddress}" Width="130"/>
-                        <DataGridTemplateColumn Header="{DynamicResource Str_Col_Type}" Width="150" SortMemberPath="DeviceTypeDisplay" CellTemplate="{StaticResource DeviceTypeCell}"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Col_Type}" Width="150" SortMemberPath="DeviceTypeDisplay" CellTemplate="{StaticResource DeviceTypeCell}" CellStyle="{StaticResource DeviceTypeCellStyle}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 

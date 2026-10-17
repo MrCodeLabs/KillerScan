@@ -27,6 +27,8 @@ namespace KillerScan.Controls
             InitializeComponent();
             HistoryChangesGrid.ItemsSource = _changes;
             HistoryAllGrid.ItemsSource = _devices;
+            HistoryChangesGrid.PreviewKeyDown += ScanWorkspace.TabOutOfGrid;
+            HistoryAllGrid.PreviewKeyDown += ScanWorkspace.TabOutOfGrid;
             ApplyView();
             ConfigureActions();
         }
