@@ -32,6 +32,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The exe's file properties show Steve the Killer as the copyright holder instead of leaving it blank.
 - Screen readers no longer read toolbar, menu, tab and title bar icons as unreadable symbols, and every part of each scroll bar now has a name.
 - Opening the shortcuts or About card moves keyboard focus into it, Tab stays inside the card, and closing it returns focus to where it was.
+- Tab no longer stops on hidden links, which screen readers announced as the window.
 - Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.
 - The Scan History sidebar can no longer be dragged or zoomed narrower than its dates, so a saved scan's date and time are never cut off.
 - The website top bar no longer leaves extra space under the wordmark and buttons.
