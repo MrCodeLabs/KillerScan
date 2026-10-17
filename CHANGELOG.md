@@ -20,6 +20,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The PATH entry for installed copies now keeps the existing Path value's type and its %variables%, tells open programs about the change, and is removed by the uninstaller.
 
 ### Fixed
+- HTML reports show the KillerScan wordmark in the report's theme and accent, loaded from killerscan.net, instead of always falling back to the text wordmark. 98SE keeps the text wordmark.
 - The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
 - On the Light theme's Yellow and Orange accents, buttons, links, tabs and accent icons keep their color with a thin gray outline around accent text and icons, instead of turning near-black or brown.
 - Gray, menu and accent text reads at 4.5:1 contrast or better in every theme and accent, and the footer's version and copyright are slightly dimmed.
