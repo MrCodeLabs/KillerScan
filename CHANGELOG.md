@@ -34,6 +34,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Opening the shortcuts or About card moves keyboard focus into it, Tab stays inside the card, and closing it returns focus to where it was.
 - Tab no longer stops on hidden links, which screen readers announced as the window.
 - Screen readers and accessibility checkers no longer report empty text or the hidden parts of scroll bars as items on screen.
+- Each group of option buttons is one Tab stop that lands on the selected option, and the arrow keys move between its options.
 - Tab moves past the device, service and history lists in one step instead of visiting every cell, and screen readers read the address and type cells instead of a placeholder.
 - Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.
 - The Scan History sidebar can no longer be dragged or zoomed narrower than its dates, so a saved scan's date and time are never cut off.
