@@ -548,4 +548,25 @@
     <sys:String x:Key="Str_Location_DuplicateName">Розташування з такою назвою вже існує. Виберіть іншу назву.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Це розташування недоступне або його неможливо змінити. Виберіть наявне розташування.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Не вдалося прочитати або зберегти дані розташування. Перед продовженням закрийте інші екземпляри KillerScan і перевірте дозволи на файли або відновіть резервну копію.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Підстави розпізнавання</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Достовірність</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Недоступно</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Низька</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Середня</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Висока</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Вручну</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Заявлена модель (не перевірена)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Період спостереження (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Джерело</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Спостережене значення</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Суперечливі ознаки; перевірте окремі джерела.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Попереднє / з кешу</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Евристична оцінка, а не ймовірність. Значення протоколів повідомляє сам пристрій. Виробник MAC не доводить модель; відсутність відповідей не доводить відсутність пристрою.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Автоматичний тип</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Вимкнені запити</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Швидке сканування</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Повне сканування</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Поглиблене сканування</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Імпортовано / область не вказана</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Інші варіанти</sys:String>
 </ResourceDictionary>

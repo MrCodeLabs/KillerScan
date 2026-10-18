@@ -548,4 +548,25 @@ Innstillingene dine fjernes ikke.</sys:String>
     <sys:String x:Key="Str_Location_DuplicateName">Et sted med dette navnet finnes allerede. Velg et annet navn.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Dette stedet er utilgjengelig eller kan ikke endres. Velg et eksisterende sted.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Stedsdata kunne ikke leses eller lagres. Lukk andre forekomster av KillerScan og kontroller filrettighetene eller gjenopprett en sikkerhetskopi før du fortsetter.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Grunnlag for gjenkjenning</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Sikkerhet i vurderingen</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Ikke tilgjengelig</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Lav</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Middels</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Høy</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Manuell</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Rapportert modell (ikke bekreftet)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Observasjonsperiode (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Kilde</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Observert verdi</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Motstridende signaler; kontroller de enkelte kildene.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Tidligere / mellomlagret</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Heuristisk vurdering, ikke en sannsynlighet. Protokollverdier rapporteres av enheten selv. MAC-produsenten beviser ingen modell; manglende svar beviser ikke fravær.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Automatisk type</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Deaktiverte forespørsler</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Hurtigskanning</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Full skanning</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Dybdeskanning</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Importert / omfang ikke angitt</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Andre kandidater</sys:String>
 </ResourceDictionary>

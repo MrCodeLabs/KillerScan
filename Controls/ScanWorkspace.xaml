@@ -5,7 +5,7 @@
          colors serves both. The triggers match the raw English type, which is why
          ServiceRow carries the raw value and localizes separately for its CSV. -->
     <DataTemplate x:Key="DeviceTypeCell">
-
+        <StackPanel Orientation="Horizontal">
             <TextBlock Text="{Binding DeviceType, Converter={StaticResource DeviceTypeLoc}}" FontWeight="Medium">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -76,6 +76,8 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <TextBlock Text="{Binding Identification, Converter={StaticResource IdentificationConfidence}}" FontSize="10" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
         </DataTemplate>
 </Grid.Resources>
 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
@@ -374,6 +376,9 @@
 
                     <DataGrid.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="{DynamicResource Str_Evidence_Title}" InputGestureText="Ctrl+I" Click="Evidence_Click">
+                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem x:Name="RescanMenuItem" Header="{DynamicResource Str_Ctx_RescanOne}" InputGestureText="Ctrl+R" Click="RescanSelected_Click">
                                 <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE72C;"/></MenuItem.Icon>
                             </MenuItem>
@@ -663,6 +668,9 @@
                           CellStyle="{StaticResource DarkDataGridCell}">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="{DynamicResource Str_Evidence_Title}" InputGestureText="Ctrl+I" Tag="Evidence" Click="ServiceMenu_Click">
+                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Services_CopyEndpoint}" InputGestureText="Ctrl+Shift+C" Tag="CopyEndpoint" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>

@@ -570,4 +570,25 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Location_DuplicateName">A location with this name already exists. Choose another name.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">This location is unavailable or cannot be changed. Choose an existing location.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Location data could not be read or saved. Close other copies of KillerScan and check file permissions or restore a backup before continuing.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Recognition evidence</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Confidence</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Not available</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Low</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Medium</sys:String>
+    <sys:String x:Key="Str_Evidence_High">High</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Manual</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Reported model (unverified)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Observation window (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Source</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Observed value</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Conflicting signals; check the individual sources.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Earlier / cached</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Heuristic estimate, not a probability. Protocol values are self-reported. MAC vendor does not identify a model; missing responses do not prove absence.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Automatic type</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Disabled probes</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Quick scan</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Full scan</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Deep scan</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Imported / unspecified scope</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Other candidates</sys:String>
 </ResourceDictionary>

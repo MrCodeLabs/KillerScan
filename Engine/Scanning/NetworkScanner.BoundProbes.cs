@@ -14,8 +14,14 @@ namespace KillerScan.Engine
         public ScanBinding? Binding => _binding;
         public NetworkScanner(ScanBinding binding) : this(new ScanProbes()) => _binding = binding ?? throw new ArgumentNullException(nameof(binding));
         private ScanProbes ProbesFor(ScanRun run) => _binding == null ? _probes : new BoundProbes(run);
-        private string ClassifyForScan(NetworkDevice device) => ClassifyDeviceForNetwork(device,
-            _binding?.Gateway ?? GatewayIp, _binding?.DnsServer ?? DnsIp, ManualTypeResolver ?? ManualTypeLookup);
+        private string ClassifyForScan(NetworkDevice device, ScanOptions options, string scope)
+        {
+            device.ObservationCompletedAtUtc = DateTimeOffset.UtcNow;
+            device.RecognitionScope = scope;
+            device.RecognitionDisabledFeatures = ScanOptions.Features.Where(feature => !options.IsEnabled(feature)).ToArray();
+            return ClassifyDeviceForNetwork(device, _binding?.Gateway ?? GatewayIp, _binding?.DnsServer ?? DnsIp,
+                ManualTypeResolver ?? ManualTypeLookup);
+        }
 
         private static async Task<UdpReceiveResult> ReceiveProbeAsync(UdpClient udp, IPAddress target, int port, ScanRun? run)
         {
