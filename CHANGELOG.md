@@ -16,6 +16,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - The history detail header is the same size as the Scan History heading.
 - Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
 - The Light theme draws a softer shadow under the toolbars.
+- Toolbar buttons with text under the icon are 6 pixels shorter, without the extra space above and below the icon and label.
 - The website's top bar Download button uses the same font and height as the other top bar buttons.
 - The PATH entry for installed copies now keeps the existing Path value's type and its %variables%, tells open programs about the change, and is removed by the uninstaller.
 - The keyboard focus outline is a thin solid ring in the theme accent instead of a thick dotted line, and uses the text color where the accent would be too faint to see.

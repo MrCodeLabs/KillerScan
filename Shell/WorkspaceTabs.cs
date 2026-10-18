@@ -176,7 +176,7 @@ namespace KillerScan.Shell
             {
                 var button = entry.Key;
                 button.Width = none ? (large ? 46 : 36) : double.NaN;
-                button.Height = under ? (large ? 56 : 52) : none ? (large ? 42 : 32) : 34;
+                button.Height = under ? (large ? 50 : 46) : none ? (large ? 42 : 32) : 34;
                 button.Padding = under ? new Thickness(6, 4, 6, 4) : new Thickness(8, 5, 8, 5);
                 var panel = new StackPanel { Orientation = under ? Orientation.Vertical : Orientation.Horizontal,
                     HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
@@ -196,7 +196,7 @@ namespace KillerScan.Shell
             }
             // The overflow button shares the strip with the view buttons. It matches their height
             // and carries no vertical margin, so it appearing never makes the toolbar row taller.
-            _toolbarOverflow.Height = under ? (large ? 56 : 52) : none ? (large ? 42 : 32) : 34;
+            _toolbarOverflow.Height = under ? (large ? 50 : 46) : none ? (large ? 42 : 32) : 34;
             foreach (var item in _toolbarMenu.Items.OfType<MenuItem>())
             {
                 if (item.Tag is ToolbarIconSize size)
