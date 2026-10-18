@@ -548,4 +548,25 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Location_DuplicateName">Já existe um local com esse nome. Escolha outro nome.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Este local não está disponível ou não pode ser alterado. Escolha um local existente.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Não foi possível ler ou salvar os dados do local. Feche outras instâncias do KillerScan e verifique as permissões dos arquivos ou restaure um backup antes de continuar.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Evidências de identificação</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Confiança</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Não disponível</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Baixa</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Média</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Alta</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Manual</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Modelo informado (não verificado)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Período de observação (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Fonte</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Valor observado</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Sinais conflitantes; confira cada fonte.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Anterior / em cache</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Estimativa heurística, não uma probabilidade. Os valores dos protocolos são informados pelo próprio dispositivo. O fabricante MAC não identifica um modelo; a falta de respostas não comprova ausência.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Tipo automático</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Consultas desativadas</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Verificação rápida</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Verificação completa</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Verificação profunda</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Importado / escopo não especificado</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Outros candidatos</sys:String>
 </ResourceDictionary>

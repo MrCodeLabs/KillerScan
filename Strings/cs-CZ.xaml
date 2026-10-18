@@ -504,4 +504,25 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Location_DuplicateName">Lokalita s tímto názvem již existuje. Zvol jiný název.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Tato lokalita není dostupná nebo ji nelze změnit. Vyber existující lokalitu.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Data lokality nelze přečíst nebo uložit. Před pokračováním zavři ostatní instance KillerScan a zkontroluj oprávnění k souborům nebo obnov zálohu.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Podklady rozpoznání</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Spolehlivost</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Není k dispozici</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Nízká</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Střední</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Vysoká</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Ruční</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Hlášený model (neověřený)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Doba pozorování (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Zdroj</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Zjištěná hodnota</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Protichůdné údaje; zkontroluj jednotlivé zdroje.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Starší / z mezipaměti</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Heuristický odhad, nikoli pravděpodobnost. Hodnoty protokolů hlásí samotné zařízení. Výrobce MAC neurčuje model; chybějící odpovědi nedokazují nepřítomnost.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Automatický typ</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Vypnuté dotazy</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Rychlé skenování</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Úplné skenování</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Hloubkové skenování</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Importováno / rozsah neurčen</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Další kandidáti</sys:String>
 </ResourceDictionary>

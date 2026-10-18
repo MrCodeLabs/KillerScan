@@ -24,6 +24,8 @@ namespace KillerScan.Services
         public string MacAddress { get; set; } = string.Empty;
         public string Vendor { get; set; } = string.Empty;
         public string DeviceType { get; set; } = string.Empty;
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public DeviceIdentification? Identification { get; set; }
         public List<int> OpenPorts { get; set; } = [];
     }
 
@@ -151,6 +153,7 @@ namespace KillerScan.Services
             MacAddress = device.MacAddress,
             Vendor = device.Vendor,
             DeviceType = device.DeviceType,
+            Identification = device.Identification?.Snapshot(),
             OpenPorts = [.. device.OpenPorts.OrderBy(port => port)]
         };
 

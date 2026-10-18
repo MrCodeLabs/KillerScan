@@ -546,6 +546,7 @@ namespace KillerScan.Features.Cli
                 spinner?.Dispose(); spinner = null;
                 try { Console.CancelKeyPress -= OnCancel; } catch { }
                 devices = [.. demoScan!.Devices];
+                DemoData.AddIdentification(devices);
             }
             else
             try
@@ -654,7 +655,7 @@ namespace KillerScan.Features.Cli
         private static string Render(string format, List<NetworkDevice> devices, string label,
                                      string theme, bool noHeader, ScanLocation? location = null) => format switch
         {
-            "csv" => location == null ? Csv(devices, !noHeader) : ReportExport.BuildLocationCsv(devices, location, !noHeader),
+            "csv" => ReportExport.BuildLocationCsv(devices, location, !noHeader),
             "json" => JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true }),
             "html" => ReportExport.BuildLocationHtml(devices, label, theme.ToLowerInvariant(), location),
             _ => Table(devices, !noHeader),

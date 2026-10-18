@@ -13,6 +13,11 @@ internal static class Program
             await Run("CIDR expansion excludes the network and broadcast addresses", Subnet);
             await Run("ARP output parsing keeps IPv4 entries with full MAC addresses", ArpParsing);
             await Run("Classifier honors manual types, the gateway, DNS and hostname rules", Classifier);
+            await Run("Recognition keeps weak names, OUI and silent hosts uncertain", RecognitionTests.WeakSignals);
+            await Run("Recognition requires corroboration and exposes contradictory evidence", RecognitionTests.CorroborationAndConflict);
+            await Run("Reported models require explicit declarations and bounded evidence", RecognitionTests.ModelsAndUntrustedValues);
+            await Run("Manual labels, frozen inference, timestamps and JSON remain distinct", RecognitionTests.ManualAndSnapshots);
+            await Run("Full, quick and deep scans retain provenance and cached timestamps", RecognitionTests.ScanProvenance);
             await Run("Bundled vendor database loads from the engine assembly", Vendors);
             await Run("Status text is English, numeric and free of double hyphens", StatusText);
             await Run("Quick scan reports stages, devices and host hooks through a fake platform", QuickScan);
