@@ -372,14 +372,6 @@ namespace KillerScan.Services
             // A palette can fill buttons with a deeper shade than its accent text (PrimaryFillBaseBrush).
             newDict["PrimaryFillBrush"] = ButtonFill(newDict.Contains("PrimaryFillBaseBrush") ? newDict["PrimaryFillBaseBrush"] : newDict["PrimaryBrush"], theme == Theme.SE98);
             newDict["OutlineHoverBrush"] = ButtonFill(newDict["OutlineHoverBrush"], theme == Theme.SE98);
-            newDict["PaneShadowEffect"] = null;
-            if (newDict["PaneShadowOpacity"] is double paneOpacity && paneOpacity > 0)
-            {
-                var shadow = new System.Windows.Media.Effects.DropShadowEffect
-                { Color = Colors.Black, BlurRadius = 16, ShadowDepth = 5, Direction = 270, Opacity = paneOpacity };
-                shadow.Freeze();
-                newDict["PaneShadowEffect"] = shadow;
-            }
             Publish(newDict);
         }
 

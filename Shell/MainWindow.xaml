@@ -537,13 +537,15 @@
 
         <!-- Devices pane - the lightest tier, lifted above the chrome with an outward drop shadow
              (kept tight to the bars; the shadow overlays them rather than adding gap) -->
-        <!-- The palette supplies a frozen effect on modern themes and null on 98SE. -->
+        <!-- Named so the shadow can be switched off. Windows 98 had no drop shadows anywhere, and
+             PaneShadow is a StaticResource effect that a palette cannot reach - so Theme.cs nulls
+             the Effect on 98SE and restores it otherwise. Same approach KillerShell takes. -->
         <Grid x:Name="WorkspaceHost" Grid.Row="1" Grid.Column="1"
               Margin="{DynamicResource DevicesPaneMargin}" Panel.ZIndex="10">
         <Border x:Name="DevicesPaneShadow" Grid.Row="1" IsHitTestVisible="False"
                 Background="{DynamicResource ScanContentPaneBrush}"
                 CornerRadius="{DynamicResource PanelCornerRadius}"
-                Effect="{DynamicResource PaneShadowEffect}"/>
+                Effect="{StaticResource PaneShadow}"/>
         <controls:PickerBorder x:Name="DevicesPane" Grid.Row="1" SnapsToDevicePixels="True" UseLayoutRounding="True"
                 Background="{DynamicResource ScanContentPaneBrush}"
                 BorderBrush="{DynamicResource PaneBorderBrush}" BorderThickness="1"
@@ -576,8 +578,10 @@
         <!-- end ScaleHost -->
 
         <!-- Status Bar -->
-        <!-- Keep the footer above workspace shadows without changing its 24px geometry. -->
-        <Border x:Name="FooterBar" Grid.Row="3" Panel.ZIndex="20" Background="{DynamicResource FooterBackgroundBrush}">
+        <!-- ZIndex -1 so the content pane's shadow lands on the footer rather than being painted
+             over by it. The footer is pushed down rather than the content row raised, which would
+             also put it above the overlays declared later. -->
+        <Border x:Name="FooterBar" Grid.Row="3" Panel.ZIndex="-1" Background="{DynamicResource FooterBackgroundBrush}">
           <Grid>
             <!-- FooterPadding: 16,0 on the flat themes (one continuous strip); 0 on 98SE, where
                  the strip breaks into sunken cells that run to the edges. -->

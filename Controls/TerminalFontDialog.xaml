@@ -18,9 +18,9 @@
         </ResourceDictionary>
     </Window.Resources>
 
-<kui:PickerBorder x:Name="RootBorder" Opacity="0"
+    <kui:PickerBorder x:Name="RootBorder" Opacity="0"
             Background="{StaticResource BackgroundBrush}"
-            BorderBrush="{DynamicResource DialogFrameBrush}"
+            BorderBrush="{StaticResource CardBorderBrush}"
             BorderThickness="1"
             CornerRadius="{DynamicResource PanelCornerRadius}"
             Margin="{DynamicResource DialogHaloMargin}">
