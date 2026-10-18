@@ -90,7 +90,7 @@ internal static class InterfaceBindingTests
             var net = Loopback(); net.Gateway = "127.0.0.1"; net.Dns = "127.0.0.1";
             var scanner = new NetworkScanner(new ScanBinding(net, () => true));
             string type = (string)typeof(NetworkScanner).GetMethod("ClassifyForScan", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .Invoke(scanner, new object[] { new NetworkDevice { IpAddress = "127.0.0.1" } })!;
+                .Invoke(scanner, new object[] { new NetworkDevice { IpAddress = "127.0.0.1" }, new ScanOptions(), "full" })!;
             Require(type == "Router/DNS", "An explicitly bound scanner uses its own gateway/DNS, not another tab's globals.");
         }
         finally { NetworkScanner.GatewayIp = gateway; NetworkScanner.DnsIp = dns; }

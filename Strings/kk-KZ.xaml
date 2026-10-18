@@ -548,4 +548,25 @@
     <sys:String x:Key="Str_Location_DuplicateName">Осындай атауы бар орналасу орны бұрыннан бар. Басқа атауды таңдаңыз.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Бұл орналасу орны қолжетімсіз немесе оны өзгерту мүмкін емес. Бар орналасу орнын таңдаңыз.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Орналасу орнының деректерін оқу немесе сақтау мүмкін болмады. Жалғастырмас бұрын KillerScan бағдарламасының басқа даналарын жауып, файл рұқсаттарын тексеріңіз немесе сақтық көшірмені қалпына келтіріңіз.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Тану негіздері</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Сенімділік</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Қолжетімсіз</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Төмен</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Орташа</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Жоғары</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Қолмен</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Хабарланған модель (тексерілмеген)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Бақылау кезеңі (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Дереккөз</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Бақыланған мән</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Қайшы белгілер; әр дереккөзді тексеріңіз.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Бұрынғы / кэштен</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Ықтималдық емес, эвристикалық баға. Хаттама мәндерін құрылғының өзі хабарлайды. MAC өндірушісі модельді дәлелдемейді; жауаптың болмауы құрылғының жоқтығын дәлелдемейді.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Автоматты түр</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Өшірілген сұраулар</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Жылдам сканерлеу</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Толық сканерлеу</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Терең сканерлеу</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Импортталған / ауқым көрсетілмеген</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Басқа нұсқалар</sys:String>
 </ResourceDictionary>

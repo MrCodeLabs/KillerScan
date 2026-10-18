@@ -11,34 +11,36 @@ $module = Get-Module KillerScan
         @()
     }
     scan '192.0.2.0/24' -Quick -Skip dns,mdns
-    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.0/24|/quick|/skip|dns,mdns|/json|/quiet') {
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.0/24|/quick|/skip|dns,mdns|/json') {
         throw 'scan did not forward the choices'
     }
     probe '192.0.2.10' -Skip ports,tls -Timeout 3
-    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/skip|ports,tls|/timeout|3|/json|/quiet') {
+    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/skip|ports,tls|/timeout|3|/json') {
         throw 'probe did not forward the choices'
     }
     try { scan '192.0.2.10' -Skip typo; throw 'Unknown choice was accepted' }
     catch { if ($_.FullyQualifiedErrorId -notlike 'ParameterArgumentValidationError*') { throw } }
     scan '192.0.2.0/24' -InterfaceId 'fixture-adapter' -SourceIp '192.0.2.20'
-    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.0/24|/interface|fixture-adapter|/source-ip|192.0.2.20|/json|/quiet') {
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.0/24|/interface|fixture-adapter|/source-ip|192.0.2.20|/json') {
         throw 'scan did not forward its interface and source'
     }
     probe '192.0.2.10' -InterfaceId 'fixture-adapter' -SourceIp '192.0.2.20'
-    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/interface|fixture-adapter|/source-ip|192.0.2.20|/json|/quiet') {
+    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/interface|fixture-adapter|/source-ip|192.0.2.20|/json') {
         throw 'probe did not forward its interface and source'
     }
 }
 & $module {
     scan '192.0.2.10' -LocationId '11111111111111111111111111111111'
-    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.10|/location|11111111111111111111111111111111|/json|/quiet') { throw 'scan did not forward location identity' }
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.10|/location|11111111111111111111111111111111|/json') { throw 'scan did not forward location identity' }
     probe '192.0.2.10' -LocationId '22222222222222222222222222222222'
-    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/location|22222222222222222222222222222222|/json|/quiet') { throw 'probe did not forward location identity' }
-    $device = ConvertTo-KsDevice ([pscustomobject]@{LocationId='fixture'; LocationName='Fixture A'})
+    if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/location|22222222222222222222222222222222|/json') { throw 'probe did not forward location identity' }
+    $evidence = [pscustomobject]@{Confidence='Low'; Evidence=@([pscustomobject]@{Source='OUI'; Value='Fixture'})}
+    $device = ConvertTo-KsDevice ([pscustomobject]@{LocationId='fixture'; LocationName='Fixture A'; Identification=$evidence})
     if ($device.LocationId -ne 'fixture' -or $device.LocationName -ne 'Fixture A') { throw 'device projection lost location metadata' }
+    if ($device.Identification.Confidence -ne 'Low' -or $device.Identification.Evidence[0].Source -ne 'OUI') { throw 'device projection lost recognition evidence' }
     $env:KS_LOCATION_ID = '33333333333333333333333333333333'
     scan '192.0.2.10'
-    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.10|/location|33333333333333333333333333333333|/json|/quiet') { throw 'module did not inherit the GUI terminal location' }
+    if (($script:CapturedArguments -join '|') -ne '/scan|192.0.2.10|/location|33333333333333333333333333333333|/json') { throw 'module did not inherit the GUI terminal location' }
 }
 $env:KS_LOCATION_ID = $previousLocation
 Write-Output 'PASS: scan/probe forward choices; unknown names fail before the executable boundary.'

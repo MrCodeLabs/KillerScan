@@ -506,4 +506,25 @@ Su configuración no se eliminará.</sys:String>
     <sys:String x:Key="Str_Location_DuplicateName">Ya existe una ubicación con este nombre. Elige otro nombre.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Esta ubicación no está disponible o no se puede cambiar. Elige una ubicación existente.</sys:String>
     <sys:String x:Key="Str_Location_DataError">No se pudieron leer o guardar los datos de la ubicación. Cierra otras instancias de KillerScan y revisa los permisos de los archivos o restaura una copia de seguridad antes de continuar.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Evidencias de identificación</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Confianza</sys:String>
+    <sys:String x:Key="Str_Evidence_None">No disponible</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Baja</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Media</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Alta</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Manual</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Modelo comunicado (sin verificar)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Periodo de observación (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Fuente</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Valor observado</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Señales contradictorias; revisa las fuentes individuales.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Anterior / en caché</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Estimación heurística, no una probabilidad. El propio dispositivo comunica los valores de protocolo. El fabricante MAC no identifica un modelo; la falta de respuestas no demuestra ausencia.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Tipo automático</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Consultas desactivadas</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Análisis rápido</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Análisis completo</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Análisis profundo</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Importado / alcance sin especificar</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Otros candidatos</sys:String>
 </ResourceDictionary>

@@ -570,4 +570,25 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Location_DuplicateName">Lokacija s tem imenom že obstaja. Izberi drugo ime.</sys:String>
     <sys:String x:Key="Str_Location_SelectionError">Ta lokacija ni na voljo ali je ni mogoče spremeniti. Izberi obstoječo lokacijo.</sys:String>
     <sys:String x:Key="Str_Location_DataError">Podatkov lokacije ni bilo mogoče prebrati ali shraniti. Pred nadaljevanjem zapri druge kopije KillerScan in preveri dovoljenja za datoteke ali obnovi varnostno kopijo.</sys:String>
+    <sys:String x:Key="Str_Evidence_Title">Dokazi prepoznavanja</sys:String>
+    <sys:String x:Key="Str_Evidence_Confidence">Zanesljivost</sys:String>
+    <sys:String x:Key="Str_Evidence_None">Ni na voljo</sys:String>
+    <sys:String x:Key="Str_Evidence_Low">Nizka</sys:String>
+    <sys:String x:Key="Str_Evidence_Medium">Srednja</sys:String>
+    <sys:String x:Key="Str_Evidence_High">Visoka</sys:String>
+    <sys:String x:Key="Str_Evidence_Manual">Ročno</sys:String>
+    <sys:String x:Key="Str_Evidence_Model">Sporočeni model (nepreverjeno)</sys:String>
+    <sys:String x:Key="Str_Evidence_Time">Čas zajema (UTC)</sys:String>
+    <sys:String x:Key="Str_Evidence_Source">Vir</sys:String>
+    <sys:String x:Key="Str_Evidence_Value">Zaznana vrednost</sys:String>
+    <sys:String x:Key="Str_Evidence_Conflict">Nasprotujoči si podatki; preveri posamezne vire.</sys:String>
+    <sys:String x:Key="Str_Evidence_Cached">Starejše / predpomnjeno</sys:String>
+    <sys:String x:Key="Str_Evidence_Note">Ocena je hevristična, ne verjetnost. Podatke protokolov sporoča naprava sama. Proizvajalec MAC ne dokazuje modela; manjkajoči odzivi ne dokazujejo odsotnosti.</sys:String>
+    <sys:String x:Key="Str_Evidence_Automatic">Samodejna vrsta</sys:String>
+    <sys:String x:Key="Str_Evidence_Disabled">Izklopljene poizvedbe</sys:String>
+    <sys:String x:Key="Str_Evidence_Quick">Hitri pregled</sys:String>
+    <sys:String x:Key="Str_Evidence_Full">Celotni pregled</sys:String>
+    <sys:String x:Key="Str_Evidence_Deep">Poglobljeni pregled</sys:String>
+    <sys:String x:Key="Str_Evidence_External">Uvoženo / obseg ni določen</sys:String>
+    <sys:String x:Key="Str_Evidence_Candidates">Drugi kandidati</sys:String>
 </ResourceDictionary>

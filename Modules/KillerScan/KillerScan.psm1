@@ -24,7 +24,8 @@ function Invoke-KsText {
     param([string[]]$Arguments)
 
     $exe = Get-KsExe
-    $raw = & $exe @Arguments 2>&1
+    # An explicit pipeline also waits for the Windows GUI-subsystem executable.
+    $raw = & $exe @Arguments 2>&1 | ForEach-Object { $_ }
     # 2 is bad usage, which is a real error. 1 is "found nothing" and 3 is "unknown
     # vendor", both of which are answers rather than failures.
     if ($LASTEXITCODE -eq 2) { throw (($raw | Out-String).Trim()) }
@@ -54,6 +55,7 @@ function ConvertTo-KsDevice {
         Mac      = $Device.MacAddress
         Vendor   = $Device.Vendor
         Type     = $Device.DeviceType
+        Identification = $Device.Identification
         Ports    = @($Device.OpenPorts)
         Ttl      = $Device.Ttl
         Http     = $Device.HttpTitle
@@ -112,7 +114,7 @@ function scan {
     if ($LocationId) { $arguments += @('/location', $LocationId) }
     if ($Skip)    { $arguments += @('/skip', ($Skip -join ',')) }
     if ($Timeout) { $arguments += @('/timeout', $Timeout) }
-    $arguments += @('/json', '/quiet')
+    $arguments += @('/json')
 
     Invoke-KsJson $arguments | ForEach-Object { ConvertTo-KsDevice $_ }
 }
@@ -144,7 +146,7 @@ function probe {
     if ($LocationId) { $arguments += @('/location', $LocationId) }
     if ($Skip) { $arguments += @('/skip', ($Skip -join ',')) }
     if ($Timeout) { $arguments += @('/timeout', $Timeout) }
-    $arguments += @('/json', '/quiet')
+    $arguments += @('/json')
 
     Invoke-KsJson $arguments | ForEach-Object { ConvertTo-KsDevice $_ }
 }

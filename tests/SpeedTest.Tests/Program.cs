@@ -29,6 +29,7 @@ internal static class Program
     {
         try
         {
+            if (args.SequenceEqual(new[] { "--evidence-ui" })) { await ReleaseUiTests.Run(evidenceOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--location-profiles-ui" })) { await LocationProfilePilot.RunIsolated(); return 0; }
             if (args.Length == 3 && args[0] == "--location-profiles-phase") { LocationProfilePilot.RunPhase(args[1], args[2]); return 0; }
             if (args.SequenceEqual(new[] { "--locations" })) { LocationTests.Run(); return 0; }

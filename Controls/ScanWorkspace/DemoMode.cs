@@ -13,6 +13,7 @@ namespace KillerScan.Controls
         private void GenerateDemoScan()
         {
             var demo = DemoData.Generate(_demoRng);
+            DemoData.AddIdentification(demo.Devices);
 
             SubnetInput.Text    = demo.Subnet;
             GatewayLabel.Text   = demo.Gateway;
