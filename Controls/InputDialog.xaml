@@ -14,9 +14,9 @@
     <!-- One-line text prompt on the ConfirmDialog chrome: same border, shadow, grain, wordmark
          title bar and button row, with an entry field where that dialog has its checkbox. Built
          so the SSH username prompt did not have to invent a second dialog language. -->
-    <kui:PickerBorder x:Name="RootBorder" Opacity="0"
+<kui:PickerBorder x:Name="RootBorder" Opacity="0"
             Background="{StaticResource BackgroundBrush}"
-            BorderBrush="{StaticResource CardBorderBrush}"
+            BorderBrush="{DynamicResource DialogFrameBrush}"
             BorderThickness="1"
             CornerRadius="{DynamicResource PanelCornerRadius}"
             Margin="{DynamicResource DialogHaloMargin}">
