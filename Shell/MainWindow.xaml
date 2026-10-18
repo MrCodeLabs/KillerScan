@@ -485,7 +485,7 @@
 
         <!-- Chevron: pinned to the top of the rail on its own, per the family rail order. -->
         <Button x:Name="SidebarToggleBtn" Grid.Row="1" Grid.Column="0" Style="{StaticResource RailButton}"
-                Content="&#xE76C;" FontSize="12" Panel.ZIndex="20"
+                Content="&#xE76C;" FontSize="16" Panel.ZIndex="20"
                 VerticalAlignment="Top" HorizontalAlignment="Right" Margin="2,10,2,0"
                 Click="SidebarToggle_Click"
                 ToolTip="{DynamicResource Str_TT_ExpandSidebar}"/>
