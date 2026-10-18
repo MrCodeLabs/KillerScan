@@ -50,13 +50,18 @@ internal static class ReleaseUiTests
         Require(directory != null, "App resource source exists.");
         var xml = new XmlDocument();
         xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
-        string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
-            .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+        string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml;
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
-        context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
-        context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
-        context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
-        context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
+        foreach (XmlAttribute attribute in xml.DocumentElement.Attributes)
+        {
+            if (attribute.Prefix != "xmlns" && attribute.Name != "xmlns") continue;
+            string prefix = attribute.Prefix == "xmlns" ? attribute.LocalName : "";
+            string mapped = attribute.Value;
+            if (mapped.StartsWith("clr-namespace:Killer", StringComparison.Ordinal) && !mapped.Contains(";assembly="))
+                mapped += ";assembly=KillerScan";
+            context.XmlnsDictionary.Add(prefix, mapped);
+            dictionary = dictionary.Replace(attribute.Value + "\"", mapped + "\"");
+        }
         app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
         var manager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
         var themeType = assembly.GetType("KillerScan.Services.Theme", true)!;
