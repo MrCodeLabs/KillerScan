@@ -160,7 +160,7 @@ namespace KillerScan
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or System.Text.Json.JsonException)
             {
-                MessageBox.Show(ex.Message, L("Str_Location_Title", "Location"), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Services.Locations.ErrorText(ex), L("Str_Location_Title", "Location"), MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
             }
         }

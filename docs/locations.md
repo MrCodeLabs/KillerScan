@@ -91,3 +91,11 @@ preferences, history, profiles, leases and export escaping. `--release-ui` adds
 picker/profile/reset/locking checks using fabricated devices. Engine checks cover
 independent callbacks for concurrent scanners. Fixtures use temporary data and
 loopback servers; physical network pilots remain separate.
+
+`SpeedTest.Tests.exe --location-profiles-ui` uses the real create/rename/save/load/delete
+GUI handlers with two same-name profiles in different locations, then starts a
+fresh process to verify persistence and isolation. It never starts a scan. Its
+temporary data root and registry are isolated. The same check verifies all 20
+language dictionaries contain their own location/profile labels (including GUI
+error guidance), exercises live language changes and checks classic dialog titles.
+User-provided location/profile names are kept as entered across language changes.
