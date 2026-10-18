@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ## [1.8.2] - Unreleased
 
 ### Added
+- Commands run as `killerscan scan` without a command prefix. `killerscan --help` lists them, and existing command forms stay compatible. Installed copies use PATH; portable copies run from their folder or full path.
 - KillerScan checks for updates on startup and offers a newer release in a dialog with an Always check on startup box. A Check for updates on startup checkbox on the About card turns the check back on.
 - Alt+Shift+G turns Film Grain on or off. It is listed in the shortcuts overlay, and the keyboard map has a new Alt+Shift layer for it.
 - The website's top bar has a Microsoft Store button on every page, and the MCP page has a Microsoft Store button for KillerMCP.

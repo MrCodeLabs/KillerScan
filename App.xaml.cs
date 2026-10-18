@@ -114,7 +114,8 @@ namespace KillerScan
 
             int uiScanIndex = Array.FindIndex(e.Args, a =>
                 string.Equals(a, "/uiscan", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(a, "--uiscan", StringComparison.OrdinalIgnoreCase));
+                string.Equals(a, "--uiscan", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(a, "uiscan", StringComparison.OrdinalIgnoreCase));
             bool startUiScan = uiScanIndex >= 0;
             string? uiScanTarget = startUiScan
                 ? string.Join(",", e.Args.Skip(uiScanIndex + 1))
