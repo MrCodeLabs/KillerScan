@@ -566,4 +566,8 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Location_Switch">Zamenjaj lokacijo</sys:String>
     <sys:String x:Key="Str_Location_Explicit">Ime izberi sam. Lokacije se nikoli ne ugotavljajo iz obsega IP ali imena omrežja Wi-Fi.</sys:String>
     <sys:String x:Key="Str_Location_Clear">Menjava lokacije počisti trenutne rezultate ter zapre nedejavni terminal in poglede nadzora povezave. Shranjeni podatki ostanejo pri prvotni lokaciji.</sys:String>
+    <sys:String x:Key="Str_Location_InvalidName">Ime lokacije naj vsebuje od 1 do 80 znakov brez krmilnih znakov.</sys:String>
+    <sys:String x:Key="Str_Location_DuplicateName">Lokacija s tem imenom že obstaja. Izberi drugo ime.</sys:String>
+    <sys:String x:Key="Str_Location_SelectionError">Ta lokacija ni na voljo ali je ni mogoče spremeniti. Izberi obstoječo lokacijo.</sys:String>
+    <sys:String x:Key="Str_Location_DataError">Podatkov lokacije ni bilo mogoče prebrati ali shraniti. Pred nadaljevanjem zapri druge kopije KillerScan in preveri dovoljenja za datoteke ali obnovi varnostno kopijo.</sys:String>
 </ResourceDictionary>

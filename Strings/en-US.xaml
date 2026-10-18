@@ -566,4 +566,8 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Location_Switch">Change location</sys:String>
     <sys:String x:Key="Str_Location_Explicit">Choose a name yourself. Locations are never inferred from IP ranges or Wi-Fi names.</sys:String>
     <sys:String x:Key="Str_Location_Clear">Changing location clears current results and closes the idle terminal and monitoring views. Saved data stays in its original location.</sys:String>
+    <sys:String x:Key="Str_Location_InvalidName">Use a location name of 1 to 80 characters without control characters.</sys:String>
+    <sys:String x:Key="Str_Location_DuplicateName">A location with this name already exists. Choose another name.</sys:String>
+    <sys:String x:Key="Str_Location_SelectionError">This location is unavailable or cannot be changed. Choose an existing location.</sys:String>
+    <sys:String x:Key="Str_Location_DataError">Location data could not be read or saved. Close other copies of KillerScan and check file permissions or restore a backup before continuing.</sys:String>
 </ResourceDictionary>

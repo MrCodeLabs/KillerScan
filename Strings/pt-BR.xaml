@@ -536,4 +536,16 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Rolar para baixo</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Rolar para a esquerda</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Rolar para a direita</sys:String>
+    <sys:String x:Key="Str_Location_Title">Local</sys:String>
+    <sys:String x:Key="Str_Location_Busy">Interrompa a verificação ou o comando do terminal em andamento antes de mudar de local.</sys:String>
+    <sys:String x:Key="Str_Location_Legacy">Dados anteriores (não atribuídos)</sys:String>
+    <sys:String x:Key="Str_Location_New">Novo local...</sys:String>
+    <sys:String x:Key="Str_Location_Rename">Renomear local...</sys:String>
+    <sys:String x:Key="Str_Location_Switch">Mudar de local</sys:String>
+    <sys:String x:Key="Str_Location_Explicit">Escolha um nome. Os locais nunca são deduzidos de faixas de IP ou nomes de redes Wi-Fi.</sys:String>
+    <sys:String x:Key="Str_Location_Clear">Mudar de local limpa os resultados atuais e fecha o terminal inativo e as visualizações de monitoramento. Os dados salvos permanecem no local original.</sys:String>
+    <sys:String x:Key="Str_Location_InvalidName">Use um nome de local com 1 a 80 caracteres, sem caracteres de controle.</sys:String>
+    <sys:String x:Key="Str_Location_DuplicateName">Já existe um local com esse nome. Escolha outro nome.</sys:String>
+    <sys:String x:Key="Str_Location_SelectionError">Este local não está disponível ou não pode ser alterado. Escolha um local existente.</sys:String>
+    <sys:String x:Key="Str_Location_DataError">Não foi possível ler ou salvar os dados do local. Feche outras instâncias do KillerScan e verifique as permissões dos arquivos ou restaure um backup antes de continuar.</sys:String>
 </ResourceDictionary>
