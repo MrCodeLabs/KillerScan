@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:KillerScan.Controls"
              xmlns:snap="clr-namespace:KillerFamily.Windowing"
->
+             xmlns:kl="clr-namespace:KillerFamily.Layout"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -47,7 +48,9 @@
 
             <!-- Global themed tooltip (replaces the plain system box). Implicit (no key) so every
                  tooltip app-wide picks it up; brushes are DynamicResource so it follows theme + accent. -->
+            <kl:TooltipTextConverter x:Key="TooltipTextConverter"/>
             <Style TargetType="ToolTip">
+                <Setter Property="kl:TooltipTextConverter.WrapContent" Value="True"/>
                 <Setter Property="Background" Value="{DynamicResource MenuBackgroundBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MenuBorderBrush}"/>
@@ -65,9 +68,15 @@
                                     CornerRadius="{DynamicResource ControlCornerRadius}"
                                     Padding="{TemplateBinding Padding}">
                                 <Border.Effect>
-                                    <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.45"/>
+                                    <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="{DynamicResource FlyoutShadowOpacity}"/>
                                 </Border.Effect>
-                                <ContentPresenter/>
+                                <ContentPresenter>
+                                    <ContentPresenter.Resources>
+                                        <DataTemplate DataType="{x:Type sys:String}">
+                                            <TextBlock Text="{Binding Converter={StaticResource TooltipTextConverter}}" MaxWidth="300" TextWrapping="Wrap"/>
+                                        </DataTemplate>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
