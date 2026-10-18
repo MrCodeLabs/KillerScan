@@ -26,6 +26,9 @@ namespace KillerScan.Shell
             // Windows 11 snap layouts flyout on the maximize button. Added after WindowChrome's
             // hook, so it answers WM_NCHITTEST first.
             SnapLayouts.Attach(this, MaximizeBtn);
+            // After RestoreWindowPlacement (constructor) and before the first show: a default or
+            // saved size larger than this monitor's work area is shrunk and moved onto it.
+            WorkAreaFit.Fit(this);
             SyncWindowCorners();
             ApplyThemeBorder(this);
             ApplyWindowIcon(hwnd);

@@ -22,6 +22,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Primary, outline and secondary buttons sit raised on a soft shadow that lifts on hover and sets down when pressed. 98SE keeps its flat beveled buttons.
 
 ### Fixed
+- The window opens fully on screen on a small or high-scaling display, or when its saved size came from a bigger monitor, instead of running off the edges.
 - HTML reports show the KillerScan wordmark in the report's theme and accent, loaded from killerscan.net, instead of always falling back to the text wordmark. 98SE keeps the text wordmark.
 - The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
 - On the Light theme's Yellow and Orange accents, buttons, links, tabs and accent icons keep their color with a thin gray outline around accent text and icons, instead of turning near-black or brown.
