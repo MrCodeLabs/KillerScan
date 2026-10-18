@@ -89,10 +89,7 @@ namespace KillerScan.Controls
             SubnetInput.KeyDown += (_, e) => { if (e.Key == Key.Enter) { Scan(); e.Handled = true; } };
             ResultsGrid.PreviewKeyDown += TabOutOfGrid;
             ServicesGrid.PreviewKeyDown += TabOutOfGrid;
-            Loaded += (_, _) =>
-            {
-                if (TryFindResource("GrainTileBrush") is ImageBrush grain) GrainBrush.ImageSource = grain.ImageSource;
-            };
+            Loaded += (_, _) => GrainTexture.Track(GrainBrush);
             if (demo) GenerateDemoScan();
         }
         private string Loc(string key) => TryFindResource(key) as string ?? key;
