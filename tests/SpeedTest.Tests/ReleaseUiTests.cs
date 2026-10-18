@@ -101,6 +101,12 @@ internal static class ReleaseUiTests
                 Theme(theme, accent);
                 window.GetType().GetMethod("ApplyFlatChrome", Instance)!.Invoke(window, null);
                 bool flat = theme == "SE98";
+                var paneShadow = (Border)window.FindName("DevicesPaneShadow");
+                Require(flat ? paneShadow.Effect == null : paneShadow.Effect is System.Windows.Media.Effects.DropShadowEffect effect &&
+                    effect.IsFrozen && effect.BlurRadius == 16 && effect.ShadowDepth == 5 && effect.Direction == 270 &&
+                    effect.Opacity == (double)app.FindResource("PaneShadowOpacity"),
+                    "The content shadow follows the theme and is null on 98SE.");
+                CheckFooterShadow(window, root);
                 var panel = new StackPanel { Background = (Brush)app.FindResource("BackgroundBrush"), Width = 370 };
                 foreach (string style in new[] { "PrimaryButton", "OutlineButton" })
                 {
@@ -480,6 +486,29 @@ internal static class ReleaseUiTests
             enabled.SetValue(null, true);
             publish.Invoke(null, null);
         }
+    }
+
+    private static void CheckFooterShadow(KillerScan.Shell.MainWindow window, FrameworkElement root)
+    {
+        var pane = (Border)window.FindName("DevicesPaneShadow");
+        var footer = (Border)window.FindName("FooterBar");
+        var effect = pane.Effect;
+        var withShadow = Render(root, 1200, 780);
+        try
+        {
+            pane.SetCurrentValue(UIElement.EffectProperty, null);
+            var withoutShadow = Render(root, 1200, 780);
+            var bounds = footer.TransformToAncestor(root).TransformBounds(new Rect(new Point(), footer.RenderSize));
+            var region = new Int32Rect((int)Math.Ceiling(bounds.Left) + 4, (int)Math.Ceiling(bounds.Top),
+                (int)Math.Floor(bounds.Width) - 8, (int)Math.Floor(bounds.Height));
+            Require(region.Width > 0 && region.Height > 0, "Footer has a rendered region.");
+            var before = new byte[region.Width * region.Height * 4];
+            var after = new byte[before.Length];
+            withShadow.CopyPixels(region, before, region.Width * 4, 0);
+            withoutShadow.CopyPixels(region, after, region.Width * 4, 0);
+            Require(before.SequenceEqual(after), "Content shadows never darken the footer pixels.");
+        }
+        finally { pane.SetCurrentValue(UIElement.EffectProperty, effect); }
     }
 
     private static BitmapSource Render(FrameworkElement element, int width, int height)

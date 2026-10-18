@@ -26,10 +26,6 @@
             <ImageBrush x:Key="GrainTileBrush" TileMode="Tile"
                         ViewportUnits="Absolute" Viewport="0,0,256,256" Stretch="None"/>
 
-            <!-- Elevation for the content pane, cast DOWN onto the footer. ShadowDepth must be
-                 non-zero with Direction 270; a zero depth is a halo with nothing below to land on. -->
-            <DropShadowEffect x:Key="PaneShadow" Color="Black" BlurRadius="16" ShadowDepth="5" Direction="270" Opacity="0.6"/>
-
             <!-- KillerUI scrollbar thumb floor: keeps the thumb grabbable on large documents. -->
             <controls:ThumbViewportFloorConverter x:Key="ThumbFloor"/>
 
