@@ -40,7 +40,7 @@ internal static class ReleaseUiTests
         return Task.CompletedTask;
     }
 
-    private static void Capture()
+    internal static KillerScan.App CreateApplication()
     {
         var assembly = typeof(KillerScan.App).Assembly;
         typeof(Application).GetField("_resourceAssembly", Static)!.SetValue(null, assembly);
@@ -58,6 +58,13 @@ internal static class ReleaseUiTests
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
         context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
+        return app;
+    }
+
+    private static void Capture()
+    {
+        var app = CreateApplication();
+        var assembly = typeof(KillerScan.App).Assembly;
         var manager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
         var themeType = assembly.GetType("KillerScan.Services.Theme", true)!;
         var accentType = assembly.GetType("KillerScan.Services.Accent", true)!;

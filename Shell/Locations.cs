@@ -67,7 +67,7 @@ namespace KillerScan.Shell
                 else { Locations.Catalog.Rename(Locations.Current.Id, dialog.Value); RefreshLocationLabel(); }
             }
             catch (Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or UnauthorizedAccessException or ArgumentException)
-            { MessageBox.Show(ex.Message, Loc("Str_Location_Title"), MessageBoxButton.OK, MessageBoxImage.Error); }
+            { MessageBox.Show(Locations.ErrorText(ex), Loc("Str_Location_Title"), MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
         private bool ChangeLocation(string id)
@@ -83,7 +83,7 @@ namespace KillerScan.Shell
             }
             try { if (!Locations.TrySelect(id)) return false; }
             catch (Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or UnauthorizedAccessException or ArgumentException or System.Text.Json.JsonException)
-            { MessageBox.Show(ex.Message, Loc("Str_Location_Title"), MessageBoxButton.OK, MessageBoxImage.Error); return false; }
+            { MessageBox.Show(Locations.ErrorText(ex), Loc("Str_Location_Title"), MessageBoxButton.OK, MessageBoxImage.Error); return false; }
             // Old transient results must never be relabelled as belonging to the new location.
             if (_terminalControl != null)
             {

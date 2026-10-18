@@ -5,6 +5,11 @@ namespace KillerScan.Services
 {
     internal sealed record ScanLocation(string Id, string Name);
 
+    internal sealed class LocationNameException(string message, string resourceKey) : ArgumentException(message)
+    {
+        internal string ResourceKey { get; } = resourceKey;
+    }
+
     /// <summary>Explicit identities, never inferred from a subnet, adapter or SSID.</summary>
     internal sealed class LocationCatalog
     {
@@ -88,7 +93,7 @@ namespace KillerScan.Services
             string selected = Current.Id;
             if (!_memoryOnly) RefreshKeepingSelection();
             if (_items.Any(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase)))
-                throw new ArgumentException("A location with this name already exists.");
+                throw new LocationNameException("A location with this name already exists.", "Str_Location_DuplicateName");
             var location = new ScanLocation(Guid.NewGuid().ToString("N"), name);
             Save([.. _items, location], selected);
             return location;
@@ -102,7 +107,7 @@ namespace KillerScan.Services
             if (!_memoryOnly) RefreshKeepingSelection();
             if (!Contains(id) || id == LegacyId) throw new ArgumentException("This location cannot be renamed.");
             if (_items.Any(item => item.Id != id && string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase)))
-                throw new ArgumentException("A location with this name already exists.");
+                throw new LocationNameException("A location with this name already exists.", "Str_Location_DuplicateName");
             Save(_items.Select(item => item.Id == id ? item with { Name = name } : item).ToList(), selected);
         }
 
@@ -120,7 +125,7 @@ namespace KillerScan.Services
         {
             name = (name ?? "").Trim();
             if (name.Length == 0 || name.Length > 80 || name.Any(char.IsControl))
-                throw new ArgumentException("Use a location name of 1 to 80 characters without control characters.");
+                throw new LocationNameException("Use a location name of 1 to 80 characters without control characters.", "Str_Location_InvalidName");
             return name;
         }
 
@@ -175,6 +180,14 @@ namespace KillerScan.Services
 
     internal static class Locations
     {
+        // Keep CLI diagnostics stable, but show localized guidance in GUI error dialogs.
+        internal static string ErrorText(Exception error)
+        {
+            string key = error is LocationNameException name ? name.ResourceKey
+                : error is ArgumentException ? "Str_Location_SelectionError" : "Str_Location_DataError";
+            return System.Windows.Application.Current?.TryFindResource(key) as string ?? error.Message;
+        }
+
         private static readonly object Gate = new();
         private static LocationCatalog? _catalog;
         private static int _runs;
