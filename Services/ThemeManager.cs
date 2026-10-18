@@ -258,7 +258,7 @@ namespace KillerScan.Services
             Complete("FileNameFontSize", compactDialogCaption ? 11.0 : 18.0);
             if (!newDict.Contains("FileNameTransform"))
             {
-                var fileNameShift = new TranslateTransform(0, compactDialogCaption ? 0 : 1);
+                var fileNameShift = new TranslateTransform(0, compactDialogCaption ? 0 : -1);
                 fileNameShift.Freeze();
                 newDict["FileNameTransform"] = fileNameShift;
             }

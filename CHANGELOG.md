@@ -52,6 +52,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Theme names and the Keep Alive view name are translated in every language.
 - The website's MCP page, contact cards, carousel and section toggles are translated in every language, the site uses the app's names for Keep Alive and Deep Scan, and text that had lost its accents in several languages is restored.
 - On phones, the website's logo and download hash fit the screen instead of making the home page scroll sideways.
+- The Network Scanner subtitle in the title bar sits on the baseline of Killer in the wordmark instead of 2px below it.
 
 ## [1.8.1] - 2026-10-14
 
