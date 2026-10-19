@@ -352,6 +352,10 @@ namespace KillerScan.Services
                         if (!palette.Contains("OutlineRestBrush"))
                             target["OutlineRestBrush"] = target["OutlineBtnBrush"];
                         target["OutlineHoverBrush"] = target["OutlineBtnBrush"];
+                        // The hover text sits on that accent fill, so it follows the overlay's
+                        // text-on-accent color unless a palette names its own.
+                        if (!palette.Contains("OutlineHoverTextBrush") && !accentDict.Contains("OutlineHoverTextBrush"))
+                            target["OutlineHoverTextBrush"] = target["OnPrimaryBrush"];
                     }
                 }
                 catch { /* overlay file not present yet - base theme stands */ }
