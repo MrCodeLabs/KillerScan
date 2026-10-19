@@ -29,6 +29,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ### Fixed
 - CSV exports keep device and scan text from running as spreadsheet formulas. (#10)
 - Overlapping scan targets count each address once against the 65,536 address limit, so a /16 with hosts inside it no longer reports as too large. (#11)
+- The public subnet helper rejects oversized ranges before expanding them. (#13)
 - HTML report columns sort from the keyboard. Each column header takes Tab focus with a visible ring, Enter and Space sort it, and screen readers hear the sort direction. (#12)
 - Windows contrast themes now use system colors for text, icons, panels and selections, without decorative grain or shadows.
 - The window opens fully on screen on a small or high-scaling display, or when its saved size came from a bigger monitor, instead of running off the edges.

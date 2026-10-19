@@ -80,9 +80,25 @@ internal static class Program
 
     private static Task Subnet()
     {
+        foreach (string cidr in new[] { "10.0.0.0/15", "0.0.0.0/0" })
+        {
+            bool rejected = false;
+            try { NetworkScanner.GetAddressesInSubnet(cidr); }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                rejected = ex.ParamName == "cidr" && ex.Message.Contains("65,536", StringComparison.Ordinal);
+            }
+            Require(rejected, cidr + " should be rejected before its hosts are allocated");
+        }
+
         var list = NetworkScanner.GetAddressesInSubnet("10.0.0.0/30");
         Require(list.Count == 2, "A /30 has two hosts, got " + list.Count);
         Require(list[0].ToString() == "10.0.0.1" && list[1].ToString() == "10.0.0.2", "Unexpected hosts");
+        var defaultSubnet = NetworkScanner.GetAddressesInSubnet("192.0.2.0");
+        Require(defaultSubnet.Count == 254 && defaultSubnet[0].ToString() == "192.0.2.1" &&
+            defaultSubnet[253].ToString() == "192.0.2.254", "An omitted prefix should still use /24");
+        Require(NetworkScanner.GetAddressesInSubnet("255.255.255.255/32").Count == 0,
+            "A /32 at the last IPv4 address has no expandable hosts");
         return Task.CompletedTask;
     }
 
