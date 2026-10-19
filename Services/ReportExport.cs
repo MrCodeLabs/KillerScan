@@ -117,6 +117,8 @@ namespace KillerScan.Services
             sb.AppendLine("table{border-collapse:collapse;width:100%;min-width:760px}");
             sb.AppendLine("th{background:var(--surface);color:var(--muted);text-align:left;padding:10px 14px;font-size:12px;font-weight:600;font-family:Consolas,monospace;letter-spacing:.3px;position:sticky;top:0;white-space:nowrap;cursor:pointer;user-select:none}");
             sb.AppendLine("th:hover{color:var(--text)}th .arrow{display:inline-block;width:10px;font-size:10px;opacity:.7}");
+            sb.AppendLine(".sortbtn{background:none;border:0;margin:0;padding:0;font:inherit;color:inherit;letter-spacing:inherit;text-align:left;white-space:nowrap;cursor:pointer}");
+            sb.AppendLine(".sortbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}");
             sb.AppendLine("td{border-top:1px solid var(--border);padding:9px 14px;font-size:13px;white-space:nowrap}");
             sb.AppendLine("td.vendor{white-space:normal}tbody tr:hover td{background:var(--hover)}");
             sb.AppendLine(".mono{font-family:Consolas,monospace}");
@@ -143,12 +145,13 @@ namespace KillerScan.Services
 
             // The report's headers reuse the grid's own column keys, so the two never disagree.
             sb.AppendLine("<div class='tablewrap'><table id='tbl'><thead><tr>");
-            sb.AppendLine($"<th data-type='num'>{Esc(L("Str_Col_Ip", "IP Address"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Host", "Hostname"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Mac", "MAC Address"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Vendor", "Vendor"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Type", "Type"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Ports", "Open Ports"))} <span class='arrow'></span></th>");
+            // Each header holds a real button, so it takes keyboard focus and sorts on Enter and Space.
+            sb.AppendLine($"<th data-type='num'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Ip", "IP Address"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Host", "Hostname"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Mac", "MAC Address"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Vendor", "Vendor"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Type", "Type"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Ports", "Open Ports"))} <span class='arrow' aria-hidden='true'></span></button></th>");
             sb.AppendLine("</tr></thead><tbody>");
             foreach (var d in list)
             {
@@ -222,7 +225,8 @@ namespace KillerScan.Services
             sb.AppendLine("sortDir=(sortCol===i)?-sortDir:1;sortCol=i;var num=ths[i].getAttribute('data-type')==='num';");
             sb.AppendLine("var rows=Array.prototype.slice.call(tb.rows);rows.sort(function(a,b){var x,y;if(num){x=parseFloat(a.cells[i].getAttribute('data-sort'))||0;y=parseFloat(b.cells[i].getAttribute('data-sort'))||0;}else{x=a.cells[i].innerText.toLowerCase();y=b.cells[i].innerText.toLowerCase();}return (x>y?1:x<y?-1:0)*sortDir;});");
             sb.AppendLine("for(var r=0;r<rows.length;r++)tb.appendChild(rows[r]);");
-            sb.AppendLine("for(var h=0;h<ths.length;h++)ths[h].getElementsByClassName('arrow')[0].textContent='';");
+            sb.AppendLine("for(var h=0;h<ths.length;h++){ths[h].getElementsByClassName('arrow')[0].textContent='';ths[h].removeAttribute('aria-sort');}");
+            sb.AppendLine("ths[i].setAttribute('aria-sort',sortDir>0?'ascending':'descending');");
             sb.AppendLine("ths[i].getElementsByClassName('arrow')[0].textContent=sortDir>0?'\\u25B2':'\\u25BC';};})(c);}");
             sb.AppendLine("</script>");
             sb.AppendLine("</body></html>");

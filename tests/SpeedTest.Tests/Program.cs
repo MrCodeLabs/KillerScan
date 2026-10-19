@@ -41,12 +41,14 @@ internal static class Program
             if (args.SequenceEqual(new[] { "--menu-icons-ui" })) { await HistoryUiTests.Run(menusOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--topology" })) { await TopologyTests.Run(); return 0; }
             if (args.SequenceEqual(new[] { "--csv-export" })) { await CsvExportTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--report-sort" })) { await ReportSortTests.Run(); return 0; }
             Require(args.All(value => value == "--worker" || value == "--internet"), "Usage: SpeedTest.Tests.exe [--worker] [--internet]");
             await Run("Menu dividers resolve declared palettes and preserve the fallback", MenuSeparatorThemeTests.Run);
             await Run("Startup content becomes visible when its animation stalls", StartupFadeTests.Run);
             await Run("Topology radial geometry, zoom and rendered interactions", TopologyTests.RunIsolated);
             await Run("History identity, saved-data menus and contextual shortcuts", HistoryUiTests.RunIsolated);
             await Run("CSV exports keep spreadsheet formulas inert", CsvExportTests.Run);
+            await Run("HTML report columns sort from the keyboard and expose aria-sort", ReportSortTests.Run);
             await Run("Metric units, median, jitter and unavailable values", Metrics);
             await Run("Scan terminal progress stays on one line and results fit narrow widths", ScanPresentation);
             await Run("Terminal history survives resizing, clears and shell replacement", TerminalHistory);
