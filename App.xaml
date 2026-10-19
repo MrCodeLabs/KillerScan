@@ -1396,7 +1396,7 @@
                                         <Ellipse x:Name="ring" Width="14" Height="14"
                                                  Stroke="{DynamicResource DimTextBrush}" StrokeThickness="1.5"
                                                  Fill="Transparent"/>
-                                        <Ellipse x:Name="dot" Width="7" Height="7"
+                                        <Ellipse x:Name="dot" Width="6" Height="6"
                                                  Fill="{DynamicResource PrimaryBrush}" Visibility="Collapsed"/>
                                     </Grid>
                                     <ContentPresenter x:Name="label" VerticalAlignment="Center">
