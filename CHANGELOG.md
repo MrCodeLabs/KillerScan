@@ -28,6 +28,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ### Fixed
 - CSV exports keep device and scan text from running as spreadsheet formulas. (#10)
+- Overlapping scan targets count each address once against the 65,536 address limit, so a /16 with hosts inside it no longer reports as too large. (#11)
 - Windows contrast themes now use system colors for text, icons, panels and selections, without decorative grain or shadows.
 - The window opens fully on screen on a small or high-scaling display, or when its saved size came from a bigger monitor, instead of running off the edges.
 - HTML reports show the KillerScan wordmark in the report's theme and accent, loaded from killerscan.net, instead of always falling back to the text wordmark. 98SE keeps the text wordmark.

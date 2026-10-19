@@ -10,6 +10,7 @@ internal static class Program
         try
         {
             await Run("Targets parse ranges, de-duplicate overlaps and refuse bad input", Targets);
+            await Run("The address ceiling counts unique addresses and keeps first-seen order", TargetCeiling);
             await Run("CIDR expansion excludes the network and broadcast addresses", Subnet);
             await Run("ARP output parsing keeps IPv4 entries with full MAC addresses", ArpParsing);
             await Run("Classifier honors manual types, the gateway, DNS and hostname rules", Classifier);
@@ -58,6 +59,22 @@ internal static class Program
         Require(huge.Error == TargetError.TooLarge, "A /8 should exceed the address ceiling");
 
         Require(ScanTargets.Parse("  ").Error == TargetError.Empty, "Blank input should be empty");
+        return Task.CompletedTask;
+    }
+
+    private static Task TargetCeiling()
+    {
+        var overlap = ScanTargets.Parse("10.0.0.0/16, 10.0.0.1, 10.0.0.2, 10.0.0.3");
+        Require(overlap.Ok, "A /16 plus hosts inside it is 65,534 unique addresses and should parse, got " + overlap.Error + " " + overlap.Detail);
+        Require(overlap.Addresses.Count == 65534, "Expected 65,534 unique addresses, got " + overlap.Addresses.Count);
+
+        var tooMany = ScanTargets.Parse("10.0.0.0/16, 10.1.0.1-10.1.0.10");
+        Require(tooMany.Error == TargetError.TooLarge, "65,544 unique addresses should exceed the ceiling");
+        Require(tooMany.Detail == 65544.ToString("N0"), "TooLarge should report the unique count, got " + tooMany.Detail);
+
+        var ordered = ScanTargets.Parse("10.0.0.5, 10.0.0.1-6");
+        Require(string.Join(" ", ordered.Addresses) == "10.0.0.5 10.0.0.1 10.0.0.2 10.0.0.3 10.0.0.4 10.0.0.6",
+            "First-seen order was " + string.Join(" ", ordered.Addresses));
         return Task.CompletedTask;
     }
 
