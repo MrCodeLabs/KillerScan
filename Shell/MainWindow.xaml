@@ -357,7 +357,7 @@
                             <StackPanel>
                                 <!-- The saved date identifies the entry; the target is supporting detail. -->
                                 <TextBlock Text="{Binding ScannedAt, StringFormat={}{0:g}}" FontSize="13" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <!-- Resting colour is a Setter, not an attribute on the
                                              element. A local value outranks a style trigger, so as
@@ -374,7 +374,7 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBlock Text="{Binding Target}" FontSize="11"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
@@ -421,7 +421,7 @@
                                     </ContextMenu>
                                 </StackPanel.ContextMenu>
                                 <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <!-- Setter, not an attribute: see the history list above. -->
                                         <Style TargetType="TextBlock">
@@ -435,7 +435,7 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBlock Text="{Binding Target}" FontSize="11"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>

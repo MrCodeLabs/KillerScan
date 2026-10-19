@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ## [1.8.3] - Unreleased
 
+### Changed
+- Scan History and Scan Profiles open wide enough to show every date in full. Dragging the sidebar narrower draws their text up to 15% smaller before it is cut off.
+
 ### Fixed
 - The theme and language menus open beside their own rail buttons instead of at the corner of the device list.
 - A thin black line no longer shows under the title bar. The film grain now covers the whole bar.

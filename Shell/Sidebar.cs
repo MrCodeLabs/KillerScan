@@ -35,14 +35,17 @@ namespace KillerScan.Shell
         private const double SidebarDefaultPx = 210;
         private const double SidebarMaxPx = 480;
 
+        // The default fits the widest date at full size. A width the user drags to is kept as is:
+        // narrower rows draw their text up to 15% smaller before trimming it (ShrinkToFit).
         private double ExpandedLogicalWidth(double scale) =>
-            Math.Max(_sidebarWidthSaved ? Math.Max(_sidebarBaseWidth / scale, PanelMinLogical) : SidebarDefaultPx,
-                DateFitLogicalWidth());
+            _sidebarWidthSaved
+                ? Math.Max(_sidebarBaseWidth / scale, PanelMinLogical)
+                : Math.Max(SidebarDefaultPx, DateFitLogicalWidth());
 
         /// <summary>
         /// The narrowest panel, in logical units, that shows the widest possible saved-scan date in
-        /// full. Measured with the font the rows actually draw in, so it holds in every theme and
-        /// at every app zoom, and no width the user drags to can trim a date.
+        /// full at its normal size. Measured with the font the rows actually draw in, so the default
+        /// width holds in every theme and at every app zoom.
         /// </summary>
         private double DateFitLogicalWidth()
         {
@@ -245,7 +248,7 @@ namespace KillerScan.Shell
         {
             // Driven straight off the pointer with no tween; a tween here reads as lag.
             double scale = _appScale <= 0 ? 1 : _appScale;
-            double next = Math.Min(SidebarMaxPx, Math.Max(Math.Max(SidebarMinPx, DateFitLogicalWidth() * scale),
+            double next = Math.Min(SidebarMaxPx, Math.Max(SidebarMinPx,
                 (SidebarCol.ActualWidth - RailW + e.HorizontalChange) * scale));
             _sidebarBaseWidth = next;
             _sidebarWidthSaved = true;

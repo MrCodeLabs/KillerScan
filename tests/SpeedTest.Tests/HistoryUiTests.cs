@@ -322,8 +322,10 @@ internal static partial class HistoryUiTests
             "The larger accented date is first and the smaller muted target is below it.");
         Console.WriteLine("SIDEBAR: rowHeight=" + firstRow.ActualHeight + " visibleRows=" + Math.Floor(historyList.ActualHeight / firstRow.ActualHeight));
 
-        // The sidebar must show the widest date in full in every theme: at the default width, and at
-        // the narrowest width the resize grip allows, at normal and large app zoom.
+        // At the default width the widest date shows in full at its normal size in every theme. At
+        // the narrowest width the grip allows, it draws up to 15% smaller first and is trimmed only
+        // past that. Measured in the app's own Killer Sans UI: this process is not KillerScan.exe,
+        // so the theme's "pack://application:,,,/" font would otherwise fall back to Segoe UI.
         var widest = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
         widest.Add(Entry(new DateTimeOffset(2026, 12, 28, 22, 58, 0, TimeSpan.Zero)));
         historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { widest });
@@ -343,18 +345,29 @@ internal static partial class HistoryUiTests
             Call(window, "ApplyAppScale", scale, false);
             foreach (string name in Enum.GetNames(themeType))
             {
-                Theme(name); Call(window, "ApplyFlatChrome"); Call(window, "ApplySidebarState", false); Render(root, 1200, 780);
+                Theme(name);
+                var uiFont = (FontFamily)app.Resources.MergedDictionaries[0]["UiFont"];
+                if (uiFont.Source.StartsWith("./Fonts/", StringComparison.Ordinal))
+                    app.Resources["UiFont"] = new FontFamily(new Uri("pack://application:,,,/KillerScan;component/"), uiFont.Source);
+                else app.Resources.Remove("UiFont");
+                Call(window, "ApplyFlatChrome"); Call(window, "ApplySidebarState", false); Render(root, 1200, 780);
                 var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
                 var date = VisualChildren<TextBlock>(row).First();
                 var face = new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch);
                 double needed = new FormattedText(date.Text, System.Globalization.CultureInfo.CurrentCulture, date.FlowDirection,
                     face, date.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(date).PixelsPerDip).WidthIncludingTrailingWhitespace;
-                Require(needed <= date.ActualWidth + 0.5, name + ": the widest date (" + date.Text + ") fits the " + label + " sidebar at " +
-                    (scale * 100) + "% zoom (" + needed.ToString("0.#") + " needed, " + date.ActualWidth.ToString("0.#") + " available).");
+                string where = name + ", " + label + " sidebar at " + (scale * 100) + "% zoom (" + needed.ToString("0.#") + " needed at " +
+                    date.FontSize.ToString("0.##") + ", " + date.ActualWidth.ToString("0.#") + " available)";
+                if (!saved)
+                    Require(date.FontSize == 13 && needed <= date.ActualWidth + 0.5, "The widest date shows in full at its normal size: " + where);
+                else
+                    Require(date.FontSize >= 13 * 0.85 - 0.01 && (needed <= date.ActualWidth + 0.5 || Math.Abs(date.FontSize - 13 * 0.85) < 0.01),
+                        "A narrow sidebar shrinks the date before trimming it: " + where);
             }
         }
-        // A wider row font must widen the panel rather than trim the date. This runner cannot load
-        // Killer Sans UI, so Courier New stands in for a font wider than the fallback.
+        app.Resources.Remove("UiFont");
+        // A width the user chose is kept even when the row font is wide: the date shrinks instead of
+        // the panel growing. Courier New stands in for a wide row font.
         Call(window, "ApplyAppScale", 1.0, false);
         Theme("Black"); Call(window, "ApplyFlatChrome");
         widthSaved.SetValue(window, true);
@@ -364,12 +377,9 @@ internal static partial class HistoryUiTests
         {
             var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
             var date = VisualChildren<TextBlock>(row).First();
-            var face = new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch);
-            double needed = new FormattedText(date.Text, System.Globalization.CultureInfo.CurrentCulture, date.FlowDirection,
-                face, date.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(date).PixelsPerDip).WidthIncludingTrailingWhitespace;
-            Require(date.FontFamily.Source == "Courier New" && needed <= date.ActualWidth + 0.5,
-                "A wide row font widens the narrowest sidebar to fit the date (" + needed.ToString("0.#") + " needed, " +
-                date.ActualWidth.ToString("0.#") + " available).");
+            Require(date.FontFamily.Source == "Courier New" && Math.Abs(sidebar.ActualWidth - narrowest) < 30 && date.FontSize < 13,
+                "A wide row font keeps the chosen sidebar width and draws the date smaller (" + sidebar.ActualWidth.ToString("0.#") +
+                " wide, date at " + date.FontSize.ToString("0.##") + ").");
         }
         historyList.ClearValue(Control.FontFamilyProperty);
         widthSaved.SetValue(window, false);
