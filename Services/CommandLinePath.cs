@@ -123,15 +123,23 @@ namespace KillerScan.Services
         {
             try
             {
-                return string.Equals(
-                    Normalize(Environment.ExpandEnvironmentVariables(entry.Trim().Trim('"'))),
-                    Normalize(directory), StringComparison.OrdinalIgnoreCase);
+                // Only a fully qualified entry can name the install folder. A relative one such
+                // as "." or "C:bin" would resolve against whatever folder setup runs from and
+                // belongs to the user.
+                string expanded = Environment.ExpandEnvironmentVariables(entry.Trim().Trim('"'));
+                if (!IsFullyQualified(expanded)) return false;
+                return string.Equals(Normalize(expanded), Normalize(directory), StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception ex) when (ex is ArgumentException || ex is NotSupportedException || ex is PathTooLongException)
             {
                 return false;
             }
         }
+
+        private static bool IsFullyQualified(string path) =>
+            path.StartsWith(@"\\", StringComparison.Ordinal)
+            || (path.Length >= 3 && char.IsLetter(path[0]) && path[1] == ':'
+                && (path[2] == Path.DirectorySeparatorChar || path[2] == Path.AltDirectorySeparatorChar));
 
         private static void BroadcastEnvironmentChange()
         {
