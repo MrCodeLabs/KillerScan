@@ -58,7 +58,8 @@ namespace KillerScan.Shell
             var face = date != null
                 ? new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch)
                 : new Typeface(HistoryList.FontFamily, FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
-            double size = date?.FontSize ?? 13;
+            // The unshrunk size: a row already drawn smaller must not talk the default width down.
+            double size = date != null ? ShrinkToFit.BaseSize(date) : 13;
             double text = new FormattedText(widest, CultureInfo.CurrentCulture, FlowDirection, face, size,
                 Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace;
             // Row padding (9 each side), the list's own margins and border, and the scrollbar when

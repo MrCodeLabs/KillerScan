@@ -47,6 +47,34 @@ internal static class ShrinkToFitTests
         host.Arrange(new Rect(host.DesiredSize));
         host.UpdateLayout();
         Require(narrow.FontSize == 13, "Room to spare returns the text to its full size.");
+
+        // The unshrunk size stays readable, so widths are never worked out from shrunk text.
+        var shrunk = Row(text, natural * 0.6);
+        Require(ShrinkToFit.BaseSize(shrunk) == 13 && shrunk.FontSize < 13, "The base size survives shrinking.");
+
+        // A shrunk size never outranks a later style: it is a current value, not a local one.
+        var source = DependencyPropertyHelper.GetValueSource(shrunk, TextBlock.FontSizeProperty);
+        Require(source.IsCurrent && source.BaseValueSource == BaseValueSource.Local,
+            "Shrinking leaves the declared font size in place underneath.");
+
+        // A discarded row must be collectable: nothing static may keep it alive.
+        var weak = Discarded(text, natural * 0.6);
+        for (int i = 0; i < 3; i++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
+        Require(!weak.IsAlive, "A discarded row is released, not held by the shrink behavior.");
+
+        // Setting the limit twice attaches once: one layout pass still yields one fit.
+        var twice = Row(text, natural * 0.93);
+        ShrinkToFit.SetMinScale(twice, 1.0);
+        ShrinkToFit.SetMinScale(twice, 0.85);
+        Require(twice.FontSize < 13, "Re-enabling the limit still shrinks.");
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static WeakReference Discarded(string text, double width)
+    {
+        var block = Row(text, width);
+        ((Border)block.Parent).Child = null;
+        return new WeakReference(block);
     }
 
     private static TextBlock Row(string text, double width)
@@ -60,10 +88,11 @@ internal static class ShrinkToFitTests
         return block;
     }
 
+    // Same pixels-per-DIP as the behavior, so both sides measure the same way on a scaled screen.
     private static double Natural(string text, double size) =>
         new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
             new Typeface(SystemFonts.MessageFontFamily, FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal),
-            size, Brushes.Black, 1.0).WidthIncludingTrailingWhitespace;
+            size, Brushes.Black, VisualTreeHelper.GetDpi(new TextBlock()).PixelsPerDip).WidthIncludingTrailingWhitespace;
 
     private static void Require(bool condition, string message)
     {

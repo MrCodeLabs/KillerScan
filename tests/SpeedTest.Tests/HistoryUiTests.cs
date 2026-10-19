@@ -377,7 +377,7 @@ internal static partial class HistoryUiTests
         {
             var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
             var date = VisualChildren<TextBlock>(row).First();
-            Require(date.FontFamily.Source == "Courier New" && Math.Abs(sidebar.ActualWidth - narrowest) < 30 && date.FontSize < 13,
+            Require(date.FontFamily.Source == "Courier New" && Math.Abs(sidebar.ActualWidth - narrowest) < 30 && date.FontSize < 13 && date.FontSize >= 13 * 0.85 - 0.01,
                 "A wide row font keeps the chosen sidebar width and draws the date smaller (" + sidebar.ActualWidth.ToString("0.#") +
                 " wide, date at " + date.FontSize.ToString("0.##") + ").");
         }
