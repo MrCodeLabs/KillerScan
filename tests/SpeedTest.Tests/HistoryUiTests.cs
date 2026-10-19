@@ -82,12 +82,14 @@ internal static partial class HistoryUiTests
             directory = new DirectoryInfo(sourceRoot);
         Require(directory != null, "Application resource source exists.");
         var xml = new XmlDocument(); xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
-        var dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml.Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+        var dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml.Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
         context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
+        context.XmlnsDictionary.Add("kl", "clr-namespace:KillerFamily.Layout;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(PreserveMenuGlyphReferences(dictionary), context);
         assembly.GetType("KillerScan.Services.DemoData", true)!.GetField("Enabled", Static)!.SetValue(null, true);
         var themeManager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;

@@ -51,12 +51,14 @@ internal static class ReleaseUiTests
         var xml = new XmlDocument();
         xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
         string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
-            .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+            .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
         context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
+        context.XmlnsDictionary.Add("kl", "clr-namespace:KillerFamily.Layout;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
         var manager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
         var themeType = assembly.GetType("KillerScan.Services.Theme", true)!;
