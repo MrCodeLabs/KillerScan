@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ### Fixed
 - A thin black line no longer shows under the title bar. The film grain now covers the whole bar.
+- Radio buttons and checkboxes line up with the middle of their labels in every theme's font, 98SE included.
 
 ## [1.8.2] - 2026-10-19
 
