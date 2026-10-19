@@ -476,7 +476,16 @@
   btn.className = 'tb-more-toggle';
   btn.setAttribute('aria-haspopup', 'true');
   btn.setAttribute('aria-expanded', 'false');
-  btn.setAttribute('aria-label', 'More');
+  // The button is built after the first language pass, so it names itself from the dictionary
+  // now and again on every language change.
+  function labelMore(lang) {
+    var dict = lang && lang !== 'en' && window.I18N ? window.I18N[lang] : null;
+    btn.setAttribute('aria-label', dict && dict.ui_more ? dict.ui_more : 'More');
+  }
+  var moreLang = 'en';
+  try { moreLang = localStorage.getItem('kscan-lang') || 'en'; } catch (e) {}
+  labelMore(moreLang);
+  document.addEventListener('kscan-languagechange', function (e) { labelMore(e.detail && e.detail.lang); });
   btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
   var menu = document.createElement('div');
   menu.className = 'lang-menu tb-more-menu';
