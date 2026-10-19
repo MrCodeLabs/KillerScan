@@ -639,7 +639,7 @@ namespace KillerScan.Features.Cli
             return sb.ToString().TrimEnd();
         }
 
-        private static string Csv(List<NetworkDevice> devices, bool header)
+        internal static string Csv(List<NetworkDevice> devices, bool header)
         {
             var sb = new StringBuilder();
             if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports");

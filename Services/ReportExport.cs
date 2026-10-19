@@ -44,7 +44,12 @@ namespace KillerScan.Services
             int first = 0;
             while (first < text.Length && (char.IsWhiteSpace(text[first]) || char.IsControl(text[first])))
                 first++;
-            return first < text.Length && "=+-@".IndexOf(text[first]) >= 0 ? "'" + text : text;
+            if (first >= text.Length || "=+-@".IndexOf(text[first]) < 0) return text;
+            // A sign with nothing after it, such as the "-" shown for a host with no open ports,
+            // is plain text to a spreadsheet and stays as written.
+            bool loneSign = (text[first] == '-' || text[first] == '+')
+                && text.Substring(first + 1).Trim().Length == 0;
+            return loneSign ? text : "'" + text;
         }
 
         internal static string CsvField(string? value) =>
