@@ -43,6 +43,7 @@ internal static class Program
             if (args.SequenceEqual(new[] { "--csv-export" })) { await CsvExportTests.Run(); return 0; }
             if (args.SequenceEqual(new[] { "--report-sort" })) { await ReportSortTests.Run(); return 0; }
             if (args.SequenceEqual(new[] { "--command-line-path" })) { await CommandLinePathTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--report-logo" })) { await ReportLogoTests.Run(); return 0; }
             Require(args.All(value => value == "--worker" || value == "--internet"), "Usage: SpeedTest.Tests.exe [--worker] [--internet]");
             await Run("Menu dividers resolve declared palettes and preserve the fallback", MenuSeparatorThemeTests.Run);
             await Run("Startup content becomes visible when its animation stalls", StartupFadeTests.Run);
@@ -51,6 +52,7 @@ internal static class Program
             await Run("CSV exports keep spreadsheet formulas inert", CsvExportTests.Run);
             await Run("HTML report columns sort from the keyboard and expose aria-sort", ReportSortTests.Run);
             await Run("PATH registration adds and removes only the install folder", CommandLinePathTests.Run);
+            await Run("HTML report logo returns after a theme without one", ReportLogoTests.Run);
             await Run("Metric units, median, jitter and unavailable values", Metrics);
             await Run("Scan terminal progress stays on one line and results fit narrow widths", ScanPresentation);
             await Run("Terminal history survives resizing, clears and shell replacement", TerminalHistory);
