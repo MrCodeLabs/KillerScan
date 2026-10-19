@@ -38,7 +38,17 @@ namespace KillerScan.Services
         private static string Ljs(string key, string fallback) =>
             L(key, fallback).Replace("\\", "\\\\").Replace("'", "\\'");
 
-        internal static string CsvField(string? value) => "\"" + (value ?? string.Empty).Replace("\"", "\"\"") + "\"";
+        internal static string SpreadsheetSafeValue(string? value)
+        {
+            string text = value ?? string.Empty;
+            int first = 0;
+            while (first < text.Length && (char.IsWhiteSpace(text[first]) || char.IsControl(text[first])))
+                first++;
+            return first < text.Length && "=+-@".IndexOf(text[first]) >= 0 ? "'" + text : text;
+        }
+
+        internal static string CsvField(string? value) =>
+            "\"" + SpreadsheetSafeValue(value).Replace("\"", "\"\"") + "\"";
 
         internal static string BuildCsv(IEnumerable<NetworkDevice> devices)
         {

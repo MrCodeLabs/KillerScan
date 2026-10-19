@@ -30,6 +30,7 @@
       <_Parameter1>ReleaseDate</_Parameter1>
       <_Parameter2>$(ReleaseDate)</_Parameter2>
     </AssemblyAttribute>
+    <InternalsVisibleTo Include="SpeedTest.Tests" />
   </ItemGroup>
 
   <ItemGroup>

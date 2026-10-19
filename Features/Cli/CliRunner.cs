@@ -649,7 +649,7 @@ namespace KillerScan.Features.Cli
         }
 
         private static string CsvCell(string? value)
-        { value ??= ""; return value.IndexOfAny([',', '"', '\r', '\n']) >= 0 ? "\"" + value.Replace("\"", "\"\"") + "\"" : value; }
+        { value = ReportExport.SpreadsheetSafeValue(value); return value.IndexOfAny([',', '"', '\r', '\n']) >= 0 ? "\"" + value.Replace("\"", "\"\"") + "\"" : value; }
 
         private static string SearchText(NetworkDevice d) => string.Join(" ", d.IpAddress, d.Hostname,
             d.MacAddress, d.Vendor, d.DeviceType, d.OpenPortsDisplay, d.HttpTitle, d.HttpServer,
