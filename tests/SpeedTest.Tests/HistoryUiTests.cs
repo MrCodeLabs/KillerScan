@@ -788,6 +788,16 @@ internal static partial class HistoryUiTests
         Call(window, "HistorySettingsMenu_Opening", icon, null);
         Require(ReferenceEquals(menu.PlacementTarget, icon) && menu.CustomPopupPlacementCallback != null && menu.HorizontalOffset == 0 && menu.VerticalOffset == 0,
             "Mouse and native keyboard menu opening use the history button anchor, never the pointer.");
+        // Every rail flyout opens beside the button that opened it, never at a fixed point.
+        var themeButton = (Button)window.FindName("ThemeButton");
+        Call(window, "ThemeButton_Click", themeButton, new RoutedEventArgs());
+        var themeMenu = (ContextMenu)typeof(MainWindow).GetField("_themeContextMenu", Instance)!.GetValue(window)!;
+        Require(ReferenceEquals(themeMenu.PlacementTarget, themeButton), "The theme flyout is anchored to the theme button.");
+        themeMenu.IsOpen = false;
+        var langButton = (Button)window.FindName("LangButton");
+        Call(window, "LangButton_Click", langButton, new RoutedEventArgs());
+        Require(ReferenceEquals(langButton.ContextMenu.PlacementTarget, langButton), "The language flyout is anchored to the language button.");
+        langButton.ContextMenu.IsOpen = false;
         var placement = typeof(MainWindow).Assembly.GetType("KillerScan.Shell.FlyoutPlacement", true)!.GetMethod("PlaceBesideButton", Static)!;
         foreach (double dpi in new[] { 1.0, 1.5, 2.0 })
         foreach (double zoom in new[] { 1.0, 1.5, 2.5 })

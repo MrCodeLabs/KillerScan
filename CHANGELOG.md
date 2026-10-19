@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ## [1.8.3] - Unreleased
 
 ### Fixed
+- The theme and language menus open beside their own rail buttons instead of at the corner of the device list.
 - A thin black line no longer shows under the title bar. The film grain now covers the whole bar.
 - Radio buttons and checkboxes line up with the middle of their labels in every theme's font, 98SE included.
 

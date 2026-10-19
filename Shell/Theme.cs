@@ -166,7 +166,7 @@ namespace KillerScan.Shell
             }
 
             if (_themeContextMenu == null) return;
-            FlyoutPlacement.Attach(_themeContextMenu);
+            FlyoutPlacement.Attach(_themeContextMenu, ThemeButton);
             _themeContextMenu.IsOpen = true;
 
             // Sync on OPEN: the theme can have changed since the menu was last visited.
@@ -345,7 +345,7 @@ namespace KillerScan.Shell
             if (sender is Button b && b.ContextMenu != null)
             {
                 BuildLanguageMenu(b.ContextMenu);
-                FlyoutPlacement.Attach(b.ContextMenu);
+                FlyoutPlacement.Attach(b.ContextMenu, b);
                 b.ContextMenu.IsOpen = true;
                 Anim.FadeIn(b.ContextMenu);
             }
