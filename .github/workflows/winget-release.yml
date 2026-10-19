@@ -36,6 +36,11 @@ jobs:
   submit:
     runs-on: windows-latest
     steps:
+      # The WinGet description comes from the Chocolatey nuspec at the released tag.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+
       # Prints what WINGET_TOKEN actually is, so a failure downstream is never guesswork again.
       # An empty x-oauth-scopes means a FINE-GRAINED token, which authenticates fine, reads fine,
       # and cannot create the branch komac needs. That failure is reported as
@@ -156,6 +161,23 @@ jobs:
           $text = $text -replace '(?m)^([ \t]*DisplayVersion:[ \t]*)[^\r\n]*', "`${1}$version"
           Set-Content $installer $text -NoNewline -Encoding utf8
           Select-String -Path $installer -Pattern 'InstallerType|DisplayVersion'
+
+          # komac also copies the previous locale manifest, which carried a Description cut off
+          # mid-word and the old website. Fill the listing from the Chocolatey nuspec at this tag
+          # so both package managers describe the same release.
+          [xml]$spec = Get-Content (Join-Path $env:GITHUB_WORKSPACE 'choco\killerscan.nuspec') -Raw
+          $meta = $spec.package.metadata
+          $summary = $meta.summary.Trim()
+          if ($summary.Length -gt 256) { Write-Error "The nuspec summary is longer than WinGet's 256-character ShortDescription"; exit 1 }
+          $body = ($meta.description.Trim() -split '\r?\n' | ForEach-Object { if ($_.Trim()) { '  ' + $_.Trim() } else { '' } }) -join "`n"
+          $locale = Join-Path $dir 'SteveTheKiller.KillerScan.locale.en-US.yaml'
+          if (-not (Test-Path $locale)) { Write-Error "komac did not write $locale"; exit 1 }
+          $loc = (Get-Content $locale -Raw) -replace '\r\n', "`n"
+          $loc = [regex]::Replace($loc, '(?m)^PackageUrl:[^\n]*', { param($m) 'PackageUrl: ' + $meta.projectUrl.Trim() })
+          $loc = [regex]::Replace($loc, '(?m)^ShortDescription:[^\n]*', { param($m) "ShortDescription: '" + $summary.Replace("'", "''") + "'" })
+          $loc = [regex]::Replace($loc, '(?m)^Description:[^\n]*\n(?:(?:[ \t]+[^\n]*)?\n)*?(?=[A-Za-z])', { param($m) "Description: |-`n" + $body + "`n" })
+          Set-Content $locale $loc -NoNewline -Encoding utf8
+          Select-String -Path $locale -Pattern '^(PackageUrl|ShortDescription|Description):'
 
           # komac picks a fresh GUID for its branch name every run, so a retry never collides
           # with a half-finished attempt.
