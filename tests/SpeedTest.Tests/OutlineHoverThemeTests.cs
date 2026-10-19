@@ -87,7 +87,6 @@ internal static class OutlineHoverThemeTests
             }
         if (failures.Count > 0)
             throw new InvalidOperationException("Outline hover text is below 4.5:1: " + string.Join("; ", failures));
-        Console.WriteLine("Outline hover text reads at 4.5:1 or better in every accent.");
     }
 
     private static double Contrast(Color a, Color b)

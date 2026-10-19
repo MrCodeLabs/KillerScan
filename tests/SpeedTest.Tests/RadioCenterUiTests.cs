@@ -76,7 +76,6 @@ internal static class RadioCenterUiTests
             foreach (double dpi in new[] { 1.0, 1.5, 2.0 })
             {
                 var (dx, dy) = MeasureDot(app, zoom, dpi);
-                Console.WriteLine($"{theme,-6} dot        zoom={zoom:0.00} dpi={dpi:0.0} dx={dx:+0.0;-0.0;0.0}px dy={dy:+0.0;-0.0;0.0}px");
                 // A 6 DIP dot leaves a 4 DIP gap to each side of the 14 DIP ring. When 4 x scale is not a whole
                 // number of pixels the dot cannot sit exactly in the middle, so half a pixel is allowed there.
                 double gap = 4 * zoom * dpi, allowed = Math.Abs(gap - Math.Round(gap)) > 0.01 ? 0.5 : 0.25;
@@ -87,11 +86,10 @@ internal static class RadioCenterUiTests
             foreach (double dpi in new[] { 1.0, 1.5, 2.0 })
             {
                 double offset = Measure(app, style, zoom, dpi);
-                Console.WriteLine($"{theme,-6} {style,-10} zoom={zoom:0.00} dpi={dpi:0.0} offset={offset:+0.0;-0.0;0.0}px");
                 // At 100% and 200% the ring must sit on the capitals (half a pixel covers an odd cap
                 // height against the even ring). At fractional scales WPF snaps the text to the
-                // pixel grid separately from the ring and a one-pixel step remains; those lines are
-                // printed for review rather than enforced.
+                // pixel grid separately from the ring and a one-pixel step remains, so those scales
+                // are measured but not enforced.
                 double total = zoom * dpi;
                 bool whole = Math.Abs(total - 1.0) < 0.01 || Math.Abs(total - 2.0) < 0.01;
                 if (whole && Math.Abs(offset) > 0.6) failures.Add($"{theme} {style} zoom {zoom} dpi {dpi}: {offset:+0.0;-0.0}px");
@@ -99,7 +97,6 @@ internal static class RadioCenterUiTests
         }
         if (failures.Count > 0)
             throw new InvalidOperationException("Indicator is off the middle of its label's capitals: " + string.Join("; ", failures));
-        Console.WriteLine("Radio dots are centered in their rings, and indicators sit on their labels' capitals at 100% and 200%.");
     }
 
     /// <summary>Dot center minus ring center on a checked radio, in device pixels (x, y).</summary>
