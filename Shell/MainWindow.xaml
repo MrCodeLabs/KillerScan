@@ -70,8 +70,9 @@
         <!-- ZIndex 1 so the wordmark's drips can hang into the top of the toolbar row below. -->
         <Border Grid.Row="0" Background="{DynamicResource TitleBarBrush}" Panel.ZIndex="1">
             <Grid>
-                <!-- Film grain over the bar (behind content) -->
-                <Border IsHitTestVisible="False" Opacity="{DynamicResource GrainOpacity}" Margin="0,0,0,1">
+                <!-- Film grain over the whole bar (behind content). Stopping it short of the bottom
+                     edge left a bare one-pixel line under the title bar on every grained theme. -->
+                <Border IsHitTestVisible="False" Opacity="{DynamicResource GrainOpacity}">
                     <Border.Background>
                         <ImageBrush x:Name="TitleGrainBrush" TileMode="Tile"
                                     ViewportUnits="Absolute" Viewport="0,0,256,256" Stretch="None"/>

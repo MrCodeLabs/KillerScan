@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 
 ## [1.8.3] - Unreleased
 
+### Fixed
+- A thin black line no longer shows under the title bar. The film grain now covers the whole bar.
+
 ## [1.8.2] - 2026-10-19
 
 ### Added
