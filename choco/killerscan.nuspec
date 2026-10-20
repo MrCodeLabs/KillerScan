@@ -34,12 +34,14 @@
 - Scan history (Ctrl+H) compares runs for added, missing and changed devices, or shows a saved run in full, with trusted-device baselines, unknown-device alerts, and retention by age, by count or without a limit
 - A service-centric view (F7) organizes results by service, port and device, with a menu that copies service details or connects with the service's protocol and port
 - Export follows the view: devices as CSV or HTML, services as CSV, topology as PNG, JPG or HTML with SVG, the Keep Alive run as CSV or a page, and the terminal session as text
-- Headless command line for scripts, RMM, and KillerMCP: scan, probe, network details, offline vendor lookup, ping, traceroute, diagnostics, availability monitoring, speed tests, and CSV, JSON or HTML export
+- Headless command line for scripts, RMM, and KillerMCP: scan, probe, network details, offline vendor lookup, ping, traceroute, diagnostics, availability monitoring, speed tests, and CSV, JSON or HTML export; installed copies run as killerscan scan from any terminal
 - Scan several networks in one pass: comma-separated CIDR blocks, single hosts, and ranges
 - Thirteen themes, with eight accent colors for Dark, Light, Black and 98SE, localized in nineteen languages
+- Follows Windows contrast themes, names every control for screen readers, and keeps keyboard focus inside open cards
 - Keyboard shortcuts on F1, with a shortcut list and a color-coded keyboard map, plus an app-wide size control from 70% to 250%
+- Checks for updates on startup and offers a newer release in a dialog, with a switch to turn the check off
 - One self-contained Windows EXE that requires .NET Framework 4.8; installs per-user or for all users, or runs portable
-- GPLv3, no account, no telemetry; device identification runs locally, and only network features such as updates, vendor database refresh and speed tests connect out
+- GPLv3, no account, no telemetry; device identification runs locally, and only network features such as update checks, vendor database refresh and speed tests connect out; an HTML report loads the KillerScan logo from killerscan.net when opened
     </description>
     <releaseNotes>https://github.com/SteveTheKiller/KillerScan/releases/tag/vREPLACE_VERSION</releaseNotes>
   </metadata>

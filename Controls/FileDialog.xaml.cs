@@ -242,10 +242,6 @@ namespace KillerScan.Controls
         {
             if (owner != null && owner.IsVisible) Owner = owner;
 
-            // The picker uses the caller's operation title in its caption. Reuse the owner's
-            // canonical close-button template so 98SE gets the square raised caption button.
-            if (owner?.TryFindResource("ChromeCloseButton") is Style closeStyle)
-                CaptionCloseButton.Style = closeStyle;
             AcceptButton.Content = Loc(_mode == FileDialogMode.Save ? "Str_Btn_Save" : "Str_Btn_Open");
             ConfigureImagePreview();
             // Extended, not Multiple: Extended is the Explorer behavior (plain click replaces the

@@ -182,7 +182,7 @@
     <sys:String x:Key="Str_KS_Device">DISPOSITIVOS</sys:String>
     <sys:String x:Key="Str_KS_Topology">TOPOLOGIA</sys:String>
     <sys:String x:Key="Str_KS_Toolbar">BARRA DE FERRAMENTAS</sys:String>
-    <sys:String x:Key="Str_KS_App">APP</sys:String>
+    <sys:String x:Key="Str_KS_App">APLICATIVO</sys:String>
     <sys:String x:Key="Str_Sc_Scan">Iniciar ou parar uma verificação</sys:String>
     <sys:String x:Key="Str_Sc_Cancel">Cancelar a verificação ou fechar isto</sys:String>
     <sys:String x:Key="Str_Sc_Rescan">Refazer a verificação profunda dos hosts selecionados</sys:String>
@@ -216,7 +216,7 @@
     <!-- ==== DIALOGS, UPDATES AND ERRORS ==== -->
     <sys:String x:Key="Str_About_Title">Sobre o KillerScan</sys:String>
     <sys:String x:Key="Str_TT_About">Sobre o KillerScan</sys:String>
-    <sys:String x:Key="Str_About_Aka" xml:space="preserve">AKA </sys:String>
+    <sys:String x:Key="Str_About_Aka" xml:space="preserve">ALIAS </sys:String>
     <sys:String x:Key="Str_About_Unsigned">(não assinado ou falha na cadeia)</sys:String>
     <sys:String x:Key="Str_About_Computing">calculando...</sys:String>
     <sys:String x:Key="Str_Ssh_Title">Conta SSH</sys:String>
@@ -236,11 +236,16 @@
     <sys:String x:Key="Str_Db_Failed">Falha na atualização: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Atualização disponível: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Baixando...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Baixar e instalar {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">O app será fechado e reaberto automaticamente.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Atualizar</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Atualização disponível: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Baixando...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Baixar e instalar {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">O app será fechado e reaberto automaticamente.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Verificar atualizações ao iniciar</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">O {0} {1} está disponível</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Deseja baixá-lo e instalá-lo agora? O aplicativo será fechado e reaberto automaticamente.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Atualizar</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Agora não</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Sempre verificar ao iniciar</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->
@@ -432,7 +437,7 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Workspace_NewScan">Nova verificação</sys:String>
     <sys:String x:Key="Str_View_Devices">Dispositivos</sys:String>
     <sys:String x:Key="Str_View_Topology">Topologia</sys:String>
-    <sys:String x:Key="Str_View_KeepAlive">Keep Alive</sys:String>
+    <sys:String x:Key="Str_View_KeepAlive">Monitoramento de conexão</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Terminal</sys:String>
     <sys:String x:Key="Str_Term_Copy">Copiar</sys:String>
     <sys:String x:Key="Str_Term_Paste">Colar</sys:String>
@@ -536,6 +541,10 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Rolar para baixo</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Rolar para a esquerda</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Rolar para a direita</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Uma página acima</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Uma página abaixo</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Uma página à esquerda</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Uma página à direita</sys:String>
     <sys:String x:Key="Str_Location_Title">Local</sys:String>
     <sys:String x:Key="Str_Location_Busy">Interrompa a verificação ou o comando do terminal em andamento antes de mudar de local.</sys:String>
     <sys:String x:Key="Str_Location_Legacy">Dados anteriores (não atribuídos)</sys:String>

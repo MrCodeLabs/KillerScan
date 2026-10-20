@@ -14,6 +14,9 @@ namespace KillerScan.Controls
         /// reusable variant below, which hides the checkbox.</summary>
         public bool AllUsers => AllUsersCheck.IsChecked == true;
 
+        /// <summary>The reused dialog's optional checkbox, read back after ShowDialog returns.</summary>
+        public bool Check1Checked => Check1.IsChecked == true;
+
         public ConfirmDialog()
         {
             InitializeComponent();
@@ -63,6 +66,16 @@ namespace KillerScan.Controls
             // like the self-update confirmation.
             AllUsersCheck.Visibility = Visibility.Collapsed;
             AllUsersNote.Visibility = Visibility.Collapsed;
+        }
+
+        // The reusable variant with one checkbox under the detail, such as "Always check on startup".
+        public ConfirmDialog(string heading, string detail, string confirmText, string cancelText,
+                             string check1Label, bool check1Initial)
+            : this(heading, detail, confirmText, cancelText)
+        {
+            Check1.Content    = new System.Windows.Controls.TextBlock { Text = check1Label, TextWrapping = TextWrapping.Wrap };
+            Check1.IsChecked  = check1Initial;
+            Check1.Visibility = Visibility.Visible;
         }
 
         // The family setup dialog's notice ring: an amber "!" on a confirmation and the accent "i" on a

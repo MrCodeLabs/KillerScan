@@ -236,11 +236,16 @@
     <sys:String x:Key="Str_Db_Failed">Не вдалося оновити: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Доступне оновлення: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Завантаження...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Завантажити й установити {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Застосунок закриється та відкриється знову автоматично.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Оновити</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Доступне оновлення: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Завантаження...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Завантажити й установити {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Застосунок закриється та відкриється знову автоматично.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Перевіряти оновлення під час запуску</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">Доступний {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Завантажити та встановити зараз? Програма закриється та відкриється знову автоматично.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Оновити</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Не зараз</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Завжди перевіряти під час запуску</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->
@@ -432,7 +437,7 @@
     <sys:String x:Key="Str_Workspace_NewScan">Нове сканування</sys:String>
     <sys:String x:Key="Str_View_Devices">Пристрої</sys:String>
     <sys:String x:Key="Str_View_Topology">Топологія</sys:String>
-    <sys:String x:Key="Str_View_KeepAlive">Keep Alive</sys:String>
+    <sys:String x:Key="Str_View_KeepAlive">Спостереження за з'єднанням</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Термінал</sys:String>
     <sys:String x:Key="Str_Term_Copy">Копіювати</sys:String>
     <sys:String x:Key="Str_Term_Paste">Вставити</sys:String>
@@ -536,6 +541,10 @@
     <sys:String x:Key="Str_Scroll_Down">Прокрутити вниз</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Прокрутити ліворуч</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Прокрутити праворуч</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">На сторінку вгору</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">На сторінку вниз</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">На сторінку ліворуч</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">На сторінку праворуч</sys:String>
     <sys:String x:Key="Str_Location_Title">Розташування</sys:String>
     <sys:String x:Key="Str_Location_Busy">Перед зміною розташування зупиніть поточне сканування або команду термінала.</sys:String>
     <sys:String x:Key="Str_Location_Legacy">Попередні дані (не призначені)</sys:String>

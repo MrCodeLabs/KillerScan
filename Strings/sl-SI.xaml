@@ -604,4 +604,18 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Access_Redirect">Odgovor preusmeritve; cilju nismo sledili</sys:String>
     <sys:String x:Key="Str_Access_Note">Odpri vzpostavi novo povezavo. HTTP 200 ne dokazuje dostopa brez prijave. Veljavnost certifikatov HTTPS ni preverjena. Dokaz prijave velja samo za zahtevani naslov.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Čas opažanja ni na voljo</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Vedno preveri ob zagonu</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Prenašanje ...</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Ne zdaj</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Preveri posodobitve ob zagonu</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Želiš posodobitev prenesti in namestiti zdaj? Program se bo zaprl in samodejno znova odprl.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">Na voljo je {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Na voljo je posodobitev: {0}</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Program se bo zaprl in samodejno znova odprl.</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Prenesem in namestim {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Posodobi</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Stran navzdol</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Stran levo</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Stran desno</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Stran navzgor</sys:String>
 </ResourceDictionary>

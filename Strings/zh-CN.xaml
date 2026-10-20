@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">显示或隐藏网卡和链路速度</sys:String>
     <sys:String x:Key="Str_Light_Idle">尚未扫描</sys:String>
     <sys:String x:Key="Str_Light_Scanning">正在扫描</sys:String>
-    <sys:String x:Key="Str_Light_Deep">正在执行 Deep Scan</sys:String>
+    <sys:String x:Key="Str_Light_Deep">正在执行深度扫描</sys:String>
     <sys:String x:Key="Str_Light_Done">扫描完成</sys:String>
     <sys:String x:Key="Str_TT_Export">导出</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">主题</sys:String>
@@ -100,7 +100,7 @@
     <sys:String x:Key="Str_About_Thumbprint">指纹</sys:String>
     <sys:String x:Key="Str_About_Sha">EXE SHA-256</sys:String>
     <sys:String x:Key="Str_About_Db">厂商数据库</sys:String>
-    <sys:String x:Key="Str_About_DbUpdate">从最新注册表更新</sys:String>
+    <sys:String x:Key="Str_About_DbUpdate">从最新的注册库更新</sys:String>
     <sys:String x:Key="Str_About_DbHint">来自 Wireshark OUI 列表。</sys:String>
     <sys:String x:Key="Str_About_DbEntries">{0} 个条目</sys:String>
     <sys:String x:Key="Str_About_DbRefreshed">更新于 {0}</sys:String>
@@ -221,11 +221,16 @@
     <sys:String x:Key="Str_Db_Updated">已更新至 {0} 条记录。</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">无法保存数据库：{0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">更新失败：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">有可用更新：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">正在下载...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">下载并安装 {0} {1}？</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">应用将关闭并自动重新打开。</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">有可用更新：{0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">正在下载...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">下载并安装 {0} {1}？</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">应用将关闭并自动重新打开。</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">启动时检查更新</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} 已发布</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">是否立即下载并安装？应用将关闭并自动重新打开。</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">更新</sys:String>
+    <sys:String x:Key="Str_About_NotNow">以后再说</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">启动时始终检查更新</sys:String>
     <sys:String x:Key="Str_Conflict_Title">安装冲突</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan 已安装两次。现在删除另一个当前用户的副本吗？
 
@@ -494,6 +499,10 @@
     <sys:String x:Key="Str_Scroll_Down">向下滚动</sys:String>
     <sys:String x:Key="Str_Scroll_Left">向左滚动</sys:String>
     <sys:String x:Key="Str_Scroll_Right">向右滚动</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">向上翻页</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">向下翻页</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">向左翻页</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">向右翻页</sys:String>
     <sys:String x:Key="Str_Location_Title">位置</sys:String>
     <sys:String x:Key="Str_Location_Busy">更改位置前，请停止当前扫描或终端命令。</sys:String>
     <sys:String x:Key="Str_Location_Legacy">旧数据（未分配）</sys:String>

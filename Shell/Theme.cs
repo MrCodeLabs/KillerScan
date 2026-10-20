@@ -32,6 +32,13 @@ namespace KillerScan.Shell
             if (sender is CheckBox check) FilmGrain.Set(check.IsChecked == true);
         }
 
+        // Alt+Shift+G: Film Grain on or off, kept in step with the theme menu's check box.
+        private void ToggleFilmGrain()
+        {
+            FilmGrain.Set(!FilmGrain.Enabled);
+            if (FindName("FilmGrainCheck") is CheckBox filmGrain) filmGrain.IsChecked = FilmGrain.Enabled;
+        }
+
         private void ThemeRadio_Checked(object sender, RoutedEventArgs e)
         {
             if (_syncingThemeRadios) return;
@@ -43,6 +50,7 @@ namespace KillerScan.Shell
                 UpdateAccentStrip(animate: true);
                 RefreshWorkspaceLocale();
                 UpdateSidebarFades();
+                RefreshSidebarWidth();   // a theme's font can need a wider panel for the dates
             }
         }
 
@@ -116,7 +124,11 @@ namespace KillerScan.Shell
         {
             if (FindName("ThemeRadios") is not Panel panel) return;
             string current = ThemeManager.Current.ToString();
-            if (FindName("FilmGrainCheck") is CheckBox filmGrain) filmGrain.IsChecked = FilmGrain.Enabled;
+            if (FindName("FilmGrainCheck") is CheckBox filmGrain)
+            {
+                filmGrain.IsChecked = FilmGrain.Enabled;
+                filmGrain.ToolTip = $"{Loc("Str_Theme_FilmGrain")} (Alt+Shift+G)";
+            }
             _syncingThemeRadios = true;
             try
             {
@@ -154,7 +166,7 @@ namespace KillerScan.Shell
             }
 
             if (_themeContextMenu == null) return;
-            FlyoutPlacement.Attach(_themeContextMenu);
+            FlyoutPlacement.Attach(_themeContextMenu, ThemeButton);
             _themeContextMenu.IsOpen = true;
 
             // Sync on OPEN: the theme can have changed since the menu was last visited.
@@ -333,7 +345,7 @@ namespace KillerScan.Shell
             if (sender is Button b && b.ContextMenu != null)
             {
                 BuildLanguageMenu(b.ContextMenu);
-                FlyoutPlacement.Attach(b.ContextMenu);
+                FlyoutPlacement.Attach(b.ContextMenu, b);
                 b.ContextMenu.IsOpen = true;
                 Anim.FadeIn(b.ContextMenu);
             }
