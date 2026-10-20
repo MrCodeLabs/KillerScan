@@ -10,12 +10,13 @@ using KillerScan.Services;
 
 namespace KillerScan.Controls
 {
-    public sealed class ScanDeviceActionEventArgs(NetworkDevice device, string action, bool beside, int? servicePort = null) : EventArgs
+    public sealed class ScanDeviceActionEventArgs(NetworkDevice device, string action, bool beside, int? servicePort = null, AccessEndpoint? access = null) : EventArgs
     {
         public NetworkDevice Device { get; } = device;
         public string Action { get; } = action;
         public bool Beside { get; } = beside;
         public int? ServicePort { get; } = servicePort;
+        public AccessEndpoint? Access { get; } = access;
     }
 
     public partial class ScanWorkspace : UserControl, IDisposable

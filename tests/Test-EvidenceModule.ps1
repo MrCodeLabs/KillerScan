@@ -12,6 +12,7 @@ try {
     # /demo is a CLI flag, never a real target: no scanning or network settings changes.
     $devices=@(scan '/demo')
     if (!$devices.Count) { throw 'The actual GUI EXE returned no JSON through the module.' }
+    if (@($devices | Where-Object { @($_.Access).Count -gt 0 }).Count -eq 0) { throw 'Access endpoints were lost in the actual module pipeline.' }
     foreach ($device in $devices) {
         if (!$device.Identification -or !$device.Identification.AutomaticType) { throw 'Recognition data was lost in the actual module pipeline.' }
         if ($device.Identification.ObservationCompletedAtUtc) { throw 'Demo invented a live capture time.' }

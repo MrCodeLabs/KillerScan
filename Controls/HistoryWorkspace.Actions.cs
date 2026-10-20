@@ -127,7 +127,7 @@ namespace KillerScan.Controls
         {
             static string Cell(string value) => "\"" + value.Replace("\"", "\"\"") + "\"";
             var lines = new List<string> { string.Join(",", new[] { "Str_History_Change", "Str_Col_Ip", "Str_Col_DeviceName",
-                "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }.Select(key => Cell(Loc(key)))) + ",Location ID,Location,Identification JSON" };
+                "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }.Select(key => Cell(Loc(key)))) + ",Location ID,Location,Identification JSON,Access JSON" };
             foreach (object row in VisibleGrid.Items)
             {
                 var device = row is HistoryChangeRow change ? change.Device : ((HistoryDeviceRow)row).Device;
@@ -135,7 +135,7 @@ namespace KillerScan.Controls
                     device.IpAddress, device.Hostname, device.MacAddress, device.Vendor,
                     DeviceTypeConverter.Display(device.DeviceType), string.Join(", ", device.OpenPorts),
                     _entry?.LocationId ?? "", _entry?.LocationName ?? "",
-                    device.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Identification) }.Select(Cell)));
+                    device.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Identification), System.Text.Json.JsonSerializer.Serialize(device.Access) }.Select(Cell)));
             }
             return string.Join(Environment.NewLine, lines) + Environment.NewLine;
         }

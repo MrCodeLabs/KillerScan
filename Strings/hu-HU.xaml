@@ -543,4 +543,17 @@ A beállítások nem törlődnek.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Mély vizsgálat</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importált / nem megadott hatókör</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">További jelöltek</sys:String>
+    <sys:String x:Key="Str_Access_Title">Hozzáférés</sys:String>
+    <sys:String x:Key="Str_Access_None">Nincs elérhető hozzáférési cím.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Hitelesítés</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Ismeretlen</sys:String>
+    <sys:String x:Key="Str_Access_Required">A kiszolgáló hitelesítést kért</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Jelszavas űrlap észlelve</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">HTTP-válasz érkezett ezen a címen</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSH-üdvözlés érkezett</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">A TCP-port nyitott; a protokoll a port alapján javasolt</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Port alapján javasolt cím; nincs tárolt ellenőrzés</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Átirányítási válasz; a célt nem követtük</sys:String>
+    <sys:String x:Key="Str_Access_Note">A megnyitás új kapcsolatot hoz létre. A HTTP 200 nem bizonyít bejelentkezés nélküli hozzáférést. A HTTPS-tanúsítványok nem lettek hitelesítve. A belépési bizonyíték csak a kért címre érvényes.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">A megfigyelés ideje nem érhető el</sys:String>
 </ResourceDictionary>

@@ -11,6 +11,8 @@ namespace KillerScan.Engine
         public string DeviceType { get; set; } = "Unknown";
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public DeviceIdentification? Identification { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public List<AccessEndpoint>? Access { get; set; }
         internal DateTimeOffset? ObservationStartedAtUtc { get; set; }
         internal DateTimeOffset? ObservationCompletedAtUtc { get; set; }
         internal DateTimeOffset? MdnsObservedAtUtc { get; set; }

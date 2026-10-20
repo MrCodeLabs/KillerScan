@@ -376,6 +376,7 @@
 
                     <DataGrid.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="{DynamicResource Str_Access_Title}" Click="Access_Click"/>
                             <MenuItem Header="{DynamicResource Str_Evidence_Title}" InputGestureText="Ctrl+I" Click="Evidence_Click">
                                 <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
                             </MenuItem>
@@ -668,6 +669,7 @@
                           CellStyle="{StaticResource DarkDataGridCell}">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="{DynamicResource Str_Access_Title}" Tag="Access" Click="ServiceMenu_Click"/>
                             <MenuItem Header="{DynamicResource Str_Evidence_Title}" InputGestureText="Ctrl+I" Tag="Evidence" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
                             </MenuItem>

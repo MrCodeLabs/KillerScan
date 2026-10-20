@@ -134,12 +134,12 @@ namespace KillerScan.Controls
                 // English headers and blanket quoting, matching ReportExport.BuildCsv so both
                 // exports open the same way in a spreadsheet.
                 var text = new StringBuilder();
-                text.AppendLine("Service,Port,Name,IP Address,Type,Location ID,Location,Identification JSON");
+                text.AppendLine("Service,Port,Name,IP Address,Type,Location ID,Location,Identification JSON,Access JSON");
                 foreach (var row in ServicesGrid.Items.OfType<ServiceRow>())
                     text.AppendLine(string.Join(",", ReportExport.CsvField(row.Service), ReportExport.CsvField(row.Port.ToString()),
                         ReportExport.CsvField(row.DeviceName), ReportExport.CsvField(row.IpAddress), ReportExport.CsvField(row.DeviceTypeDisplay),
                         ReportExport.CsvField(Locations.Current.Id), ReportExport.CsvField(Locations.Current.Name),
-                        ReportExport.CsvField(row.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(row.Identification))));
+                        ReportExport.CsvField(row.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(row.Identification)), ReportExport.CsvField(System.Text.Json.JsonSerializer.Serialize(row.Access))));
                 File.WriteAllText(dlg.FileName, text.ToString(), Encoding.UTF8);
                 StatusText.Text = string.Format(Loc("Str_St_Exported"), Path.GetFileName(dlg.FileName));
             }

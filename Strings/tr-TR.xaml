@@ -527,4 +527,17 @@ Ayarlarınız silinmeyecek.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Derin tarama</sys:String>
     <sys:String x:Key="Str_Evidence_External">İçe aktarılmış / kapsam belirtilmemiş</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Diğer adaylar</sys:String>
+    <sys:String x:Key="Str_Access_Title">Erişim</sys:String>
+    <sys:String x:Key="Str_Access_None">Kullanılabilir erişim adresi yok.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Kimlik doğrulama</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Bilinmiyor</sys:String>
+    <sys:String x:Key="Str_Access_Required">Sunucu kimlik doğrulaması istedi</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Parola formu algılandı</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Bu adreste HTTP yanıtı alındı</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSH karşılama iletisi alındı</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP bağlantı noktası açık; protokol porta göre önerildi</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Adres porta göre önerildi; kayıtlı doğrulama yok</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Yönlendirme yanıtı; hedef izlenmedi</sys:String>
+    <sys:String x:Key="Str_Access_Note">Aç yeni bir bağlantı kurar. HTTP 200, oturum açmadan erişimi kanıtlamaz. HTTPS sertifikaları doğrulanmadı. Kimlik doğrulama kanıtı yalnızca istenen adres için geçerlidir.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Gözlem zamanı kullanılamıyor</sys:String>
 </ResourceDictionary>

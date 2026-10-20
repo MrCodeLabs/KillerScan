@@ -527,4 +527,17 @@
     <sys:String x:Key="Str_Evidence_Deep">深度扫描</sys:String>
     <sys:String x:Key="Str_Evidence_External">已导入 / 范围不明</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">其他候选类型</sys:String>
+    <sys:String x:Key="Str_Access_Title">访问</sys:String>
+    <sys:String x:Key="Str_Access_None">没有可用的访问地址。</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">身份验证</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">未知</sys:String>
+    <sys:String x:Key="Str_Access_Required">服务器要求身份验证</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">检测到密码表单</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">在此地址收到 HTTP 响应</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">收到 SSH 标识</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP 端口开放；协议按端口推测</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">按端口推测的地址；无已保存的验证</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">重定向响应；未访问目标</sys:String>
+    <sys:String x:Key="Str_Access_Note">打开会建立新连接。HTTP 200 不能证明无需登录即可访问。HTTPS 证书未经验证。身份验证证据仅适用于请求的地址。</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">观察时间不可用</sys:String>
 </ResourceDictionary>

@@ -18,6 +18,7 @@ namespace KillerScan.Engine
         {
             device.ObservationCompletedAtUtc = DateTimeOffset.UtcNow;
             device.RecognitionScope = scope;
+            device.Access = DeviceAccess.ForDevice(device).ToList();
             device.RecognitionDisabledFeatures = ScanOptions.Features.Where(feature => !options.IsEnabled(feature)).ToArray();
             return ClassifyDeviceForNetwork(device, _binding?.Gateway ?? GatewayIp, _binding?.DnsServer ?? DnsIp,
                 ManualTypeResolver ?? ManualTypeLookup);
@@ -80,13 +81,14 @@ namespace KillerScan.Engine
                 catch { }
             }
 
-            internal override async Task Http(NetworkDevice device, IPAddress address, bool deep)
+            internal override async Task Http(NetworkDevice device, IPAddress address, bool deep, CancellationToken token = default)
             {
-                (int Port, bool Tls)[] standard = [(80, false), (8080, false), (5000, false), (8123, false), (443, true), (8443, true), (8006, true), (5001, true)];
+                (int Port, bool Tls)[] standard = [(80, false), (8080, false), (5000, false), (8123, false), (443, true), (8443, true), (8006, true), (5001, true), (5357, false), (32400, false)];
                 var candidates = standard.Where(p => device.OpenPorts.Contains(p.Port)).ToList();
-                if (deep) candidates.AddRange(device.OpenPorts.Where(p => !standard.Any(s => s.Port == p)).Take(12).Select(p => (p, TlsLikelyPorts.Contains(p))));
+                if (deep) candidates.AddRange(device.OpenPorts.Where(p => !standard.Any(s => s.Port == p)).Take(12).SelectMany(p => new[] { (p, TlsLikelyPorts.Contains(p)), (p, !TlsLikelyPorts.Contains(p)) }));
                 foreach (var candidate in candidates)
                 {
+                    if (device.Access?.Any(item => item.Port == candidate.Port && item.Verification == "HttpResponse" && item.HttpStatus is not (400 or 426)) == true) continue;
                     run.CheckTarget(address);
                     using var client = run.Tcp();
                     try
@@ -103,22 +105,20 @@ namespace KillerScan.Engine
                         byte[] request = Encoding.ASCII.GetBytes("GET / HTTP/1.1\r\nHost: " + address + ":" + candidate.Port + "\r\nConnection: close\r\nAccept-Encoding: identity\r\n\r\n");
                         await run.Wait(stream.WriteAsync(request, 0, request.Length, run.Token), 1000);
                         using var body = new MemoryStream();
+                        bool recordedHeaders = false;
+                        var bodyClock = System.Diagnostics.Stopwatch.StartNew();
                         var buffer = new byte[4096];
-                        while (body.Length < 65536)
+                        while (body.Length < 65536 && bodyClock.ElapsedMilliseconds < 3000)
                         {
                             var read = stream.ReadAsync(buffer, 0, (int)Math.Min(buffer.Length, 65536 - body.Length), run.Token);
-                            await run.Wait(read, 1500);
+                            await run.Wait(read, (int)Math.Max(1, Math.Min(1500, 3000 - bodyClock.ElapsedMilliseconds)));
                             if (read.Result == 0) break;
                             body.Write(buffer, 0, read.Result);
-                            if (Encoding.UTF8.GetString(body.ToArray()).IndexOf("</title>", StringComparison.OrdinalIgnoreCase) >= 0) break;
+                            if (!recordedHeaders && Encoding.UTF8.GetString(body.ToArray()).Contains("\r\n\r\n"))
+                            { HttpAccessObservation.RecordRaw(device, candidate.Port, candidate.Tls, Encoding.UTF8.GetString(body.ToArray()), headersOnly: true); recordedHeaders = true; }
                         }
                         string text = Encoding.UTF8.GetString(body.ToArray());
-                        if (!text.StartsWith("HTTP/", StringComparison.OrdinalIgnoreCase)) continue;
-                        var server = Regex.Match(text.Split(new[] { "\r\n\r\n" }, 2, StringSplitOptions.None)[0], @"(?im)^Server:\s*([^\r\n]*)");
-                        if (server.Success) device.HttpServer = server.Groups[1].Value.Trim();
-                        var title = Regex.Match(text, @"(?is)<title[^>]*>(.*?)</title>");
-                        if (title.Success) device.HttpTitle = WebUtility.HtmlDecode(Regex.Replace(title.Groups[1].Value, "<[^>]+>", "")).Trim();
-                        if (device.HttpTitle.Length > 0 || device.HttpServer.Length > 0) return;
+                        HttpAccessObservation.RecordRaw(device, candidate.Port, candidate.Tls, text);
                     }
                     catch (NetworkBindingException) { throw; }
                     catch (OperationCanceledException) { throw; }

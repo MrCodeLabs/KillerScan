@@ -591,4 +591,17 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Deep scan</sys:String>
     <sys:String x:Key="Str_Evidence_External">Imported / unspecified scope</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Other candidates</sys:String>
+    <sys:String x:Key="Str_Access_Title">Access</sys:String>
+    <sys:String x:Key="Str_Access_None">No access endpoints are available.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Authentication</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Unknown</sys:String>
+    <sys:String x:Key="Str_Access_Required">Server requested authentication</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Password form detected</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">HTTP response received at this address</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSH banner received</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP port open; protocol suggested by port</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Address suggested by port; no stored verification</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Redirect response; destination was not followed</sys:String>
+    <sys:String x:Key="Str_Access_Note">Opening makes a new connection. HTTP 200 does not prove access without login. HTTPS certificates were not validated. Login evidence applies only to the requested address.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Observation time unavailable</sys:String>
 </ResourceDictionary>
