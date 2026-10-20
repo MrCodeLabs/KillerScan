@@ -31,7 +31,7 @@ namespace KillerScan.Engine
             internal virtual Task<bool> Connect(IPAddress address, int port, int timeout) => TryConnectAsync(address, port, timeout);
             internal virtual Task<Dictionary<string, MulticastDiscovery.MdnsInfo>> Mdns(CancellationToken ct) => MulticastDiscovery.CollectMdnsAsync(ct);
             internal virtual Task<Dictionary<string, string>> Ssdp(CancellationToken ct) => MulticastDiscovery.CollectSsdpAsync(ct);
-            internal virtual Task Http(NetworkDevice device, IPAddress address, bool deep) => ProbeHttpAsync(device, address, deep);
+            internal virtual Task Http(NetworkDevice device, IPAddress address, bool deep, CancellationToken token = default) => ProbeHttpWithCancellationAsync(device, address, deep, token);
             internal virtual Task Tls(NetworkDevice device, IPAddress address, bool deep) => ProbeTlsCertAsync(device, address, deep);
             internal virtual Task Ssh(NetworkDevice device, IPAddress address) => ProbeSshBannerAsync(device, address);
             internal virtual Task Snmp(NetworkDevice device, IPAddress address) => ProbeSnmpAsync(device, address);

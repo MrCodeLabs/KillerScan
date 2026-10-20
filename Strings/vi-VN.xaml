@@ -508,4 +508,17 @@ Cài đặt của bạn sẽ không bị xóa.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Quét sâu</sys:String>
     <sys:String x:Key="Str_Evidence_External">Đã nhập / chưa rõ phạm vi</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Các khả năng khác</sys:String>
+    <sys:String x:Key="Str_Access_Title">Truy cập</sys:String>
+    <sys:String x:Key="Str_Access_None">Không có địa chỉ truy cập.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Xác thực</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Chưa rõ</sys:String>
+    <sys:String x:Key="Str_Access_Required">Máy chủ yêu cầu xác thực</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Phát hiện biểu mẫu mật khẩu</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Đã nhận phản hồi HTTP tại địa chỉ này</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Đã nhận biểu ngữ SSH</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Cổng TCP mở; giao thức được gợi ý theo cổng</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Địa chỉ gợi ý theo cổng; chưa lưu kiểm chứng</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Phản hồi chuyển hướng; không truy cập đích</sys:String>
+    <sys:String x:Key="Str_Access_Note">Mở sẽ tạo kết nối mới. HTTP 200 không chứng minh có thể truy cập mà không đăng nhập. Chứng chỉ HTTPS chưa được xác thực. Bằng chứng xác thực chỉ áp dụng cho địa chỉ đã yêu cầu.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Không có thời gian quan sát</sys:String>
 </ResourceDictionary>

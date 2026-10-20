@@ -553,4 +553,17 @@
     <sys:String x:Key="Str_Evidence_Deep">Глубокое сканирование</sys:String>
     <sys:String x:Key="Str_Evidence_External">Импортировано / область не указана</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Другие варианты</sys:String>
+    <sys:String x:Key="Str_Access_Title">Доступ</sys:String>
+    <sys:String x:Key="Str_Access_None">Нет доступных адресов подключения.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Аутентификация</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Неизвестно</sys:String>
+    <sys:String x:Key="Str_Access_Required">Сервер запросил аутентификацию</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Обнаружена форма с паролем</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">По этому адресу получен ответ HTTP</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Получен баннер SSH</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Порт TCP открыт; протокол предложен по номеру порта</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Адрес предложен по порту; нет сохранённой проверки</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Ответ перенаправления; переход не выполнен</sys:String>
+    <sys:String x:Key="Str_Access_Note">Открытие создаёт новое соединение. HTTP 200 не доказывает доступ без входа. Сертификаты HTTPS не проверены. Данные об аутентификации относятся только к запрошенному адресу.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Время наблюдения недоступно</sys:String>
 </ResourceDictionary>

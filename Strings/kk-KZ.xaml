@@ -569,4 +569,17 @@
     <sys:String x:Key="Str_Evidence_Deep">Терең сканерлеу</sys:String>
     <sys:String x:Key="Str_Evidence_External">Импортталған / ауқым көрсетілмеген</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Басқа нұсқалар</sys:String>
+    <sys:String x:Key="Str_Access_Title">Қол жеткізу</sys:String>
+    <sys:String x:Key="Str_Access_None">Қол жеткізу мекенжайлары жоқ.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Аутентификация</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Белгісіз</sys:String>
+    <sys:String x:Key="Str_Access_Required">Сервер аутентификацияны талап етті</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Құпиясөз пішіні анықталды</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Осы мекенжайдан HTTP жауабы алынды</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSH баннері алынды</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP порты ашық; протокол порт бойынша ұсынылған</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Мекенжай порт бойынша ұсынылған; сақталған тексеру жоқ</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Қайта бағыттау жауабы; нысанаға өтпедік</sys:String>
+    <sys:String x:Key="Str_Access_Note">Ашу жаңа қосылым орнатады. HTTP 200 кірусіз қол жеткізуді дәлелдемейді. HTTPS сертификаттары тексерілмеген. Аутентификация дәлелі тек сұралған мекенжайға қатысты.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Бақылау уақыты қолжетімсіз</sys:String>
 </ResourceDictionary>

@@ -527,4 +527,17 @@
     <sys:String x:Key="Str_Evidence_Deep">গভীর স্ক্যান</sys:String>
     <sys:String x:Key="Str_Evidence_External">আমদানি করা / পরিসর অনির্দিষ্ট</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">অন্যান্য সম্ভাব্য ধরন</sys:String>
+    <sys:String x:Key="Str_Access_Title">প্রবেশ</sys:String>
+    <sys:String x:Key="Str_Access_None">কোনো প্রবেশের ঠিকানা উপলব্ধ নেই।</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">প্রমাণীকরণ</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">অজানা</sys:String>
+    <sys:String x:Key="Str_Access_Required">সার্ভার প্রমাণীকরণ চেয়েছে</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">পাসওয়ার্ড ফর্ম শনাক্ত হয়েছে</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">এই ঠিকানায় HTTP উত্তর পাওয়া গেছে</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSH ব্যানার পাওয়া গেছে</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP পোর্ট খোলা; পোর্ট অনুযায়ী প্রোটোকল প্রস্তাবিত</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">পোর্ট অনুযায়ী ঠিকানা প্রস্তাবিত; সংরক্ষিত যাচাই নেই</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">পুনর্নির্দেশের উত্তর; গন্তব্য অনুসরণ করা হয়নি</sys:String>
+    <sys:String x:Key="Str_Access_Note">খুললে নতুন সংযোগ তৈরি হয়। HTTP 200 লগইন ছাড়া প্রবেশ প্রমাণ করে না। HTTPS সনদ যাচাই করা হয়নি। প্রমাণীকরণের তথ্য শুধু অনুরোধ করা ঠিকানার জন্য প্রযোজ্য।</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">পর্যবেক্ষণের সময় উপলব্ধ নেই</sys:String>
 </ResourceDictionary>

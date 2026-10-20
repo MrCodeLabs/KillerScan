@@ -591,4 +591,17 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Poglobljeni pregled</sys:String>
     <sys:String x:Key="Str_Evidence_External">Uvoženo / obseg ni določen</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Drugi kandidati</sys:String>
+    <sys:String x:Key="Str_Access_Title">Dostop</sys:String>
+    <sys:String x:Key="Str_Access_None">Ni razpoložljivih naslovov za dostop.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Prijava</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Neznano</sys:String>
+    <sys:String x:Key="Str_Access_Required">Strežnik zahteva avtentikacijo</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Zaznan obrazec z geslom</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Na tem naslovu je prejet odgovor HTTP</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Prejeta uvodna vrstica SSH</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP vrata so odprta; protokol je predlagan po vratih</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Naslov je predlagan po vratih; preverjanje ni shranjeno</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Odgovor preusmeritve; cilju nismo sledili</sys:String>
+    <sys:String x:Key="Str_Access_Note">Odpri vzpostavi novo povezavo. HTTP 200 ne dokazuje dostopa brez prijave. Veljavnost certifikatov HTTPS ni preverjena. Dokaz prijave velja samo za zahtevani naslov.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Čas opažanja ni na voljo</sys:String>
 </ResourceDictionary>

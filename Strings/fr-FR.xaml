@@ -527,4 +527,17 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Analyse approfondie</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importé / périmètre non précisé</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Autres candidats</sys:String>
+    <sys:String x:Key="Str_Access_Title">Accès</sys:String>
+    <sys:String x:Key="Str_Access_None">Aucune adresse d’accès disponible.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Authentification</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Inconnue</sys:String>
+    <sys:String x:Key="Str_Access_Required">Le serveur demande une authentification</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Formulaire de mot de passe détecté</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Réponse HTTP reçue à cette adresse</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Bannière SSH reçue</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Port TCP ouvert ; protocole suggéré par le port</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Adresse suggérée par le port ; aucune vérification enregistrée</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Réponse de redirection ; destination non suivie</sys:String>
+    <sys:String x:Key="Str_Access_Note">Ouvrir établit une nouvelle connexion. HTTP 200 ne prouve pas un accès sans connexion. Les certificats HTTPS n’ont pas été validés. Les preuves d’authentification concernent uniquement l’adresse demandée.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Heure d’observation indisponible</sys:String>
 </ResourceDictionary>

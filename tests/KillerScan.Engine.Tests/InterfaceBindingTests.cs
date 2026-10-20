@@ -106,9 +106,9 @@ internal static class InterfaceBindingTests
         using var trap = new Listener(IPAddress.Parse("127.0.0.2"), 0);
         trap.Start();
         int trapPort = ((IPEndPoint)trap.LocalEndpoint).Port;
-        async Task Serve(string response)
+        async Task Serve(string response, Listener? source = null)
         {
-            using var client = await listener.AcceptTcpClientAsync();
+            using var client = await (source ?? listener).AcceptTcpClientAsync();
             Require(((IPEndPoint)client.Client.RemoteEndPoint!).Address.Equals(IPAddress.Loopback), "HTTP uses the selected source address.");
             using var reader = new StreamReader(client.GetStream(), Encoding.ASCII, false, 4096, leaveOpen: true);
             while (await reader.ReadLineAsync() is { Length: > 0 }) { }
@@ -120,10 +120,22 @@ internal static class InterfaceBindingTests
         await Probes(run).Http(device, IPAddress.Loopback, true);
         Require(await Task.WhenAny(serve, Task.Delay(2000)) == serve, "HTTP fixture received the request."); await serve;
         Require(device.HttpTitle == "Bound title" && device.HttpServer == "Bound-Fixture", "Bound HTTP retains title and server fingerprints.");
+        Require(device.Access?.Single().Port == port && device.Access!.Single().HttpStatus == 200,
+            "Bound HTTP stores the actual endpoint response.");
         serve = Serve("HTTP/1.1 302 Found\r\nServer: Redirect-Fixture\r\nLocation: http://127.0.0.2:" + trapPort + "/\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
         await Probes(run).Http(new NetworkDevice { OpenPorts = [port] }, IPAddress.Loopback, true);
         Require(await Task.WhenAny(serve, Task.Delay(2000)) == serve, "Redirect fixture received the request."); await serve;
         Require(!trap.Pending(), "Bound fingerprinting never follows redirects to another endpoint.");
+        using var second = new Listener(IPAddress.Loopback, 0); second.Start();
+        int secondPort = ((IPEndPoint)second.LocalEndpoint).Port;
+        var firstReply = Serve("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=fixture\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+        var secondReply = Serve("HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n<form><input type=password></form>", second);
+        var multiple = new NetworkDevice { IpAddress = "127.0.0.1", OpenPorts = [port, secondPort] };
+        await Probes(run).Http(multiple, IPAddress.Loopback, true);
+        await Task.WhenAll(firstReply, secondReply);
+        Require(multiple.Access?.Count == 2 && multiple.Access!.Any(item => item.Port == port && item.Authentication == "Required")
+            && multiple.Access!.Any(item => item.Port == secondPort && item.Authentication == "LoginPage"),
+            "Bound probes preserve multiple endpoint-specific authentication observations: " + System.Text.Json.JsonSerializer.Serialize(multiple.Access));
     }
 
     public static async Task BoundDnsRoundTrip()

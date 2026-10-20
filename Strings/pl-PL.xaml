@@ -512,4 +512,17 @@ Twoje ustawienia nie zostaną usunięte.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Dokładne skanowanie</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importowane / zakres nieokreślony</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Inne możliwości</sys:String>
+    <sys:String x:Key="Str_Access_Title">Dostęp</sys:String>
+    <sys:String x:Key="Str_Access_None">Brak dostępnych adresów dostępu.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Uwierzytelnianie</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Nieznane</sys:String>
+    <sys:String x:Key="Str_Access_Required">Serwer wymaga uwierzytelnienia</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Wykryto formularz hasła</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Otrzymano odpowiedź HTTP pod tym adresem</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Otrzymano baner SSH</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Port TCP otwarty; protokół sugerowany na podstawie portu</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Adres sugerowany na podstawie portu; brak zapisanej weryfikacji</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Odpowiedź przekierowania; nie otwarto celu</sys:String>
+    <sys:String x:Key="Str_Access_Note">Otwarcie tworzy nowe połączenie. HTTP 200 nie dowodzi dostępu bez logowania. Certyfikaty HTTPS nie zostały zweryfikowane. Dowód uwierzytelniania dotyczy tylko żądanego adresu.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Czas obserwacji niedostępny</sys:String>
 </ResourceDictionary>

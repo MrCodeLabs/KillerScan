@@ -424,8 +424,8 @@ namespace KillerScan.Engine
 
             // -- Fingerprint probes: run in parallel, each is gated on relevant open ports --
             var fpTasks = new List<Task>();
-            if (options.Http && device.OpenPorts.Any(p => p == 80 || p == 443 || p == 8006 || p == 8080 || p == 8443 || p == 5000 || p == 5001 || p == 8123))
-                fpTasks.Add(probes.Http(device, addr, false));
+            if (options.Http && device.OpenPorts.Any(p => DeviceAccess.SuggestedWebProtocol(p) != null))
+                fpTasks.Add(probes.Http(device, addr, false, token));
             if (options.Ssh && device.OpenPorts.Contains(22))
                 fpTasks.Add(probes.Ssh(device, addr));
             if (options.Tls && device.OpenPorts.Any(p => p == 443 || p == 8443 || p == 8006 || p == 902))
@@ -529,7 +529,7 @@ namespace KillerScan.Engine
             if (options.Snmp) fpTasks.Add(probes.Snmp(device, addr));
             if (device.OpenPorts.Count > 0)
             {
-                if (options.Http) fpTasks.Add(probes.Http(device, addr, true));
+                if (options.Http) fpTasks.Add(probes.Http(device, addr, true, ct));
                 if (options.Tls) fpTasks.Add(probes.Tls(device, addr, true));
             }
             if (options.Ssh && device.OpenPorts.Contains(22))
@@ -889,12 +889,15 @@ namespace KillerScan.Engine
         // a web service on a non-standard port.
         private static readonly int[] TlsLikelyPorts = [443, 8443, 8006, 902, 5001, 9443, 4443, 10000, 8834];
 
-        private static async Task ProbeHttpAsync(NetworkDevice device, IPAddress addr, bool deep = false)
+        private static Task ProbeHttpAsync(NetworkDevice device, IPAddress addr, bool deep = false) =>
+            ProbeHttpWithCancellationAsync(device, addr, deep, CancellationToken.None);
+
+        internal static async Task ProbeHttpWithCancellationAsync(NetworkDevice device, IPAddress addr, bool deep, CancellationToken token)
         {
             (int port, bool https)[] standard =
             [
                 (80, false), (8080, false), (5000, false), (8123, false),
-                (443, true), (8443, true), (8006, true), (5001, true),
+                (443, true), (8443, true), (8006, true), (5001, true), (5357, false), (32400, false),
             ];
 
             // Normal scan: only the known web ports. Deep rescan: also treat every other open
@@ -907,13 +910,13 @@ namespace KillerScan.Engine
                 candidates.AddRange(device.OpenPorts
                     .Where(p => !standard.Any(s => s.port == p))
                     .Take(12)
-                    .Select(p => (port: p, https: TlsLikelyPorts.Contains(p))));
+                    .SelectMany(p => new[] { (port: p, https: TlsLikelyPorts.Contains(p)), (port: p, https: !TlsLikelyPorts.Contains(p)) }));
             }
 
             using var handler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
-                AllowAutoRedirect = true,
+                AllowAutoRedirect = false, UseProxy = false, UseCookies = false,
                 MaxAutomaticRedirections = 2,
             };
             using var client = new HttpClient(handler)
@@ -925,22 +928,18 @@ namespace KillerScan.Engine
 
             foreach (var (port, https) in candidates)
             {
+                token.ThrowIfCancellationRequested();
                 try
                 {
+                    if (device.Access?.Any(item => item.Port == port && item.Verification == "HttpResponse" && item.HttpStatus is not (400 or 426)) == true) continue;
                     var scheme = https ? "https" : "http";
-                    using var resp = await client.GetAsync($"{scheme}://{addr}:{port}/");
+                    using var resp = await client.GetAsync($"{scheme}://{addr}:{port}/", HttpCompletionOption.ResponseHeadersRead, token);
+                    HttpAccessObservation.Record(device, port, https, (int)resp.StatusCode, resp.Headers.ToString(), "");
 
-                    if (resp.Headers.TryGetValues("Server", out var serverVals))
-                        device.HttpServer = string.Join(", ", serverVals).Trim();
-
-                    var body = await resp.Content.ReadAsStringAsync();
-                    var m = Regex.Match(body, @"<title[^>]*>([^<]+)</title>", RegexOptions.IgnoreCase);
-                    if (m.Success)
-                        device.HttpTitle = WebUtility.HtmlDecode(m.Groups[1].Value).Trim();
-
-                    if (device.HttpTitle.Length > 0 || device.HttpServer.Length > 0)
-                        return;
+                    var body = await HttpAccessObservation.ReadBody(resp.Content, deep ? 1000 : 1500, token);
+                    HttpAccessObservation.Record(device, port, https, (int)resp.StatusCode, resp.Headers.ToString(), body);
                 }
+                catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
                 catch { }
             }
         }

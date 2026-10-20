@@ -23,6 +23,20 @@ namespace KillerScan.Controls
                 new DeviceEvidenceWindow(device) { Owner = Window.GetWindow(this) }.ShowDialog();
         }
 
+        private void Access_Click(object sender, RoutedEventArgs e)
+        {
+            if (EvidenceDevice is not { } device) return;
+            new DeviceAccessWindow(device, endpoint => OpenAccess(device, endpoint), CopyDeviceText)
+                { Owner = Window.GetWindow(this) }.ShowDialog();
+        }
+
+        internal void OpenAccess(NetworkDevice device, AccessEndpoint endpoint)
+        {
+            if (DeviceAccess.Address(device.IpAddress, endpoint) == null) return;
+            string? action = endpoint.Protocol switch { "http" or "https" => "Browser", "ssh" => "Ssh", "rdp" => "Rdp", _ => null };
+            if (action != null) DeviceAction?.Invoke(this, new ScanDeviceActionEventArgs(device, action, false, endpoint.Port, endpoint));
+        }
+
         private void ResultsGrid_RightClick(object sender, MouseButtonEventArgs e)
         {
             var row = ItemsControl.ContainerFromElement(ResultsGrid, e.OriginalSource as DependencyObject) as DataGridRow;

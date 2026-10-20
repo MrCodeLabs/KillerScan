@@ -55,6 +55,12 @@ namespace KillerScan.Services
                 if (preset == "Hypervisor")
                 { device.HttpTitle = "VMware ESXi"; device.TlsSubject = "CN=VMware ESXi"; }
                 NetworkScanner.IdentifyDevice(device);
+                device.Access = DeviceAccess.ForDevice(device).ToList();
+                if (preset == "Printer" && device.OpenPorts.Contains(80))
+                {
+                    device.Access.RemoveAll(endpoint => endpoint.Port == 80);
+                    device.Access.Add(new AccessEndpoint { Protocol = "http", Port = 80, Verification = "HttpResponse", HttpStatus = 200, Authentication = "LoginPage" });
+                }
                 if (device.DeviceType != preset) DeviceIdentification.ApplyManualType(device, preset);
             }
         }

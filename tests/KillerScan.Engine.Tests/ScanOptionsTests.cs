@@ -10,6 +10,7 @@ internal static class ScanOptionsTests
     {
         internal readonly ConcurrentDictionary<string, int> Calls = new();
         internal bool FailMulticast;
+        internal HashSet<int> ResponsivePorts = [80, 443, 22];
         private void Hit(string name) => Calls.AddOrUpdate(name, 1, (_, count) => count + 1);
         internal override IReadOnlyDictionary<string, string> ReadNeighbors()
         { Hit("neighbor-cache"); return new Dictionary<string, string> { [Host] = "" }; }
@@ -20,7 +21,7 @@ internal static class ScanOptionsTests
         internal override Task<int?> Ping(IPAddress address, int timeout) { Hit("icmp"); return Task.FromResult<int?>(null); }
         internal override Task<bool> TcpAlive(IPAddress address) { Hit("tcp-liveness"); return Task.FromResult(true); }
         internal override Task<bool> Connect(IPAddress address, int port, int timeout)
-        { Hit("ports"); return Task.FromResult(port is 80 or 443 or 22); }
+        { Hit("ports"); return Task.FromResult(ResponsivePorts.Contains(port)); }
         internal override Task<Dictionary<string, MulticastDiscovery.MdnsInfo>> Mdns(CancellationToken ct)
         {
             Hit("mdns");
@@ -30,7 +31,7 @@ internal static class ScanOptionsTests
         }
         internal override Task<Dictionary<string, string>> Ssdp(CancellationToken ct)
         { Hit("ssdp"); return Task.FromResult(new Dictionary<string, string> { [Host] = "Fixture" }); }
-        internal override Task Http(NetworkDevice device, IPAddress address, bool deep) { Hit("http"); return Task.CompletedTask; }
+        internal override Task Http(NetworkDevice device, IPAddress address, bool deep, CancellationToken token = default) { Hit("http"); return Task.CompletedTask; }
         internal override Task Tls(NetworkDevice device, IPAddress address, bool deep) { Hit("tls"); return Task.CompletedTask; }
         internal override Task Ssh(NetworkDevice device, IPAddress address) { Hit("ssh"); return Task.CompletedTask; }
         internal override Task Snmp(NetworkDevice device, IPAddress address) { Hit("snmp"); return Task.CompletedTask; }
@@ -76,6 +77,16 @@ internal static class ScanOptionsTests
         foreach (string feature in ScanOptions.Features)
             Require(defaults.Calls.ContainsKey(feature), "The existing API still enables " + feature);
         Require(defaults.Calls.ContainsKey("dns-flush"), "The existing API keeps the DNS cache flush.");
+
+        foreach (int port in new[] { 5357, 32400 })
+        {
+            var onlyWeb = new Probes { ResponsivePorts = [port] };
+            await new NetworkScanner(onlyWeb).ScanSubnetAsync(Host, CancellationToken.None);
+            Require(onlyWeb.Calls.ContainsKey("http"), "A service alone on port " + port + " starts the normal HTTP fingerprint.");
+            var disabled = new Probes { ResponsivePorts = [port] };
+            await new NetworkScanner(disabled).ScanSubnetAsync(Host, CancellationToken.None, new ScanOptions().Without("http"));
+            Require(!disabled.Calls.ContainsKey("http"), "The additional web port still respects HTTP off.");
+        }
 
         var probes = new Probes();
         var scanner = new NetworkScanner(probes);

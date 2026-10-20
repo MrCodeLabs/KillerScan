@@ -35,7 +35,8 @@ $module = Get-Module KillerScan
     probe '192.0.2.10' -LocationId '22222222222222222222222222222222'
     if (($script:CapturedArguments -join '|') -ne '/probe|192.0.2.10|/location|22222222222222222222222222222222|/json') { throw 'probe did not forward location identity' }
     $evidence = [pscustomobject]@{Confidence='Low'; Evidence=@([pscustomobject]@{Source='OUI'; Value='Fixture'})}
-    $device = ConvertTo-KsDevice ([pscustomobject]@{LocationId='fixture'; LocationName='Fixture A'; Identification=$evidence})
+    $device = ConvertTo-KsDevice ([pscustomobject]@{LocationId='fixture'; LocationName='Fixture A'; Identification=$evidence; Access=@([pscustomobject]@{Protocol='https'; Port=9187; Authentication='Required'})})
+    if ($device.Access[0].Port -ne 9187 -or $device.Access[0].Authentication -ne 'Required') { throw 'device projection lost access metadata' }
     if ($device.LocationId -ne 'fixture' -or $device.LocationName -ne 'Fixture A') { throw 'device projection lost location metadata' }
     if ($device.Identification.Confidence -ne 'Low' -or $device.Identification.Evidence[0].Source -ne 'OUI') { throw 'device projection lost recognition evidence' }
     $env:KS_LOCATION_ID = '33333333333333333333333333333333'
