@@ -11,7 +11,7 @@ namespace KillerScan.Shell
     // layer and physical key so both views show the same bindings.
     public partial class MainWindow
     {
-        private enum KbLayer { Base, Ctrl, CtrlShift, Shift, CtrlAlt }
+        private enum KbLayer { Base, Ctrl, CtrlShift, Shift, CtrlAlt, AltShift }
 
         private KbLayer _kbLayer = KbLayer.Base;
         private bool _kbHooked;
@@ -21,7 +21,7 @@ namespace KillerScan.Shell
         private static readonly (KbLayer Layer, string Caption)[] KbLayerTabs =
         [
             (KbLayer.Base, "BASE"), (KbLayer.Ctrl, "CTRL"), (KbLayer.CtrlShift, "CTRL+SHIFT"),
-            (KbLayer.Shift, "SHIFT"), (KbLayer.CtrlAlt, "CTRL+ALT"),
+            (KbLayer.Shift, "SHIFT"), (KbLayer.CtrlAlt, "CTRL+ALT"), (KbLayer.AltShift, "ALT+SHIFT"),
         ];
 
         // Light both physical modifier keys for the active layer.
@@ -32,6 +32,7 @@ namespace KillerScan.Shell
             [KbLayer.CtrlShift] = ["Ctrl", "RCtrl", "Shift", "RShift"],
             [KbLayer.Shift] = ["Shift", "RShift"],
             [KbLayer.CtrlAlt] = ["Ctrl", "RCtrl", "Alt", "RAlt"],
+            [KbLayer.AltShift] = ["Alt", "RAlt", "Shift", "RShift"],
         };
 
         // The physical keyboard, moved here from Shortcuts.cs since nothing else in that file
@@ -74,7 +75,7 @@ namespace KillerScan.Shell
             var map = new Dictionary<KbLayer, Dictionary<string, List<(string, string, string)>>>
             {
                 [KbLayer.Base] = [], [KbLayer.Ctrl] = [], [KbLayer.CtrlShift] = [],
-                [KbLayer.Shift] = [], [KbLayer.CtrlAlt] = [],
+                [KbLayer.Shift] = [], [KbLayer.CtrlAlt] = [], [KbLayer.AltShift] = [],
             };
             foreach (var (keys, desc, cat) in ShortcutRows)
             {
@@ -119,6 +120,7 @@ namespace KillerScan.Shell
             else if (ctrl && !shift && !alt) layer = KbLayer.Ctrl;
             else if (shift && !ctrl && !alt) layer = KbLayer.Shift;
             else if (ctrl && alt && !shift) layer = KbLayer.CtrlAlt;
+            else if (alt && shift && !ctrl) layer = KbLayer.AltShift;
             else if (!ctrl && !shift && !alt) layer = KbLayer.Base;
             else return false;
             id = KeyIdFor(keyToken);
@@ -312,6 +314,7 @@ namespace KillerScan.Shell
             var layer = m.HasFlag(ModifierKeys.Control) && m.HasFlag(ModifierKeys.Shift) ? KbLayer.CtrlShift
                       : m.HasFlag(ModifierKeys.Control) && m.HasFlag(ModifierKeys.Alt) ? KbLayer.CtrlAlt
                       : m.HasFlag(ModifierKeys.Control) ? KbLayer.Ctrl
+                      : m.HasFlag(ModifierKeys.Alt) && m.HasFlag(ModifierKeys.Shift) ? KbLayer.AltShift
                       : m.HasFlag(ModifierKeys.Shift) ? KbLayer.Shift
                       : KbLayer.Base;
             if (layer != _kbLayer) SetKbLayer(layer);

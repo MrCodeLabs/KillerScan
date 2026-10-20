@@ -25,6 +25,7 @@ namespace KillerScan.Shell
             _startScanOnLoad = startScanOnLoad;
             _ = Locations.Current;
             InitializeComponent();
+            new KillerFamily.Accessibility.OverlayFocus(this).Track(ShortcutsOverlay, AboutOverlay);
             var titleFrames = System.Windows.Media.Imaging.BitmapDecoder.Create(
                 new System.Uri("pack://application:,,,/Resources/ks-icon.ico"),
                 System.Windows.Media.Imaging.BitmapCreateOptions.None,
@@ -65,6 +66,9 @@ namespace KillerScan.Shell
                 if (_startScanOnLoad && !DemoMode)
                     Dispatcher.BeginInvoke(new Action(() => ActiveScan?.Scan()),
                         System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                // After the first paint, so an update offer never lands before the window (About.cs).
+                Dispatcher.BeginInvoke(new Action(_about.CheckOnStartup),
+                    System.Windows.Threading.DispatcherPriority.Background);
             };
         }
 

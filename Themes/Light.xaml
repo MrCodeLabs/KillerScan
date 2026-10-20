@@ -32,7 +32,7 @@
     <SolidColorBrush x:Key="TextBrush" Color="#1a1a1a" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
     <SolidColorBrush x:Key="MutedTextBrush" Color="#555555" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
     <SolidColorBrush x:Key="ChromeTextBrush" Color="#3a3a3a" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
-    <SolidColorBrush x:Key="DimTextBrush" Color="#666666" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
+    <SolidColorBrush x:Key="DimTextBrush" Color="#616161" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
 
     <SolidColorBrush x:Key="RowAltBrush" Color="#14000000" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
     <SolidColorBrush x:Key="RowHoverBrush" Color="#b2b2b2" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
@@ -117,7 +117,7 @@
     <sys:Double x:Key="PaneShadowOpacity" xmlns:sys="clr-namespace:System;assembly=mscorlib">0.6</sys:Double>
     <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#FFB2B2B2" po:Freeze="True"/>
     <sys:Double x:Key="TitleBarHeight" xmlns:sys="clr-namespace:System;assembly=mscorlib">32</sys:Double>
-    <sys:Double x:Key="BarShadowOpacity" xmlns:sys="clr-namespace:System;assembly=mscorlib">0.38</sys:Double>
+    <sys:Double x:Key="BarShadowOpacity" xmlns:sys="clr-namespace:System;assembly=mscorlib">0.18</sys:Double>
     <SolidColorBrush x:Key="DialogTitleBarBrush" Color="#FFDCDCDC" po:Freeze="True"/>
     <SolidColorBrush x:Key="FooterBackgroundBrush" Color="#FFDCDCDC" po:Freeze="True"/>
     <sys:Double x:Key="FlyoutShadowOpacity" xmlns:sys="clr-namespace:System;assembly=mscorlib">0.55</sys:Double>

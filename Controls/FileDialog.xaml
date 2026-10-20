@@ -7,6 +7,7 @@
 <Window x:Class="KillerScan.Controls.FileDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:a11y="clr-namespace:KillerFamily.Accessibility"
         xmlns:kui="clr-namespace:KillerScan.Controls"
         Title="KillerScan"
         Width="720" Height="520" MinWidth="560" MinHeight="420"
@@ -114,12 +115,14 @@
                                FontSize="{DynamicResource MenuFontSize}" FontWeight="Bold"
                                Foreground="{DynamicResource ChromeTextBrush}"
                                VerticalAlignment="Center" IsHitTestVisible="False"/>
-                    <Button x:Name="CaptionCloseButton" Content="&#xE8BB;" Click="Cancel_Click" AutomationProperties.Name="{DynamicResource Str_Sys_Close}"
+                    <!-- The family overlay and dialog close (App.xaml, OverlayCloseButton): the glyph
+                         reddens on hover without a fill, and 98SE gets the caption button face. -->
+                    <Button x:Name="CaptionCloseButton" Content="{DynamicResource AboutCloseGlyph}" Click="Cancel_Click"
+                            ToolTip="{DynamicResource Str_Sys_Close}" AutomationProperties.Name="{DynamicResource Str_Sys_Close}"
+                            Style="{StaticResource OverlayCloseButton}"
                             HorizontalAlignment="Right" VerticalAlignment="Top"
                             Width="{DynamicResource DialogCloseWidth}" Height="{DynamicResource DialogCloseHeight}"
-                            Margin="{DynamicResource DialogCaptionButtonsMargin}"
-                            FontSize="10" FontFamily="Segoe MDL2 Assets"
-                            Cursor="Hand"/>
+                            Margin="{DynamicResource DialogCaptionButtonsMargin}"/>
                 </Grid>
                 </Grid>
             </Border>
@@ -197,15 +200,15 @@
                                          ItemContainerStyle="{StaticResource PickerMenuItem}">
                                 <MenuItem x:Name="SortNameItem" Header="{DynamicResource Str_Col_Name}"
                                           IsCheckable="True" Click="SortName_Click">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="SortSizeItem" Header="{DynamicResource Str_Col_Size}"
                                           IsCheckable="True" Click="SortSize_Click">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE799;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE799;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="SortModifiedItem" Header="{DynamicResource Str_Col_Modified}"
                                           IsCheckable="True" Click="SortModified_Click">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE787;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE787;"/></MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
                         </Button.ContextMenu>
@@ -262,7 +265,7 @@
                         <ListBox.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="{DynamicResource Str_Menu_UnpinPlace}" Click="UnpinPlace_Click">
-                                    <MenuItem.Icon><TextBlock Text="&#xE77A;" FontFamily="Segoe MDL2 Assets" FontSize="12"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Text="&#xE77A;" FontFamily="Segoe MDL2 Assets" FontSize="12"/></MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
                         </ListBox.ContextMenu>
@@ -310,7 +313,7 @@
                         <TreeView.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="{DynamicResource Str_Menu_PinPlace}" Click="TreePin_Click">
-                                    <MenuItem.Icon><TextBlock Text="&#xE718;" FontFamily="Segoe MDL2 Assets" FontSize="12"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Text="&#xE718;" FontFamily="Segoe MDL2 Assets" FontSize="12"/></MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
                         </TreeView.ContextMenu>
@@ -452,7 +455,7 @@
                                 <ListBox.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{DynamicResource Str_Menu_PinPlace}" Click="FilePin_Click">
-                                            <MenuItem.Icon><TextBlock Text="&#xE718;" FontFamily="Segoe MDL2 Assets" FontSize="12"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Text="&#xE718;" FontFamily="Segoe MDL2 Assets" FontSize="12"/></MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
                                 </ListBox.ContextMenu>
@@ -496,7 +499,7 @@
                                            FontFamily="{DynamicResource UiFont}" FontSize="11"
                                            Foreground="{DynamicResource MutedTextBrush}"/>
                                 <Grid Grid.Row="1" Margin="0,10,0,0">
-                                    <TextBlock x:Name="ImagePreviewPlaceholder" Text="&#xEB9F;"
+                                    <a11y:Glyph x:Name="ImagePreviewPlaceholder" Text="&#xEB9F;"
                                                FontFamily="Segoe MDL2 Assets" FontSize="42"
                                                Foreground="{DynamicResource DimTextBrush}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>

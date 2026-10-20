@@ -16,7 +16,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">アダプターとリンク速度の表示を切り替え</sys:String>
     <sys:String x:Key="Str_Light_Idle">まだスキャンしていません</sys:String>
     <sys:String x:Key="Str_Light_Scanning">スキャン中</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan 実行中</sys:String>
+    <sys:String x:Key="Str_Light_Deep">詳細スキャン実行中</sys:String>
     <sys:String x:Key="Str_Light_Done">スキャン完了</sys:String>
     <sys:String x:Key="Str_TT_Export">エクスポート</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">テーマ</sys:String>
@@ -49,7 +49,7 @@
     <sys:String x:Key="Str_History_Removed">不明</sys:String>
     <sys:String x:Key="Str_History_Changed">変更済み</sys:String>
     <sys:String x:Key="Str_History_FirstScan">この対象の最初のスキャンです。すべてのデバイスが新規です。</sys:String>
-    <sys:String x:Key="Str_History_Summary">追加 {0}、不明 {1}、変更 {2}</sys:String>
+    <sys:String x:Key="Str_History_Summary">追加 {0}、未検出 {1}、変更 {2}</sys:String>
     <sys:String x:Key="Str_History_ViewChanges">変更</sys:String>
     <sys:String x:Key="Str_History_ViewAll">すべてのデバイス</sys:String>
     <sys:String x:Key="Str_History_AllSummary">このスキャンのデバイス数: {0}</sys:String>
@@ -232,11 +232,16 @@
     <sys:String x:Key="Str_Db_Updated">{0} 件に更新しました。</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">データベースを保存できませんでした: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">更新に失敗しました: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">更新が利用可能: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">ダウンロード中...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} をダウンロードしてインストールしますか?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">アプリは終了し、自動的に再起動します。</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">更新が利用可能: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">ダウンロード中...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} をダウンロードしてインストールしますか?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">アプリは終了し、自動的に再起動します。</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">起動時に更新を確認する</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} が利用可能です</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">今すぐダウンロードしてインストールしますか？アプリは終了し、自動的に再起動します。</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">更新</sys:String>
+    <sys:String x:Key="Str_About_NotNow">後で</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">起動時に常に更新を確認する</sys:String>
     <sys:String x:Key="Str_Conflict_Title">インストールの競合</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan が二重にインストールされています。もう一方のユーザー単位のコピーを今すぐ削除しますか?
 
@@ -505,6 +510,10 @@
     <sys:String x:Key="Str_Scroll_Down">下へスクロール</sys:String>
     <sys:String x:Key="Str_Scroll_Left">左へスクロール</sys:String>
     <sys:String x:Key="Str_Scroll_Right">右へスクロール</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">1 ページ上へ</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">1 ページ下へ</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">1 ページ左へ</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">1 ページ右へ</sys:String>
     <sys:String x:Key="Str_Location_Title">拠点</sys:String>
     <sys:String x:Key="Str_Location_Busy">拠点を変更する前に、実行中のスキャンまたはターミナルのコマンドを停止してください。</sys:String>
     <sys:String x:Key="Str_Location_Legacy">従来のデータ（未割り当て）</sys:String>

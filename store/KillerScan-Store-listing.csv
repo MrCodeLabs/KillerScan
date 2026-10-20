@@ -1,5 +1,5 @@
-﻿Field,Type,English,Bangla,Czech,German,Spanish,Hungarian,Italian,Japanese,Kazakh,Turkish,Ukrainian,Vietnamese (Vietnam),Portuguese (Brazil),Polish,Norwegian (Bokmål),Chinese (Simplified),Chinese (Traditional),French,Russian
-ProductName,Text,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan
+﻿Field,Type,English,Bangla,Czech,German,French,Hungarian,Italian,Japanese,Kazakh,Norwegian (Bokmål),Polish,Portuguese (Brazil),Russian,Turkish,Ukrainian,Vietnamese,Chinese (Simplified),Chinese (Traditional)
+ProductName,Text,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan,KillerScan
 Description,Text,"A portable network scanner that discovers reachable IPv4 devices, identifies vendors, and helps you investigate what is running on the network.
 
 Install or run portable. Free, open source, GPLv3. No agent, account, subscription, or ads. The app sends no usage analytics. Network connections explained.
@@ -224,63 +224,63 @@ Von Grund auf privat
 Herstellererkennung und Geräteklassifizierung erfolgen lokal, ohne Nutzungsanalysen oder automatischen Upload von Scanergebnissen. Updates und andere Netzwerkfunktionen stellen externe Verbindungen her. Geschwindigkeitstests übertragen erzeugte Testdaten über speed.killerscan.net. Welche Verbindungen entstehen und was gesendet wird.
 
 Themes & Einstellungen
-Dreizehn live umschaltbare Themes, je acht Akzentfarben für Dark, Light, Black und 98SE (41 Looks insgesamt) sowie gerätetypbezogene Farben. KillerScan merkt sich Theme, Akzent, Sprache und App-Größe. Im Themenmenü lässt sich Filmkorn ein- oder ausschalten.","Un escáner de red portátil que descubre dispositivos IPv4 accesibles, identifica fabricantes y te ayuda a investigar qué está funcionando en la red.
+Dreizehn live umschaltbare Themes, je acht Akzentfarben für Dark, Light, Black und 98SE (41 Looks insgesamt) sowie gerätetypbezogene Farben. KillerScan merkt sich Theme, Akzent, Sprache und App-Größe. Im Themenmenü lässt sich Filmkorn ein- oder ausschalten.","Un scanner réseau portable qui découvre les appareils IPv4 accessibles, identifie leurs fabricants et vous aide à examiner les services du réseau.
 
-Instálalo o usa la versión portátil. Gratis, de código abierto, GPLv3. Sin agente, cuenta, suscripción ni anuncios. La aplicación no envía analíticas de uso. Información sobre las conexiones de red.
+Installez ou lancez la version portable. Gratuit, open source, GPLv3. Sans agent, compte, abonnement ni publicité. L’application n’envoie aucune analyse d’utilisation. Comprendre les connexions réseau.
 
-Descubre hosts
-KillerScan lee la caché ARP, ejecuta sondeos ICMP paralelos con una alternativa TCP y vuelve a leer ARP para encontrar dispositivos que bloquean el ping pero responden a ARP. Los cortafuegos, los dispositivos suspendidos y el aislamiento de red pueden impedir su descubrimiento.
+Découvrir les hôtes
+KillerScan lit le cache ARP, lance des sondes ICMP parallèles avec un recours à TCP, puis relit ARP pour trouver les appareils qui bloquent le ping mais répondent à ARP. Les pare-feu, les appareils en veille et l'isolation réseau peuvent empêcher la découverte.
 
-Clasificación de dispositivos
-Un evaluador ponderado combina nombre de host, fabricante, puertos abiertos, banners, mDNS y SSDP en un tipo estimado más probable: Router, switch/AP, NAS, printer, camera, hypervisor, phone, IoT y más.
+Classification des appareils
+Un évaluateur pondéré combine le nom d'hôte, le fabricant, les ports ouverts, les bannières, le mDNS et le SSDP en un type le plus probable : Router, switch/AP, NAS, printer, camera, hypervisor, phone, IoT et plus.
 
-Identificación de puertos
-Un escaneo de conexión TCP regulado a través de más de 30 puertos de servicio (SSH, RDP, SMB, HTTP, impresión, RTSP, MQTT, hypervisor, NAS y más), con sondas de banner, HTTP, TLS, NetBIOS y SNMP para una identificación más sólida.
+Empreinte des ports
+Un scan de connexion TCP limité sur plus de 30 ports de service (SSH, RDP, SMB, HTTP, impression, RTSP, MQTT, hypervisor, NAS et plus), avec des sondes bannière, HTTP, TLS, NetBIOS et SNMP pour une identification plus fiable.
 
 mDNS & SSDP
-Una pasada de multidifusión en toda la red se ejecuta junto con el barrido. Los tipos de servicio Bonjour y las cadenas SERVER de UPnP revelan Chromecast, impresoras, Sonos, AirPlay, HomeKit, Roku, Plex y equipos Synology.
+Un passage multicast sur l'ensemble du réseau s'exécute parallèlement au balayage. Les types de service Bonjour et les chaînes SERVER UPnP révèlent les Chromecast, imprimantes, Sonos, AirPlay, HomeKit, Roku, Plex et boîtiers Synology.
 
-Identificación de fabricante
-Búsqueda de OUI de MAC por prefijo más largo en los registros completos de IEEE - MA-L, MA-M y MA-S - con anulaciones de marca para bloques que IEEE oculta como ""Private"", y una etiqueta clara para las MAC de privacidad aleatorizadas.
+Identification du fabricant
+Recherche OUI MAC par préfixe le plus long dans les registres IEEE complets - MA-L, MA-M et MA-S - avec des remplacements de marque pour les blocs que l'IEEE masque comme ""Private"", et une étiquette claire pour les MAC de confidentialité aléatoires.
 
-Consciente de gateway & DNS
-La puerta de enlace se etiqueta como Router, DNS Server o Router/DNS - y solo Router/DNS cuando la puerta de enlace realmente es el DNS que configuraste, de modo que un servidor DNS dedicado nunca se etiqueta mal.
+Reconnaissance gateway & DNS
+La passerelle est étiquetée Router, DNS Server ou Router/DNS - et seulement Router/DNS lorsque la passerelle est réellement votre DNS configuré, de sorte qu'un serveur DNS dédié n'est jamais mal étiqueté.
 
-Topología de red
-F8 muestra dispositivos como cuadros móviles, agrupados por función, tipo, dirección o fabricante. El mapa se deduce del escaneo, no del cableado de los switches. Exporta la distribución completa como PNG transparente, JPG con tema o HTML con SVG escalable.
+Topologie du réseau
+F8 dessine les appareils sous forme de blocs déplaçables, regroupés par rôle, type, adresse ou fabricant. La carte est déduite des résultats, pas du câblage des commutateurs. Exportez toute la disposition en PNG transparent, JPG thématisé ou HTML contenant du SVG redimensionnable.
 
 Keep Alive
-Vigila hasta dieciséis dispositivos a la vez, cada uno como una tarjeta con un gráfico de latencia, pérdida de paquetes y su propio registro de eventos de exactamente cuándo se cayó y cuándo volvió. Cada tarjeta lleva sus propias comprobaciones: ruta, DNS directo e inverso, ping, puertos y traceroute. Copia todo directamente en un ticket.
+Surveillez jusqu'à seize appareils à la fois, chacun sous forme de carte avec un graphique de latence, la perte de paquets, et son propre journal d'événements indiquant exactement quand il est tombé et revenu. Chaque carte porte ses propres vérifications : route, DNS direct et inverse, ping, ports et traceroute. Copiez le tout directement dans un ticket.
 
-Terminal integrado
-Un terminal real dentro de la app, que ejecuta PowerShell 7 donde existe, con el prompt de KillerShell y un módulo de KillerScan que convierte un escaneo en objetos que puedes filtrar y canalizar. Las acciones de dispositivo se abren aquí: ping en color, SSH con la cuenta que diste para ese dispositivo.
+Terminal intégré
+Un vrai terminal à l'intérieur de l'application, exécutant PowerShell 7 lorsqu'il est présent, avec l'invite de KillerShell et un module KillerScan qui transforme un scan en objets que vous pouvez filtrer et rediriger. Les actions sur les appareils s'ouvrent ici : ping en couleur, SSH avec le compte que vous avez donné pour cet appareil.
 
-Historial & dispositivos de confianza
-Los escaneos completados en la interfaz que encuentran dispositivos se guardan y comparan con el escaneo anterior del mismo objetivo. Si no hay dispositivos de confianza, el primer escaneo no vacío crea una base de confianza; los posteriores señalan dispositivos desconocidos.
+Historique & appareils de confiance
+Les analyses terminées dans l'interface qui trouvent des appareils sont enregistrées et comparées à l'analyse précédente de la même cible. La première analyse non vide crée une référence de confiance si aucun appareil approuvé n'existe ; les suivantes signalent les appareils inconnus.
 
-Vista de servicios
-F7 muestra una fila por puerto abierto. Encuentra los dispositivos que ofrecen un servicio, ordena o filtra la lista y expórtala como CSV.
+Vue des services
+F7 affiche une ligne par port ouvert plutôt que par appareil. Trouvez les appareils proposant un service, triez ou filtrez la liste et exportez-la en CSV.
 
-Perfiles & deep scan
-Guarda objetivos como perfiles con nombre y luego cárgalos o ejecútalos desde el panel de perfiles. Puedes añadir Deep Scan, que comprueba los puertos 1-1024 y otros puertos de servicio y recoge más datos de identificación. La barra lateral también ofrece KillerSpeed.
+Profils & deep scan
+Enregistrez les cibles dans des profils nommés, puis chargez-les ou lancez-les depuis le panneau des profils. Vous pouvez poursuivre avec une analyse approfondie qui vérifie les ports 1-1024 et d'autres ports de services et recueille davantage d'empreintes. KillerSpeed est disponible dans la barre latérale.
 
-Acciones rápidas
-Haz clic derecho en cualquier dispositivo para copiar su IP, MAC o nombre de host, o saltar directamente a él. Abre su interfaz web, o inicia RDP o SSH directamente, y establece un tipo de dispositivo manual que se mantiene.
+Actions rapides
+Faites un clic droit sur n'importe quel appareil pour copier son IP, sa MAC ou son nom d'hôte, ou y accéder directement. Ouvrez son interface web, ou lancez RDP ou SSH directement, et définissez un type d'appareil manuel qui persiste.
 
-Listo para la línea de comandos
-Instálalo, abre un terminal nuevo y ejecuta killerscan /scan 192.168.50.0/24. El escáner completo funciona sin ventana, con modos rápido y silencioso, exportación a CSV o HTML, cancelación con Ctrl+C y códigos de salida fiables para scripts, tareas programadas y herramientas RMM. Consulta todos los comandos.
+Prêt pour la ligne de commande
+Installez-le, ouvrez un nouveau terminal et lancez killerscan /scan 192.168.50.0/24. Le scanner complet fonctionne sans fenêtre, avec des modes rapide et silencieux, l'export en CSV ou HTML, l'annulation par Ctrl+C et des codes de sortie fiables pour les scripts, les tâches planifiées et les outils RMM. Voir toutes les commandes.
 
-Exportar
-Exportar ofrece CSV de dispositivos o HTML interactivo, CSV de servicios, topología PNG/JPG o HTML con SVG, Keep Alive CSV/HTML/PNG y texto del terminal con su historial.
+Exporter
+Exportez les appareils en CSV ou HTML interactif, les services en CSV, la topologie en PNG/JPG ou HTML avec SVG, Keep Alive en CSV/HTML/PNG et le texte du terminal avec son historique de défilement.
 
-Base de datos de fabricantes
-La base de fabricantes MAC de Wireshark incluida cubre registros MA-L, MA-M y MA-S para búsquedas sin conexión. Usa Actualizar base de fabricantes en Acerca de para descargar una lista más reciente; una copia local antigua no puede sustituir una base incluida más grande.
+Base de données des fabricants
+La base de fabricants MAC Wireshark intégrée couvre les enregistrements MA-L, MA-M et MA-S pour la consultation hors ligne. Actualisez la base des fabricants dans À propos pour télécharger une liste plus récente ; une ancienne copie locale ne peut pas remplacer une base intégrée plus grande.
 
-Privado por diseño
-La identificación de fabricantes y la clasificación de dispositivos se realizan localmente, sin analíticas de uso ni envío automático de resultados de escaneo. Las actualizaciones y otras funciones de red establecen conexiones externas. Las pruebas de velocidad transfieren datos generados a través de speed.killerscan.net. Qué se conecta y qué se envía.
+Privé par conception
+L’identification des fabricants et la classification des appareils s’effectuent localement, sans analyse d’utilisation ni envoi automatique des résultats d’analyse. Les mises à jour et d’autres fonctions réseau établissent des connexions externes. Les tests de débit transfèrent des données générées via speed.killerscan.net. Connexions et données envoyées.
 
-Temas & ajustes
-Trece temas, todos cambiables en vivo, con ocho colores de acento para cada uno de Dark, Light, Black y 98SE (41 aspectos en total) y coloración de dispositivos por tema. KillerScan recuerda el tema, el acento, el idioma y el tamaño de la aplicación. El menú de temas permite activar o desactivar Grano de película.","Hordozható hálózati szkenner, amely elérhető IPv4-eszközöket keres, azonosítja a gyártókat, és segít felderíteni a hálózaton futó szolgáltatásokat.
+Thèmes & réglages
+Treize thèmes commutables en direct, huit couleurs d'accent pour chacun de Dark, Light, Black et 98SE (41 apparences en tout) et une coloration des appareils par thème. KillerScan mémorise le thème, l'accent, la langue et la taille de l'application. Le menu des thèmes permet d'activer ou de désactiver le grain de film.","Hordozható hálózati szkenner, amely elérhető IPv4-eszközöket keres, azonosítja a gyártókat, és segít felderíteni a hálózaton futó szolgáltatásokat.
 
 Telepíthető vagy hordozhatóan futtatható. Ingyenes, nyílt forráskódú, GPLv3. Nincs ügynök, fiók, előfizetés vagy reklám. Az alkalmazás nem küld használati analitikát. A hálózati kapcsolatok ismertetése.
 
@@ -504,7 +504,231 @@ F7 құрылғыға емес, әр ашық портқа бір жол көр�
 Өндірушіні анықтау мен құрылғыларды жіктеу жергілікті орындалады, пайдалану аналитикасы жиналмайды және сканерлеу нәтижелері автоматты жүктеп жіберілмейді. Жаңартулар мен басқа желілік мүмкіндіктер сыртқы қосылымдарды пайдаланады. Жылдамдық сынағы speed.killerscan.net арқылы жасалған сынақ деректерін тасымалдайды. Қайда қосылатынын және не жіберілетінін қараңыз.
 
 Тақырыптар & параметрлер
-Он үш тақырып, барлығы қолданба жұмыс істеп тұрғанда ауысады; Dark, Light, Black және 98SE әрқайсысында сегіз акцент түсі бар - барлығы 41 көрініс - оған қоса әр тақырыпқа тән құрылғы түрлерінің түстері. KillerScan тақырыбыңызды, акцентіңізді, тіліңізді және қолданба өлшемін іске қосулар арасында есте сақтайды. Тақырыптар мәзірінде пленка түйіршігін қосуға немесе өшіруге болады.","Erişilebilir IPv4 cihazlarını bulan, üreticileri tanımlayan ve ağda çalışan hizmetleri incelemenize yardımcı olan taşınabilir ağ tarayıcısı.
+Он үш тақырып, барлығы қолданба жұмыс істеп тұрғанда ауысады; Dark, Light, Black және 98SE әрқайсысында сегіз акцент түсі бар - барлығы 41 көрініс - оған қоса әр тақырыпқа тән құрылғы түрлерінің түстері. KillerScan тақырыбыңызды, акцентіңізді, тіліңізді және қолданба өлшемін іске қосулар арасында есте сақтайды. Тақырыптар мәзірінде пленка түйіршігін қосуға немесе өшіруге болады.","En portabel nettverksskanner som finner tilgjengelige IPv4-enheter, identifiserer produsenter og hjelper deg å undersøke hva som kjører på nettverket.
+
+Installer eller kjør portabelt. Gratis, åpen kildekode, GPLv3. Ingen agent, konto, abonnement eller annonser. Appen sender ingen bruksanalyse. Nettverkstilkoblinger forklart.
+
+Finn verter
+KillerScan leser ARP-bufferen, kjører parallelle ICMP-prober med en TCP-reserve, og leser ARP på nytt for å finne enheter som blokkerer ping, men svarer på ARP. Brannmurer, enheter i dvale og nettverksisolasjon kan hindre oppdagelse.
+
+Enhetsklassifisering
+En vektet poengsetter kombinerer vertsnavn, produsent, åpne porter, bannere, mDNS og SSDP til en beste gjetning på type: Ruter, svitsj/AP, NAS, skriver, kamera, hypervisor, telefon, IoT og mer.
+
+Portfingeravtrykk
+En strupet TCP-tilkoblingsskanning over 30+ tjenesteporter (SSH, RDP, SMB, HTTP, utskrift, RTSP, MQTT, hypervisor, NAS og mer), med banner-, HTTP-, TLS-, NetBIOS- og SNMP-prober for sterkere identifisering.
+
+mDNS & SSDP
+Et multicast-gjennomløp over hele nettverket kjører ved siden av sveipet. Bonjour-tjenestetyper og UPnP SERVER-strenger avslører Chromecast, skrivere, Sonos, AirPlay, HomeKit, Roku, Plex og Synology-bokser.
+
+Produsentidentifisering
+Lengste-prefiks MAC OUI-oppslag over de fullstendige IEEE-registrene - MA-L, MA-M og MA-S - med merkeoverstyringer for blokker IEEE skjuler som «Private», og en tydelig merking av tilfeldige personvern-MAC-er.
+
+Kjenner gateway & DNS
+Gatewayen merkes Ruter, DNS-server eller Ruter/DNS - og bare Ruter/DNS når gatewayen faktisk er din konfigurerte DNS, så en dedikert DNS-server aldri blir feilmerket.
+
+Nettverkstopologi
+F8 tegner enheter som flyttbare bokser, gruppert etter rolle, type, adresse eller produsent. Kartet utledes fra skanneresultater, ikke fra svitsjkabling. Eksporter hele ordningen som gjennomsiktig PNG, temabasert JPG eller HTML med skalerbar SVG.
+
+Keep Alive
+Overvåk opptil seksten enheter samtidig, hver som et kort med ventetidsgraf, pakketap og sin egen hendelseslogg over nøyaktig når den falt ut og kom tilbake. Hvert kort bærer sine egne sjekker: rute, fremover- og omvendt DNS, ping, porter og traceroute. Kopier alt rett inn i en sak.
+
+Innebygd terminal
+En ekte terminal inni appen, som kjører PowerShell 7 der den finnes, med KillerShells ledetekst og en KillerScan-modul som gjør en skanning om til objekter du kan filtrere og pipe. Enhetshandlinger åpnes her: ping i farger, SSH med kontoen du oppga for den enheten.
+
+Logg & klarerte enheter
+Fullførte GUI-skanninger som finner enheter lagres og sammenlignes med forrige skanning av samme mål. Den første ikke-tomme skanningen oppretter en klarert baselinje når det ikke finnes klarerte enheter; senere skanninger flagger ukjente enheter.
+
+Tjenestevisning
+F7 viser én rad per åpen port i stedet for per enhet. Finn hvilke enheter som tilbyr en tjeneste, sorter eller filtrer listen, og eksporter den som CSV.
+
+Profiler & dypskann
+Lagre mål som navngitte profiler, og last inn eller kjør dem fra profilsidepanelet. Følg eventuelt opp med Dypskann, som sjekker port 1-1024 pluss flere tjenesteporter og samler flere fingeravtrykk. KillerSpeed er tilgjengelig i rekken.
+
+Hurtighandlinger
+Høyreklikk på en hvilken som helst enhet for å kopiere IP, MAC eller vertsnavn, eller hoppe rett til den. Åpne nettgrensesnittet, eller start RDP eller SSH direkte, og sett en manuell enhetstype som blir stående.
+
+Klar for kommandolinjen
+Skann flere nettverk, dypprobe én vert, undersøk det aktive nettverket, eller slå opp en MAC-produsent frakoblet. Filtrer og sorter resultatene, velg porter og enhetstyper, sett grenser og tidsavbrudd, vis fremdrift, og skriv ut tabell-, CSV-, JSON- eller temabasert HTML-utdata med pålitelige avslutningskoder for automatisering. Se alle kommandoene.
+
+Eksport
+Bruk Eksporter for enhets-CSV eller interaktiv HTML, tjeneste-CSV, topologi som PNG/JPG eller HTML med SVG, Keep Alive som CSV/HTML/PNG, og terminaltekst inkludert rullehistorikk.
+
+Produsentdatabase
+Den medfølgende Wireshark MAC-produsentdatabasen dekker MA-L-, MA-M- og MA-S-registreringer for frakoblet oppslag. Bruk Oppdater produsentdatabase i Om for å laste ned en nyere liste; en eldre lokal kopi kan ikke erstatte en større medfølgende.
+
+Personvern fra grunnen av
+Produsentidentifisering og enhetsklassifisering kjører lokalt, uten bruksanalyse eller automatisk opplasting av skanneresultater. Oppdateringer og andre nettverksfunksjoner oppretter eksterne tilkoblinger. Hastighetstester overfører genererte data via speed.killerscan.net. Se hva som kobler til og hva som sendes.
+
+Temaer & innstillinger
+Tretten temaer, alle kan byttes live, med åtte aksentfarger hver for Mørk, Lys, Svart og 98SE - 41 uttrykk til sammen - pluss enhetstypefarger per tema. KillerScan husker tema, aksent, språk og appstørrelse mellom kjøringene. Temamenyen kan slå filmkorn av eller på.","Przenośny skaner sieci, który wykrywa dostępne urządzenia IPv4, identyfikuje producentów i pomaga ustalić, co działa w sieci.
+
+Zainstaluj lub uruchom wersję przenośną. Bezpłatny, otwarty kod, GPLv3. Bez agenta, konta, subskrypcji i reklam. Aplikacja nie wysyła analityki użytkowania. Informacje o połączeniach sieciowych.
+
+Wykrywanie hostów
+KillerScan odczytuje pamięć ARP, wykonuje równoległe próby ICMP z zapasowym TCP i ponownie odczytuje ARP, aby znaleźć urządzenia blokujące ping, ale odpowiadające na ARP. Zapory, uśpione urządzenia i izolacja sieci mogą uniemożliwić wykrycie.
+
+Klasyfikacja urządzeń
+Ważony klasyfikator łączy nazwę hosta, producenta, otwarte porty, banery, mDNS i SSDP w najbardziej prawdopodobny typ: router, przełącznik/AP, NAS, drukarka, kamera, hiperwizor, telefon, IoT i inne.
+
+Identyfikacja po portach
+Ograniczane skanowanie połączeniami TCP na ponad 30 portach usług (SSH, RDP, SMB, HTTP, drukowanie, RTSP, MQTT, hiperwizory, NAS i inne), z sondami banerów, HTTP, TLS, NetBIOS i SNMP dla pewniejszej identyfikacji.
+
+mDNS i SSDP
+Równolegle ze skanowaniem przebiega multicastowy przegląd całej sieci. Typy usług Bonjour i łańcuchy SERVER z UPnP ujawniają urządzenia Chromecast, drukarki, Sonos, AirPlay, HomeKit, Roku, Plex i urządzenia Synology.
+
+Identyfikacja producenta
+Wyszukiwanie MAC OUI po najdłuższym prefiksie w pełnych rejestrach IEEE - MA-L, MA-M i MA-S - z ręcznymi korektami marek dla bloków, które IEEE ukrywa jako ""Private"", oraz czytelną etykietą dla losowych adresów MAC chroniących prywatność.
+
+Rozpoznaje bramę i DNS
+Brama jest oznaczana jako Router, Serwer DNS lub Router/DNS - a jako Router/DNS tylko wtedy, gdy brama naprawdę jest Twoim skonfigurowanym DNS, więc dedykowany serwer DNS nigdy nie dostaje błędnej etykiety.
+
+Topologia sieci
+F8 pokazuje urządzenia jako przesuwalne pola, pogrupowane według roli, typu, adresu lub producenta. Mapa wynika ze skanowania, nie z okablowania przełączników. Eksportuj cały układ jako przezroczysty PNG, JPG z motywem lub HTML ze skalowalnym SVG.
+
+Keep Alive
+Obserwuj do szesnastu urządzeń naraz, każde jako karta z wykresem opóźnień, utratą pakietów i własnym dziennikiem zdarzeń pokazującym dokładnie, kiedy padło i kiedy wróciło. Każda karta ma własne testy: trasę, DNS w przód i wstecz, ping, porty i traceroute. Skopiuj całość prosto do zgłoszenia.
+
+Wbudowany terminal
+Prawdziwy terminal wewnątrz aplikacji, uruchamiający PowerShell 7 tam, gdzie jest dostępny, z wierszem poleceń KillerShell i modułem KillerScan, który zamienia skanowanie w obiekty, które można filtrować i przekazywać dalej. Tutaj otwierają się akcje na urządzeniach: ping w kolorze, SSH z kontem podanym dla danego urządzenia.
+
+Historia i zaufane urządzenia
+Ukończone skanowania w interfejsie, które znalazły urządzenia, są zapisywane i porównywane z poprzednim skanowaniem tego samego celu. Jeśli nie ma zaufanych urządzeń, pierwsze niepuste skanowanie tworzy zaufaną bazę; kolejne oznaczają nieznane urządzenia.
+
+Widok usług
+F7 pokazuje po jednym wierszu na otwarty port. Znajdź urządzenia oferujące usługę, posortuj lub przefiltruj listę i wyeksportuj ją do CSV.
+
+Profile i głębokie skanowanie
+Zapisz cele jako nazwane profile, a następnie wczytaj lub uruchom je z panelu profili. Opcjonalny Deep Scan sprawdza porty 1-1024 oraz dodatkowe porty usług i zbiera więcej danych identyfikacyjnych. Na pasku bocznym dostępny jest też KillerSpeed.
+
+Szybkie akcje
+Kliknij dowolne urządzenie prawym przyciskiem, aby skopiować jego IP, MAC lub nazwę hosta, albo przejść prosto do niego. Otwórz jego interfejs WWW, uruchom bezpośrednio RDP lub SSH i ustaw ręczny typ urządzenia, który zostaje zapamiętany.
+
+Gotowy na wiersz poleceń
+Zainstaluj go, otwórz nowy terminal i uruchom killerscan /scan 192.168.50.0/24. Pełny skaner działa bez okna, z trybem szybkim i cichym, eksportem do CSV lub HTML, anulowaniem przez Ctrl+C i niezawodnymi kodami wyjścia dla skryptów, zaplanowanych zadań i narzędzi RMM. Zobacz wszystkie polecenia.
+
+Eksport
+Eksport oferuje CSV urządzeń lub interaktywny HTML, CSV usług, topologię PNG/JPG lub HTML z SVG, Keep Alive CSV/HTML/PNG oraz tekst terminala wraz z historią przewijania.
+
+Baza producentów
+Wbudowana baza producentów MAC Wireshark obejmuje rejestracje MA-L, MA-M i MA-S do wyszukiwania offline. Użyj odświeżania bazy producentów w oknie O programie, aby pobrać nowszą listę; starsza lokalna kopia nie zastąpi większej bazy wbudowanej.
+
+Prywatność w założeniu
+Rozpoznawanie producentów i klasyfikowanie urządzeń odbywa się lokalnie, bez analityki użytkowania i automatycznego przesyłania wyników skanowania. Aktualizacje i inne funkcje sieciowe nawiązują połączenia zewnętrzne. Testy prędkości przesyłają wygenerowane dane przez speed.killerscan.net. Co się łączy i jakie dane wysyła.
+
+Motywy i ustawienia
+Trzynaście motywów przełączanych na żywo, po osiem kolorów akcentu dla motywów Dark, Light, Black i 98SE (łącznie 41 wyglądów) oraz kolorowanie typów urządzeń zależne od motywu. KillerScan pamięta Twój motyw, akcent, język i rozmiar aplikacji między uruchomieniami. Menu motywów pozwala włączyć lub wyłączyć ziarno filmowe.","Um scanner de rede portátil que descobre dispositivos IPv4 acessíveis, identifica fabricantes e ajuda a investigar o que está rodando na rede.
+
+Instale ou execute como portátil. Gratuito, código aberto, GPLv3. Sem agente, conta, assinatura ou anúncios. O aplicativo não envia análise de uso. Conexões de rede explicadas.
+
+Descobrir hosts
+O KillerScan lê o cache ARP, executa sondas ICMP paralelas com um recurso alternativo por TCP e lê o ARP de novo para achar dispositivos que bloqueiam o ping, mas respondem ao ARP. Firewalls, dispositivos em repouso e isolamento de rede podem impedir a descoberta.
+
+Classificação de dispositivos
+Um pontuador ponderado combina hostname, fabricante, portas abertas, banners, mDNS e SSDP em um palpite de tipo: roteador, switch/AP, NAS, impressora, câmera, hypervisor, celular, IoT e mais.
+
+Identificação por portas
+Uma varredura de conexão TCP limitada em mais de 30 portas de serviço (SSH, RDP, SMB, HTTP, impressão, RTSP, MQTT, hypervisor, NAS e mais), com sondas de banner, HTTP, TLS, NetBIOS e SNMP para uma identificação mais forte.
+
+mDNS & SSDP
+Uma passagem multicast em toda a rede roda junto com a varredura. Tipos de serviço Bonjour e strings SERVER de UPnP revelam Chromecasts, impressoras, Sonos, AirPlay, HomeKit, Roku, Plex e caixas Synology.
+
+Identificação de fabricantes
+Consulta de OUI de MAC pelo prefixo mais longo em todos os registros completos do IEEE - MA-L, MA-M e MA-S - com marcas forçadas para blocos que o IEEE oculta como “Private” e um rótulo claro para MACs de privacidade aleatórios.
+
+Ciente de gateway & DNS
+O gateway é rotulado como Roteador, Servidor DNS ou Roteador/DNS - e só como Roteador/DNS quando o gateway realmente é o seu DNS configurado, de modo que um servidor DNS dedicado nunca seja rotulado errado.
+
+Topologia de rede
+F8 desenha dispositivos como caixas móveis, agrupadas por função, tipo, endereço ou fabricante. O mapa é inferido dos resultados da varredura, não da cablagem dos switches. Exporte o arranjo completo como PNG transparente, JPG com tema ou HTML contendo SVG escalável.
+
+Keep Alive
+Monitore até dezesseis dispositivos ao mesmo tempo, cada um como um cartão com gráfico de latência, perda de pacotes e seu próprio registro de eventos de exatamente quando caiu e voltou. Cada cartão traz suas próprias verificações: rota, DNS direto e reverso, ping, portas e traceroute. Copie tudo direto para um chamado.
+
+Terminal embutido
+Um terminal de verdade dentro do aplicativo, executando o PowerShell 7 onde existir, com o prompt do KillerShell e um módulo do KillerScan que transforma uma varredura em objetos que você pode filtrar e encadear. As ações de dispositivo abrem aqui: ping em cores, SSH com a conta que você informou para esse dispositivo.
+
+Histórico & dispositivos confiáveis
+As varreduras concluídas na interface gráfica que encontram dispositivos são salvas e comparadas com a varredura anterior do mesmo destino. A primeira varredura não vazia cria uma linha de base confiável quando não existem dispositivos confiáveis; as varreduras seguintes sinalizam dispositivos desconhecidos.
+
+Visualização de serviços
+F7 mostra uma linha por porta aberta em vez de por dispositivo. Descubra quais dispositivos oferecem um serviço, ordene ou filtre a lista e exporte-a como CSV.
+
+Perfis & varredura profunda
+Salve destinos como perfis nomeados e depois carregue-os ou execute-os pela barra lateral de perfis. Opcionalmente, siga com a Varredura Profunda, que verifica as portas 1-1024 mais portas de serviço adicionais e coleta mais identificações. O KillerSpeed está disponível na barra lateral.
+
+Ações rápidas
+Clique com o botão direito em qualquer dispositivo para copiar seu IP, MAC ou hostname, ou ir direto a ele. Abra sua interface web, inicie RDP ou SSH diretamente e defina um tipo de dispositivo manual que permanece.
+
+Pronto para a linha de comando
+Escaneie várias redes, sonde um host a fundo, inspecione a rede ativa ou resolva um fabricante de MAC offline. Filtre e ordene os resultados, selecione portas e tipos de dispositivo, defina limites e tempos limite, mostre o progresso e emita saída em tabela, CSV, JSON ou HTML com tema, com códigos de saída confiáveis para automação. Veja todos os comandos.
+
+Exportação
+Use Exportar para CSV de dispositivos ou HTML interativo, CSV de serviços, topologia em PNG/JPG ou HTML com SVG, Keep Alive em CSV/HTML/PNG e texto do terminal, incluindo o histórico de rolagem.
+
+Banco de dados de fabricantes
+O banco de dados de fabricantes de MAC do Wireshark embutido cobre os registros MA-L, MA-M e MA-S para consulta offline. Use Atualizar banco de dados de fabricantes em Sobre para baixar uma lista mais nova; uma cópia local mais antiga não pode substituir um pacote maior.
+
+Privado por princípio
+A identificação de fabricantes e a classificação de dispositivos rodam localmente, sem análise de uso e sem envio automático de resultados de varredura. Atualizações e outros recursos de rede fazem conexões externas. Os testes de velocidade transferem dados gerados por speed.killerscan.net. Veja o que se conecta e o que é enviado.
+
+Temas & configurações
+Treze temas, todos alternáveis ao vivo, com oito cores de destaque cada para Escuro, Claro, Preto e 98SE - 41 aparências no total - mais coloração de tipos de dispositivo por tema. O KillerScan lembra seu tema, destaque, idioma e tamanho do aplicativo entre execuções. O menu de temas permite ativar ou desativar o grão de filme.","Портативный сетевой сканер, который находит доступные устройства IPv4, определяет производителей и помогает выяснить, что работает в сети.
+
+Установите или запустите портативную версию. Бесплатно, открытый код, GPLv3. Без агента, учетной записи, подписки и рекламы. Приложение не отправляет аналитику использования. О сетевых подключениях.
+
+Обнаружение узлов
+KillerScan читает ARP-кэш, выполняет параллельные ICMP-запросы с резервной проверкой TCP и снова читает ARP, находя устройства, которые блокируют ping, но отвечают по ARP. Брандмауэры, спящие устройства и изоляция сети могут мешать обнаружению.
+
+Классификация устройств
+Взвешенная система очков объединяет имя узла, производителя, открытые порты, баннеры, mDNS и SSDP в наиболее вероятный тип: маршрутизатор, коммутатор/точка доступа, NAS, принтер, камера, гипервизор, телефон, IoT и другие.
+
+Фингерпринтинг портов
+Дозированное TCP-сканирование методом connect по более чем 30 служебным портам (SSH, RDP, SMB, HTTP, печать, RTSP, MQTT, гипервизоры, NAS и другие) с зондами баннеров, HTTP, TLS, NetBIOS и SNMP для более надежной идентификации.
+
+mDNS & SSDP
+Общесетевой multicast-проход выполняется параллельно с обходом. Типы служб Bonjour и строки SERVER из UPnP выдают Chromecast, принтеры, Sonos, AirPlay, HomeKit, Roku, Plex и устройства Synology.
+
+Определение производителя
+Поиск MAC OUI по самому длинному префиксу во всех реестрах IEEE - MA-L, MA-M и MA-S - с ручными поправками для блоков, которые IEEE скрывает как ""Private"", и понятной пометкой для случайных приватных MAC.
+
+Учитывает шлюз & DNS
+Шлюз помечается как Маршрутизатор, DNS-сервер или Маршрутизатор/DNS - причем Маршрутизатор/DNS только тогда, когда шлюз действительно является вашим настроенным DNS, так что выделенный DNS-сервер никогда не получит неверную метку.
+
+Топология сети
+F8 показывает устройства как перемещаемые блоки, сгруппированные по роли, типу, адресу или производителю. Карта строится по результатам сканирования, а не по соединениям коммутаторов. Экспортируйте всю схему в прозрачный PNG, JPG с текущей темой или HTML с масштабируемым SVG.
+
+Keep Alive
+Наблюдайте до шестнадцати устройств одновременно, каждое как карточка с графиком задержки, потерей пакетов и собственным журналом событий о том, когда именно оно пропало и вернулось. Каждая карточка несёт свои собственные проверки: маршрут, прямой и обратный DNS, ping, порты и traceroute. Скопируйте всё это прямо в тикет.
+
+Встроенный терминал
+Настоящий терминал внутри приложения, работающий на PowerShell 7 там, где он есть, с промптом KillerShell и модулем KillerScan, который превращает сканирование в объекты, которые можно фильтровать и передавать по конвейеру. Здесь же открываются действия с устройством: ping в цвете, SSH с учётной записью, которую вы задали для этого устройства.
+
+История и доверенные устройства
+Завершенные сканирования в интерфейсе, нашедшие устройства, сохраняются и сравниваются с предыдущим сканированием той же цели. Если доверенных устройств еще нет, первое непустое сканирование создает доверенную основу; последующие отмечают незнакомые устройства.
+
+Вид служб
+F7 показывает отдельную строку для каждого открытого порта. Находите устройства с нужной службой, сортируйте или фильтруйте список и экспортируйте его в CSV.
+
+Профили и Deep Scan
+Сохраняйте цели как именованные профили, затем загружайте или запускайте их с боковой панели профилей. При желании добавьте Deep Scan: проверку портов 1-1024 и дополнительных служебных портов с более подробным определением устройств. На боковой панели также есть KillerSpeed.
+
+Быстрые действия
+Щелкните устройство правой кнопкой, чтобы скопировать его IP, MAC или имя узла, либо сразу перейти к нему. Откройте его веб-интерфейс или запустите RDP или SSH напрямую и задайте вручную тип устройства, который сохранится.
+
+Готов к командной строке
+Сканируйте несколько сетей, глубоко зондируйте один узел, изучайте активную сеть или определяйте производителя по MAC офлайн. Фильтруйте и сортируйте результаты, выбирайте порты и типы устройств, задавайте лимиты и тайм-ауты, показывайте прогресс и выводите таблицу, CSV, JSON или HTML с темами - с надежными кодами завершения для автоматизации. Полный список команд.
+
+Экспорт
+Экспорт предлагает CSV устройств или интерактивный HTML, CSV служб, топологию в PNG/JPG или HTML с SVG, Keep Alive в CSV/HTML/PNG и текст терминала вместе с историей вывода.
+
+База производителей
+Встроенная база производителей MAC из Wireshark охватывает регистрации MA-L, MA-M и MA-S для поиска офлайн. Обновить список можно командой обновления базы производителей в окне «О программе». Более старый локальный список не заменит более крупную встроенную базу.
+
+Приватность по замыслу
+Определение производителей и типов устройств выполняется локально, без аналитики использования и автоматической отправки результатов сканирования. Обновления и другие сетевые функции используют внешние подключения. Тест скорости передает сгенерированные данные через speed.killerscan.net. Какие подключения используются и что передается.
+
+Темы & настройки
+Тринадцать тем, все переключаются на лету, с восемью акцентными цветами для каждой из тем Темная, Светлая, Черная и 98SE - всего 41 вариант оформления - плюс раскраска типов устройств для каждой темы. KillerScan запоминает тему, акцент, язык и размер приложения между запусками. В меню тем можно включить или выключить зернистость плёнки.","Erişilebilir IPv4 cihazlarını bulan, üreticileri tanımlayan ve ağda çalışan hizmetleri incelemenize yardımcı olan taşınabilir ağ tarayıcısı.
 
 Kurun veya taşınabilir olarak çalıştırın. Ücretsiz, açık kaynaklı, GPLv3. Ajan, hesap, abonelik veya reklam yok. Uygulama kullanım analitiği göndermez. Ağ bağlantılarının açıklaması.
 
@@ -672,175 +896,7 @@ Riêng tư theo thiết kế
 Nhận dạng nhà cung cấp và phân loại thiết bị được thực hiện cục bộ, không có phân tích sử dụng hoặc tải lên kết quả quét tự động. Các cập nhật và tính năng mạng khác tạo kết nối ra bên ngoài. Các bài kiểm tra tốc độ truyền dữ liệu được tạo qua speed.killerscan.net. Xem những gì được kết nối và những gì được gửi.
 
 Chủ đề & bối cảnh
-Mười ba chủ đề, tất cả có thể chuyển đổi trực tiếp, với tám màu nhấn cho mỗi Dark, Light, Black và 98SE - tổng cộng 41 giao diện - cùng với việc tô màu theo loại thiết bị cho từng chủ đề. KillerScan ghi nhớ chủ đề, màu nhấn, ngôn ngữ và kích thước ứng dụng của bạn giữa các lần chạy. Menu chủ đề cho phép bật hoặc tắt hạt phim.","Um scanner de rede portátil que descobre dispositivos IPv4 acessíveis, identifica fabricantes e ajuda a investigar o que está rodando na rede.
-
-Instale ou execute como portátil. Gratuito, código aberto, GPLv3. Sem agente, conta, assinatura ou anúncios. O aplicativo não envia análise de uso. Conexões de rede explicadas.
-
-Descobrir hosts
-O KillerScan lê o cache ARP, executa sondas ICMP paralelas com um recurso alternativo por TCP e lê o ARP de novo para achar dispositivos que bloqueiam o ping, mas respondem ao ARP. Firewalls, dispositivos em repouso e isolamento de rede podem impedir a descoberta.
-
-Classificação de dispositivos
-Um pontuador ponderado combina hostname, fabricante, portas abertas, banners, mDNS e SSDP em um palpite de tipo: roteador, switch/AP, NAS, impressora, câmera, hypervisor, celular, IoT e mais.
-
-Identificação por portas
-Uma varredura de conexão TCP limitada em mais de 30 portas de serviço (SSH, RDP, SMB, HTTP, impressão, RTSP, MQTT, hypervisor, NAS e mais), com sondas de banner, HTTP, TLS, NetBIOS e SNMP para uma identificação mais forte.
-
-mDNS & SSDP
-Uma passagem multicast em toda a rede roda junto com a varredura. Tipos de serviço Bonjour e strings SERVER de UPnP revelam Chromecasts, impressoras, Sonos, AirPlay, HomeKit, Roku, Plex e caixas Synology.
-
-Identificação de fabricantes
-Consulta de OUI de MAC pelo prefixo mais longo em todos os registros completos do IEEE - MA-L, MA-M e MA-S - com marcas forçadas para blocos que o IEEE oculta como “Private” e um rótulo claro para MACs de privacidade aleatórios.
-
-Ciente de gateway & DNS
-O gateway é rotulado como Roteador, Servidor DNS ou Roteador/DNS - e só como Roteador/DNS quando o gateway realmente é o seu DNS configurado, de modo que um servidor DNS dedicado nunca seja rotulado errado.
-
-Topologia de rede
-F8 desenha dispositivos como caixas móveis, agrupadas por função, tipo, endereço ou fabricante. O mapa é inferido dos resultados da varredura, não da cablagem dos switches. Exporte o arranjo completo como PNG transparente, JPG com tema ou HTML contendo SVG escalável.
-
-Keep Alive
-Monitore até dezesseis dispositivos ao mesmo tempo, cada um como um cartão com gráfico de latência, perda de pacotes e seu próprio registro de eventos de exatamente quando caiu e voltou. Cada cartão traz suas próprias verificações: rota, DNS direto e reverso, ping, portas e traceroute. Copie tudo direto para um chamado.
-
-Terminal embutido
-Um terminal de verdade dentro do aplicativo, executando o PowerShell 7 onde existir, com o prompt do KillerShell e um módulo do KillerScan que transforma uma varredura em objetos que você pode filtrar e encadear. As ações de dispositivo abrem aqui: ping em cores, SSH com a conta que você informou para esse dispositivo.
-
-Histórico & dispositivos confiáveis
-As varreduras concluídas na interface gráfica que encontram dispositivos são salvas e comparadas com a varredura anterior do mesmo destino. A primeira varredura não vazia cria uma linha de base confiável quando não existem dispositivos confiáveis; as varreduras seguintes sinalizam dispositivos desconhecidos.
-
-Visualização de serviços
-F7 mostra uma linha por porta aberta em vez de por dispositivo. Descubra quais dispositivos oferecem um serviço, ordene ou filtre a lista e exporte-a como CSV.
-
-Perfis & varredura profunda
-Salve destinos como perfis nomeados e depois carregue-os ou execute-os pela barra lateral de perfis. Opcionalmente, siga com a Varredura Profunda, que verifica as portas 1-1024 mais portas de serviço adicionais e coleta mais identificações. O KillerSpeed está disponível na barra lateral.
-
-Ações rápidas
-Clique com o botão direito em qualquer dispositivo para copiar seu IP, MAC ou hostname, ou ir direto a ele. Abra sua interface web, inicie RDP ou SSH diretamente e defina um tipo de dispositivo manual que permanece.
-
-Pronto para a linha de comando
-Escaneie várias redes, sonde um host a fundo, inspecione a rede ativa ou resolva um fabricante de MAC offline. Filtre e ordene os resultados, selecione portas e tipos de dispositivo, defina limites e tempos limite, mostre o progresso e emita saída em tabela, CSV, JSON ou HTML com tema, com códigos de saída confiáveis para automação. Veja todos os comandos.
-
-Exportação
-Use Exportar para CSV de dispositivos ou HTML interativo, CSV de serviços, topologia em PNG/JPG ou HTML com SVG, Keep Alive em CSV/HTML/PNG e texto do terminal, incluindo o histórico de rolagem.
-
-Banco de dados de fabricantes
-O banco de dados de fabricantes de MAC do Wireshark embutido cobre os registros MA-L, MA-M e MA-S para consulta offline. Use Atualizar banco de dados de fabricantes em Sobre para baixar uma lista mais nova; uma cópia local mais antiga não pode substituir um pacote maior.
-
-Privado por princípio
-A identificação de fabricantes e a classificação de dispositivos rodam localmente, sem análise de uso e sem envio automático de resultados de varredura. Atualizações e outros recursos de rede fazem conexões externas. Os testes de velocidade transferem dados gerados por speed.killerscan.net. Veja o que se conecta e o que é enviado.
-
-Temas & configurações
-Treze temas, todos alternáveis ao vivo, com oito cores de destaque cada para Escuro, Claro, Preto e 98SE - 41 aparências no total - mais coloração de tipos de dispositivo por tema. O KillerScan lembra seu tema, destaque, idioma e tamanho do aplicativo entre execuções. O menu de temas permite ativar ou desativar o grão de filme.","Przenośny skaner sieci, który wykrywa dostępne urządzenia IPv4, identyfikuje producentów i pomaga ustalić, co działa w sieci.
-
-Zainstaluj lub uruchom wersję przenośną. Bezpłatny, otwarty kod, GPLv3. Bez agenta, konta, subskrypcji i reklam. Aplikacja nie wysyła analityki użytkowania. Informacje o połączeniach sieciowych.
-
-Wykrywanie hostów
-KillerScan odczytuje pamięć ARP, wykonuje równoległe próby ICMP z zapasowym TCP i ponownie odczytuje ARP, aby znaleźć urządzenia blokujące ping, ale odpowiadające na ARP. Zapory, uśpione urządzenia i izolacja sieci mogą uniemożliwić wykrycie.
-
-Klasyfikacja urządzeń
-Ważony klasyfikator łączy nazwę hosta, producenta, otwarte porty, banery, mDNS i SSDP w najbardziej prawdopodobny typ: router, przełącznik/AP, NAS, drukarka, kamera, hiperwizor, telefon, IoT i inne.
-
-Identyfikacja po portach
-Ograniczane skanowanie połączeniami TCP na ponad 30 portach usług (SSH, RDP, SMB, HTTP, drukowanie, RTSP, MQTT, hiperwizory, NAS i inne), z sondami banerów, HTTP, TLS, NetBIOS i SNMP dla pewniejszej identyfikacji.
-
-mDNS i SSDP
-Równolegle ze skanowaniem przebiega multicastowy przegląd całej sieci. Typy usług Bonjour i łańcuchy SERVER z UPnP ujawniają urządzenia Chromecast, drukarki, Sonos, AirPlay, HomeKit, Roku, Plex i urządzenia Synology.
-
-Identyfikacja producenta
-Wyszukiwanie MAC OUI po najdłuższym prefiksie w pełnych rejestrach IEEE - MA-L, MA-M i MA-S - z ręcznymi korektami marek dla bloków, które IEEE ukrywa jako ""Private"", oraz czytelną etykietą dla losowych adresów MAC chroniących prywatność.
-
-Rozpoznaje bramę i DNS
-Brama jest oznaczana jako Router, Serwer DNS lub Router/DNS - a jako Router/DNS tylko wtedy, gdy brama naprawdę jest Twoim skonfigurowanym DNS, więc dedykowany serwer DNS nigdy nie dostaje błędnej etykiety.
-
-Topologia sieci
-F8 pokazuje urządzenia jako przesuwalne pola, pogrupowane według roli, typu, adresu lub producenta. Mapa wynika ze skanowania, nie z okablowania przełączników. Eksportuj cały układ jako przezroczysty PNG, JPG z motywem lub HTML ze skalowalnym SVG.
-
-Keep Alive
-Obserwuj do szesnastu urządzeń naraz, każde jako karta z wykresem opóźnień, utratą pakietów i własnym dziennikiem zdarzeń pokazującym dokładnie, kiedy padło i kiedy wróciło. Każda karta ma własne testy: trasę, DNS w przód i wstecz, ping, porty i traceroute. Skopiuj całość prosto do zgłoszenia.
-
-Wbudowany terminal
-Prawdziwy terminal wewnątrz aplikacji, uruchamiający PowerShell 7 tam, gdzie jest dostępny, z wierszem poleceń KillerShell i modułem KillerScan, który zamienia skanowanie w obiekty, które można filtrować i przekazywać dalej. Tutaj otwierają się akcje na urządzeniach: ping w kolorze, SSH z kontem podanym dla danego urządzenia.
-
-Historia i zaufane urządzenia
-Ukończone skanowania w interfejsie, które znalazły urządzenia, są zapisywane i porównywane z poprzednim skanowaniem tego samego celu. Jeśli nie ma zaufanych urządzeń, pierwsze niepuste skanowanie tworzy zaufaną bazę; kolejne oznaczają nieznane urządzenia.
-
-Widok usług
-F7 pokazuje po jednym wierszu na otwarty port. Znajdź urządzenia oferujące usługę, posortuj lub przefiltruj listę i wyeksportuj ją do CSV.
-
-Profile i głębokie skanowanie
-Zapisz cele jako nazwane profile, a następnie wczytaj lub uruchom je z panelu profili. Opcjonalny Deep Scan sprawdza porty 1-1024 oraz dodatkowe porty usług i zbiera więcej danych identyfikacyjnych. Na pasku bocznym dostępny jest też KillerSpeed.
-
-Szybkie akcje
-Kliknij dowolne urządzenie prawym przyciskiem, aby skopiować jego IP, MAC lub nazwę hosta, albo przejść prosto do niego. Otwórz jego interfejs WWW, uruchom bezpośrednio RDP lub SSH i ustaw ręczny typ urządzenia, który zostaje zapamiętany.
-
-Gotowy na wiersz poleceń
-Zainstaluj go, otwórz nowy terminal i uruchom killerscan /scan 192.168.50.0/24. Pełny skaner działa bez okna, z trybem szybkim i cichym, eksportem do CSV lub HTML, anulowaniem przez Ctrl+C i niezawodnymi kodami wyjścia dla skryptów, zaplanowanych zadań i narzędzi RMM. Zobacz wszystkie polecenia.
-
-Eksport
-Eksport oferuje CSV urządzeń lub interaktywny HTML, CSV usług, topologię PNG/JPG lub HTML z SVG, Keep Alive CSV/HTML/PNG oraz tekst terminala wraz z historią przewijania.
-
-Baza producentów
-Wbudowana baza producentów MAC Wireshark obejmuje rejestracje MA-L, MA-M i MA-S do wyszukiwania offline. Użyj odświeżania bazy producentów w oknie O programie, aby pobrać nowszą listę; starsza lokalna kopia nie zastąpi większej bazy wbudowanej.
-
-Prywatność w założeniu
-Rozpoznawanie producentów i klasyfikowanie urządzeń odbywa się lokalnie, bez analityki użytkowania i automatycznego przesyłania wyników skanowania. Aktualizacje i inne funkcje sieciowe nawiązują połączenia zewnętrzne. Testy prędkości przesyłają wygenerowane dane przez speed.killerscan.net. Co się łączy i jakie dane wysyła.
-
-Motywy i ustawienia
-Trzynaście motywów przełączanych na żywo, po osiem kolorów akcentu dla motywów Dark, Light, Black i 98SE (łącznie 41 wyglądów) oraz kolorowanie typów urządzeń zależne od motywu. KillerScan pamięta Twój motyw, akcent, język i rozmiar aplikacji między uruchomieniami. Menu motywów pozwala włączyć lub wyłączyć ziarno filmowe.","En portabel nettverksskanner som finner tilgjengelige IPv4-enheter, identifiserer produsenter og hjelper deg å undersøke hva som kjører på nettverket.
-
-Installer eller kjør portabelt. Gratis, åpen kildekode, GPLv3. Ingen agent, konto, abonnement eller annonser. Appen sender ingen bruksanalyse. Nettverkstilkoblinger forklart.
-
-Finn verter
-KillerScan leser ARP-bufferen, kjører parallelle ICMP-prober med en TCP-reserve, og leser ARP på nytt for å finne enheter som blokkerer ping, men svarer på ARP. Brannmurer, enheter i dvale og nettverksisolasjon kan hindre oppdagelse.
-
-Enhetsklassifisering
-En vektet poengsetter kombinerer vertsnavn, produsent, åpne porter, bannere, mDNS og SSDP til en beste gjetning på type: Ruter, svitsj/AP, NAS, skriver, kamera, hypervisor, telefon, IoT og mer.
-
-Portfingeravtrykk
-En strupet TCP-tilkoblingsskanning over 30+ tjenesteporter (SSH, RDP, SMB, HTTP, utskrift, RTSP, MQTT, hypervisor, NAS og mer), med banner-, HTTP-, TLS-, NetBIOS- og SNMP-prober for sterkere identifisering.
-
-mDNS & SSDP
-Et multicast-gjennomløp over hele nettverket kjører ved siden av sveipet. Bonjour-tjenestetyper og UPnP SERVER-strenger avslører Chromecast, skrivere, Sonos, AirPlay, HomeKit, Roku, Plex og Synology-bokser.
-
-Produsentidentifisering
-Lengste-prefiks MAC OUI-oppslag over de fullstendige IEEE-registrene - MA-L, MA-M og MA-S - med merkeoverstyringer for blokker IEEE skjuler som «Private», og en tydelig merking av tilfeldige personvern-MAC-er.
-
-Kjenner gateway & DNS
-Gatewayen merkes Ruter, DNS-server eller Ruter/DNS - og bare Ruter/DNS når gatewayen faktisk er din konfigurerte DNS, så en dedikert DNS-server aldri blir feilmerket.
-
-Nettverkstopologi
-F8 tegner enheter som flyttbare bokser, gruppert etter rolle, type, adresse eller produsent. Kartet utledes fra skanneresultater, ikke fra svitsjkabling. Eksporter hele ordningen som gjennomsiktig PNG, temabasert JPG eller HTML med skalerbar SVG.
-
-Keep Alive
-Overvåk opptil seksten enheter samtidig, hver som et kort med ventetidsgraf, pakketap og sin egen hendelseslogg over nøyaktig når den falt ut og kom tilbake. Hvert kort bærer sine egne sjekker: rute, fremover- og omvendt DNS, ping, porter og traceroute. Kopier alt rett inn i en sak.
-
-Innebygd terminal
-En ekte terminal inni appen, som kjører PowerShell 7 der den finnes, med KillerShells ledetekst og en KillerScan-modul som gjør en skanning om til objekter du kan filtrere og pipe. Enhetshandlinger åpnes her: ping i farger, SSH med kontoen du oppga for den enheten.
-
-Logg & klarerte enheter
-Fullførte GUI-skanninger som finner enheter lagres og sammenlignes med forrige skanning av samme mål. Den første ikke-tomme skanningen oppretter en klarert baselinje når det ikke finnes klarerte enheter; senere skanninger flagger ukjente enheter.
-
-Tjenestevisning
-F7 viser én rad per åpen port i stedet for per enhet. Finn hvilke enheter som tilbyr en tjeneste, sorter eller filtrer listen, og eksporter den som CSV.
-
-Profiler & dypskann
-Lagre mål som navngitte profiler, og last inn eller kjør dem fra profilsidepanelet. Følg eventuelt opp med Dypskann, som sjekker port 1-1024 pluss flere tjenesteporter og samler flere fingeravtrykk. KillerSpeed er tilgjengelig i rekken.
-
-Hurtighandlinger
-Høyreklikk på en hvilken som helst enhet for å kopiere IP, MAC eller vertsnavn, eller hoppe rett til den. Åpne nettgrensesnittet, eller start RDP eller SSH direkte, og sett en manuell enhetstype som blir stående.
-
-Klar for kommandolinjen
-Skann flere nettverk, dypprobe én vert, undersøk det aktive nettverket, eller slå opp en MAC-produsent frakoblet. Filtrer og sorter resultatene, velg porter og enhetstyper, sett grenser og tidsavbrudd, vis fremdrift, og skriv ut tabell-, CSV-, JSON- eller temabasert HTML-utdata med pålitelige avslutningskoder for automatisering. Se alle kommandoene.
-
-Eksport
-Bruk Eksporter for enhets-CSV eller interaktiv HTML, tjeneste-CSV, topologi som PNG/JPG eller HTML med SVG, Keep Alive som CSV/HTML/PNG, og terminaltekst inkludert rullehistorikk.
-
-Produsentdatabase
-Den medfølgende Wireshark MAC-produsentdatabasen dekker MA-L-, MA-M- og MA-S-registreringer for frakoblet oppslag. Bruk Oppdater produsentdatabase i Om for å laste ned en nyere liste; en eldre lokal kopi kan ikke erstatte en større medfølgende.
-
-Personvern fra grunnen av
-Produsentidentifisering og enhetsklassifisering kjører lokalt, uten bruksanalyse eller automatisk opplasting av skanneresultater. Oppdateringer og andre nettverksfunksjoner oppretter eksterne tilkoblinger. Hastighetstester overfører genererte data via speed.killerscan.net. Se hva som kobler til og hva som sendes.
-
-Temaer & innstillinger
-Tretten temaer, alle kan byttes live, med åtte aksentfarger hver for Mørk, Lys, Svart og 98SE - 41 uttrykk til sammen - pluss enhetstypefarger per tema. KillerScan husker tema, aksent, språk og appstørrelse mellom kjøringene. Temamenyen kan slå filmkorn av eller på.","便携式网络扫描器，发现可访问的 IPv4 设备、识别厂商，帮助您调查网络上运行的服务。
+Mười ba chủ đề, tất cả có thể chuyển đổi trực tiếp, với tám màu nhấn cho mỗi Dark, Light, Black và 98SE - tổng cộng 41 giao diện - cùng với việc tô màu theo loại thiết bị cho từng chủ đề. KillerScan ghi nhớ chủ đề, màu nhấn, ngôn ngữ và kích thước ứng dụng của bạn giữa các lần chạy. Menu chủ đề cho phép bật hoặc tắt hạt phim.","便携式网络扫描器，发现可访问的 IPv4 设备、识别厂商，帮助您调查网络上运行的服务。
 
 安装或以便携模式运行。免费、开源、GPLv3。无代理程序、账号、订阅或广告。应用不发送使用情况分析数据。 网络连接说明。
 
@@ -952,184 +1008,72 @@ F7 依開放連接埠而非裝置顯示每一列。找出提供特定服務的�
 廠商識別和裝置分類都在本機執行，不收集使用情況分析資料，也不自動上傳掃描結果。更新及其他網路功能會建立外部連線。速度測試透過 speed.killerscan.net 傳輸產生的測試資料。查看連線對象與傳送內容。
 
 主題與設定
-十三種可即時切換的主題，Dark、Light、Black 與 98SE 各提供八種強調色（共 41 種外觀），並有各主題的裝置類型著色。KillerScan 會記住主題、強調色、語言與應用程式大小。 主題選單可開啟或關閉膠片顆粒。","Un scanner réseau portable qui découvre les appareils IPv4 accessibles, identifie leurs fabricants et vous aide à examiner les services du réseau.
-
-Installez ou lancez la version portable. Gratuit, open source, GPLv3. Sans agent, compte, abonnement ni publicité. L’application n’envoie aucune analyse d’utilisation. Comprendre les connexions réseau.
-
-Découvrir les hôtes
-KillerScan lit le cache ARP, lance des sondes ICMP parallèles avec un recours à TCP, puis relit ARP pour trouver les appareils qui bloquent le ping mais répondent à ARP. Les pare-feu, les appareils en veille et l'isolation réseau peuvent empêcher la découverte.
-
-Classification des appareils
-Un évaluateur pondéré combine le nom d'hôte, le fabricant, les ports ouverts, les bannières, le mDNS et le SSDP en un type le plus probable : Router, switch/AP, NAS, printer, camera, hypervisor, phone, IoT et plus.
-
-Empreinte des ports
-Un scan de connexion TCP limité sur plus de 30 ports de service (SSH, RDP, SMB, HTTP, impression, RTSP, MQTT, hypervisor, NAS et plus), avec des sondes bannière, HTTP, TLS, NetBIOS et SNMP pour une identification plus fiable.
-
-mDNS & SSDP
-Un passage multicast sur l'ensemble du réseau s'exécute parallèlement au balayage. Les types de service Bonjour et les chaînes SERVER UPnP révèlent les Chromecast, imprimantes, Sonos, AirPlay, HomeKit, Roku, Plex et boîtiers Synology.
-
-Identification du fabricant
-Recherche OUI MAC par préfixe le plus long dans les registres IEEE complets - MA-L, MA-M et MA-S - avec des remplacements de marque pour les blocs que l'IEEE masque comme ""Private"", et une étiquette claire pour les MAC de confidentialité aléatoires.
-
-Reconnaissance gateway & DNS
-La passerelle est étiquetée Router, DNS Server ou Router/DNS - et seulement Router/DNS lorsque la passerelle est réellement votre DNS configuré, de sorte qu'un serveur DNS dédié n'est jamais mal étiqueté.
-
-Topologie du réseau
-F8 dessine les appareils sous forme de blocs déplaçables, regroupés par rôle, type, adresse ou fabricant. La carte est déduite des résultats, pas du câblage des commutateurs. Exportez toute la disposition en PNG transparent, JPG thématisé ou HTML contenant du SVG redimensionnable.
-
-Keep Alive
-Surveillez jusqu'à seize appareils à la fois, chacun sous forme de carte avec un graphique de latence, la perte de paquets, et son propre journal d'événements indiquant exactement quand il est tombé et revenu. Chaque carte porte ses propres vérifications : route, DNS direct et inverse, ping, ports et traceroute. Copiez le tout directement dans un ticket.
-
-Terminal intégré
-Un vrai terminal à l'intérieur de l'application, exécutant PowerShell 7 lorsqu'il est présent, avec l'invite de KillerShell et un module KillerScan qui transforme un scan en objets que vous pouvez filtrer et rediriger. Les actions sur les appareils s'ouvrent ici : ping en couleur, SSH avec le compte que vous avez donné pour cet appareil.
-
-Historique & appareils de confiance
-Les analyses terminées dans l'interface qui trouvent des appareils sont enregistrées et comparées à l'analyse précédente de la même cible. La première analyse non vide crée une référence de confiance si aucun appareil approuvé n'existe ; les suivantes signalent les appareils inconnus.
-
-Vue des services
-F7 affiche une ligne par port ouvert plutôt que par appareil. Trouvez les appareils proposant un service, triez ou filtrez la liste et exportez-la en CSV.
-
-Profils & deep scan
-Enregistrez les cibles dans des profils nommés, puis chargez-les ou lancez-les depuis le panneau des profils. Vous pouvez poursuivre avec une analyse approfondie qui vérifie les ports 1-1024 et d'autres ports de services et recueille davantage d'empreintes. KillerSpeed est disponible dans la barre latérale.
-
-Actions rapides
-Faites un clic droit sur n'importe quel appareil pour copier son IP, sa MAC ou son nom d'hôte, ou y accéder directement. Ouvrez son interface web, ou lancez RDP ou SSH directement, et définissez un type d'appareil manuel qui persiste.
-
-Prêt pour la ligne de commande
-Installez-le, ouvrez un nouveau terminal et lancez killerscan /scan 192.168.50.0/24. Le scanner complet fonctionne sans fenêtre, avec des modes rapide et silencieux, l'export en CSV ou HTML, l'annulation par Ctrl+C et des codes de sortie fiables pour les scripts, les tâches planifiées et les outils RMM. Voir toutes les commandes.
-
-Exporter
-Exportez les appareils en CSV ou HTML interactif, les services en CSV, la topologie en PNG/JPG ou HTML avec SVG, Keep Alive en CSV/HTML/PNG et le texte du terminal avec son historique de défilement.
-
-Base de données des fabricants
-La base de fabricants MAC Wireshark intégrée couvre les enregistrements MA-L, MA-M et MA-S pour la consultation hors ligne. Actualisez la base des fabricants dans À propos pour télécharger une liste plus récente ; une ancienne copie locale ne peut pas remplacer une base intégrée plus grande.
-
-Privé par conception
-L’identification des fabricants et la classification des appareils s’effectuent localement, sans analyse d’utilisation ni envoi automatique des résultats d’analyse. Les mises à jour et d’autres fonctions réseau établissent des connexions externes. Les tests de débit transfèrent des données générées via speed.killerscan.net. Connexions et données envoyées.
-
-Thèmes & réglages
-Treize thèmes commutables en direct, huit couleurs d'accent pour chacun de Dark, Light, Black et 98SE (41 apparences en tout) et une coloration des appareils par thème. KillerScan mémorise le thème, l'accent, la langue et la taille de l'application. Le menu des thèmes permet d'activer ou de désactiver le grain de film.","Портативный сетевой сканер, который находит доступные устройства IPv4, определяет производителей и помогает выяснить, что работает в сети.
-
-Установите или запустите портативную версию. Бесплатно, открытый код, GPLv3. Без агента, учетной записи, подписки и рекламы. Приложение не отправляет аналитику использования. О сетевых подключениях.
-
-Обнаружение узлов
-KillerScan читает ARP-кэш, выполняет параллельные ICMP-запросы с резервной проверкой TCP и снова читает ARP, находя устройства, которые блокируют ping, но отвечают по ARP. Брандмауэры, спящие устройства и изоляция сети могут мешать обнаружению.
-
-Классификация устройств
-Взвешенная система очков объединяет имя узла, производителя, открытые порты, баннеры, mDNS и SSDP в наиболее вероятный тип: маршрутизатор, коммутатор/точка доступа, NAS, принтер, камера, гипервизор, телефон, IoT и другие.
-
-Фингерпринтинг портов
-Дозированное TCP-сканирование методом connect по более чем 30 служебным портам (SSH, RDP, SMB, HTTP, печать, RTSP, MQTT, гипервизоры, NAS и другие) с зондами баннеров, HTTP, TLS, NetBIOS и SNMP для более надежной идентификации.
-
-mDNS & SSDP
-Общесетевой multicast-проход выполняется параллельно с обходом. Типы служб Bonjour и строки SERVER из UPnP выдают Chromecast, принтеры, Sonos, AirPlay, HomeKit, Roku, Plex и устройства Synology.
-
-Определение производителя
-Поиск MAC OUI по самому длинному префиксу во всех реестрах IEEE - MA-L, MA-M и MA-S - с ручными поправками для блоков, которые IEEE скрывает как ""Private"", и понятной пометкой для случайных приватных MAC.
-
-Учитывает шлюз & DNS
-Шлюз помечается как Маршрутизатор, DNS-сервер или Маршрутизатор/DNS - причем Маршрутизатор/DNS только тогда, когда шлюз действительно является вашим настроенным DNS, так что выделенный DNS-сервер никогда не получит неверную метку.
-
-Топология сети
-F8 показывает устройства как перемещаемые блоки, сгруппированные по роли, типу, адресу или производителю. Карта строится по результатам сканирования, а не по соединениям коммутаторов. Экспортируйте всю схему в прозрачный PNG, JPG с текущей темой или HTML с масштабируемым SVG.
-
-Keep Alive
-Наблюдайте до шестнадцати устройств одновременно, каждое как карточка с графиком задержки, потерей пакетов и собственным журналом событий о том, когда именно оно пропало и вернулось. Каждая карточка несёт свои собственные проверки: маршрут, прямой и обратный DNS, ping, порты и traceroute. Скопируйте всё это прямо в тикет.
-
-Встроенный терминал
-Настоящий терминал внутри приложения, работающий на PowerShell 7 там, где он есть, с промптом KillerShell и модулем KillerScan, который превращает сканирование в объекты, которые можно фильтровать и передавать по конвейеру. Здесь же открываются действия с устройством: ping в цвете, SSH с учётной записью, которую вы задали для этого устройства.
-
-История и доверенные устройства
-Завершенные сканирования в интерфейсе, нашедшие устройства, сохраняются и сравниваются с предыдущим сканированием той же цели. Если доверенных устройств еще нет, первое непустое сканирование создает доверенную основу; последующие отмечают незнакомые устройства.
-
-Вид служб
-F7 показывает отдельную строку для каждого открытого порта. Находите устройства с нужной службой, сортируйте или фильтруйте список и экспортируйте его в CSV.
-
-Профили и Deep Scan
-Сохраняйте цели как именованные профили, затем загружайте или запускайте их с боковой панели профилей. При желании добавьте Deep Scan: проверку портов 1-1024 и дополнительных служебных портов с более подробным определением устройств. На боковой панели также есть KillerSpeed.
-
-Быстрые действия
-Щелкните устройство правой кнопкой, чтобы скопировать его IP, MAC или имя узла, либо сразу перейти к нему. Откройте его веб-интерфейс или запустите RDP или SSH напрямую и задайте вручную тип устройства, который сохранится.
-
-Готов к командной строке
-Сканируйте несколько сетей, глубоко зондируйте один узел, изучайте активную сеть или определяйте производителя по MAC офлайн. Фильтруйте и сортируйте результаты, выбирайте порты и типы устройств, задавайте лимиты и тайм-ауты, показывайте прогресс и выводите таблицу, CSV, JSON или HTML с темами - с надежными кодами завершения для автоматизации. Полный список команд.
-
-Экспорт
-Экспорт предлагает CSV устройств или интерактивный HTML, CSV служб, топологию в PNG/JPG или HTML с SVG, Keep Alive в CSV/HTML/PNG и текст терминала вместе с историей вывода.
-
-База производителей
-Встроенная база производителей MAC из Wireshark охватывает регистрации MA-L, MA-M и MA-S для поиска офлайн. Обновить список можно командой обновления базы производителей в окне «О программе». Более старый локальный список не заменит более крупную встроенную базу.
-
-Приватность по замыслу
-Определение производителей и типов устройств выполняется локально, без аналитики использования и автоматической отправки результатов сканирования. Обновления и другие сетевые функции используют внешние подключения. Тест скорости передает сгенерированные данные через speed.killerscan.net. Какие подключения используются и что передается.
-
-Темы & настройки
-Тринадцать тем, все переключаются на лету, с восемью акцентными цветами для каждой из тем Темная, Светлая, Черная и 98SE - всего 41 вариант оформления - плюс раскраска типов устройств для каждой темы. KillerScan запоминает тему, акцент, язык и размер приложения между запусками. В меню тем можно включить или выключить зернистость плёнки."
-WhatsNew,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures1,Text,"ARP cache plus a parallel ping sweep, then a second ARP read to catch ICMP-blockers","ARP ক্যাশে এবং একটি সমান্তরাল পিং সুইপ, তারপর ICMP-ব্লককারীদের ধরতে দ্বিতীয়বার ARP পাঠ","ARP cache plus paralelní ping sweep, poté druhé čtení ARP pro zachycení zařízení blokujících ICMP","ARP-Cache plus paralleler Ping-Sweep, dann ein zweiter ARP-Durchlauf, um ICMP-Blocker zu erfassen","Caché ARP más un barrido de ping en paralelo, y luego una segunda lectura ARP para detectar los que bloquean ICMP","ARP gyorsítótár és párhuzamos ping sweep, majd egy második ARP olvasás az ICMP-blokkolók elkapásához","Cache ARP più uno sweep di ping in parallelo, poi una seconda lettura ARP per catturare chi blocca ICMP",ARP キャッシュと並列 ping スイープ、さらに 2 回目の ARP 読み取りで ICMP を遮断するデバイスも捕捉,"ARP кэші және параллель ping шолуы, содан кейін ICMP-ді бұғаттайтындарды ұстау үшін екінші ARP оқуы","ARP önbelleği artı paralel bir ping taraması, ardından ICMP engelleyicileri yakalamak için ikinci bir ARP okuması","ARP-кеш плюс паралельний ping-обхід, потім повторне читання ARP, щоб упіймати пристрої, які блокують ICMP","Bộ nhớ cache ARP cùng với quét ping song song, sau đó đọc ARP lần thứ hai để phát hiện các thiết bị chặn ICMP",Cache ARP mais uma varredura de ping paralela e uma segunda leitura de ARP para pegar bloqueadores de ICMP,"Pamięć podręczna ARP plus równoległy ping sweep, a potem drugi odczyt ARP, aby wychwycić urządzenia blokujące ICMP","ARP-buffer pluss et parallelt ping-sveip, deretter en andre ARP-lesing for å fange ICMP-blokkerere",ARP 缓存加上并行 ping 扫描，再进行第二次 ARP 读取以捕捉屏蔽 ICMP 的设备,ARP 快取加上並行 ping 掃描，再進行第二次 ARP 讀取以捕捉封鎖 ICMP 的裝置,"Cache ARP plus un balayage ping en parallèle, puis une seconde lecture ARP pour attraper les bloqueurs ICMP","ARP-кэш плюс параллельный ping-обход, затем повторное чтение ARP, чтобы поймать устройства, блокирующие ICMP"
-ProductFeatures2,Text,TCP fingerprinting across 30+ service ports,৩০+ পরিষেবা পোর্ট জুড়ে TCP ফিঙ্গারপ্রিন্টিং,Identifikace přes TCP na více než 30 servisních portech,TCP-Fingerprinting über mehr als 30 Dienstports,Identificación TCP en más de 30 puertos de servicio,TCP-ujjlenyomat 30+ szolgáltatási porton keresztül,Fingerprinting TCP su oltre 30 porte di servizio,30 以上のサービスポートに対する TCP フィンガープリント,30+ қызмет порты бойынша TCP саусақ ізін алу,30'dan fazla hizmet bağlantı noktasında TCP parmak izi,TCP-фінгерпринтинг за понад 30 службовими портами,Định danh TCP trên hơn 30 cổng dịch vụ,Identificação TCP em mais de 30 portas de serviço,Identyfikacja TCP na ponad 30 portach usług,TCP-fingeravtrykk over 30+ tjenesteporter,跨 30 多个服务端口的 TCP 指纹识别,跨 30 多個服務連接埠的 TCP 指紋辨識,Empreinte TCP sur plus de 30 ports de service,TCP-фингерпринтинг по более чем 30 служебным портам
-ProductFeatures3,Text,mDNS (Bonjour) and SSDP (UPnP) discovery,mDNS (Bonjour) এবং SSDP (UPnP) আবিষ্কার,Vyhledávání mDNS (Bonjour) a SSDP (UPnP),mDNS- (Bonjour) und SSDP- (UPnP) Erkennung,Descubrimiento mDNS (Bonjour) y SSDP (UPnP),mDNS (Bonjour) és SSDP (UPnP) felfedezés,Rilevamento mDNS (Bonjour) e SSDP (UPnP),mDNS (Bonjour) と SSDP (UPnP) による検出,mDNS (Bonjour) және SSDP (UPnP) арқылы анықтау,mDNS (Bonjour) ve SSDP (UPnP) keşfi,Виявлення через mDNS (Bonjour) і SSDP (UPnP),Khám phá mDNS (Bonjour) và SSDP (UPnP),Descoberta mDNS (Bonjour) e SSDP (UPnP),Wykrywanie mDNS (Bonjour) i SSDP (UPnP),mDNS (Bonjour)- og SSDP (UPnP)-oppdagelse,mDNS（Bonjour）与 SSDP（UPnP）发现,mDNS（Bonjour）與 SSDP（UPnP）探索,Découverte mDNS (Bonjour) et SSDP (UPnP),Обнаружение через mDNS (Bonjour) и SSDP (UPnP)
-ProductFeatures4,Text,"IEEE OUI vendor ID - MA-L, MA-M and MA-S","IEEE OUI বিক্রেতা শনাক্তকরণ - MA-L, MA-M এবং MA-S","Určení výrobce z IEEE OUI - MA-L, MA-M a MA-S","IEEE-OUI-Herstellerkennung - MA-L, MA-M und MA-S","ID de fabricante por OUI de IEEE - MA-L, MA-M y MA-S","IEEE OUI szállítóazonosító - MA-L, MA-M és MA-S","Identificazione dei produttori OUI IEEE - MA-L, MA-M e MA-S",IEEE OUI ベンダー特定 - MA-L、MA-M、MA-S 対応,"IEEE OUI өндіруші идентификациясы - MA-L, MA-M және MA-S","IEEE OUI üretici kimliği - MA-L, MA-M ve MA-S","Визначення виробника за IEEE OUI - MA-L, MA-M і MA-S","ID nhà cung cấp IEEE OUI - MA-L, MA-M và MA-S","Identificação de fabricante por OUI do IEEE - MA-L, MA-M e MA-S","Ustalanie producenta z IEEE OUI - MA-L, MA-M i MA-S","IEEE OUI-produsent-ID - MA-L, MA-M og MA-S",IEEE OUI 制造商识别 - MA-L、MA-M 与 MA-S,IEEE OUI 製造商識別 - MA-L、MA-M 與 MA-S,"Identifiant fabricant OUI de l'IEEE - MA-L, MA-M et MA-S","Определение производителя по IEEE OUI - MA-L, MA-M и MA-S"
-ProductFeatures5,Text,"Weighted classifier: routers, NAS, printers, cameras, IoT, phones and more","ওজনযুক্ত শ্রেণিবিন্যাসকারী: রাউটার, NAS, প্রিন্টার, ক্যামেরা, IoT, ফোন এবং আরও অনেক কিছু","Vážený klasifikátor: routery, NAS, tiskárny, kamery, IoT, telefony a další","Gewichteter Klassifikator: Router, NAS, Drucker, Kameras, IoT, Telefone und mehr","Clasificador ponderado: routers, NAS, impresoras, cámaras, IoT, teléfonos y más","Súlyozott osztályozó: útválasztók, NAS, nyomtatók, kamerák, IoT, telefonok és egyebek","Classificatore ponderato: router, NAS, stampanti, telecamere, IoT, telefoni e altro",重み付き分類器: ルーター、NAS、プリンター、カメラ、IoT、スマートフォンなど,"Салмақталған жіктеуіш: маршрутизаторлар, NAS, принтерлер, камералар, IoT, телефондар және басқалары","Ağırlıklı sınıflandırıcı: yönlendiriciler, NAS'lar, yazıcılar, kameralar, IoT, telefonlar ve daha fazlası","Зважений класифікатор: маршрутизатори, NAS, принтери, камери, IoT, телефони й не тільки","Bộ phân loại có trọng số: router, NAS, máy in, camera, IoT, điện thoại và nhiều hơn nữa","Classificador ponderado: roteadores, NAS, impressoras, câmeras, IoT, celulares e mais","Ważony klasyfikator: routery, NAS, drukarki, kamery, IoT, telefony i inne","Vektet klassifiserer: rutere, NAS, skrivere, kameraer, IoT, telefoner og mer",加权分类器：路由器、NAS、打印机、摄像头、IoT、手机等,加權分類器：路由器、NAS、印表機、攝影機、IoT、手機等,"Classificateur pondéré : routeurs, NAS, imprimantes, caméras, IoT, téléphones et plus","Взвешенный классификатор: маршрутизаторы, NAS, принтеры, камеры, IoT, телефоны и не только"
-ProductFeatures6,Text,"Topology, Keep Alive and an embedded terminal beside the device list","টপোলজি, Keep Alive, এবং ডিভাইস তালিকার পাশে একটি এমবেডেড টার্মিনাল","Topologie, Keep Alive a vestavěný terminál vedle seznamu zařízení","Topologie, Keep Alive und ein eingebettetes Terminal neben der Geräteliste","Topología, Keep Alive y un terminal integrado junto a la lista de dispositivos","Topológia, Keep Alive és egy beépített terminál az eszközlista mellett","Topologia, Keep Alive e un terminale integrato accanto all'elenco dei dispositivi",トポロジー、Keep Alive、デバイス一覧の横に組み込まれたターミナル,"Топология, Keep Alive және құрылғылар тізімінің қасындағы кірістірілген терминал","Topoloji, Keep Alive ve cihaz listesinin yanında yerleşik bir terminal","Топологія, Keep Alive та вбудований термінал поруч зі списком пристроїв","Sơ đồ mạng, giữ kết nối (Keep Alive) và một terminal nhúng bên cạnh danh sách thiết bị","Topologia, Keep Alive e um terminal embutido ao lado da lista de dispositivos","Topologia, Keep Alive i wbudowany terminal obok listy urządzeń","Topologi, Keep Alive og en innebygd terminal ved siden av enhetslisten",拓扑、Keep Alive，以及设备列表旁的内置终端,拓撲圖、Keep Alive，以及裝置清單旁的內嵌終端機,"Topologie, Keep Alive et un terminal intégré à côté de la liste des appareils","Топология, Keep Alive и встроенный терминал рядом со списком устройств"
-ProductFeatures7,Text,Scan history with trusted-device baselines and unknown-device alerts,বিশ্বস্ত-ডিভাইস বেসলাইন ও অপরিচিত-ডিভাইস সতর্কতাসহ স্ক্যান ইতিহাস,Historie skenování s výchozími stavy důvěryhodných zařízení a upozorněními na neznámá zařízení,Scanverlauf mit Basislinien für vertrauenswürdige Geräte und Warnungen bei unbekannten Geräten,Historial de escaneos con líneas base de dispositivos de confianza y alertas de dispositivos desconocidos,Vizsgálati előzmények megbízható eszköz-alapállapotokkal és ismeretlen eszközökre vonatkozó riasztásokkal,Cronologia delle scansioni con basi di dispositivi fidati e avvisi per dispositivi sconosciuti,信頼済みデバイスのベースラインと未知デバイスの通知を備えたスキャン履歴,Сенімді құрылғы негіздемелерімен және белгісіз құрылғы ескертулерімен сканерлеу тарихы,Güvenilir cihaz temel çizgileriyle ve bilinmeyen cihaz uyarılarıyla tarama geçmişi,Історія сканувань з базовими лініями довірених пристроїв і сповіщеннями про невідомі пристрої,Lịch sử quét với các chuẩn thiết bị tin cậy và cảnh báo thiết bị không xác định,Histórico de varreduras com linhas de base de dispositivos confiáveis e alertas de dispositivos desconhecidos,Historia skanów z punktami odniesienia zaufanych urządzeń i alertami o nieznanych urządzeniach,Skannelogg med baselinjer for klarerte enheter og varsler om ukjente enheter,扫描历史记录，具备受信任设备基线和未知设备提醒,掃描歷史記錄，具備信任裝置基準與未知裝置警示,Historique des scans avec des références d'appareils de confiance et des alertes d'appareils inconnus,История сканирований с базовыми линиями доверенных устройств и оповещениями о неизвестных устройствах
-ProductFeatures8,Text,"Export follows the view: CSV, HTML, or the topology as PNG, JPG or HTML with SVG","এক্সপোর্ট ভিউ অনুযায়ী হয়: CSV, HTML, অথবা টপোলজি PNG, JPG বা SVG-সহ HTML হিসেবে","Export sleduje zobrazení: CSV, HTML, nebo topologie jako PNG, JPG či HTML s SVG","Export folgt der Ansicht: CSV, HTML oder die Topologie als PNG, JPG oder HTML mit SVG","La exportación sigue la vista: CSV, HTML, o la topología como PNG, JPG o HTML con SVG","Az exportálás a nézetet követi: CSV, HTML, vagy a topológia PNG, JPG vagy SVG-t tartalmazó HTML formátumban","L'esportazione segue la vista: CSV, HTML, o la topologia come PNG, JPG o HTML con SVG",エクスポートはビューに応じて決まる: CSV、HTML、またはトポロジーを PNG、JPG、SVG を含む HTML として,"Экспорт көрініске сай келеді: CSV, HTML немесе топология PNG, JPG не SVG бар HTML түрінде","Görünüme göre dışa aktarma: CSV, HTML veya topoloji PNG, JPG ya da SVG içeren HTML olarak","Експорт відповідає поданню: CSV, HTML або топологія у вигляді PNG, JPG чи HTML з SVG","Xuất dữ liệu theo chế độ xem: CSV, HTML hoặc sơ đồ mạng dưới dạng PNG, JPG hoặc HTML kèm SVG","A exportação acompanha a visualização: CSV, HTML ou a topologia em PNG, JPG ou HTML com SVG","Eksport podąża za widokiem: CSV, HTML, lub topologia jako PNG, JPG czy HTML z SVG","Eksport følger visningen: CSV, HTML, eller topologien som PNG, JPG eller HTML med SVG",导出取决于视图：CSV、HTML，或将拓扑导出为 PNG、JPG 或 内含 SVG 的 HTML,匯出依檢視而定：CSV、HTML，或將拓撲圖匯出為 PNG、JPG 或 內含 SVG 的 HTML,"L'export suit la vue : CSV, HTML, ou la topologie en PNG, JPG ou HTML avec SVG","Экспорт соответствует виду: CSV, HTML или топология в виде PNG, JPG или HTML с SVG"
-ProductFeatures9,Text,"KillerSpeed, device diagnostics and traceroute without leaving the app","অ্যাপ ছেড়ে না গিয়ে স্পিড টেস্ট, ডিভাইস ডায়াগনস্টিকস ও ট্রেসরুট","Test rychlosti, diagnostika zařízení a traceroute bez opuštění aplikace","Geschwindigkeitstest, Gerätediagnose und Traceroute, ohne die App zu verlassen","Prueba de velocidad, diagnóstico de dispositivos y traceroute sin salir de la aplicación","Sebességteszt, eszközdiagnosztika és traceroute az alkalmazás elhagyása nélkül","Test di velocità, diagnostica dei dispositivi e traceroute senza uscire dall'app",アプリを離れずに実行できる速度テスト、デバイス診断、traceroute,"Қолданбадан шықпай-ақ жылдамдық сынағы, құрылғы диагностикасы және traceroute","Uygulamadan çıkmadan hız testi, cihaz tanılaması ve traceroute","Тест швидкості, діагностика пристрою й трасування маршруту, не виходячи із застосунку","KillerSpeed, chẩn đoán thiết bị và traceroute mà không cần rời khỏi ứng dụng","KillerSpeed, diagnóstico de dispositivos e traceroute sem sair do aplicativo","Test szybkości, diagnostyka urządzeń i traceroute bez opuszczania aplikacji","KillerSpeed, enhetsdiagnostikk og traceroute uten å forlate appen",无需离开应用即可进行速度测试、设备诊断和 traceroute,不必離開應用程式即可執行速度測試、裝置診斷與 traceroute,"Test de vitesse, diagnostic d'appareil et traceroute sans quitter l'application","Тест скорости, диагностика устройства и трассировка маршрута, не выходя из приложения"
-ProductFeatures10,Text,"Headless command line for scripts, scheduled tasks and RMM","স্ক্রিপ্ট, শিডিউল করা টাস্ক এবং RMM-এর জন্য হেডলেস কমান্ড লাইন","Příkazový řádek bez okna pro skripty, naplánované úlohy a RMM","Fensterlose Befehlszeile für Skripte, geplante Aufgaben und RMM","Línea de comandos sin ventana para scripts, tareas programadas y RMM","Fej nélküli parancssor szkriptekhez, ütemezett feladatokhoz és RMM-hez","Riga di comando senza interfaccia per script, attività pianificate e RMM",スクリプト、スケジュールされたタスク、RMM 向けのヘッドレスコマンドライン,"Сценарийлерге, жоспарланған тапсырмаларға және RMM жүйелеріне арналған терезесіз пәрмен жолы","Betikler, zamanlanmış görevler ve RMM için penceresiz komut satırı","Безвіконний режим командного рядка для скриптів, планувальника завдань і RMM","Dòng lệnh không giao diện cho script, nhiệm vụ theo lịch và RMM","Linha de comando sem janela para scripts, tarefas agendadas e RMM","Wiersz poleceń bez okna do skryptów, zaplanowanych zadań i RMM","Hodeløs kommandolinje for skript, planlagte oppgaver og RMM",无窗口命令行，适用于脚本、计划任务与 RMM,無視窗命令列，適用於指令碼、排程工作與 RMM,"Ligne de commande sans fenêtre pour les scripts, les tâches planifiées et le RMM","Безоконный режим командной строки для скриптов, планировщика задач и RMM"
-ProductFeatures11,Text,Thirteen themes with live accent colors and remembered appearance settings,লাইভ অ্যাকসেন্ট রঙ ও মনে রাখা চেহারা সেটিংসহ তেরোটি থিম,Třináct motivů se živými akcentovými barvami a zapamatovaným nastavením vzhledu,Dreizehn Designs mit Live-Akzentfarben und gespeicherten Darstellungseinstellungen,Trece temas con colores de acento en vivo y ajustes de apariencia recordados,Tizenhárom téma élő hangsúlyos színekkel és megjegyzett megjelenési beállításokkal,Tredici temi con colori d'accento in tempo reale e impostazioni di aspetto memorizzate,ライブアクセントカラーと記憶される外観設定を備えた 13 テーマ,Тірі акцент түстері және есте сақталатын көрініс параметрлері бар он үш тақырып,Canlı vurgu renkleri ve hatırlanan görünüm ayarlarıyla on üç tema,Тринадцять тем із живими акцентними кольорами та запам'ятовуванням налаштувань оформлення,Mười ba giao diện với màu nhấn sống động và ghi nhớ cài đặt hiển thị,Treze temas com cores de destaque ao vivo e configurações de aparência lembradas,Trzynaście motywów z kolorami akcentu na żywo i zapamiętywanymi ustawieniami wyglądu,Tretten temaer med levende aksentfarger og husket utseendeinnstillinger,十三种主题，具备实时强调色和记忆的外观设置,十三種主題，具備即時強調色與記憶的外觀設定,Treize thèmes avec couleurs d'accent en direct et réglages d'apparence mémorisés,Тринадцать тем с живыми акцентными цветами и запоминанием настроек оформления
-ProductFeatures12,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures13,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures14,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures15,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures16,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures17,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures18,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures19,Text,,,,,,,,,,,,,,,,,,,
-ProductFeatures20,Text,,,,,,,,,,,,,,,,,,,
-ShortDescription,Text,"A portable network scanner that discovers reachable IPv4 devices, identifies vendors, and helps you investigate what is running on the network.","একটি পোর্টেবল নেটওয়ার্ক স্ক্যানার, যা সংযোগযোগ্য IPv4 ডিভাইস খুঁজে পায়, প্রস্তুতকারক শনাক্ত করে এবং নেটওয়ার্কে কী চলছে তা খতিয়ে দেখতে সাহায্য করে।","Přenosný síťový skener, který vyhledává dostupná zařízení IPv4, určuje výrobce a pomáhá zjistit, co v síti běží.","Ein portabler Netzwerkscanner, der erreichbare IPv4-Geräte findet, Hersteller ermittelt und bei der Untersuchung laufender Netzwerkdienste hilft.","Un escáner de red portátil que descubre dispositivos IPv4 accesibles, identifica fabricantes y te ayuda a investigar qué está funcionando en la red.","Hordozható hálózati szkenner, amely elérhető IPv4-eszközöket keres, azonosítja a gyártókat, és segít felderíteni a hálózaton futó szolgáltatásokat.","Uno scanner di rete portatile che rileva dispositivi IPv4 raggiungibili, identifica i produttori e aiuta a capire cosa è in esecuzione sulla rete.",到達可能な IPv4 デバイスの検出、メーカーの識別、ネットワークで動作するサービスの調査に役立つポータブルネットワークスキャナー。,"Қолжетімді IPv4 құрылғыларын тауып, өндірушілерін анықтайтын және желіде қандай қызметтер жұмыс істейтінін зерттеуге көмектесетін тасымалды желі сканері.","Erişilebilir IPv4 cihazlarını bulan, üreticileri tanımlayan ve ağda çalışan hizmetleri incelemenize yardımcı olan taşınabilir ağ tarayıcısı.","Портативний мережевий сканер, який знаходить доступні пристрої IPv4, визначає виробників і допомагає з'ясувати, що працює в мережі.","Một máy quét mạng di động phát hiện các thiết bị IPv4 có thể truy cập, xác định nhà cung cấp và giúp bạn điều tra những gì đang chạy trên mạng.","Um scanner de rede portátil que descobre dispositivos IPv4 acessíveis, identifica fabricantes e ajuda a investigar o que está rodando na rede.","Przenośny skaner sieci, który wykrywa dostępne urządzenia IPv4, identyfikuje producentów i pomaga ustalić, co działa w sieci.","En portabel nettverksskanner som finner tilgjengelige IPv4-enheter, identifiserer produsenter og hjelper deg å undersøke hva som kjører på nettverket.",便携式网络扫描器，发现可访问的 IPv4 设备、识别厂商，帮助您调查网络上运行的服务。,可攜式網路掃描器，探索可連線的 IPv4 裝置、識別廠商，協助您調查網路上執行的服務。,"Un scanner réseau portable qui découvre les appareils IPv4 accessibles, identifie leurs fabricants et vous aide à examiner les services du réseau.","Портативный сетевой сканер, который находит доступные устройства IPv4, определяет производителей и помогает выяснить, что работает в сети."
-SearchTerms1,Text,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner
-SearchTerms2,Text,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner
-SearchTerms3,Text,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner
-SearchTerms4,Text,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner
-SearchTerms5,Text,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup
-SearchTerms6,Text,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery
-SearchTerms7,Text,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor
-Applicable license terms,Text,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan
-Copyright,Text,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer
-DevelopedBy,Text,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer
-RequirementsMinimum1,Text,.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows)
-RequirementsMinimum2,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum3,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum4,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum5,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum6,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum7,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum8,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum9,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum10,Text,,,,,,,,,,,,,,,,,,,
-RequirementsMinimum11,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended1,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended2,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended3,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended4,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended5,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended6,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended7,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended8,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended9,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended10,Text,,,,,,,,,,,,,,,,,,,
-RequirementsRecommended11,Text,,,,,,,,,,,,,,,,,,,
-StoreLogos1,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png
-StoreLogos2,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,,,,,,,,,,,,,,,,,,,
-Screenshots1,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png
-Screenshots2,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png
-Screenshots3,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png
-Screenshots4,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png
-Screenshots5,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png
-Screenshots6,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png
-Screenshots7,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png
-Screenshots8,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png
-Screenshots9,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png
-Screenshots10,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,,,,,,,,,,,,,,,,,,,
-HeroArts,Text,,,,,,,,,,,,,,,,,,,
-Trailers,Text,,,,,,,,,,,,,,,,,,,
+十三種可即時切換的主題，Dark、Light、Black 與 98SE 各提供八種強調色（共 41 種外觀），並有各主題的裝置類型著色。KillerScan 會記住主題、強調色、語言與應用程式大小。 主題選單可開啟或關閉膠片顆粒。"
+WhatsNew,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures1,Text,"ARP cache plus a parallel ping sweep, then a second ARP read to catch ICMP-blockers","ARP ক্যাশে এবং একটি সমান্তরাল পিং সুইপ, তারপর ICMP-ব্লককারীদের ধরতে দ্বিতীয়বার ARP পাঠ","ARP cache plus paralelní ping sweep, poté druhé čtení ARP pro zachycení zařízení blokujících ICMP","ARP-Cache plus paralleler Ping-Sweep, dann ein zweiter ARP-Durchlauf, um ICMP-Blocker zu erfassen","Cache ARP plus un balayage ping en parallèle, puis une seconde lecture ARP pour attraper les bloqueurs ICMP","ARP gyorsítótár és párhuzamos ping sweep, majd egy második ARP olvasás az ICMP-blokkolók elkapásához","Cache ARP più uno sweep di ping in parallelo, poi una seconda lettura ARP per catturare chi blocca ICMP",ARP キャッシュと並列 ping スイープ、さらに 2 回目の ARP 読み取りで ICMP を遮断するデバイスも捕捉,"ARP кэші және параллель ping шолуы, содан кейін ICMP-ді бұғаттайтындарды ұстау үшін екінші ARP оқуы","ARP-buffer pluss et parallelt ping-sveip, deretter en andre ARP-lesing for å fange ICMP-blokkerere","Pamięć podręczna ARP plus równoległy ping sweep, a potem drugi odczyt ARP, aby wychwycić urządzenia blokujące ICMP",Cache ARP mais uma varredura de ping paralela e uma segunda leitura de ARP para pegar bloqueadores de ICMP,"ARP-кэш плюс параллельный ping-обход, затем повторное чтение ARP, чтобы поймать устройства, блокирующие ICMP","ARP önbelleği artı paralel bir ping taraması, ardından ICMP engelleyicileri yakalamak için ikinci bir ARP okuması","ARP-кеш плюс паралельний ping-обхід, потім повторне читання ARP, щоб упіймати пристрої, які блокують ICMP","Bộ nhớ cache ARP cùng với quét ping song song, sau đó đọc ARP lần thứ hai để phát hiện các thiết bị chặn ICMP",ARP 缓存加上并行 ping 扫描，再进行第二次 ARP 读取以捕捉屏蔽 ICMP 的设备,ARP 快取加上並行 ping 掃描，再進行第二次 ARP 讀取以捕捉封鎖 ICMP 的裝置
+ProductFeatures2,Text,TCP fingerprinting across 30+ service ports,৩০+ পরিষেবা পোর্ট জুড়ে TCP ফিঙ্গারপ্রিন্টিং,Identifikace přes TCP na více než 30 servisních portech,TCP-Fingerprinting über mehr als 30 Dienstports,Empreinte TCP sur plus de 30 ports de service,TCP-ujjlenyomat 30+ szolgáltatási porton keresztül,Fingerprinting TCP su oltre 30 porte di servizio,30 以上のサービスポートに対する TCP フィンガープリント,30+ қызмет порты бойынша TCP саусақ ізін алу,TCP-fingeravtrykk over 30+ tjenesteporter,Identyfikacja TCP na ponad 30 portach usług,Identificação TCP em mais de 30 portas de serviço,TCP-фингерпринтинг по более чем 30 служебным портам,30'dan fazla hizmet bağlantı noktasında TCP parmak izi,TCP-фінгерпринтинг за понад 30 службовими портами,Định danh TCP trên hơn 30 cổng dịch vụ,跨 30 多个服务端口的 TCP 指纹识别,跨 30 多個服務連接埠的 TCP 指紋辨識
+ProductFeatures3,Text,mDNS (Bonjour) and SSDP (UPnP) discovery,mDNS (Bonjour) এবং SSDP (UPnP) আবিষ্কার,Vyhledávání mDNS (Bonjour) a SSDP (UPnP),mDNS- (Bonjour) und SSDP- (UPnP) Erkennung,Découverte mDNS (Bonjour) et SSDP (UPnP),mDNS (Bonjour) és SSDP (UPnP) felfedezés,Rilevamento mDNS (Bonjour) e SSDP (UPnP),mDNS (Bonjour) と SSDP (UPnP) による検出,mDNS (Bonjour) және SSDP (UPnP) арқылы анықтау,mDNS (Bonjour)- og SSDP (UPnP)-oppdagelse,Wykrywanie mDNS (Bonjour) i SSDP (UPnP),Descoberta mDNS (Bonjour) e SSDP (UPnP),Обнаружение через mDNS (Bonjour) и SSDP (UPnP),mDNS (Bonjour) ve SSDP (UPnP) keşfi,Виявлення через mDNS (Bonjour) і SSDP (UPnP),Khám phá mDNS (Bonjour) và SSDP (UPnP),mDNS（Bonjour）与 SSDP（UPnP）发现,mDNS（Bonjour）與 SSDP（UPnP）探索
+ProductFeatures4,Text,"IEEE OUI vendor ID - MA-L, MA-M and MA-S","IEEE OUI বিক্রেতা শনাক্তকরণ - MA-L, MA-M এবং MA-S","Určení výrobce z IEEE OUI - MA-L, MA-M a MA-S","IEEE-OUI-Herstellerkennung - MA-L, MA-M und MA-S","Identifiant fabricant OUI de l'IEEE - MA-L, MA-M et MA-S","IEEE OUI szállítóazonosító - MA-L, MA-M és MA-S","Identificazione dei produttori OUI IEEE - MA-L, MA-M e MA-S",IEEE OUI ベンダー特定 - MA-L、MA-M、MA-S 対応,"IEEE OUI өндіруші идентификациясы - MA-L, MA-M және MA-S","IEEE OUI-produsent-ID - MA-L, MA-M og MA-S","Ustalanie producenta z IEEE OUI - MA-L, MA-M i MA-S","Identificação de fabricante por OUI do IEEE - MA-L, MA-M e MA-S","Определение производителя по IEEE OUI - MA-L, MA-M и MA-S","IEEE OUI üretici kimliği - MA-L, MA-M ve MA-S","Визначення виробника за IEEE OUI - MA-L, MA-M і MA-S","ID nhà cung cấp IEEE OUI - MA-L, MA-M và MA-S",IEEE OUI 制造商识别 - MA-L、MA-M 与 MA-S,IEEE OUI 製造商識別 - MA-L、MA-M 與 MA-S
+ProductFeatures5,Text,"Weighted classifier: routers, NAS, printers, cameras, IoT, phones and more","ওজনযুক্ত শ্রেণিবিন্যাসকারী: রাউটার, NAS, প্রিন্টার, ক্যামেরা, IoT, ফোন এবং আরও অনেক কিছু","Vážený klasifikátor: routery, NAS, tiskárny, kamery, IoT, telefony a další","Gewichteter Klassifikator: Router, NAS, Drucker, Kameras, IoT, Telefone und mehr","Classificateur pondéré : routeurs, NAS, imprimantes, caméras, IoT, téléphones et plus","Súlyozott osztályozó: útválasztók, NAS, nyomtatók, kamerák, IoT, telefonok és egyebek","Classificatore ponderato: router, NAS, stampanti, telecamere, IoT, telefoni e altro",重み付き分類器: ルーター、NAS、プリンター、カメラ、IoT、スマートフォンなど,"Салмақталған жіктеуіш: маршрутизаторлар, NAS, принтерлер, камералар, IoT, телефондар және басқалары","Vektet klassifiserer: rutere, NAS, skrivere, kameraer, IoT, telefoner og mer","Ważony klasyfikator: routery, NAS, drukarki, kamery, IoT, telefony i inne","Classificador ponderado: roteadores, NAS, impressoras, câmeras, IoT, celulares e mais","Взвешенный классификатор: маршрутизаторы, NAS, принтеры, камеры, IoT, телефоны и не только","Ağırlıklı sınıflandırıcı: yönlendiriciler, NAS'lar, yazıcılar, kameralar, IoT, telefonlar ve daha fazlası","Зважений класифікатор: маршрутизатори, NAS, принтери, камери, IoT, телефони й не тільки","Bộ phân loại có trọng số: router, NAS, máy in, camera, IoT, điện thoại và nhiều hơn nữa",加权分类器：路由器、NAS、打印机、摄像头、IoT、手机等,加權分類器：路由器、NAS、印表機、攝影機、IoT、手機等
+ProductFeatures6,Text,"Topology, Keep Alive and an embedded terminal beside the device list","টপোলজি, Keep Alive, এবং ডিভাইস তালিকার পাশে একটি এমবেডেড টার্মিনাল","Topologie, Keep Alive a vestavěný terminál vedle seznamu zařízení","Topologie, Keep Alive und ein eingebettetes Terminal neben der Geräteliste","Topologie, Keep Alive et un terminal intégré à côté de la liste des appareils","Topológia, Keep Alive és egy beépített terminál az eszközlista mellett","Topologia, Keep Alive e un terminale integrato accanto all'elenco dei dispositivi",トポロジー、Keep Alive、デバイス一覧の横に組み込まれたターミナル,"Топология, Keep Alive және құрылғылар тізімінің қасындағы кірістірілген терминал","Topologi, Keep Alive og en innebygd terminal ved siden av enhetslisten","Topologia, Keep Alive i wbudowany terminal obok listy urządzeń","Topologia, Keep Alive e um terminal embutido ao lado da lista de dispositivos","Топология, Keep Alive и встроенный терминал рядом со списком устройств","Topoloji, Keep Alive ve cihaz listesinin yanında yerleşik bir terminal","Топологія, Keep Alive та вбудований термінал поруч зі списком пристроїв","Sơ đồ mạng, giữ kết nối (Keep Alive) và một terminal nhúng bên cạnh danh sách thiết bị",拓扑、Keep Alive，以及设备列表旁的内置终端,拓撲圖、Keep Alive，以及裝置清單旁的內嵌終端機
+ProductFeatures7,Text,Scan history with trusted-device baselines and unknown-device alerts,বিশ্বস্ত-ডিভাইস বেসলাইন ও অপরিচিত-ডিভাইস সতর্কতাসহ স্ক্যান ইতিহাস,Historie skenování s výchozími stavy důvěryhodných zařízení a upozorněními na neznámá zařízení,Scanverlauf mit Basislinien für vertrauenswürdige Geräte und Warnungen bei unbekannten Geräten,Historique des scans avec des références d'appareils de confiance et des alertes d'appareils inconnus,Vizsgálati előzmények megbízható eszköz-alapállapotokkal és ismeretlen eszközökre vonatkozó riasztásokkal,Cronologia delle scansioni con basi di dispositivi fidati e avvisi per dispositivi sconosciuti,信頼済みデバイスのベースラインと未知デバイスの通知を備えたスキャン履歴,Сенімді құрылғы негіздемелерімен және белгісіз құрылғы ескертулерімен сканерлеу тарихы,Skannelogg med baselinjer for klarerte enheter og varsler om ukjente enheter,Historia skanów z punktami odniesienia zaufanych urządzeń i alertami o nieznanych urządzeniach,Histórico de varreduras com linhas de base de dispositivos confiáveis e alertas de dispositivos desconhecidos,История сканирований с базовыми линиями доверенных устройств и оповещениями о неизвестных устройствах,Güvenilir cihaz temel çizgileriyle ve bilinmeyen cihaz uyarılarıyla tarama geçmişi,Історія сканувань з базовими лініями довірених пристроїв і сповіщеннями про невідомі пристрої,Lịch sử quét với các chuẩn thiết bị tin cậy và cảnh báo thiết bị không xác định,扫描历史记录，具备受信任设备基线和未知设备提醒,掃描歷史記錄，具備信任裝置基準與未知裝置警示
+ProductFeatures8,Text,"Export follows the view: CSV, HTML, or the topology as PNG, JPG or HTML with SVG","এক্সপোর্ট ভিউ অনুযায়ী হয়: CSV, HTML, অথবা টপোলজি PNG, JPG বা SVG-সহ HTML হিসেবে","Export sleduje zobrazení: CSV, HTML, nebo topologie jako PNG, JPG či HTML s SVG","Export folgt der Ansicht: CSV, HTML oder die Topologie als PNG, JPG oder HTML mit SVG","L'export suit la vue : CSV, HTML, ou la topologie en PNG, JPG ou HTML avec SVG","Az exportálás a nézetet követi: CSV, HTML, vagy a topológia PNG, JPG vagy SVG-t tartalmazó HTML formátumban","L'esportazione segue la vista: CSV, HTML, o la topologia come PNG, JPG o HTML con SVG",エクスポートはビューに応じて決まる: CSV、HTML、またはトポロジーを PNG、JPG、SVG を含む HTML として,"Экспорт көрініске сай келеді: CSV, HTML немесе топология PNG, JPG не SVG бар HTML түрінде","Eksport følger visningen: CSV, HTML, eller topologien som PNG, JPG eller HTML med SVG","Eksport podąża za widokiem: CSV, HTML, lub topologia jako PNG, JPG czy HTML z SVG","A exportação acompanha a visualização: CSV, HTML ou a topologia em PNG, JPG ou HTML com SVG","Экспорт соответствует виду: CSV, HTML или топология в виде PNG, JPG или HTML с SVG","Görünüme göre dışa aktarma: CSV, HTML veya topoloji PNG, JPG ya da SVG içeren HTML olarak","Експорт відповідає поданню: CSV, HTML або топологія у вигляді PNG, JPG чи HTML з SVG","Xuất dữ liệu theo chế độ xem: CSV, HTML hoặc sơ đồ mạng dưới dạng PNG, JPG hoặc HTML kèm SVG",导出取决于视图：CSV、HTML，或将拓扑导出为 PNG、JPG 或 内含 SVG 的 HTML,匯出依檢視而定：CSV、HTML，或將拓撲圖匯出為 PNG、JPG 或 內含 SVG 的 HTML
+ProductFeatures9,Text,"KillerSpeed, device diagnostics and traceroute without leaving the app","অ্যাপ ছেড়ে না গিয়ে স্পিড টেস্ট, ডিভাইস ডায়াগনস্টিকস ও ট্রেসরুট","Test rychlosti, diagnostika zařízení a traceroute bez opuštění aplikace","Geschwindigkeitstest, Gerätediagnose und Traceroute, ohne die App zu verlassen","Test de vitesse, diagnostic d'appareil et traceroute sans quitter l'application","Sebességteszt, eszközdiagnosztika és traceroute az alkalmazás elhagyása nélkül","Test di velocità, diagnostica dei dispositivi e traceroute senza uscire dall'app",アプリを離れずに実行できる速度テスト、デバイス診断、traceroute,"Қолданбадан шықпай-ақ жылдамдық сынағы, құрылғы диагностикасы және traceroute","KillerSpeed, enhetsdiagnostikk og traceroute uten å forlate appen","Test szybkości, diagnostyka urządzeń i traceroute bez opuszczania aplikacji","KillerSpeed, diagnóstico de dispositivos e traceroute sem sair do aplicativo","Тест скорости, диагностика устройства и трассировка маршрута, не выходя из приложения","Uygulamadan çıkmadan hız testi, cihaz tanılaması ve traceroute","Тест швидкості, діагностика пристрою й трасування маршруту, не виходячи із застосунку","KillerSpeed, chẩn đoán thiết bị và traceroute mà không cần rời khỏi ứng dụng",无需离开应用即可进行速度测试、设备诊断和 traceroute,不必離開應用程式即可執行速度測試、裝置診斷與 traceroute
+ProductFeatures10,Text,"Headless command line for scripts, scheduled tasks and RMM","স্ক্রিপ্ট, শিডিউল করা টাস্ক এবং RMM-এর জন্য হেডলেস কমান্ড লাইন","Příkazový řádek bez okna pro skripty, naplánované úlohy a RMM","Fensterlose Befehlszeile für Skripte, geplante Aufgaben und RMM","Ligne de commande sans fenêtre pour les scripts, les tâches planifiées et le RMM","Fej nélküli parancssor szkriptekhez, ütemezett feladatokhoz és RMM-hez","Riga di comando senza interfaccia per script, attività pianificate e RMM",スクリプト、スケジュールされたタスク、RMM 向けのヘッドレスコマンドライン,"Сценарийлерге, жоспарланған тапсырмаларға және RMM жүйелеріне арналған терезесіз пәрмен жолы","Hodeløs kommandolinje for skript, planlagte oppgaver og RMM","Wiersz poleceń bez okna do skryptów, zaplanowanych zadań i RMM","Linha de comando sem janela para scripts, tarefas agendadas e RMM","Безоконный режим командной строки для скриптов, планировщика задач и RMM","Betikler, zamanlanmış görevler ve RMM için penceresiz komut satırı","Безвіконний режим командного рядка для скриптів, планувальника завдань і RMM","Dòng lệnh không giao diện cho script, nhiệm vụ theo lịch và RMM",无窗口命令行，适用于脚本、计划任务与 RMM,無視窗命令列，適用於指令碼、排程工作與 RMM
+ProductFeatures11,Text,Thirteen themes with live accent colors and remembered appearance settings,লাইভ অ্যাকসেন্ট রঙ ও মনে রাখা চেহারা সেটিংসহ তেরোটি থিম,Třináct motivů se živými akcentovými barvami a zapamatovaným nastavením vzhledu,Dreizehn Designs mit Live-Akzentfarben und gespeicherten Darstellungseinstellungen,Treize thèmes avec couleurs d'accent en direct et réglages d'apparence mémorisés,Tizenhárom téma élő hangsúlyos színekkel és megjegyzett megjelenési beállításokkal,Tredici temi con colori d'accento in tempo reale e impostazioni di aspetto memorizzate,ライブアクセントカラーと記憶される外観設定を備えた 13 テーマ,Тірі акцент түстері және есте сақталатын көрініс параметрлері бар он үш тақырып,Tretten temaer med levende aksentfarger og husket utseendeinnstillinger,Trzynaście motywów z kolorami akcentu na żywo i zapamiętywanymi ustawieniami wyglądu,Treze temas com cores de destaque ao vivo e configurações de aparência lembradas,Тринадцать тем с живыми акцентными цветами и запоминанием настроек оформления,Canlı vurgu renkleri ve hatırlanan görünüm ayarlarıyla on üç tema,Тринадцять тем із живими акцентними кольорами та запам'ятовуванням налаштувань оформлення,Mười ba giao diện với màu nhấn sống động và ghi nhớ cài đặt hiển thị,十三种主题，具备实时强调色和记忆的外观设置,十三種主題，具備即時強調色與記憶的外觀設定
+ProductFeatures12,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures13,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures14,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures15,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures16,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures17,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures18,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures19,Text,,,,,,,,,,,,,,,,,,
+ProductFeatures20,Text,,,,,,,,,,,,,,,,,,
+ShortDescription,Text,"A portable network scanner that discovers reachable IPv4 devices, identifies vendors, and helps you investigate what is running on the network.","একটি পোর্টেবল নেটওয়ার্ক স্ক্যানার, যা সংযোগযোগ্য IPv4 ডিভাইস খুঁজে পায়, প্রস্তুতকারক শনাক্ত করে এবং নেটওয়ার্কে কী চলছে তা খতিয়ে দেখতে সাহায্য করে।","Přenosný síťový skener, který vyhledává dostupná zařízení IPv4, určuje výrobce a pomáhá zjistit, co v síti běží.","Ein portabler Netzwerkscanner, der erreichbare IPv4-Geräte findet, Hersteller ermittelt und bei der Untersuchung laufender Netzwerkdienste hilft.","Un scanner réseau portable qui découvre les appareils IPv4 accessibles, identifie leurs fabricants et vous aide à examiner les services du réseau.","Hordozható hálózati szkenner, amely elérhető IPv4-eszközöket keres, azonosítja a gyártókat, és segít felderíteni a hálózaton futó szolgáltatásokat.","Uno scanner di rete portatile che rileva dispositivi IPv4 raggiungibili, identifica i produttori e aiuta a capire cosa è in esecuzione sulla rete.",到達可能な IPv4 デバイスの検出、メーカーの識別、ネットワークで動作するサービスの調査に役立つポータブルネットワークスキャナー。,"Қолжетімді IPv4 құрылғыларын тауып, өндірушілерін анықтайтын және желіде қандай қызметтер жұмыс істейтінін зерттеуге көмектесетін тасымалды желі сканері.","En portabel nettverksskanner som finner tilgjengelige IPv4-enheter, identifiserer produsenter og hjelper deg å undersøke hva som kjører på nettverket.","Przenośny skaner sieci, który wykrywa dostępne urządzenia IPv4, identyfikuje producentów i pomaga ustalić, co działa w sieci.","Um scanner de rede portátil que descobre dispositivos IPv4 acessíveis, identifica fabricantes e ajuda a investigar o que está rodando na rede.","Портативный сетевой сканер, который находит доступные устройства IPv4, определяет производителей и помогает выяснить, что работает в сети.","Erişilebilir IPv4 cihazlarını bulan, üreticileri tanımlayan ve ağda çalışan hizmetleri incelemenize yardımcı olan taşınabilir ağ tarayıcısı.","Портативний мережевий сканер, який знаходить доступні пристрої IPv4, визначає виробників і допомагає з'ясувати, що працює в мережі.","Một máy quét mạng di động phát hiện các thiết bị IPv4 có thể truy cập, xác định nhà cung cấp và giúp bạn điều tra những gì đang chạy trên mạng.",便携式网络扫描器，发现可访问的 IPv4 设备、识别厂商，帮助您调查网络上运行的服务。,可攜式網路掃描器，探索可連線的 IPv4 裝置、識別廠商，協助您調查網路上執行的服務。
+SearchTerms1,Text,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner,network scanner
+SearchTerms2,Text,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner,IP scanner
+SearchTerms3,Text,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner,port scanner
+SearchTerms4,Text,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner,LAN scanner
+SearchTerms5,Text,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup,MAC vendor lookup
+SearchTerms6,Text,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery,network discovery
+SearchTerms7,Text,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor,ping monitor
+Applicable license terms,Text,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan,GNU General Public License v3.0 (GPLv3). Source code: https://github.com/SteveTheKiller/KillerScan
+Copyright,Text,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer,© 2026 Steve the Killer
+DevelopedBy,Text,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer,Steve the Killer
+RequirementsMinimum1,Text,.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows),.NET Framework 4.8 or newer (included with Windows)
+RequirementsMinimum2,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum3,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum4,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum5,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum6,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum7,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum8,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum9,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum10,Text,,,,,,,,,,,,,,,,,,
+RequirementsMinimum11,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended1,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended2,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended3,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended4,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended5,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended6,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended7,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended8,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended9,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended10,Text,,,,,,,,,,,,,,,,,,
+RequirementsRecommended11,Text,,,,,,,,,,,,,,,,,,
+StoreLogos1,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png,StoreLogo-1080.png
+StoreLogos2,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,,,,,,,,,,,,,,,,,,
+Screenshots1,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png,screenshots/01.png
+Screenshots2,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png,screenshots/02.png
+Screenshots3,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png,screenshots/03.png
+Screenshots4,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png,screenshots/04.png
+Screenshots5,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png,screenshots/05.png
+Screenshots6,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png,screenshots/06.png
+Screenshots7,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png,screenshots/07.png
+Screenshots8,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png,screenshots/08.png
+Screenshots9,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png,screenshots/09.png
+Screenshots10,Provide the file name only if it is in the same folder. Provide relative path to image starting with the subfolder name otherwise,,,,,,,,,,,,,,,,,,
+HeroArts,Text,,,,,,,,,,,,,,,,,,
+Trailers,Text,,,,,,,,,,,,,,,,,,
