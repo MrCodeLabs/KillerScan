@@ -15,6 +15,10 @@ internal static class Program
             await Run("ARP output parsing keeps IPv4 entries with full MAC addresses", ArpParsing);
             await Run("Classifier honors manual types, the gateway, DNS and hostname rules", Classifier);
             await Run("Recognition keeps weak names, OUI and silent hosts uncertain", RecognitionTests.WeakSignals);
+            await Run("Access keeps endpoint evidence, login uncertainty and safe addresses", AccessTests.Evidence);
+            await Run("Real HTTP retains multiple endpoints and refuses redirects/auth retries", AccessTests.HttpRoundTrip);
+            await Run("Deep access records real HTTPS on a nonstandard port", AccessTests.HttpsRoundTrip);
+            await Run("Stop cancels HTTP and prevents later access probes", AccessTests.StopRequests);
             await Run("Recognition requires corroboration and exposes contradictory evidence", RecognitionTests.CorroborationAndConflict);
             await Run("Reported models require explicit declarations and bounded evidence", RecognitionTests.ModelsAndUntrustedValues);
             await Run("Manual labels, frozen inference, timestamps and JSON remain distinct", RecognitionTests.ManualAndSnapshots);
@@ -100,7 +104,7 @@ internal static class Program
             try { NetworkScanner.GetAddressesInSubnet(cidr); }
             catch (ArgumentOutOfRangeException ex)
             {
-                rejected = ex.ParamName == "cidr" && ex.Message.Contains("65,536", StringComparison.Ordinal);
+                rejected = ex.ParamName == "cidr" && ex.Message.Contains(ScanTargets.MaxAddresses.ToString("N0"), StringComparison.Ordinal);
             }
             Require(rejected, cidr + " should be rejected before its hosts are allocated");
         }

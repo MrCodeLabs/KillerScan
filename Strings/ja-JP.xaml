@@ -547,4 +547,17 @@
     <sys:String x:Key="Str_Evidence_Deep">詳細スキャン</sys:String>
     <sys:String x:Key="Str_Evidence_External">インポート / 範囲不明</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">その他の候補</sys:String>
+    <sys:String x:Key="Str_Access_Title">アクセス</sys:String>
+    <sys:String x:Key="Str_Access_None">利用できるアクセス先がありません。</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">認証</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">不明</sys:String>
+    <sys:String x:Key="Str_Access_Required">サーバーが認証を要求</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">パスワードフォームを検出</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">このアドレスでHTTP応答を受信</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSHバナーを受信</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCPポートが開いています。プロトコルはポートから推定</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">ポートから推定したアドレス。検証記録なし</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">リダイレクト応答。転送先にはアクセスしていません</sys:String>
+    <sys:String x:Key="Str_Access_Note">開く操作は新しい接続を開始します。HTTP 200はログイン不要の証拠ではありません。HTTPS証明書の有効性は未検証です。認証の証拠は要求したアドレスにのみ適用されます。</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">観測時刻不明</sys:String>
 </ResourceDictionary>

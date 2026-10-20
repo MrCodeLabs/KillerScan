@@ -537,4 +537,17 @@ Ihre Einstellungen bleiben erhalten.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Tiefenscan</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importiert / Umfang nicht angegeben</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Weitere Kandidaten</sys:String>
+    <sys:String x:Key="Str_Access_Title">Zugriff</sys:String>
+    <sys:String x:Key="Str_Access_None">Keine Zugriffsadressen verfügbar.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Anmeldung</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Unbekannt</sys:String>
+    <sys:String x:Key="Str_Access_Required">Server fordert Authentifizierung</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Passwortformular erkannt</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">HTTP-Antwort an dieser Adresse empfangen</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">SSH-Banner empfangen</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">TCP-Port offen; Protokoll anhand des Ports vorgeschlagen</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Adresse anhand des Ports vorgeschlagen; keine gespeicherte Prüfung</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Weiterleitung empfangen; Ziel nicht aufgerufen</sys:String>
+    <sys:String x:Key="Str_Access_Note">Öffnen stellt eine neue Verbindung her. HTTP 200 belegt keinen Zugriff ohne Anmeldung. HTTPS-Zertifikate wurden nicht validiert. Anmeldebelege gelten nur für die angeforderte Adresse.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Beobachtungszeit nicht verfügbar</sys:String>
 </ResourceDictionary>

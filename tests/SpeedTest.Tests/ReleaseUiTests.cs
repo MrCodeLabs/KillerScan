@@ -95,6 +95,7 @@ internal static class ReleaseUiTests
         var output = Path.Combine(Path.GetTempPath(), "KillerScan-release-ui-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(output);
         EvidenceUiChecks.Run(window, (element, name) => Save(Render(element, 820, 600), Path.Combine(output, name)));
+        AccessUiChecks.Run(window, (element, name) => Save(Render(element, 900, 620), Path.Combine(output, name)));
         if (evidenceOnly) { Console.WriteLine("Evidence UI: " + output); window.Close(); return; }
         var samples = new List<(string Label, BitmapSource Image)>();
         int states = 0;
@@ -240,7 +241,7 @@ internal static class ReleaseUiTests
         Require(!ReferenceEquals(grid.ContextMenu, devicesGrid.ContextMenu), "Services have their own context menu.");
         var actions = grid.ContextMenu.Items.OfType<MenuItem>().ToDictionary(item => (string)item.Tag);
         Require(actions.Keys.OrderBy(value => value).SequenceEqual(new[] { "Browser", "CopyEndpoint", "CopyHost", "CopyIp", "CopyPort",
-            "CopyService", "Evidence", "Export", "Rdp", "SelectAll", "Ssh", "SshAs" }.OrderBy(value => value)),
+            "CopyService", "Access", "Evidence", "Export", "Rdp", "SelectAll", "Ssh", "SshAs" }.OrderBy(value => value)),
             "The service menu contains service actions and excludes device trust, renaming, MAC copying and type overrides.");
         var original = ((IEnumerable<KillerScan.Engine.NetworkDevice>)type.GetProperty("ScannedDevices", Instance)!.GetValue(workspace)!).ToArray();
         string originalTarget = workspace.Targets;

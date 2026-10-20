@@ -60,13 +60,13 @@ namespace KillerScan.Services
         internal static string BuildLocationCsv(IEnumerable<NetworkDevice> devices, ScanLocation? location, bool header = true)
         {
             var sb = new StringBuilder();
-            if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports" + (location == null ? "" : ",Location ID,Location") + ",Recognition confidence,Reported model,Identification JSON");
+            if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports" + (location == null ? "" : ",Location ID,Location") + ",Recognition confidence,Reported model,Identification JSON,Access JSON");
             foreach (var d in devices.OrderBy(d => d.IpSortKey))
                 sb.AppendLine(string.Join(",", CsvField(d.IpAddress), CsvField(d.Hostname),
                     CsvField(d.MacAddress), CsvField(d.Vendor), CsvField(d.DeviceType), CsvField(d.OpenPortsDisplay)) +
                     (location == null ? "" : "," + CsvField(location.Id) + "," + CsvField(location.Name)) + "," +
                     CsvField(d.Identification?.EffectiveConfidence) + "," + CsvField(d.Identification?.ReportedModel) + "," +
-                    CsvField(d.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(d.Identification)));
+                    CsvField(d.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(d.Identification)) + "," + CsvField(System.Text.Json.JsonSerializer.Serialize(DeviceAccess.ForDevice(d))));
             return sb.ToString();
         }
 
@@ -180,7 +180,8 @@ namespace KillerScan.Services
                     // the visible cell is translated.
                     $"<td class='{cls}'>{Esc(Controls.DeviceTypeConverter.Display(d.DeviceType))}" +
                     $"<details><summary>{Esc(L("Str_Evidence_Title", "Recognition evidence"))}: {Esc(IdentificationText.Confidence(d.Identification))}</summary>" +
-                    $"<pre style='white-space:pre-wrap'>{Esc(IdentificationText.Describe(d))}</pre></details></td>" +
+                    $"<pre style='white-space:pre-wrap'>{Esc(IdentificationText.Describe(d))}</pre></details>" +
+                    $"<details><summary>{Esc(AccessText.L("Title"))}</summary><pre style='white-space:pre-wrap'>{Esc(AccessText.DescribeDevice(d))}</pre></details></td>" +
                     $"<td class='mono'>{Esc(d.OpenPortsDisplay)}</td></tr>");
             }
             sb.AppendLine("</tbody></table></div>");

@@ -92,7 +92,7 @@ internal static class RecognitionTests
         internal override Task<Dictionary<string, MulticastDiscovery.MdnsInfo>> Mdns(CancellationToken token) => Task.FromResult(new Dictionary<string, MulticastDiscovery.MdnsInfo>
         { ["192.0.2.10"] = new() { Services = { "_printer._tcp.local" } } });
         internal override Task<Dictionary<string, string>> Ssdp(CancellationToken token) => Task.FromResult(new Dictionary<string, string> { ["192.0.2.10"] = "model=Unit42" });
-        internal override Task Http(NetworkDevice device, IPAddress address, bool deep) { device.HttpTitle = "Embedded Web Server; model=Unit42"; return Task.CompletedTask; }
+        internal override Task Http(NetworkDevice device, IPAddress address, bool deep, CancellationToken token = default) { device.HttpTitle = "Embedded Web Server; model=Unit42"; return Task.CompletedTask; }
         internal override Task Tls(NetworkDevice device, IPAddress address, bool deep) => Task.CompletedTask;
         internal override Task Ssh(NetworkDevice device, IPAddress address) => Task.CompletedTask;
         internal override Task Snmp(NetworkDevice device, IPAddress address) { device.SnmpDescr = "Printer; model=Unit42"; return Task.CompletedTask; }

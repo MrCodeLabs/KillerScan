@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ## [1.8.4] - Unreleased
 
 ### Added
+- A unified Access list with exact captured HTTP/HTTPS endpoints, protocol/port suggestions, response and authentication evidence, and Open/Copy actions using existing clients. Deep web probes retain nonstandard endpoints; history, exports and PowerShell preserve the optional data. All 19 locales include the new labels.
 - Device recognition evidence and heuristic confidence, source/timestamp details, explicitly reported model declarations, read-only device/service/history inspection, and structured evidence in JSON/CSV/HTML and PowerShell. Missing replies alone no longer imply IoT or Mobile; a MAC vendor never establishes a model.
 - Location controls and GUI error guidance in all 19 supported languages, plus a two-process location/profile GUI persistence check. Classic input dialog titles follow the action being performed.
 - Explicit location identities, per-location device data/history/profiles, safe copy-and-backup migration of legacy files, location-aware CLI/PowerShell and export metadata. Changing location clears transient results and is locked during scans.

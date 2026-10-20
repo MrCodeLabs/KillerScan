@@ -534,4 +534,17 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Hloubkové skenování</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importováno / rozsah neurčen</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Další kandidáti</sys:String>
+    <sys:String x:Key="Str_Access_Title">Přístup</sys:String>
+    <sys:String x:Key="Str_Access_None">Nejsou dostupné žádné přístupové adresy.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Přihlášení</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Neznámé</sys:String>
+    <sys:String x:Key="Str_Access_Required">Server požaduje ověření</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Zjištěn formulář s heslem</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Na této adrese přijata odpověď HTTP</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Přijat banner SSH</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Port TCP je otevřen; protokol navržen podle portu</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Adresa navržena podle portu; bez uloženého ověření</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Odpověď přesměrování; cíl nebyl následován</sys:String>
+    <sys:String x:Key="Str_Access_Note">Otevření vytvoří nové spojení. HTTP 200 nedokazuje přístup bez přihlášení. Certifikáty HTTPS nebyly ověřeny. Doklad přihlášení platí jen pro požadovanou adresu.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Čas pozorování není dostupný</sys:String>
 </ResourceDictionary>

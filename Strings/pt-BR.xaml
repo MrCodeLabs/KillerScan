@@ -578,4 +578,17 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Verificação profunda</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importado / escopo não especificado</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Outros candidatos</sys:String>
+    <sys:String x:Key="Str_Access_Title">Acesso</sys:String>
+    <sys:String x:Key="Str_Access_None">Nenhum endereço de acesso disponível.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Autenticação</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Desconhecida</sys:String>
+    <sys:String x:Key="Str_Access_Required">O servidor solicitou autenticação</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Formulário de senha detectado</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Resposta HTTP recebida neste endereço</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Banner SSH recebido</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Porta TCP aberta; protocolo sugerido pela porta</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Endereço sugerido pela porta; sem verificação salva</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Resposta de redirecionamento; destino não seguido</sys:String>
+    <sys:String x:Key="Str_Access_Note">Abrir cria uma nova conexão. HTTP 200 não comprova acesso sem login. Os certificados HTTPS não foram validados. A evidência de autenticação vale apenas para o endereço solicitado.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Horário da observação indisponível</sys:String>
 </ResourceDictionary>

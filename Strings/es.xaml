@@ -536,4 +536,17 @@ Su configuración no se eliminará.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Análisis profundo</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importado / alcance sin especificar</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Otros candidatos</sys:String>
+    <sys:String x:Key="Str_Access_Title">Acceso</sys:String>
+    <sys:String x:Key="Str_Access_None">No hay direcciones de acceso disponibles.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Autenticación</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Desconocida</sys:String>
+    <sys:String x:Key="Str_Access_Required">El servidor solicitó autenticación</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Formulario de contraseña detectado</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Respuesta HTTP recibida en esta dirección</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Banner SSH recibido</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Puerto TCP abierto; protocolo sugerido por el puerto</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Dirección sugerida por el puerto; sin verificación guardada</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Respuesta de redirección; no se siguió el destino</sys:String>
+    <sys:String x:Key="Str_Access_Note">Abrir crea una nueva conexión. HTTP 200 no demuestra acceso sin iniciar sesión. No se validaron los certificados HTTPS. La evidencia de autenticación solo se aplica a la dirección solicitada.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Hora de observación no disponible</sys:String>
 </ResourceDictionary>

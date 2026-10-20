@@ -552,4 +552,17 @@ Le tue impostazioni non verranno rimosse.</sys:String>
     <sys:String x:Key="Str_Evidence_Deep">Scansione approfondita</sys:String>
     <sys:String x:Key="Str_Evidence_External">Importato / ambito non specificato</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Altri candidati</sys:String>
+    <sys:String x:Key="Str_Access_Title">Accesso</sys:String>
+    <sys:String x:Key="Str_Access_None">Nessun indirizzo di accesso disponibile.</sys:String>
+    <sys:String x:Key="Str_Access_Authentication">Autenticazione</sys:String>
+    <sys:String x:Key="Str_Access_Unknown">Sconosciuta</sys:String>
+    <sys:String x:Key="Str_Access_Required">Il server richiede autenticazione</sys:String>
+    <sys:String x:Key="Str_Access_LoginPage">Rilevato modulo con password</sys:String>
+    <sys:String x:Key="Str_Access_HttpResponse">Risposta HTTP ricevuta a questo indirizzo</sys:String>
+    <sys:String x:Key="Str_Access_SshBanner">Banner SSH ricevuto</sys:String>
+    <sys:String x:Key="Str_Access_TcpOpen">Porta TCP aperta; protocollo suggerito dalla porta</sys:String>
+    <sys:String x:Key="Str_Access_PortHint">Indirizzo suggerito dalla porta; nessuna verifica salvata</sys:String>
+    <sys:String x:Key="Str_Access_Redirect">Risposta di reindirizzamento; destinazione non seguita</sys:String>
+    <sys:String x:Key="Str_Access_Note">Aprire crea una nuova connessione. HTTP 200 non dimostra accesso senza autenticazione. I certificati HTTPS non sono stati convalidati. La prova di autenticazione vale solo per l’indirizzo richiesto.</sys:String>
+    <sys:String x:Key="Str_Access_NoTime">Ora dell’osservazione non disponibile</sys:String>
 </ResourceDictionary>
