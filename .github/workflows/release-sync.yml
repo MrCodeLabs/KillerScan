@@ -16,6 +16,8 @@ permissions:
 
 jobs:
   verify:
+    # These package IDs belong to the upstream publisher, not development forks.
+    if: github.repository == 'SteveTheKiller/KillerScan'
     runs-on: ubuntu-latest
     env:
       APP_NAME: KillerScan
@@ -44,7 +46,9 @@ jobs:
           } else {
               "repos/$repository/releases/latest"
           }
-          $release = gh api $releasePath | ConvertFrom-Json
+          $releaseJson = gh api $releasePath
+          if ($LASTEXITCODE -ne 0) { throw "Could not fetch release metadata from $releasePath (gh exit $LASTEXITCODE)." }
+          $release = $releaseJson | ConvertFrom-Json
           $tag = [string]$release.tag_name
           $version = $tag -replace '^v', ''
           if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid release tag: $tag" }
