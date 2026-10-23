@@ -131,7 +131,7 @@ internal static class ReleaseUiTests
         }
         Require(states == 45, "All 45 default and explicit theme/accent states render.");
         Theme("Black", "Orange");
-        var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
+        var localeWorkspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
         foreach (string locale in Enum.GetNames(localeType))
         {
             Locale(locale);
@@ -143,7 +143,7 @@ internal static class ReleaseUiTests
                 ("ServicesGrid", new[] { "Str_Services_Service", "Str_Col_Ports", "Str_Col_DeviceName", "Str_Col_Ip", "Str_Col_Type" })
             })
             {
-                var grid = (DataGrid)workspace.FindName(gridName);
+                var grid = (DataGrid)localeWorkspace.FindName(gridName);
                 Require(grid.Columns.Select(column => column.Header).SequenceEqual(keys.Select(key => app.FindResource(key))),
                     locale + ": " + gridName + " headers follow the selected locale.");
             }
@@ -181,6 +181,7 @@ internal static class ReleaseUiTests
         menu.Items.Clear();
         var menuSurface = new Border { Child = columnsPanel, Background = (Brush)app.FindResource("MenuBackgroundBrush") };
         Save(Render(menuSurface, 450, 420), Path.Combine(output, "LanguageMenu.png"));
+        var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
         workspace.SetView("services");
         Render(root, 1200, 780);
         CheckServiceMenu(workspace, root, output);
