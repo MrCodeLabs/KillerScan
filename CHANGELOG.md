@@ -4,7 +4,7 @@ All notable changes to KillerScan are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.8.4] - Unreleased
 
 ### Added
 - Location controls and GUI error guidance in all 19 supported languages, plus a two-process location/profile GUI persistence check. Classic input dialog titles follow the action being performed.
@@ -12,6 +12,75 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Explicit Windows IPv4 interface selection for scan tabs, profiles, CLI and the terminal toolbar, with pinned TCP/UDP/multicast, source-aware ARP/ICMP/DNS, per-interface classification and cancellation on link changes. Missing selections never fall back to a different adapter.
 - Per-tab scan options for neighbor cache, explicit ARP, ICMP, TCP discovery, DNS, mDNS, SSDP, port scanning and individual HTTP/TLS/SSH/SNMP/NetBIOS fingerprints. Profiles save the choices; scan, quick and deep paths enforce them in the engine. CLI `/skip` and PowerShell `-Skip` provide the same choices. Existing profiles and API calls keep their defaults.
 
+### Fixed
+- The shortcuts card shows shadows at its edges when more content is out of view.
+
+## [1.8.3] - 2026-10-19
+
+### Changed
+- Refreshed the bundled MAC vendor database to 58,575 assignments.
+- Scan History and Scan Profiles open wide enough to show every date in full. Dragging the sidebar narrower draws their text up to 15% smaller before it is cut off.
+
+### Fixed
+- The theme and language menus open beside their own rail buttons instead of at the corner of the device list.
+- A thin black line no longer shows under the title bar. The film grain now covers the whole bar.
+- The dot in a selected radio button sits in the middle of its ring, and radio buttons and checkboxes line up with the capitals of their labels in Killer Sans UI and on 98SE.
+
+## [1.8.2] - 2026-10-19
+
+### Added
+- Commands run as `killerscan scan` without a command prefix. `killerscan --help` lists them, and existing command forms stay compatible. Installed copies use PATH; portable copies run from their folder or full path.
+- KillerScan checks for updates on startup and offers a newer release in a dialog with an Always check on startup box. A Check for updates on startup checkbox on the About card turns the check back on.
+- Alt+Shift+G turns Film Grain on or off. It is listed in the shortcuts overlay, and the keyboard map has a new Alt+Shift layer for it.
+- The website's top bar has a Microsoft Store button on every page, and the MCP page has a Microsoft Store button for KillerMCP.
+- The website's About page lists KillerBench and KillerShot under Also try, with larger app icons.
+
+### Changed
+- Refreshed the bundled MAC vendor database to 58,575 assignments.
+- Film grain is softer and shows on every theme, Black included. Its specks come in many shades, and some lean toward a color opposite the theme accent, such as purple on green and orange-brown on blue and red.
+- Rail buttons and the collapse arrow sit centered across the rail, and the arrow is larger.
+- Dialog headings, the history sidebar heading and the history detail header use Lacquer, the wordmark's app-name face, in place of Killer Sans. 98SE keeps Killer Sans.
+- The history detail header is the same size as the Scan History heading.
+- Context menus use Killer Sans UI like the rest of the interface instead of Segoe UI.
+- The Light theme draws a softer shadow under the toolbars.
+- Toolbar buttons with text under the icon are 6 pixels shorter, without the extra space above and below the icon and label.
+- The website's top bar Download button uses the same font and height as the other top bar buttons.
+- The PATH entry for installed copies now keeps the existing Path value's type and its %variables%, tells open programs about the change, and is removed by the uninstaller.
+- The keyboard focus outline is a thin one-pixel dotted ring in the theme accent instead of a thick dotted line, and uses the text color where the accent would be too faint to see.
+- Primary, outline and secondary buttons sit raised on a soft shadow that lifts on hover and sets down when pressed. 98SE keeps its flat beveled buttons.
+
+### Fixed
+- CSV exports keep device and scan text from running as spreadsheet formulas. (#10)
+- Overlapping scan targets count each address once against the 65,536 address limit, so a /16 with hosts inside it no longer reports as too large. (#11)
+- The public subnet helper rejects oversized ranges before expanding them. (#13)
+- HTML report columns sort from the keyboard. Each column header takes Tab focus with a visible ring, Enter and Space sort it, and screen readers hear the sort direction. (#12)
+- Windows contrast themes now use system colors for text, icons, panels and selections, without decorative grain or shadows.
+- The window opens fully on screen on a small or high-scaling display, or when its saved size came from a bigger monitor, instead of running off the edges.
+- HTML reports show the KillerScan wordmark in the report's theme and accent, loaded from killerscan.net, instead of always falling back to the text wordmark. 98SE keeps the text wordmark.
+- The deep scan status and a few labels that were still in English are translated in every language, and the website's MCP page footer follows the language picker.
+- On the Light theme's Yellow and Orange accents, buttons, links, tabs and accent icons keep their color with a thin gray outline around accent text and icons, instead of turning near-black or brown.
+- Gray, menu and accent text reads at 4.5:1 contrast or better in every theme and accent, and the footer's version and copyright are slightly dimmed.
+- The Dark theme's Red accent stays a true red on buttons, lines, scroll bars and the website's accent swatches, and only small red text uses a lighter red.
+- The website's text and accent colors read at 4.5:1 contrast or better in every theme, and a narrow top bar shrinks the Microsoft Store and MCP buttons to their logos and moves links into a More menu instead of wrapping.
+- On the website's Light theme with the Yellow or Orange accent, links, headings and labels keep their color with a thin gray outline instead of turning olive or brown.
+- The exe's file properties show Steve the Killer as the copyright holder instead of leaving it blank.
+- Screen readers no longer read toolbar, menu, tab and title bar icons as unreadable symbols, and every part of each scroll bar now has a name. File-picker rows announce folder and file names.
+- Opening the shortcuts or About card moves keyboard focus into it, Tab stays inside the card, and closing it returns focus to where it was.
+- Tab no longer stops on hidden links, which screen readers announced as the window.
+- Screen readers and accessibility checkers no longer report empty text or the hidden parts of scroll bars as items on screen.
+- Each group of option buttons is one Tab stop that lands on the selected option, and the arrow keys move between its options.
+- Tab moves past the device, service and history lists in one step instead of visiting every cell, and screen readers read the address and type cells instead of a placeholder and a blank host name, MAC address or vendor as Unknown.
+- Turning off Film Grain removes the grain from the device table, Services and Topology views too, instead of leaving it behind them.
+- The Scan History sidebar can no longer be dragged or zoomed narrower than its dates, so a saved scan's date and time are never cut off.
+- The website top bar no longer leaves extra space under the wordmark and buttons.
+- The file picker's close button turns red on hover without filling a red block, like every other dialog's close, and keeps the classic caption button on 98SE.
+- Theme and language radio buttons and the Film Grain checkbox line up with their labels again.
+- On the website, text on accent-colored buttons, tabs and highlights switches to white or near-black for contrast, so it is never white on yellow.
+- Theme names and the Keep Alive view name are translated in every language.
+- The website's MCP page, contact cards, carousel and section toggles are translated in every language, the site uses the app's names for Keep Alive and Deep Scan, and text that had lost its accents in several languages is restored.
+- On phones, the website's logo and download hash fit the screen instead of making the home page scroll sideways.
+- The Network Scanner subtitle in the title bar sits on the baseline of Killer in the wordmark instead of 2px below it.
+- The footer copyright sits a few pixels further from the corner grip instead of running into it.
 ## [1.8.1] - 2026-10-14
 
 ### Added

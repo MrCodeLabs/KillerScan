@@ -44,6 +44,7 @@ namespace KillerScan.Shell
 
         bool IAboutHost.UpdateEnabled   { set => AboutUpdateButton.IsEnabled = value; }
         bool IAboutHost.DbUpdateEnabled { set => AboutDbUpdateLink.IsEnabled = value; }
+        bool IAboutHost.StartupUpdateCheck { set => AboutStartupUpdateCheck.IsChecked = value; }
 
         void IAboutHost.ShowCard() => FadeOverlayIn(AboutOverlay);
 
@@ -82,6 +83,9 @@ namespace KillerScan.Shell
         private void AboutVersion_Click(object sender, MouseButtonEventArgs e) => _about.OpenReleaseNotes();
 
         private void AboutUpdateButton_Click(object sender, RoutedEventArgs e) => _about.Update();
+
+        private void AboutStartupUpdateCheck_Click(object sender, RoutedEventArgs e)
+            => _about.SetStartupCheck(AboutStartupUpdateCheck.IsChecked == true);
 
         private void AboutDbUpdate_Click(object sender, RoutedEventArgs e) => _about.UpdateVendorDb();
 

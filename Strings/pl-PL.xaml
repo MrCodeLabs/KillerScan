@@ -9,7 +9,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Pokaż lub ukryj kartę sieciową i szybkość łącza</sys:String>
     <sys:String x:Key="Str_Light_Idle">Nic jeszcze nie przeskanowano</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Skanowanie</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Trwa Deep Scan</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Trwa skanowanie dogłębne</sys:String>
     <sys:String x:Key="Str_Light_Done">Skanowanie zakończone</sys:String>
     <sys:String x:Key="Str_TT_Export">Eksportuj</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">MOTYW</sys:String>
@@ -112,7 +112,7 @@
     <sys:String x:Key="Str_Ctx_Ssh">SSH</sys:String>
     <sys:String x:Key="Str_Ctx_SshAs">SSH jako...</sys:String>
     <sys:String x:Key="Str_Ssh_Head">Połącz z {0} przez SSH</sys:String>
-    <sys:String x:Key="Str_Ssh_Detail">Konto, na które nastąpi logowanie. KillerScan zapamięta je dla tego urządzenia, więc następnym razem wystarczy nacisnąć SSH. Zapisywana jest wyłącznie nazwa użytkownika - hasło i klucz prywatny pozostają w kliencie SSH systemu Windows.</sys:String>
+    <sys:String x:Key="Str_Ssh_Detail">Konto, na które nastąpi logowanie. KillerScan zapamięta je dla tego urządzenia, więc zostaniesz o nie zapytany tylko raz. Pozostaw puste, aby klient SSH zdecydował sam.</sys:String>
     <sys:String x:Key="Str_Ssh_User">NAZWA UŻYTKOWNIKA</sys:String>
     <sys:String x:Key="Str_About_Sha">SHA-256 PLIKU EXE</sys:String>
     <sys:String x:Key="Str_About_Db">BAZA PRODUCENTÓW</sys:String>
@@ -127,8 +127,8 @@
     <sys:String x:Key="Str_St_OverrideSet">Ustawiono typ: {0} = {1}</sys:String>
     <sys:String x:Key="Str_St_OverrideCleared">Wyczyszczono typ dla {0}</sys:String>
     <sys:String x:Key="Str_St_AppSize">Rozmiar aplikacji {0}%</sys:String>
-    <sys:String x:Key="Str_St_BadTarget">Nieprawidłowy cel: "{0}" - użyj 192.168.1.0/24, 192.168.1.7 lub 192.168.1.1-50</sys:String>
-    <sys:String x:Key="Str_St_TooManyAddresses">To {0} adresów - zbyt wiele na jedno skanowanie (limit {1}). Zawęź zakres.</sys:String>
+    <sys:String x:Key="Str_St_BadTarget">Nieprawidłowy cel: "{0}" - użyj 192.168.1.0/24, 192.168.1.7 lub 192.168.1.10-50, oddzielonych przecinkami</sys:String>
+    <sys:String x:Key="Str_St_TooManyAddresses">To {0} adresów - zbyt wiele na jedno skanowanie (limit {1}). Zawęź zakres lub przeskanuj go w częściach.</sys:String>
     <sys:String x:Key="Str_St_NoTarget">Podaj podsieć, adres lub zakres do skanowania</sys:String>
     <sys:String x:Key="Str_Portable">PRZENOŚNA</sys:String>
     <sys:String x:Key="Str_TT_Portable">Tryb przenośny - zainstaluj KillerScan</sys:String>
@@ -136,7 +136,7 @@
     <sys:String x:Key="Str_Install_AllUsersNote">Instaluje w folderze Program Files dla każdego konta na tym komputerze. System Windows poprosi o zgodę.</sys:String>
     <sys:String x:Key="Str_Install_HeadUser">Zainstalować KillerScan w Twoim profilu użytkownika?</sys:String>
     <sys:String x:Key="Str_Install_HeadAll">Zainstalować KillerScan dla wszystkich użytkowników tego komputera?</sys:String>
-    <sys:String x:Key="Str_Install_AlreadyAllUsers">KillerScan jest już zainstalowany dla wszystkich użytkowników tego komputera, więc spowoduje to aktualizację tej instalacji.</sys:String>
+    <sys:String x:Key="Str_Install_AlreadyAllUsers">KillerScan jest już zainstalowany dla wszystkich użytkowników tego komputera, więc spowoduje to aktualizację tej instalacji. System Windows poprosi o zgodę.</sys:String>
     <sys:String x:Key="Str_TT_Shortcuts">Skróty klawiaturowe (F1)</sys:String>
     <sys:String x:Key="Str_TT_ExpandSidebar">Pokaż historię skanowania</sys:String>
     <sys:String x:Key="Str_TT_CollapseSidebar">Ukryj historię skanowania</sys:String>
@@ -206,11 +206,16 @@
     <sys:String x:Key="Str_Db_Updated">Zaktualizowano do {0} wpisów.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Nie można zapisać bazy danych: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Aktualizacja nie powiodła się: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Dostępna aktualizacja: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Pobieranie...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Pobrać i zainstalować {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Aplikacja zamknie się i uruchomi ponownie automatycznie.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Aktualizuj</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Dostępna aktualizacja: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Pobieranie...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Pobrać i zainstalować {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Aplikacja zamknie się i uruchomi ponownie automatycznie.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Sprawdzaj aktualizacje przy uruchamianiu</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">Dostępny jest {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Czy chcesz go teraz pobrać i zainstalować? Aplikacja zamknie się i otworzy ponownie automatycznie.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Aktualizuj</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Nie teraz</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Zawsze sprawdzaj aktualizacje przy uruchamianiu</sys:String>
     <sys:String x:Key="Str_Conflict_Title">konflikt instalacji</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan jest zainstalowany dwukrotnie. Usunąć teraz drugą kopię dla tego użytkownika?
 
@@ -382,7 +387,7 @@ Twoje ustawienia nie zostaną usunięte.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Zaznacz wszystko</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Kopiuj wszystko</sys:String>
     <sys:String x:Key="Str_Term_Clear">Wyczyść</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Esc aby zatrzymac</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Esc aby zatrzymać</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Podziel panele</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Przenieś do drugiego panelu</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Zamknij kartę</sys:String>
@@ -479,6 +484,10 @@ Twoje ustawienia nie zostaną usunięte.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Przewiń w dół</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Przewiń w lewo</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Przewiń w prawo</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Strona w górę</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Strona w dół</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Strona w lewo</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Strona w prawo</sys:String>
     <sys:String x:Key="Str_Location_Title">Lokalizacja</sys:String>
     <sys:String x:Key="Str_Location_Busy">Przed zmianą lokalizacji zatrzymaj trwające skanowanie lub polecenie terminala.</sys:String>
     <sys:String x:Key="Str_Location_Legacy">Dotychczasowe dane (nieprzypisane)</sys:String>

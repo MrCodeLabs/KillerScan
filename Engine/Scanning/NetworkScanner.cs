@@ -98,6 +98,13 @@ namespace KillerScan.Engine
             var parts = cidr.Trim().Split('/');
             var ip = IPAddress.Parse(parts[0]);
             int prefixLen = parts.Length > 1 ? int.Parse(parts[1]) : 24;
+            if (prefixLen < 0 || prefixLen > 32)
+                throw new ArgumentOutOfRangeException(nameof(cidr), "CIDR prefix must be between 0 and 32.");
+            long hostCount = prefixLen >= 31 ? 0 : (1L << (32 - prefixLen)) - 2;
+            if (hostCount > ScanTargets.MaxAddresses)
+                throw new ArgumentOutOfRangeException(nameof(cidr),
+                    $"Subnet expands to {hostCount:N0} hosts, exceeding the {ScanTargets.MaxAddresses:N0} address limit.");
+            if (hostCount == 0) return [];
 
             byte[] ipBytes = ip.GetAddressBytes();
             uint ipUint = (uint)(ipBytes[0] << 24 | ipBytes[1] << 16 | ipBytes[2] << 8 | ipBytes[3]);

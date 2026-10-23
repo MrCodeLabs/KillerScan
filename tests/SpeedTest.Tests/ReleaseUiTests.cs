@@ -51,12 +51,14 @@ internal static class ReleaseUiTests
         var xml = new XmlDocument();
         xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
         string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
-            .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+            .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
         context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
+        context.XmlnsDictionary.Add("kl", "clr-namespace:KillerFamily.Layout;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
         return app;
     }
@@ -191,6 +193,13 @@ internal static class ReleaseUiTests
         var canvas = (Canvas)workspace.FindName("TopologyCanvas");
         Require(canvas.Width > 0 && canvas.Height > 0 && canvas.Children.Count > 0, "Topology has arranged device content.");
         CheckTopologySettings(workspace, root, canvas, output, Locale);
+        foreach (string view in new[] { "devices", "services", "topology" })
+        {
+            workspace.SetView(view);
+            CheckFilmGrainOff(root, view);
+        }
+        workspace.SetView("topology");
+        Render(root, 1200, 780);
         var formatType = workspace.GetType().GetNestedType("SnapshotFormat", BindingFlags.NonPublic)!;
         foreach (string format in new[] { "PngTransparent", "Jpeg" })
         {
@@ -448,6 +457,49 @@ internal static class ReleaseUiTests
             options["FontSize"] == "11" && options["NodeScale"] == "100" && options["Links"] == "On", "Topology settings reset to the original appearance.");
         Render(root, 1200, 780);
         Console.WriteLine("PASS: " + combinations + " topology layout/size/font combinations and all menu choices.");
+    }
+
+    /// <summary>Turns Film Grain off without saving the choice and requires every tiled grain layer in
+    /// the window to stop drawing, then turns it back on.</summary>
+    private static void CheckFilmGrainOff(FrameworkElement root, string view)
+    {
+        var grain = typeof(KillerScan.App).Assembly.GetType("KillerScan.Services.FilmGrain", true)!;
+        var enabled = grain.GetProperty("Enabled", Static)!;
+        var publish = grain.GetMethod("Publish", Static)!;
+        static IEnumerable<DependencyObject> Descendants(DependencyObject parent)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                yield return child;
+                foreach (var descendant in Descendants(child)) yield return descendant;
+            }
+        }
+        // IsVisible is false throughout an offscreen window that is never shown, so walk the
+        // layer's own Visibility and Opacity up to the root instead.
+        bool Drawn(Border border)
+        {
+            for (DependencyObject? node = border; node != null; node = VisualTreeHelper.GetParent(node))
+                if (node is UIElement element && (element.Visibility != Visibility.Visible || element.Opacity <= 0))
+                    return false;
+            return true;
+        }
+        try
+        {
+            enabled.SetValue(null, false);
+            publish.Invoke(null, null);
+            Render(root, 1200, 780);
+            var drawn = Descendants(root).OfType<Border>()
+                .Where(border => border.Background is ImageBrush { TileMode: TileMode.Tile } && Drawn(border))
+                .Select(border => string.IsNullOrEmpty(border.Name) ? border.TemplatedParent?.GetType().Name ?? "Border" : border.Name)
+                .ToList();
+            Require(drawn.Count == 0, view + ": with Film Grain off no grain layer is drawn (" + string.Join(", ", drawn) + ").");
+        }
+        finally
+        {
+            enabled.SetValue(null, true);
+            publish.Invoke(null, null);
+        }
     }
 
     private static BitmapSource Render(FrameworkElement element, int width, int height)

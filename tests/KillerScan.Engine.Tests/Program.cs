@@ -10,6 +10,7 @@ internal static class Program
         try
         {
             await Run("Targets parse ranges, de-duplicate overlaps and refuse bad input", Targets);
+            await Run("The address ceiling counts unique addresses and keeps first-seen order", TargetCeiling);
             await Run("CIDR expansion excludes the network and broadcast addresses", Subnet);
             await Run("ARP output parsing keeps IPv4 entries with full MAC addresses", ArpParsing);
             await Run("Classifier honors manual types, the gateway, DNS and hostname rules", Classifier);
@@ -70,11 +71,43 @@ internal static class Program
         return Task.CompletedTask;
     }
 
+    private static Task TargetCeiling()
+    {
+        var overlap = ScanTargets.Parse("10.0.0.0/16, 10.0.0.1, 10.0.0.2, 10.0.0.3");
+        Require(overlap.Ok, "A /16 plus hosts inside it is 65,534 unique addresses and should parse, got " + overlap.Error + " " + overlap.Detail);
+        Require(overlap.Addresses.Count == 65534, "Expected 65,534 unique addresses, got " + overlap.Addresses.Count);
+
+        var tooMany = ScanTargets.Parse("10.0.0.0/16, 10.1.0.1-10.1.0.10");
+        Require(tooMany.Error == TargetError.TooLarge, "65,544 unique addresses should exceed the ceiling");
+        Require(tooMany.Detail == 65544.ToString("N0"), "TooLarge should report the unique count, got " + tooMany.Detail);
+
+        var ordered = ScanTargets.Parse("10.0.0.5, 10.0.0.1-6");
+        Require(string.Join(" ", ordered.Addresses) == "10.0.0.5 10.0.0.1 10.0.0.2 10.0.0.3 10.0.0.4 10.0.0.6",
+            "First-seen order was " + string.Join(" ", ordered.Addresses));
+        return Task.CompletedTask;
+    }
+
     private static Task Subnet()
     {
+        foreach (string cidr in new[] { "10.0.0.0/15", "0.0.0.0/0" })
+        {
+            bool rejected = false;
+            try { NetworkScanner.GetAddressesInSubnet(cidr); }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                rejected = ex.ParamName == "cidr" && ex.Message.Contains(ScanTargets.MaxAddresses.ToString("N0"), StringComparison.Ordinal);
+            }
+            Require(rejected, cidr + " should be rejected before its hosts are allocated");
+        }
+
         var list = NetworkScanner.GetAddressesInSubnet("10.0.0.0/30");
         Require(list.Count == 2, "A /30 has two hosts, got " + list.Count);
         Require(list[0].ToString() == "10.0.0.1" && list[1].ToString() == "10.0.0.2", "Unexpected hosts");
+        var defaultSubnet = NetworkScanner.GetAddressesInSubnet("192.0.2.0");
+        Require(defaultSubnet.Count == 254 && defaultSubnet[0].ToString() == "192.0.2.1" &&
+            defaultSubnet[253].ToString() == "192.0.2.254", "An omitted prefix should still use /24");
+        Require(NetworkScanner.GetAddressesInSubnet("255.255.255.255/32").Count == 0,
+            "A /32 at the last IPv4 address has no expandable hosts");
         return Task.CompletedTask;
     }
 

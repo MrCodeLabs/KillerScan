@@ -34,6 +34,9 @@ namespace KillerScan.Features.About
         bool UpdateVisible { set; }
         bool UpdateEnabled { set; }
 
+        /// <summary>The "Check for updates on startup" checkbox, first of the card's checkboxes.</summary>
+        bool StartupUpdateCheck { set; }
+
         /// <summary>Vendor-database size and origin, and the line under the refresh link that
         /// reports what a refresh did. The link goes insensitive while one is running.</summary>
         string DbInfo { set; }

@@ -17,7 +17,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Mostra o nascondi la scheda e la velocità del collegamento</sys:String>
     <sys:String x:Key="Str_Light_Idle">Nessuna scansione ancora</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Scansione in corso</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan in corso</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Scansione approfondita in corso</sys:String>
     <sys:String x:Key="Str_Light_Done">Scansione completata</sys:String>
     <sys:String x:Key="Str_TT_Export">Esporta</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">TEMA</sys:String>
@@ -111,7 +111,7 @@
     <sys:String x:Key="Str_Theme_Greed">Avidità</sys:String>
     <sys:String x:Key="Str_Theme_Cyanotic">Cianotico</sys:String>
     <sys:String x:Key="Str_Theme_Ectoplasm">Ectoplasma</sys:String>
-    <sys:String x:Key="Str_Theme_Decay">Decadimento</sys:String>
+    <sys:String x:Key="Str_Theme_Decay">Decadenza</sys:String>
     <sys:String x:Key="Str_Theme_Malaise">Malessere</sys:String>
     <sys:String x:Key="Str_Theme_Sepulchre">Sepolcro</sys:String>
     <sys:String x:Key="Str_Theme_Delirium">Delirio</sys:String>
@@ -121,7 +121,7 @@
     <!-- About overlay -->
     <sys:String x:Key="Str_About_Version">VERSIONE</sys:String>
     <sys:String x:Key="Str_About_Publisher">EDITORE</sys:String>
-    <sys:String x:Key="Str_About_Thumbprint">IMPRONTA DIGITALE</sys:String>
+    <sys:String x:Key="Str_About_Thumbprint">IMPRONTA CERTIFICATO</sys:String>
     <sys:String x:Key="Str_About_Sha">SHA-256 DELL'EXE</sys:String>
     <sys:String x:Key="Str_About_Db">DATABASE DEI PRODUTTORI</sys:String>
     <sys:String x:Key="Str_About_DbUpdate">Aggiorna dai registri più recenti</sys:String>
@@ -248,11 +248,16 @@
     <sys:String x:Key="Str_Db_Updated">Aggiornato a {0} voci.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Impossibile salvare il database: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Aggiornamento non riuscito: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Aggiornamento disponibile: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Download...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Scaricare e installare {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">L'app si chiuderà e si riaprirà automaticamente.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Aggiorna</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Aggiornamento disponibile: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Download...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Scaricare e installare {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">L'app si chiuderà e si riaprirà automaticamente.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">All'avvio cerca aggiornamenti</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">È disponibile {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Vuoi scaricarlo e installarlo ora? L'app si chiuderà e si riaprirà automaticamente.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Aggiorna</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Non ora</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">All'avvio controlla sempre aggiornamenti</sys:String>
     <sys:String x:Key="Str_Conflict_Title">conflitto di installazione</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan è installato due volte. Rimuovere ora l'altra copia per utente?
 
@@ -510,6 +515,10 @@ Le tue impostazioni non verranno rimosse.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Scorri verso il basso</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Scorri a sinistra</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Scorri a destra</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Pagina su</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Pagina giù</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Pagina a sinistra</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Pagina a destra</sys:String>
     <sys:String x:Key="Str_Location_Title">Posizione</sys:String>
     <sys:String x:Key="Str_Location_Busy">Interrompi la scansione o il comando del terminale in corso prima di cambiare posizione.</sys:String>
     <sys:String x:Key="Str_Location_Legacy">Dati precedenti (non assegnati)</sys:String>

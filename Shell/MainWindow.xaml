@@ -1,6 +1,7 @@
 <Window x:Class="KillerScan.Shell.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:a11y="clr-namespace:KillerFamily.Accessibility"
         xmlns:icons="clr-namespace:KillerScan.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -69,8 +70,9 @@
         <!-- ZIndex 1 so the wordmark's drips can hang into the top of the toolbar row below. -->
         <Border Grid.Row="0" Background="{DynamicResource TitleBarBrush}" Panel.ZIndex="1">
             <Grid>
-                <!-- Film grain over the bar (behind content) -->
-                <Border IsHitTestVisible="False" Opacity="{DynamicResource GrainOpacity}" Margin="0,0,0,1">
+                <!-- Film grain over the whole bar (behind content). Stopping it short of the bottom
+                     edge left a bare one-pixel line under the title bar on every grained theme. -->
+                <Border IsHitTestVisible="False" Opacity="{DynamicResource GrainOpacity}">
                     <Border.Background>
                         <ImageBrush x:Name="TitleGrainBrush" TileMode="Tile"
                                     ViewportUnits="Absolute" Viewport="0,0,256,256" Stretch="None"/>
@@ -316,14 +318,14 @@
                      gets the width beside the glyph and wraps to a second centered line when the
                      language needs it; short titles still size to their text and stay centered. -->
                 <DockPanel x:Name="HistorySidebarHeader" Grid.Row="0" HorizontalAlignment="Center" Margin="8,0,8,6">
-                    <TextBlock x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
+                    <a11y:Glyph x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
                                Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="SidebarHeading" Text="{DynamicResource Str_History_Title}" TextAlignment="Center"
-                               Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource BrandSansFont}"
+                               Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource HeadingFont}"
                                FontSize="20" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 </DockPanel>
                 <ListBox x:Name="HistoryList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_History_Title}" Background="Transparent" BorderThickness="0"
-                         Margin="14,0,8,0" HorizontalContentAlignment="Stretch"
+                         Margin="14,0,5,0" HorizontalContentAlignment="Stretch"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          SelectionChanged="HistoryList_SelectionChanged">
                     <ListBox.ItemContainerStyle>
@@ -355,7 +357,7 @@
                             <StackPanel>
                                 <!-- The saved date identifies the entry; the target is supporting detail. -->
                                 <TextBlock Text="{Binding ScannedAt, StringFormat={}{0:g}}" FontSize="13" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <!-- Resting colour is a Setter, not an attribute on the
                                              element. A local value outranks a style trigger, so as
@@ -372,7 +374,7 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBlock Text="{Binding Target}" FontSize="11"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
@@ -392,7 +394,7 @@
 
                 <!-- Second section, sharing the row so the two cross-fade in place. -->
                 <ListBox x:Name="ProfilesList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_Profiles_Title}" Background="Transparent" BorderThickness="0"
-                         Margin="14,0,8,0" HorizontalContentAlignment="Stretch" Visibility="Collapsed"
+                         Margin="14,0,5,0" HorizontalContentAlignment="Stretch" Visibility="Collapsed"
                          PreviewMouseRightButtonDown="ProfileList_RightClick"
                          PreviewMouseLeftButtonUp="ProfileList_Activate"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -403,23 +405,23 @@
                                 <StackPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Run}" InputGestureText="Enter" Click="ProfileRun_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE768;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE768;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Load}" InputGestureText="Ctrl+L" Click="ProfileLoad_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8E5;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8E5;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Deep}" IsCheckable="True"
                                                   InputGestureText="Ctrl+Alt+D" IsChecked="{Binding DeepScanAfter, Mode=OneWay}" Click="ProfileDeep_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <Separator/>
                                         <MenuItem Header="{DynamicResource Str_Profiles_Delete}" InputGestureText="Delete" Click="ProfileDelete_Click">
-                                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE74D;"/></MenuItem.Icon>
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE74D;"/></MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
                                 </StackPanel.ContextMenu>
                                 <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <!-- Setter, not an attribute: see the history list above. -->
                                         <Style TargetType="TextBlock">
@@ -433,7 +435,7 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBlock Text="{Binding Target}" FontSize="11"
-                                           TextTrimming="CharacterEllipsis">
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
@@ -484,7 +486,7 @@
 
         <!-- Chevron: pinned to the top of the rail on its own, per the family rail order. -->
         <Button x:Name="SidebarToggleBtn" Grid.Row="1" Grid.Column="0" Style="{StaticResource RailButton}"
-                Content="&#xE76C;" FontSize="12" Panel.ZIndex="20"
+                Content="&#xE76C;" FontSize="16" Panel.ZIndex="20"
                 VerticalAlignment="Top" HorizontalAlignment="Right" Margin="2,10,2,0"
                 Click="SidebarToggle_Click"
                 ToolTip="{DynamicResource Str_TT_ExpandSidebar}"/>
@@ -509,7 +511,7 @@
                     <ContextMenu>
                         <MenuItem Header="{DynamicResource Str_History_Settings}" InputGestureText="Ctrl+Alt+R"
                                   Click="HistorySettings_Click">
-                            <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE81C;"/></MenuItem.Icon>
+                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE81C;"/></MenuItem.Icon>
                         </MenuItem>
                     </ContextMenu>
                 </Button.ContextMenu>
@@ -667,7 +669,7 @@
                             MouseLeftButtonUp="NetworkFooter_Click"
                             ToolTip="{DynamicResource Str_TT_FooterNetwork}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock x:Name="NetworkFooterIcon" FontSize="13" FontFamily="Segoe MDL2 Assets"
+                            <a11y:Glyph x:Name="NetworkFooterIcon" FontSize="13" FontFamily="Segoe MDL2 Assets"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
                             <TextBlock x:Name="NetworkFooter" FontSize="16" FontFamily="{DynamicResource BrandSansFont}" TextOptions.TextFormattingMode="Ideal"
                                        Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
@@ -685,14 +687,14 @@
                                  Foreground="{DynamicResource HeaderLineBrush}"
                                  Background="{DynamicResource CardBorderBrush}"
                                  Visibility="Collapsed" Margin="0,0,12,0"/>
-                    <TextBlock x:Name="VersionLabel" Text="v1.5.2"
+                    <TextBlock x:Name="VersionLabel" Opacity="0.75" Text="v1.5.2"
                                Foreground="{DynamicResource TextFooter}" FontFamily="{DynamicResource BrandSansFont}"
                                FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center" Margin="0,0,12,0"
                                Cursor="Hand" ToolTip="{DynamicResource Str_TT_About}"
                                MouseLeftButtonUp="VersionLabel_Click"/>
-                    <!-- 14px trailing margin keeps the copyright clear of the corner grip (family standard) -->
-                    <TextBlock FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center"
-                               FontFamily="{DynamicResource BrandSansFont}" Margin="0,0,14,0">
+                    <!-- 20px trailing margin keeps the copyright clear of the corner grip (family standard) -->
+                    <TextBlock Opacity="0.75" FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center"
+                               FontFamily="{DynamicResource BrandSansFont}" Margin="0,0,20,0">
                         <Run Text="&#x00A9; 2026 " Foreground="{DynamicResource TextFooter}"/>
                         <Hyperlink NavigateUri="https://thekiller.net"
                                    RequestNavigate="Hyperlink_RequestNavigate"
@@ -819,7 +821,8 @@
                                 </TextBlock>
                             </Grid>
                             <ScrollViewer x:Name="ShortcutListHost" Grid.Row="1" Margin="{DynamicResource ShortcutsScrollBleed}"
-                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                          Style="{StaticResource ShadowScrollViewer}">
                                 <StackPanel Margin="{DynamicResource ShortcutsScrollInset}">
                                     <!-- Two authored columns with a fixed gutter, as in KillerPDF.
                                          Which category lands where is declared in the table, not
@@ -1024,6 +1027,13 @@
                                 <Border IsHitTestVisible="False" VerticalAlignment="Bottom"
                                         Height="{DynamicResource ScanPaneBandSize}" Background="{DynamicResource ScanPaneBottomBrush}"/>
                             </Grid>
+
+                            <!-- About options sit below the identity pane, the startup check first. -->
+                            <StackPanel Margin="0,12,0,0" HorizontalAlignment="Left">
+                                <CheckBox x:Name="AboutStartupUpdateCheck"
+                                          Content="{DynamicResource Str_About_StartupUpdateCheck}"
+                                          FontSize="11" Click="AboutStartupUpdateCheck_Click"/>
+                            </StackPanel>
 
                             <!-- Update notice: shown only when a newer release is found -->
                             <Button x:Name="AboutUpdateButton" Style="{StaticResource OutlineButton}" Padding="14,7" Visibility="Collapsed" Margin="0,14,0,0"

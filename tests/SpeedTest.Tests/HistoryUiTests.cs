@@ -82,12 +82,14 @@ internal static partial class HistoryUiTests
             directory = new DirectoryInfo(sourceRoot);
         Require(directory != null, "Application resource source exists.");
         var xml = new XmlDocument(); xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
-        var dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml.Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+        var dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml.Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
         context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
         context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
+        context.XmlnsDictionary.Add("kl", "clr-namespace:KillerFamily.Layout;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(PreserveMenuGlyphReferences(dictionary), context);
         assembly.GetType("KillerScan.Services.DemoData", true)!.GetField("Enabled", Static)!.SetValue(null, true);
         var themeManager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
@@ -152,6 +154,9 @@ internal static partial class HistoryUiTests
         var grid = (DataGrid)history.FindName("HistoryChangesGrid");
         var all = (DataGrid)history.FindName("HistoryAllGrid");
         var title = (TextBlock)history.FindName("HistoryIdentity");
+        var sidebarTitle = (TextBlock)window.FindName("SidebarHeading");
+        Require(title.FontSize == sidebarTitle.FontSize && Equals(title.FontFamily, sidebarTitle.FontFamily),
+            "The history table header is the same size and face as the Scan History heading.");
         string Identity() => string.Concat(title.Inlines.OfType<Run>().Select(run => run.Text));
         var header = (TextBlock)history.FindName("HistorySummary");
         var metadata = (TextBlock)history.FindName("HistoryEntryContext");
@@ -316,6 +321,70 @@ internal static partial class HistoryUiTests
             Equals(texts[1].Foreground, app.FindResource("MutedTextBrush")),
             "The larger accented date is first and the smaller muted target is below it.");
         Console.WriteLine("SIDEBAR: rowHeight=" + firstRow.ActualHeight + " visibleRows=" + Math.Floor(historyList.ActualHeight / firstRow.ActualHeight));
+
+        // At the default width the widest date shows in full at its normal size in every theme. At
+        // the narrowest width the grip allows, it draws up to 15% smaller first and is trimmed only
+        // past that. Measured in the app's own Killer Sans UI: this process is not KillerScan.exe,
+        // so the theme's "pack://application:,,,/" font would otherwise fall back to Segoe UI.
+        var widest = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
+        widest.Add(Entry(new DateTimeOffset(2026, 12, 28, 22, 58, 0, TimeSpan.Zero)));
+        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { widest });
+        Call(window, "RefreshHistoryList");
+        var widthSaved = window.GetType().GetField("_sidebarWidthSaved", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var baseWidth = window.GetType().GetField("_sidebarBaseWidth", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        double narrowest = (double)window.GetType().GetField("SidebarMinPx", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+        double defaultWidth = (double)baseWidth.GetValue(window)!;
+        // An animated open freezes the panel at its open width until the tween completes, which never
+        // happens offscreen. Release it so the panel follows its column as it does on screen.
+        sidebar.ClearValue(FrameworkElement.WidthProperty);
+        sidebar.HorizontalAlignment = HorizontalAlignment.Stretch;
+        foreach (var (label, saved, scale) in new[] { ("default", false, 1.0), ("narrowest", true, 1.0), ("narrowest", true, 2.5) })
+        {
+            widthSaved.SetValue(window, saved);
+            baseWidth.SetValue(window, saved ? narrowest : defaultWidth);
+            Call(window, "ApplyAppScale", scale, false);
+            foreach (string name in Enum.GetNames(themeType))
+            {
+                Theme(name);
+                var uiFont = (FontFamily)app.Resources.MergedDictionaries[0]["UiFont"];
+                if (uiFont.Source.StartsWith("./Fonts/", StringComparison.Ordinal))
+                    app.Resources["UiFont"] = new FontFamily(new Uri("pack://application:,,,/KillerScan;component/"), uiFont.Source);
+                else app.Resources.Remove("UiFont");
+                Call(window, "ApplyFlatChrome"); Call(window, "ApplySidebarState", false); Render(root, 1200, 780);
+                var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
+                var date = VisualChildren<TextBlock>(row).First();
+                var face = new Typeface(date.FontFamily, date.FontStyle, date.FontWeight, date.FontStretch);
+                double needed = new FormattedText(date.Text, System.Globalization.CultureInfo.CurrentCulture, date.FlowDirection,
+                    face, date.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(date).PixelsPerDip).WidthIncludingTrailingWhitespace;
+                string where = name + ", " + label + " sidebar at " + (scale * 100) + "% zoom (" + needed.ToString("0.#") + " needed at " +
+                    date.FontSize.ToString("0.##") + ", " + date.ActualWidth.ToString("0.#") + " available)";
+                if (!saved)
+                    Require(date.FontSize == 13 && needed <= date.ActualWidth + 0.5, "The widest date shows in full at its normal size: " + where);
+                else
+                    Require(date.FontSize >= 13 * 0.85 - 0.01 && (needed <= date.ActualWidth + 0.5 || Math.Abs(date.FontSize - 13 * 0.85) < 0.01),
+                        "A narrow sidebar shrinks the date before trimming it: " + where);
+            }
+        }
+        app.Resources.Remove("UiFont");
+        // A width the user chose is kept even when the row font is wide: the date shrinks instead of
+        // the panel growing. Courier New stands in for a wide row font.
+        Call(window, "ApplyAppScale", 1.0, false);
+        Theme("Black"); Call(window, "ApplyFlatChrome");
+        widthSaved.SetValue(window, true);
+        baseWidth.SetValue(window, narrowest);
+        historyList.FontFamily = new FontFamily("Courier New");
+        Call(window, "ApplySidebarState", false); Render(root, 1200, 780);
+        {
+            var row = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0);
+            var date = VisualChildren<TextBlock>(row).First();
+            Require(date.FontFamily.Source == "Courier New" && Math.Abs(sidebar.ActualWidth - narrowest) < 30 && date.FontSize < 13 && date.FontSize >= 13 * 0.85 - 0.01,
+                "A wide row font keeps the chosen sidebar width and draws the date smaller (" + sidebar.ActualWidth.ToString("0.#") +
+                " wide, date at " + date.FontSize.ToString("0.##") + ").");
+        }
+        historyList.ClearValue(Control.FontFamilyProperty);
+        widthSaved.SetValue(window, false);
+        baseWidth.SetValue(window, defaultWidth);
+        Call(window, "ApplySidebarState", false);
         historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { entries });
         Call(window, "RefreshHistoryList"); Call(window, "ShowHistoryEntry");
         Console.WriteLine("RENDERED: " + output);
@@ -411,7 +480,7 @@ internal static partial class HistoryUiTests
         foreach (string name in Enum.GetNames(assembly.GetType("KillerScan.Services.Theme", true)!))
         {
             theme(name); Call(window, "ApplyFlatChrome"); Draw();
-            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("BrandSansFont")) &&
+            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("HeadingFont")) &&
                 group.HorizontalAlignment == HorizontalAlignment.Center && icon.Text == "\uE728" &&
                 Equals(button.Content, icon.Text) && icon.FontFamily.Source == "Segoe MDL2 Assets" && icon.FontSize == 16,
                 name + ": Profiles uses the centered History heading format and the same saved-list glyph as its rail.");
@@ -729,6 +798,16 @@ internal static partial class HistoryUiTests
         Call(window, "HistorySettingsMenu_Opening", icon, null);
         Require(ReferenceEquals(menu.PlacementTarget, icon) && menu.CustomPopupPlacementCallback != null && menu.HorizontalOffset == 0 && menu.VerticalOffset == 0,
             "Mouse and native keyboard menu opening use the history button anchor, never the pointer.");
+        // Every rail flyout opens beside the button that opened it, never at a fixed point.
+        var themeButton = (Button)window.FindName("ThemeButton");
+        Call(window, "ThemeButton_Click", themeButton, new RoutedEventArgs());
+        var themeMenu = (ContextMenu)typeof(MainWindow).GetField("_themeContextMenu", Instance)!.GetValue(window)!;
+        Require(ReferenceEquals(themeMenu.PlacementTarget, themeButton), "The theme flyout is anchored to the theme button.");
+        themeMenu.IsOpen = false;
+        var langButton = (Button)window.FindName("LangButton");
+        Call(window, "LangButton_Click", langButton, new RoutedEventArgs());
+        Require(ReferenceEquals(langButton.ContextMenu.PlacementTarget, langButton), "The language flyout is anchored to the language button.");
+        langButton.ContextMenu.IsOpen = false;
         var placement = typeof(MainWindow).Assembly.GetType("KillerScan.Shell.FlyoutPlacement", true)!.GetMethod("PlaceBesideButton", Static)!;
         foreach (double dpi in new[] { 1.0, 1.5, 2.0 })
         foreach (double zoom in new[] { 1.0, 1.5, 2.5 })
