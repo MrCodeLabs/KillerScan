@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Bağdaştırıcıyı ve bağlantı hızını göster veya gizle</sys:String>
     <sys:String x:Key="Str_Light_Idle">Henüz tarama yapılmadı</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Taranıyor</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan çalışıyor</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Derin tarama çalışıyor</sys:String>
     <sys:String x:Key="Str_Light_Done">Tarama tamamlandı</sys:String>
     <sys:String x:Key="Str_TT_Export">Dışa aktar</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">TEMA</sys:String>
@@ -221,11 +221,16 @@
     <sys:String x:Key="Str_Db_Updated">{0} kayda güncellendi.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Veritabanı kaydedilemedi: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Güncelleme başarısız: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Güncelleme mevcut: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">İndiriliyor...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} indirilip yüklensin mi?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Uygulama kapanacak ve otomatik olarak yeniden açılacak.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Güncelle</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Güncelleme mevcut: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">İndiriliyor...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} indirilip yüklensin mi?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Uygulama kapanacak ve otomatik olarak yeniden açılacak.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Başlangıçta güncellemeleri denetle</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} kullanılabilir</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Şimdi indirip yüklemek ister misiniz? Uygulama kapanacak ve otomatik olarak yeniden açılacak.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Güncelle</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Şimdi değil</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Başlangıçta her zaman güncellemeleri denetle</sys:String>
     <sys:String x:Key="Str_Conflict_Title">yükleme çakışması</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan iki kez yüklü. Diğer kullanıcıya özel kopya şimdi kaldırılsın mı?
 
@@ -397,7 +402,7 @@ Ayarlarınız silinmeyecek.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Tümünü seç</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Tümünü kopyala</sys:String>
     <sys:String x:Key="Str_Term_Clear">Temizle</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Durdurmak icin Esc</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Durdurmak için Esc</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Bölmeleri ayır</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Diğer bölmeye taşı</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Sekmeyi kapat</sys:String>
@@ -494,4 +499,8 @@ Ayarlarınız silinmeyecek.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Aşağı kaydır</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Sola kaydır</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Sağa kaydır</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Bir sayfa yukarı</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Bir sayfa aşağı</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Bir sayfa sola</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Bir sayfa sağa</sys:String>
 </ResourceDictionary>

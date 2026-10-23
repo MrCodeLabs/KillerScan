@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Afficher ou masquer la carte réseau et le débit</sys:String>
     <sys:String x:Key="Str_Light_Idle">Rien n'a encore été analysé</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Analyse en cours</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan en cours</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Analyse approfondie en cours</sys:String>
     <sys:String x:Key="Str_Light_Done">Analyse terminée</sys:String>
     <sys:String x:Key="Str_TT_Export">Exporter</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">THÈME</sys:String>
@@ -148,7 +148,7 @@
     <sys:String x:Key="Str_St_InstallCanceled">Installation annulée</sys:String>
     <sys:String x:Key="Str_Sys_Restore">Restaurer</sys:String>
     <sys:String x:Key="Str_Sys_Move">Déplacer</sys:String>
-    <sys:String x:Key="Str_Sys_Size">Dimensionner</sys:String>
+    <sys:String x:Key="Str_Sys_Size">Taille</sys:String>
     <sys:String x:Key="Str_Sys_Minimize">Réduire</sys:String>
     <sys:String x:Key="Str_Sys_Maximize">Agrandir</sys:String>
     <sys:String x:Key="Str_Sys_Close">Fermer</sys:String>
@@ -221,11 +221,16 @@
     <sys:String x:Key="Str_Db_Updated">Mise à jour vers {0} entrées.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Impossible d'enregistrer la base de données : {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Échec de la mise à jour : {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Mise à jour disponible : {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Téléchargement...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Télécharger et installer {0} {1} ?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">L'application se fermera et redémarrera automatiquement.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Mettre à jour</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Mise à jour disponible : {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Téléchargement...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Télécharger et installer {0} {1} ?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">L'application se fermera et redémarrera automatiquement.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Rechercher les mises à jour au démarrage</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} est disponible</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Voulez-vous le télécharger et l'installer maintenant ? L'application se fermera et rouvrira automatiquement.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Mettre à jour</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Pas maintenant</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Toujours rechercher les mises à jour au démarrage</sys:String>
     <sys:String x:Key="Str_Conflict_Title">conflit d'installation</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan est installé deux fois. Supprimer maintenant l'autre copie par utilisateur ?
 
@@ -339,7 +344,7 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Profiles_Save">Enregistrer le profil actuel</sys:String>
     <sys:String x:Key="Str_Profiles_Run">Exécuter le profil</sys:String>
     <sys:String x:Key="Str_Profiles_Load">Charger la cible</sys:String>
-    <sys:String x:Key="Str_Profiles_Deep">Analyse approfondie ensuite</sys:String>
+    <sys:String x:Key="Str_Profiles_Deep">Tout analyser en profondeur ensuite</sys:String>
     <sys:String x:Key="Str_Profiles_Delete">Supprimer le profil</sys:String>
     <sys:String x:Key="Str_Watch_Title">Surveillance de connexion</sys:String>
     <sys:String x:Key="Str_Watch_Targets">Adresses IP (16 au maximum, séparées par des virgules)</sys:String>
@@ -397,7 +402,7 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Tout sélectionner</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Tout copier</sys:String>
     <sys:String x:Key="Str_Term_Clear">Effacer</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Esc pour arreter</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Esc pour arrêter</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Diviser les volets</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Déplacer vers l'autre volet</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Fermer l'onglet</sys:String>
@@ -494,4 +499,8 @@ Vos paramètres ne seront pas supprimés.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Défiler vers le bas</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Défiler vers la gauche</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Défiler vers la droite</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Page vers le haut</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Page vers le bas</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Page vers la gauche</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Page vers la droite</sys:String>
 </ResourceDictionary>

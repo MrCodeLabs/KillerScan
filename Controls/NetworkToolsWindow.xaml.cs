@@ -476,7 +476,7 @@ namespace KillerScan.Controls
         internal string BuildCsv()
         {
             static string Cell(string? value) =>
-                value is null ? "" : "\"" + value.Replace("\"", "\"\"") + "\"";
+                value is null ? "" : ReportExport.CsvField(value);
 
             var csv = new System.Text.StringBuilder();
             csv.AppendLine(string.Join(",", Cell(L("Str_Watch_Targets")), Cell(L("Str_Diag_Result")),

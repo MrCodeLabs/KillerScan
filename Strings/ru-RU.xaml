@@ -17,7 +17,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Показать или скрыть адаптер и скорость соединения</sys:String>
     <sys:String x:Key="Str_Light_Idle">Сканирование еще не выполнялось</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Сканирование</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Выполняется Deep Scan</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Выполняется глубокое сканирование</sys:String>
     <sys:String x:Key="Str_Light_Done">Сканирование завершено</sys:String>
     <sys:String x:Key="Str_TT_Export">Экспорт</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">ТЕМА</sys:String>
@@ -103,17 +103,17 @@
     <!-- Theme names, shown in the rail's theme flyout. Shared with KillerShell and KillerNotes
          key for key, so the same thirteen themes read the same way across the family. SE98 is
          listed here ahead of the theme itself landing, because the name is not translated. -->
-    <sys:String x:Key="Str_Theme_Dark">Темная</sys:String>
+    <sys:String x:Key="Str_Theme_Dark">Тёмная</sys:String>
     <sys:String x:Key="Str_Theme_Light">Светлая</sys:String>
-    <sys:String x:Key="Str_Theme_Black">Черная</sys:String>
+    <sys:String x:Key="Str_Theme_Black">Чёрная</sys:String>
     <sys:String x:Key="Str_Theme_SE98">98SE</sys:String>
     <sys:String x:Key="Str_Theme_Blood">Кровь</sys:String>
     <sys:String x:Key="Str_Theme_Greed">Алчность</sys:String>
     <sys:String x:Key="Str_Theme_Cyanotic">Цианоз</sys:String>
     <sys:String x:Key="Str_Theme_Ectoplasm">Эктоплазма</sys:String>
     <sys:String x:Key="Str_Theme_Decay">Распад</sys:String>
-    <sys:String x:Key="Str_Theme_Malaise">Недуг</sys:String>
-    <sys:String x:Key="Str_Theme_Sepulchre">Гробница</sys:String>
+    <sys:String x:Key="Str_Theme_Malaise">Недомогание</sys:String>
+    <sys:String x:Key="Str_Theme_Sepulchre">Склеп</sys:String>
     <sys:String x:Key="Str_Theme_Delirium">Бред</sys:String>
     <sys:String x:Key="Str_Theme_Mourning">Траур</sys:String>
     <sys:String x:Key="Str_Theme_FilmGrain">Зернистость плёнки</sys:String>
@@ -121,7 +121,7 @@
     <!-- About overlay -->
     <sys:String x:Key="Str_About_Version">ВЕРСИЯ</sys:String>
     <sys:String x:Key="Str_About_Publisher">ИЗДАТЕЛЬ</sys:String>
-    <sys:String x:Key="Str_About_Thumbprint">ПОДПИСЬ</sys:String>
+    <sys:String x:Key="Str_About_Thumbprint">ОТПЕЧАТОК</sys:String>
     <sys:String x:Key="Str_About_Sha">EXE SHA-256</sys:String>
     <sys:String x:Key="Str_About_Db">БАЗА ПРОИЗВОДИТЕЛЕЙ</sys:String>
     <sys:String x:Key="Str_About_DbUpdate">Обновить из последних реестров</sys:String>
@@ -236,11 +236,16 @@
     <sys:String x:Key="Str_Db_Failed">Обновление не удалось: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Доступно обновление: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Загрузка...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Загрузить и установить {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Приложение автоматически закроется и снова откроется.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Обновить</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Доступно обновление: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Загрузка...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Загрузить и установить {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Приложение автоматически закроется и снова откроется.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Проверять обновления при запуске</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">Доступен {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Хотите скачать и установить его сейчас? Приложение закроется и снова откроется автоматически.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Обновить</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Не сейчас</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Всегда проверять обновления при запуске</sys:String>
 
     <!-- Install conflict, uninstall -->
     <sys:String x:Key="Str_Conflict_Title">конфликт установки</sys:String>
@@ -520,4 +525,8 @@
     <sys:String x:Key="Str_Scroll_Down">Прокрутить вниз</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Прокрутить влево</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Прокрутить вправо</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">На страницу вверх</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">На страницу вниз</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">На страницу влево</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">На страницу вправо</sys:String>
 </ResourceDictionary>

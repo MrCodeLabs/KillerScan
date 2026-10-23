@@ -91,6 +91,7 @@ namespace KillerScan.Shell
             ("Ctrl + Shift + +", "Str_Sc_AppBigger",        "App"),
             ("Ctrl + Shift + -", "Str_Sc_AppSmaller",       "App"),
             ("Ctrl + Shift + 0", "Str_Sc_AppReset",         "App"),
+            ("Alt + Shift + G", "Str_Theme_FilmGrain",      "App"),
             ("F1",              "Str_Sc_Help",              "App"),
             ("F12",             "Str_Sc_About",             "App"),
         ];
@@ -173,6 +174,11 @@ namespace KillerScan.Shell
             if (ctrl && alt && !shift && key == Key.H)
             {
                 _scanWorkspace?.Export("svg");
+                e.Handled = true; return;
+            }
+            if (alt && shift && !ctrl && key == Key.G)
+            {
+                if (!e.IsRepeat) ToggleFilmGrain();
                 e.Handled = true; return;
             }
             if (key == Key.Escape)

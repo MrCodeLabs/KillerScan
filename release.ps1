@@ -177,6 +177,13 @@ Write-Host "Release date: $csprojReleaseDate"
 
 Write-Host 'Preflight OK'
 
+# The Microsoft Store listing installs the versioned installer the Cloudflare Worker serves from
+# the GitHub release. Check the Store credentials and that no submission is in progress now, so a
+# problem stops the release before anything is built or published.
+$storeScript = Join-Path $PSScriptRoot 'store\Submit-StoreRelease.ps1'
+$storeArgs = @{ ProductId = 'XPDCGDNQ2VX925'; PackageUrl = "https://killerscan.net/store/$Version/KillerScan.exe" }
+& $storeScript @storeArgs -PreflightOnly
+
 # --- 2b. OUI vendor database refresh ---
 # This happens before the build and source bundle so both release artifacts contain the exact
 # database recorded in the changelog. A real release commits and pushes these inputs first;
@@ -590,6 +597,16 @@ if ($Choco) {
     } elseif ($nupkg) {
         Write-Host 'Skipping push - set CHOCO_API_KEY or pass -ChocoApiKey to push automatically.' -ForegroundColor Yellow
     }
+}
+
+Step "Submitting $Tag to the Microsoft Store"
+# The GitHub release is already published, so a Store failure is reported with the exact retry
+# command rather than failing the release.
+try { & $storeScript @storeArgs }
+catch {
+    Write-Host "WARNING: The Microsoft Store submission did not finish: $($_.Exception.Message)" -ForegroundColor Yellow
+    Write-Host "Retry only the Store step with:" -ForegroundColor Yellow
+    Write-Host "  & '$storeScript' -ProductId $($storeArgs.ProductId) -PackageUrl $($storeArgs.PackageUrl)" -ForegroundColor Yellow
 }
 
 Step "Done"

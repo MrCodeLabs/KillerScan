@@ -1,4 +1,4 @@
-<UserControl x:Class="KillerScan.Controls.ScanWorkspace" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:cm="clr-namespace:System.ComponentModel;assembly=System" Background="{DynamicResource BackgroundBrush}" UseLayoutRounding="True">
+<UserControl x:Class="KillerScan.Controls.ScanWorkspace" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:a11y="clr-namespace:KillerFamily.Accessibility" xmlns:cm="clr-namespace:System.ComponentModel;assembly=System" Background="{DynamicResource BackgroundBrush}" UseLayoutRounding="True">
 <Grid>
 <Grid.Resources>
     <!-- The type cell, shared by the Devices grid and the Services grid so one list of
@@ -77,6 +77,34 @@
                 </TextBlock.Style>
             </TextBlock>
         </DataTemplate>
+    <!-- Template cells have no text of their own for UI Automation, which otherwise reads them
+         out as the row's type name and a column number. -->
+    <Style x:Key="IpCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Setter Property="AutomationProperties.Name" Value="{Binding IpAddress}"/>
+    </Style>
+    <Style x:Key="DeviceTypeCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Setter Property="AutomationProperties.Name" Value="{Binding DeviceTypeDisplay}"/>
+    </Style>
+    <!-- A blank cell would read out as the row's type name, so an empty host name, MAC address
+         or vendor is read as unknown. -->
+    <Style x:Key="HostCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Hostname}" Value="{x:Null}"><Setter Property="AutomationProperties.Name" Value="{DynamicResource Str_Dev_Unknown}"/></DataTrigger>
+            <DataTrigger Binding="{Binding Hostname}" Value=""><Setter Property="AutomationProperties.Name" Value="{DynamicResource Str_Dev_Unknown}"/></DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="MacCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding MacAddress}" Value="{x:Null}"><Setter Property="AutomationProperties.Name" Value="{DynamicResource Str_Dev_Unknown}"/></DataTrigger>
+            <DataTrigger Binding="{Binding MacAddress}" Value=""><Setter Property="AutomationProperties.Name" Value="{DynamicResource Str_Dev_Unknown}"/></DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="VendorCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Vendor, Converter={StaticResource VendorLoc}}" Value="{x:Null}"><Setter Property="AutomationProperties.Name" Value="{DynamicResource Str_Dev_Unknown}"/></DataTrigger>
+            <DataTrigger Binding="{Binding Vendor, Converter={StaticResource VendorLoc}}" Value=""><Setter Property="AutomationProperties.Name" Value="{DynamicResource Str_Dev_Unknown}"/></DataTrigger>
+        </Style.Triggers>
+    </Style>
 </Grid.Resources>
 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 <Grid x:Name="ScanToolbar">
@@ -138,7 +166,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE71C;" FontFamily="Segoe MDL2 Assets" FontSize="11"
+                            <a11y:Glyph Grid.Column="0" Text="&#xE71C;" FontFamily="Segoe MDL2 Assets" FontSize="11"
                                        Foreground="{DynamicResource DimTextBrush}" Margin="8,0,5,0" VerticalAlignment="Center"/>
                             <Grid Grid.Column="1">
                                 <TextBlock Text="{DynamicResource Str_FilterPlaceholder}" Foreground="{DynamicResource DimTextBrush}"
@@ -173,22 +201,22 @@
                         <Button.ContextMenu>
                             <ContextMenu PreviewMouseWheel="Menu_ForwardWheelToGrid">
                                 <MenuItem Header="{DynamicResource Str_TT_TopologyOrder}">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
                                     <MenuItem x:Name="TopologyRoleItem" Header="{DynamicResource Str_Topology_Role}"
                                               Tag="Role" InputGestureText="Ctrl+1" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE902;"/></MenuItem.Icon>
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE902;"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem x:Name="TopologyTypeItem" Header="{DynamicResource Str_Col_Type}"
                                               Tag="Type" InputGestureText="Ctrl+2" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem x:Name="TopologyIpItem" Header="{DynamicResource Str_Col_Ip}"
                                               Tag="Ip" InputGestureText="Ctrl+3" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE774;"/></MenuItem.Icon>
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE774;"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem x:Name="TopologyVendorItem" Header="{DynamicResource Str_Col_Vendor}"
                                               Tag="Vendor" InputGestureText="Ctrl+4" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
                                     </MenuItem>
                                 </MenuItem>
                             </ContextMenu>
@@ -239,44 +267,44 @@
                                          PreviewMouseWheel="Menu_ForwardWheelToGrid">
                                 <MenuItem x:Name="ExportCsvItem" Header="{DynamicResource Str_Export_Csv}"
                                           InputGestureText="Ctrl+E" Click="ExportCsv_Click">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9F9;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9F9;"/></MenuItem.Icon>
                                 </MenuItem>
 
                                 <MenuItem x:Name="ExportHtmlItem" Header="{DynamicResource Str_Export_Html}"
                                           InputGestureText="Ctrl+Shift+E" Click="ExportHtml_Click">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE943;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE943;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <!-- Keep Alive: the run as a table, as a page, or as a picture of
                                      the cards. The shell owns that control, so these are requests
                                      rather than handlers. -->
                                 <MenuItem x:Name="ExportWatchCsvItem" Header="{DynamicResource Str_Export_Csv}"
                                           InputGestureText="Ctrl+E" Click="ExportWatchCsv_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9F9;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9F9;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportWatchHtmlItem" Header="{DynamicResource Str_Export_Html}"
                                           InputGestureText="Ctrl+Shift+E" Click="ExportWatchHtml_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE943;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE943;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportWatchTxtItem" Header="{DynamicResource Str_Export_Txt}"
                                           InputGestureText="Ctrl+Shift+X" Click="ExportWatchTxt_Click" Visibility="Collapsed">
                                     <MenuItem.Icon>
                                         <Grid Width="16" Height="16">
-                                            <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8A5;"/>
-                                            <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE70B;" FontSize="8"
+                                            <a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8A5;"/>
+                                            <a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE70B;" FontSize="8"
                                                        HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                                         </Grid>
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportWatchPngItem" Header="{DynamicResource Str_Export_WatchPng}"
                                           InputGestureText="Ctrl+Shift+G" Click="ExportWatchPng_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xEB9F;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xEB9F;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportTerminalTextItem" Header="{DynamicResource Str_Export_TerminalTxt}"
                                           InputGestureText="Ctrl+Shift+X" Click="ExportTerminalText_Click" Visibility="Collapsed">
                                     <MenuItem.Icon>
                                         <Grid Width="16" Height="16">
-                                            <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8A5;"/>
-                                            <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE70B;" FontSize="8"
+                                            <a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8A5;"/>
+                                            <a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE70B;" FontSize="8"
                                                        HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                                         </Grid>
                                     </MenuItem.Icon>
@@ -288,19 +316,19 @@
                                      page carrying real SVG. -->
                                 <MenuItem x:Name="ExportTopologyPngItem" Header="{DynamicResource Str_Export_SnapPngAlpha}"
                                           InputGestureText="Ctrl+Shift+G" Click="ExportSnapshotPngAlpha_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE91B;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE91B;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportTopologyJpegItem" Header="{DynamicResource Str_Export_SnapJpeg}"
                                           InputGestureText="Ctrl+Shift+J" Click="ExportSnapshotJpeg_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xEB9F;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xEB9F;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportTopologySvgItem" Header="{DynamicResource Str_Export_SnapSvg}"
                                           InputGestureText="Ctrl+Alt+H" Click="ExportSnapshotSvg_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE943;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE943;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem x:Name="ExportServicesCsvItem" Header="{DynamicResource Str_Export_ServicesCsv}"
                                           InputGestureText="Ctrl+E" Click="ExportServicesCsv_Click" Visibility="Collapsed">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9F9;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9F9;"/></MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
                         </Button.ContextMenu>
@@ -326,7 +354,8 @@
                         Height="{DynamicResource ScanPaneBandSize}" Background="{DynamicResource ScanPaneBottomBrush}"/>
 
 
-                <Border Grid.RowSpan="1" IsHitTestVisible="False" Opacity="0.20" Panel.ZIndex="-1" CornerRadius="{DynamicResource PaneGrainCornerRadius}">
+                <Border Grid.RowSpan="1" IsHitTestVisible="False" Opacity="0.20" Panel.ZIndex="-1" CornerRadius="{DynamicResource PaneGrainCornerRadius}"
+                        Visibility="{DynamicResource FilmGrainVisibility}">
                     <Border.Background>
                         <ImageBrush x:Name="GrainBrush" TileMode="Tile"
                                     ViewportUnits="Absolute" Viewport="0,0,256,256" Stretch="None"/>
@@ -375,49 +404,49 @@
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem x:Name="RescanMenuItem" Header="{DynamicResource Str_Ctx_RescanOne}" InputGestureText="Ctrl+R" Click="RescanSelected_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE72C;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE72C;"/></MenuItem.Icon>
                             </MenuItem>
                             <Separator Style="{x:Null}" Background="#3a3a3a" Height="1" Margin="8,4"/>
 
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyIp}" InputGestureText="Ctrl+C" Click="CopyIp_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyMac}" InputGestureText="Ctrl+Shift+C" Click="CopyMac_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyHost}" InputGestureText="Ctrl+Alt+C" Click="CopyHostname_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <Separator Style="{x:Null}" Background="#3a3a3a" Height="1" Margin="8,4"/>
                             <MenuItem Header="{DynamicResource Str_Sc_Diagnostics}" InputGestureText="F3" Click="Diagnose_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_View_KeepAlive}" InputGestureText="F9" Click="Watch_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_Ping}" InputGestureText="Ctrl+P" Click="PingDevice_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE704;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE704;"/></MenuItem.Icon>
                             </MenuItem>
 
                             <MenuItem Header="{DynamicResource Str_Ctx_OpenBrowser}" InputGestureText="Enter" Click="OpenBrowser_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8A7;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8A7;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_Rdp}" InputGestureText="Ctrl+D" Click="RdpDevice_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE7F4;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE7F4;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_Ssh}" InputGestureText="Ctrl+S" Click="SshDevice_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
                             </MenuItem>
 
                             <MenuItem Header="{DynamicResource Str_Ctx_SshAs}" InputGestureText="Ctrl+Shift+S" Click="SshAsDevice_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
                             </MenuItem>
                             <Separator Style="{x:Null}" Background="#3a3a3a" Height="1" Margin="8,4"/>
                             <MenuItem Header="{DynamicResource Str_Rename_Title}" InputGestureText="F2" Click="RenameDevice_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE70F;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE70F;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Rename_Clear}" InputGestureText="Ctrl+Alt+N" Click="ClearDeviceName_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE894;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE894;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem x:Name="TrustDeviceMenuItem" Header="{DynamicResource Str_Trust_Device}" InputGestureText="Ctrl+Shift+B"
                                       Click="TrustDevice_Click">
@@ -425,75 +454,75 @@
                             </MenuItem>
                             <Separator Style="{x:Null}" Background="#3a3a3a" Height="1" Margin="8,4"/>
                             <MenuItem Header="{DynamicResource Str_Ctx_SetType}" SubmenuOpened="SetTypeMenu_Opened">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
 
 
                                 <MenuItem Header="{DynamicResource Str_Dev_Router}" Click="SetType_Click" Tag="Router">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE965;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE965;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_SwitchAP}" Click="SetType_Click" Tag="Switch/AP">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE701;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE701;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Network}" Click="SetType_Click" Tag="Network">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE839;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE839;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Windows}" Click="SetType_Click" Tag="Windows">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE7F4;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE7F4;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_WindowsServer}" Click="SetType_Click" Tag="Windows Server">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE968;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE968;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_LinuxSSH}" Click="SetType_Click" Tag="Linux/SSH">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Server}" Click="SetType_Click" Tag="Server">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xEDA2;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xEDA2;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Printer}" Click="SetType_Click" Tag="Printer">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE749;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE749;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_SmartTV}" Click="SetType_Click" Tag="Smart TV">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE7F8;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE7F8;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_AppleTV}" Click="SetType_Click" Tag="Apple TV">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE786;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE786;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_MediaStreamer}" Click="SetType_Click" Tag="Media Streamer">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8B2;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8B2;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_AppleDevice}" Click="SetType_Click" Tag="Apple Device">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE977;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE977;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Mobile}" Click="SetType_Click" Tag="Mobile">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8EA;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EA;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_IoT}" Click="SetType_Click" Tag="IoT">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9A9;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9A9;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_NAS}" Click="SetType_Click" Tag="NAS">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8CE;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8CE;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Camera}" Click="SetType_Click" Tag="Camera">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE714;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE714;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Hypervisor}" Click="SetType_Click" Tag="Hypervisor">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE81E;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE81E;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_HomeAssistant}" Click="SetType_Click" Tag="Home Assistant">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE80F;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE80F;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_DNSServer}" Click="SetType_Click" Tag="DNS Server">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE12B;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE12B;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_WebDevice}" Click="SetType_Click" Tag="Web Device">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE774;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE774;"/></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{DynamicResource Str_Dev_Other}" Click="SetType_Click" Tag="Other">
-                                    <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE9CE;"/></MenuItem.Icon>
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9CE;"/></MenuItem.Icon>
                                 </MenuItem>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_ClearOverride}" InputGestureText="Ctrl+Alt+T" Click="ClearOverride_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE894;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE894;"/></MenuItem.Icon>
                             </MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
@@ -583,7 +612,8 @@
                              left edge. In the cell rather than a column of its own: a separate
                              column would sit at index 0 and fight the saved column order, and the
                              marker belongs to the row rather than being something to sort by. -->
-                        <DataGridTemplateColumn x:Name="ColIp" Header="{DynamicResource Str_Col_Ip}" Width="Auto" MinWidth="92" SortMemberPath="IpSortKey">
+                        <DataGridTemplateColumn x:Name="ColIp" Header="{DynamicResource Str_Col_Ip}" Width="Auto" MinWidth="92" SortMemberPath="IpSortKey"
+                                                CellStyle="{StaticResource IpCellStyle}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid Margin="-4,0,0,0">
@@ -602,7 +632,7 @@
                         </DataGridTemplateColumn>
                         <!-- Host and Vendor trim a long value to an ellipsis and give the whole of
                              it in a tooltip, which only opens when something was cut. -->
-                        <DataGridTextColumn x:Name="ColHost" Header="{DynamicResource Str_Col_Host}" Binding="{Binding Hostname}" Width="Auto" MinWidth="142" MaxWidth="220">
+                        <DataGridTextColumn x:Name="ColHost" Header="{DynamicResource Str_Col_Host}" Binding="{Binding Hostname}" Width="Auto" MinWidth="142" MaxWidth="220" CellStyle="{StaticResource HostCellStyle}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock" BasedOn="{x:Static DataGridTextColumn.DefaultElementStyle}">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -611,10 +641,10 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn x:Name="ColMac" Header="{DynamicResource Str_Col_Mac}" Binding="{Binding MacAddress}" Width="Auto" MinWidth="110"/>
+                        <DataGridTextColumn x:Name="ColMac" Header="{DynamicResource Str_Col_Mac}" Binding="{Binding MacAddress}" Width="Auto" MinWidth="110" CellStyle="{StaticResource MacCellStyle}"/>
                         <!-- Vendor and Open Ports share the leftover width equally. At 2* a long
                              vendor name took the room the port list needed. -->
-                        <DataGridTextColumn x:Name="ColVendor" Header="{DynamicResource Str_Col_Vendor}" Binding="{Binding Vendor, Converter={StaticResource VendorLoc}}" Width="*" MinWidth="150">
+                        <DataGridTextColumn x:Name="ColVendor" Header="{DynamicResource Str_Col_Vendor}" Binding="{Binding Vendor, Converter={StaticResource VendorLoc}}" Width="*" MinWidth="150" CellStyle="{StaticResource VendorCellStyle}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock" BasedOn="{x:Static DataGridTextColumn.DefaultElementStyle}">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -624,7 +654,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTemplateColumn x:Name="ColType" Header="{DynamicResource Str_Col_Type}" Width="Auto" MinWidth="95" SortMemberPath="DeviceTypeDisplay"
-                                                CellTemplate="{StaticResource DeviceTypeCell}"/>
+                                                CellTemplate="{StaticResource DeviceTypeCell}" CellStyle="{StaticResource DeviceTypeCellStyle}"/>
                         <DataGridTextColumn x:Name="ColPorts" Header="{DynamicResource Str_Col_Ports}" Binding="{Binding OpenPortsDisplay}" Width="*" MinWidth="130">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
@@ -664,39 +694,39 @@
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="{DynamicResource Str_Services_CopyEndpoint}" InputGestureText="Ctrl+Shift+C" Tag="CopyEndpoint" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Services_CopyName}" InputGestureText="Ctrl+Shift+Y" Tag="CopyService" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Services_CopyPort}" InputGestureText="Ctrl+Alt+P" Tag="CopyPort" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyIp}" Tag="CopyIp" InputGestureText="Ctrl+C" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyHost}" Tag="CopyHost" InputGestureText="Ctrl+Alt+C" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <Separator x:Name="ServiceConnectSeparator"/>
                             <MenuItem Header="{DynamicResource Str_Ctx_OpenBrowser}" Tag="Browser" InputGestureText="Enter" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8A7;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8A7;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_Ssh}" Tag="Ssh" InputGestureText="Ctrl+S" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_SshAs}" Tag="SshAs" InputGestureText="Ctrl+Shift+S" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_Rdp}" Tag="Rdp" InputGestureText="Ctrl+D" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE7F4;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE7F4;"/></MenuItem.Icon>
                             </MenuItem>
                             <Separator/>
                             <MenuItem Header="{DynamicResource Str_Ctx_SelectAll}" Tag="SelectAll" InputGestureText="Ctrl+A" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE8B3;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8B3;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Export_ServicesCsv}" Tag="Export" InputGestureText="Ctrl+E" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE896;"/></MenuItem.Icon>
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE896;"/></MenuItem.Icon>
                             </MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
@@ -705,7 +735,7 @@
                         <DataGridTextColumn Header="{DynamicResource Str_Col_Ports}" Binding="{Binding Port}" Width="80"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Col_DeviceName}" Binding="{Binding DeviceName}" Width="*"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Col_Ip}" Binding="{Binding IpAddress}" Width="130"/>
-                        <DataGridTemplateColumn Header="{DynamicResource Str_Col_Type}" Width="150" SortMemberPath="DeviceTypeDisplay" CellTemplate="{StaticResource DeviceTypeCell}"/>
+                        <DataGridTemplateColumn Header="{DynamicResource Str_Col_Type}" Width="150" SortMemberPath="DeviceTypeDisplay" CellTemplate="{StaticResource DeviceTypeCell}" CellStyle="{StaticResource DeviceTypeCellStyle}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 

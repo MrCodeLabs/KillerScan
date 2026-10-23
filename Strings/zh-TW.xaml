@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">顯示或隱藏網路卡與連線速度</sys:String>
     <sys:String x:Key="Str_Light_Idle">尚未掃描</sys:String>
     <sys:String x:Key="Str_Light_Scanning">正在掃描</sys:String>
-    <sys:String x:Key="Str_Light_Deep">正在執行 Deep Scan</sys:String>
+    <sys:String x:Key="Str_Light_Deep">正在執行深度掃描</sys:String>
     <sys:String x:Key="Str_Light_Done">掃描完成</sys:String>
     <sys:String x:Key="Str_TT_Export">匯出</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">主題</sys:String>
@@ -196,7 +196,7 @@
     <sys:String x:Key="Str_Accent_Red">紅色</sys:String>
     <sys:String x:Key="Str_Accent_Orange">橙色</sys:String>
     <sys:String x:Key="Str_Accent_Green">綠色</sys:String>
-    <sys:String x:Key="Str_Accent_Teal">青色</sys:String>
+    <sys:String x:Key="Str_Accent_Teal">藍綠色</sys:String>
     <sys:String x:Key="Str_Accent_Blue">藍色</sys:String>
     <sys:String x:Key="Str_Accent_Purple">紫色</sys:String>
     <sys:String x:Key="Str_Accent_Yellow">黃色</sys:String>
@@ -221,11 +221,16 @@
     <sys:String x:Key="Str_Db_Updated">已更新至 {0} 筆記錄。</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">無法儲存資料庫：{0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">更新失敗：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">有可用更新：{0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">正在下載...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">下載並安裝 {0} {1}？</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">應用程式將關閉並自動重新開啟。</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">更新</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">有可用更新：{0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">正在下載...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">下載並安裝 {0} {1}？</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">應用程式將關閉並自動重新開啟。</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">啟動時檢查更新</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} 已推出</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">要立即下載並安裝嗎？應用程式將關閉並自動重新開啟。</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">更新</sys:String>
+    <sys:String x:Key="Str_About_NotNow">稍後再說</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">啟動時一律檢查更新</sys:String>
     <sys:String x:Key="Str_Conflict_Title">安裝衝突</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan 已安裝兩次。現在移除另一個目前使用者的複本嗎？
 
@@ -494,4 +499,8 @@
     <sys:String x:Key="Str_Scroll_Down">向下捲動</sys:String>
     <sys:String x:Key="Str_Scroll_Left">向左捲動</sys:String>
     <sys:String x:Key="Str_Scroll_Right">向右捲動</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">向上翻頁</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">向下翻頁</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">向左翻頁</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">向右翻頁</sys:String>
 </ResourceDictionary>

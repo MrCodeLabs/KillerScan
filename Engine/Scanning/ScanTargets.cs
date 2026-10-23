@@ -74,8 +74,7 @@ namespace KillerScan.Engine
 
             if (spans.Count == 0) { res.Error = TargetError.Empty; return res; }
 
-            long total = 0;
-            foreach (var (s, e) in spans) total += (long)e - s + 1;
+            long total = UniqueCount(spans);
             if (total > MaxAddresses)
             {
                 res.Error = TargetError.TooLarge;
@@ -93,6 +92,25 @@ namespace KillerScan.Engine
                 }
 
             return res;
+        }
+
+        /// <summary>Addresses covered by the spans with overlaps counted once. Works on merged
+        /// spans, so an oversized or heavily overlapping input is measured without expanding it.</summary>
+        private static long UniqueCount(List<(uint Start, uint End)> spans)
+        {
+            var sorted = new List<(uint Start, uint End)>(spans);
+            sorted.Sort((a, b) => a.Start.CompareTo(b.Start));
+
+            long total = 0;
+            long runStart = sorted[0].Start, runEnd = sorted[0].End;
+            for (int i = 1; i < sorted.Count; i++)
+            {
+                var (s, e) = sorted[i];
+                if (s <= runEnd + 1) { if (e > runEnd) runEnd = e; continue; }
+                total += runEnd - runStart + 1;
+                runStart = s; runEnd = e;
+            }
+            return total + runEnd - runStart + 1;
         }
 
         /// <summary>One cleaned token -> an inclusive address span.</summary>

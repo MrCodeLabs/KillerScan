@@ -236,11 +236,16 @@
     <sys:String x:Key="Str_Db_Failed">Update failed: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Update available: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Downloading...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Download and install {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">The app will close and reopen automatically.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Update</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Update available: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Downloading...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Download and install {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">The app will close and reopen automatically.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Check for updates on startup</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} is available</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Would you like to download and install it now? The app will close and reopen automatically.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Update</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Not now</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Always check on startup</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->
@@ -536,8 +541,10 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Scroll down</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Scroll left</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Scroll right</sys:String>
-
-    <!-- Per-scan probe choices; stable feature IDs also serve CLI /skip. -->
+    <sys:String x:Key="Str_Scroll_PageUp">Page up</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Page down</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Page left</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Page right</sys:String>
     <sys:String x:Key="Str_Options_Title">Scan options</sys:String>
     <sys:String x:Key="Str_Options_Detail">Per tab; saved with profiles. Fewer probes may reduce results. HTTP/TLS/SSH need port scanning; SNMP/NetBIOS are independent.</sys:String>
     <sys:String x:Key="Str_Options_Defaults">Restore defaults (all enabled)</sys:String>

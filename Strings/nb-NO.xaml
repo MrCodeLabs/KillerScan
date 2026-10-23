@@ -216,7 +216,7 @@
     <!-- ==== DIALOGS, UPDATES AND ERRORS ==== -->
     <sys:String x:Key="Str_About_Title">Om KillerScan</sys:String>
     <sys:String x:Key="Str_TT_About">Om KillerScan</sys:String>
-    <sys:String x:Key="Str_About_Aka" xml:space="preserve">AKA </sys:String>
+    <sys:String x:Key="Str_About_Aka" xml:space="preserve">ALIAS </sys:String>
     <sys:String x:Key="Str_About_Unsigned">(ikke signert eller kjedekontroll mislyktes)</sys:String>
     <sys:String x:Key="Str_About_Computing">beregner...</sys:String>
     <sys:String x:Key="Str_Ssh_Title">SSH-konto</sys:String>
@@ -236,11 +236,16 @@
     <sys:String x:Key="Str_Db_Failed">Oppdateringen mislyktes: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Oppdatering tilgjengelig: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Laster ned...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Laste ned og installere {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Appen lukkes og åpnes på nytt automatisk.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Oppdater</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Oppdatering tilgjengelig: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Laster ned...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Laste ned og installere {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Appen lukkes og åpnes på nytt automatisk.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Se etter oppdateringer ved oppstart</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} er tilgjengelig</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Vil du laste den ned og installere den nå? Appen lukkes og åpnes på nytt automatisk.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Oppdater</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Ikke nå</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Se alltid etter ved oppstart</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->
@@ -432,7 +437,7 @@ Innstillingene dine fjernes ikke.</sys:String>
     <sys:String x:Key="Str_Workspace_NewScan">Ny skanning</sys:String>
     <sys:String x:Key="Str_View_Devices">Enheter</sys:String>
     <sys:String x:Key="Str_View_Topology">Topologi</sys:String>
-    <sys:String x:Key="Str_View_KeepAlive">Keep Alive</sys:String>
+    <sys:String x:Key="Str_View_KeepAlive">Tilkoblingsovervåking</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Terminal</sys:String>
     <sys:String x:Key="Str_Term_Copy">Kopier</sys:String>
     <sys:String x:Key="Str_Term_Paste">Lim inn</sys:String>
@@ -536,4 +541,8 @@ Innstillingene dine fjernes ikke.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Rull ned</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Rull til venstre</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Rull til høyre</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Side opp</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Side ned</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Side til venstre</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Side til høyre</sys:String>
 </ResourceDictionary>

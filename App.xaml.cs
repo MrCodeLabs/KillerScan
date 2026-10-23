@@ -45,14 +45,6 @@ namespace KillerScan
         private const uint SHCNE_ASSOCCHANGED = 0x08000000;
         private const uint SHCNF_IDLIST       = 0x0000;
 
-        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern IntPtr SendMessageTimeout(
-            IntPtr hWnd, uint msg, IntPtr wParam, string lParam,
-            uint flags, uint timeout, out IntPtr result);
-        private static readonly IntPtr HwndBroadcast = new(0xffff);
-        private const uint WmSettingChange = 0x001A;
-        private const uint SmtoAbortIfHung = 0x0002;
-
         // ============================================================
         // Startup
         // ============================================================
@@ -60,6 +52,7 @@ namespace KillerScan
         protected override void OnStartup(StartupEventArgs e)
         {
             KillerFamily.Accessibility.AccessibleControls.Initialize();
+            KillerFamily.Theming.AccentShadow.Initialize();
             base.OnStartup(e);
             // Every window (dialogs, tools, pickers) takes the family UI face from the active theme
             // unless it sets its own, so no dialog falls back to the system Segoe UI.
@@ -121,7 +114,8 @@ namespace KillerScan
 
             int uiScanIndex = Array.FindIndex(e.Args, a =>
                 string.Equals(a, "/uiscan", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(a, "--uiscan", StringComparison.OrdinalIgnoreCase));
+                string.Equals(a, "--uiscan", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(a, "uiscan", StringComparison.OrdinalIgnoreCase));
             bool startUiScan = uiScanIndex >= 0;
             string? uiScanTarget = startUiScan
                 ? string.Join(",", e.Args.Skip(uiScanIndex + 1))
@@ -493,59 +487,13 @@ namespace KillerScan
         /// <summary>Add an install directory to PATH exactly once. The self-installer updates the
         /// current user; the elevated silent installer updates the machine, so a new terminal can
         /// invoke the app as simply "KillerScan" from any directory.</summary>
-        private static void AddToPath(string directory, EnvironmentVariableTarget target)
-        {
-            string current = Environment.GetEnvironmentVariable("Path", target) ?? "";
-            var entries = current.Split([';'], StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (!entries.Any(p => SamePath(p, directory)))
-            {
-                entries.Add(directory);
-                Environment.SetEnvironmentVariable("Path", string.Join(";", entries), target);
-                BroadcastEnvironmentChange();
-            }
-        }
+        private static void AddToPath(string directory, EnvironmentVariableTarget target) =>
+            Services.CommandLinePath.Register(directory, target == EnvironmentVariableTarget.Machine);
 
         /// <summary>Remove every spelling of an install directory from PATH without disturbing
         /// entries belonging to other programs.</summary>
-        private static void RemoveFromPath(string directory, EnvironmentVariableTarget target)
-        {
-            try
-            {
-                string current = Environment.GetEnvironmentVariable("Path", target) ?? "";
-                var entries = current.Split([';'], StringSplitOptions.RemoveEmptyEntries)
-                    .Where(p => !SamePath(p, directory)).ToList();
-                string updated = string.Join(";", entries);
-                if (!string.Equals(current.TrimEnd(';'), updated, StringComparison.Ordinal))
-                {
-                    Environment.SetEnvironmentVariable("Path", updated, target);
-                    BroadcastEnvironmentChange();
-                }
-            }
-            catch { /* uninstall and install-scope migration are best-effort cleanup */ }
-        }
-
-        private static bool SamePath(string left, string right)
-        {
-            try
-            {
-                return string.Equals(
-                    Path.GetFullPath(Environment.ExpandEnvironmentVariables(left.Trim().Trim('"')))
-                        .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                    Path.GetFullPath(right).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                    StringComparison.OrdinalIgnoreCase);
-            }
-            catch { return false; }
-        }
-
-        private static void BroadcastEnvironmentChange()
-        {
-            try
-            {
-                SendMessageTimeout(HwndBroadcast, WmSettingChange, IntPtr.Zero, "Environment",
-                    SmtoAbortIfHung, 2000, out _);
-            }
-            catch { /* a newly signed-in session still reads the persisted PATH */ }
-        }
+        private static void RemoveFromPath(string directory, EnvironmentVariableTarget target) =>
+            Services.CommandLinePath.Unregister(directory, target == EnvironmentVariableTarget.Machine);
 
         // ============================================================
         // Uninstall
