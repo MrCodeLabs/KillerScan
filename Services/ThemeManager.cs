@@ -33,6 +33,7 @@ namespace KillerScan.Services
     {
         /// <summary>Killer Sans UI (Killer Sans scaled to Segoe UI proportions) with the Segoe fallback stack.</summary>
         internal static readonly FontFamily KillerSansUiStack = new(new Uri("pack://application:,,,/"), "./Fonts/#Killer Sans UI, Segoe UI, Microsoft JhengHei UI, Nirmala UI");
+        internal static readonly FontFamily LacquerHeadingStack = new(new Uri("pack://application:,,,/"), "./Fonts/#Lacquer, ./Fonts/#Killer Sans UI, Segoe UI, Microsoft JhengHei UI, Nirmala UI");
         internal static readonly FontFamily KillerSansFont = new(new Uri("pack://application:,,,/"), "./Fonts/#Killer Sans");
         private static Theme _current = Theme.Black;
         // Dark, Light, and Black each remember their own accent independently.
@@ -250,10 +251,14 @@ namespace KillerScan.Services
             Complete("UiFont", compactDialogCaption ? newDict["MenuFontFamily"] : KillerSansUiStack);
             // The titlebar subtitle sits on the wordmark baseline in Killer Sans, as KillerPDF's filename does.
             Complete("FileNameFont", compactDialogCaption ? newDict["MenuFontFamily"] : KillerSansFont);
+            // Primary headings (dialog headings, page and period titles): Lacquer, the app-name face of
+            // the wordmark, falling back to Killer Sans UI for scripts Lacquer does not cover. 98SE keeps
+            // Killer Sans. Secondary headings, the footer and the interface stay Killer Sans.
+            Complete("HeadingFont", compactDialogCaption ? KillerSansFont : LacquerHeadingStack);
             Complete("FileNameFontSize", compactDialogCaption ? 11.0 : 18.0);
             if (!newDict.Contains("FileNameTransform"))
             {
-                var fileNameShift = new TranslateTransform(0, compactDialogCaption ? 0 : 1);
+                var fileNameShift = new TranslateTransform(0, compactDialogCaption ? 0 : -1);
                 fileNameShift.Freeze();
                 newDict["FileNameTransform"] = fileNameShift;
             }
@@ -347,6 +352,10 @@ namespace KillerScan.Services
                         if (!palette.Contains("OutlineRestBrush"))
                             target["OutlineRestBrush"] = target["OutlineBtnBrush"];
                         target["OutlineHoverBrush"] = target["OutlineBtnBrush"];
+                        // The hover text sits on that accent fill, so it follows the overlay's
+                        // text-on-accent color unless a palette names its own.
+                        if (!palette.Contains("OutlineHoverTextBrush") && !accentDict.Contains("OutlineHoverTextBrush"))
+                            target["OutlineHoverTextBrush"] = target["OnPrimaryBrush"];
                     }
                 }
                 catch { /* overlay file not present yet - base theme stands */ }
@@ -364,7 +373,8 @@ namespace KillerScan.Services
             if (!newDict.Contains("WordmarkAccentShadowOpacity")) newDict["WordmarkAccentShadowOpacity"] = 0.0;
             if (!hasExplicitComboHighlightText)
                 newDict["ComboHighlightTextBrush"] = newDict["PrimaryBrush"];
-            newDict["PrimaryFillBrush"] = ButtonFill(newDict["PrimaryBrush"], theme == Theme.SE98);
+            // A palette can fill buttons with a deeper shade than its accent text (PrimaryFillBaseBrush).
+            newDict["PrimaryFillBrush"] = ButtonFill(newDict.Contains("PrimaryFillBaseBrush") ? newDict["PrimaryFillBaseBrush"] : newDict["PrimaryBrush"], theme == Theme.SE98);
             newDict["OutlineHoverBrush"] = ButtonFill(newDict["OutlineHoverBrush"], theme == Theme.SE98);
             Publish(newDict);
         }

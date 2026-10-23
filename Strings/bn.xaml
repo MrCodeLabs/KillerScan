@@ -211,7 +211,7 @@
     <sys:String x:Key="Str_Ssh_Title">SSH অ্যাকাউন্ট</sys:String>
     <sys:String x:Key="Str_Btn_Install">ইনস্টল করুন</sys:String>
     <sys:String x:Key="Str_Install_BulletShortcut">- স্টার্ট মেনু শর্টকাট</sys:String>
-    <sys:String x:Key="Str_Install_BulletArp">- Add/Remove Programs তালিকায় দেখা যাবে</sys:String>
+    <sys:String x:Key="Str_Install_BulletArp">- প্রোগ্রাম যোগ/সরান তালিকায় দেখা যাবে</sys:String>
     <sys:String x:Key="Str_Db_Checking">নতুন ভেন্ডর ডেটা খোঁজা হচ্ছে...</sys:String>
     <sys:String x:Key="Str_Db_Downloading">ভেন্ডর ডেটা ডাউনলোড হচ্ছে...</sys:String>
     <sys:String x:Key="Str_Db_Fallback">বিকল্প উৎস চেষ্টা করা হচ্ছে...</sys:String>
@@ -221,11 +221,16 @@
     <sys:String x:Key="Str_Db_Updated">{0}টি এন্ট্রিতে হালনাগাদ হয়েছে।</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">ডেটাবেস সংরক্ষণ করা যায়নি: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">আপডেট ব্যর্থ হয়েছে: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">আপডেট উপলব্ধ: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">ডাউনলোড হচ্ছে...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} ডাউনলোড করে ইনস্টল করবেন?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">অ্যাপটি বন্ধ হয়ে স্বয়ংক্রিয়ভাবে আবার চালু হবে।</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">আপডেট</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">আপডেট উপলব্ধ: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">ডাউনলোড হচ্ছে...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} ডাউনলোড করে ইনস্টল করবেন?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">অ্যাপটি বন্ধ হয়ে স্বয়ংক্রিয়ভাবে আবার চালু হবে।</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">অ্যাপ চালু হলে আপডেট পরীক্ষা করুন</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} উপলব্ধ</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">এখনই এটি ডাউনলোড করে ইনস্টল করবেন? অ্যাপটি বন্ধ হয়ে স্বয়ংক্রিয়ভাবে আবার খুলবে।</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">আপডেট</sys:String>
+    <sys:String x:Key="Str_About_NotNow">এখন নয়</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">অ্যাপ চালু হলে সর্বদা আপডেট পরীক্ষা করুন</sys:String>
     <sys:String x:Key="Str_Conflict_Title">ইনস্টলেশন দ্বন্দ্ব</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan দুইবার ইনস্টল করা আছে। অন্য ব্যবহারকারী-ভিত্তিক কপিটি এখন সরাবেন?
 
@@ -365,7 +370,7 @@
     <sys:String x:Key="Str_Trace_Timeout">কোনো উত্তর নেই</sys:String>
     <sys:String x:Key="Str_Diag_Working">পরীক্ষা করা হচ্ছে</sys:String>
     <sys:String x:Key="Str_Diag_Refresh">আবার পরীক্ষা করুন</sys:String>
-    <sys:String x:Key="Str_Diag_Pick">বিস্তারিত দেখতে একটি কার্ড নির্বাচন করুন।</sys:String>
+    <sys:String x:Key="Str_Diag_Pick">সেই লক্ষ্যের বিরুদ্ধে পরীক্ষা চালাতে একটি কার্ড নির্বাচন করুন।</sys:String>
     <sys:String x:Key="Str_Watch_Event">{0}: {1}</sys:String>
     <sys:String x:Key="Str_Watch_Stopped">থামানো হয়েছে</sys:String>
     <sys:String x:Key="Str_Diag_Title">ডিভাইস ডায়াগনস্টিকস</sys:String>
@@ -494,4 +499,8 @@
     <sys:String x:Key="Str_Scroll_Down">নিচে স্ক্রল করুন</sys:String>
     <sys:String x:Key="Str_Scroll_Left">বাঁয়ে স্ক্রল করুন</sys:String>
     <sys:String x:Key="Str_Scroll_Right">ডানে স্ক্রল করুন</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">এক পৃষ্ঠা উপরে</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">এক পৃষ্ঠা নিচে</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">এক পৃষ্ঠা বাঁয়ে</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">এক পৃষ্ঠা ডানে</sys:String>
 </ResourceDictionary>

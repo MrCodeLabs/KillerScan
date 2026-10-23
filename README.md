@@ -46,8 +46,8 @@ Part of [killertools.net](https://killertools.net).
 
 <table>
 <tr>
-<td width="50%"><img src="scan-landing/screenshots/01.png" alt="KillerScan device list with the scan history sidebar open"><br><sub>A completed scan with IP addresses, hostnames, MAC vendors, device classifications and open ports in one sortable view, beside the scan history.</sub></td>
-<td width="50%"><img src="scan-landing/screenshots/03.png" alt="KillerScan network topology with its export menu open"><br><sub>Topology draws the same devices as a map you can rearrange and tune, and exports the arranged view as a transparent PNG, a JPG or an HTML page with SVG.</sub></td>
+<td width="50%"><img src="scan-landing/screenshots/01.png" alt="KillerScan device list beside the scan history sidebar"><br><sub>A completed scan with IP addresses, hostnames, MAC vendors, device classifications and open ports in one sortable view, beside the scan history.</sub></td>
+<td width="50%"><img src="scan-landing/screenshots/03.png" alt="KillerScan network topology with the scan history sidebar collapsed"><br><sub>Topology draws the same devices as a map you can rearrange and tune, and exports the arranged view as a transparent PNG, a JPG or an HTML page with SVG.</sub></td>
 </tr>
 </table>
 
@@ -60,7 +60,7 @@ Part of [killertools.net](https://killertools.net).
 ## Download
 
 - Prebuilt binary: <https://github.com/SteveTheKiller/KillerScan/releases/latest/download/KillerScan.exe>
-- Source (GPL3 corresponding source for this release): <https://github.com/SteveTheKiller/KillerScan/releases/download/v1.8.1/KillerScan-1.8.1-src.zip>
+- Source (GPL3 corresponding source for this release): <https://github.com/SteveTheKiller/KillerScan/releases/download/v1.8.3/KillerScan-1.8.3-src.zip>
 
 WinGet:
 

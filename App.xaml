@@ -1,9 +1,10 @@
 <Application x:Class="KillerScan.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:kl="clr-namespace:KillerFamily.Layout"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:KillerScan.Controls"
              xmlns:snap="clr-namespace:KillerFamily.Windowing"
->
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -39,15 +40,17 @@
             <controls:TrustMarkConverter x:Key="TrustMark"/>
 
             <!-- Family brand faces, bundled in Fonts/ with their licenses beside them: Punktype
-                 (commercial license) for "Killer", Lacquer (OFL) for the app name, and Killer Sans
-                 (OFL) for headings and the footer. -->
+                 (commercial license) for "Killer", Lacquer (OFL) for the app name and primary headings, and
+                 Killer Sans (OFL) for secondary headings and the footer. -->
             <FontFamily x:Key="WordmarkFont">/KillerScan;component/Fonts/#Punktype</FontFamily>
             <FontFamily x:Key="WordmarkAccentFont">/KillerScan;component/Fonts/#Lacquer</FontFamily>
             <FontFamily x:Key="BrandSansFont">/KillerScan;component/Fonts/#Killer Sans</FontFamily>
 
             <!-- Global themed tooltip (replaces the plain system box). Implicit (no key) so every
                  tooltip app-wide picks it up; brushes are DynamicResource so it follows theme + accent. -->
+            <kl:TooltipTextConverter x:Key="TooltipTextConverter"/>
             <Style TargetType="ToolTip">
+                <Setter Property="kl:TooltipTextConverter.WrapContent" Value="True"/>
                 <Setter Property="Background" Value="{DynamicResource MenuBackgroundBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MenuBorderBrush}"/>
@@ -65,9 +68,15 @@
                                     CornerRadius="{DynamicResource ControlCornerRadius}"
                                     Padding="{TemplateBinding Padding}">
                                 <Border.Effect>
-                                    <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.45"/>
+                                    <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="{DynamicResource FlyoutShadowOpacity}"/>
                                 </Border.Effect>
-                                <ContentPresenter/>
+                                <ContentPresenter>
+                                    <ContentPresenter.Resources>
+                                        <DataTemplate DataType="{x:Type sys:String}">
+                                            <TextBlock Text="{Binding Converter={StaticResource TooltipTextConverter}}" MaxWidth="300" TextWrapping="Wrap"/>
+                                        </DataTemplate>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
@@ -415,34 +424,53 @@
                                  PrimaryHoverBrush == PrimaryBrush, so the old brush swap was a
                                  no-op and this button had never shown a hover. Ported from
                                  KillerShell. (2026-07-30) -->
-                            <Border x:Name="border"
-                                    Background="{TemplateBinding Background}"
-                                    CornerRadius="{DynamicResource ControlCornerRadius}">
-                                <Grid>
-                                    <Border x:Name="tint" CornerRadius="{DynamicResource ControlCornerRadius}" Background="Transparent"/>
-                                    <!-- RAISED bevel, so the brushes are PAIRED with their slots:
-                                         light on top+left, dark on bottom+right. Both thicknesses
-                                         are 0 and both brushes transparent on every theme but
-                                         98SE, so this draws nothing and costs nothing elsewhere. -->
-                                    <Border x:Name="bevelLight" BorderBrush="{DynamicResource BevelLightBrush}"
-                                            BorderThickness="{DynamicResource BevelLightThickness}"/>
-                                    <Border x:Name="bevelDark" BorderBrush="{DynamicResource BevelDarkBrush}"
-                                            BorderThickness="{DynamicResource BevelDarkThickness}"/>
-                                    <ContentPresenter Margin="{TemplateBinding Padding}"
-                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Border>
+                            <Grid>
+                                <!-- Raised: a soft shadow on item-free SIBLINGS under the face (an effect on the face
+                                     itself would rasterize the caption and lose ClearType). Hover lifts the button
+                                     higher, press sets it down. BarShadowOpacity is 0 on 98SE, which stays flat. -->
+                                <Border x:Name="liftRest" IsHitTestVisible="False" CornerRadius="{DynamicResource ControlCornerRadius}"
+                                        Background="Black" Opacity="{DynamicResource BarShadowOpacity}">
+                                    <Border.Effect><DropShadowEffect Color="Black" Direction="270" ShadowDepth="1.5" BlurRadius="5" RenderingBias="Quality"/></Border.Effect>
+                                </Border>
+                                <Border x:Name="liftHover" IsHitTestVisible="False" Visibility="Collapsed" CornerRadius="{DynamicResource ControlCornerRadius}"
+                                        Background="Black" Opacity="{DynamicResource BarShadowOpacity}">
+                                    <Border.Effect><DropShadowEffect Color="Black" Direction="270" ShadowDepth="3.5" BlurRadius="10" RenderingBias="Quality"/></Border.Effect>
+                                </Border>
+                                <Border x:Name="border"
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="{DynamicResource ControlCornerRadius}">
+                                    <Grid>
+                                        <Border x:Name="tint" CornerRadius="{DynamicResource ControlCornerRadius}" Background="Transparent"/>
+                                        <!-- RAISED bevel, so the brushes are PAIRED with their slots:
+                                             light on top+left, dark on bottom+right. Both thicknesses
+                                             are 0 and both brushes transparent on every theme but
+                                             98SE, so this draws nothing and costs nothing elsewhere. -->
+                                        <Border x:Name="bevelLight" BorderBrush="{DynamicResource BevelLightBrush}"
+                                                BorderThickness="{DynamicResource BevelLightThickness}"/>
+                                        <Border x:Name="bevelDark" BorderBrush="{DynamicResource BevelDarkBrush}"
+                                                BorderThickness="{DynamicResource BevelDarkThickness}"/>
+                                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="tint" Property="Background" Value="#2EFFFFFF"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Visible"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter TargetName="tint" Property="Background" Value="#38000000"/>
                                     <Setter TargetName="bevelLight" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
                                     <Setter TargetName="bevelDark" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter Property="Opacity" Value="0.5"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -469,7 +497,19 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Grid><Border x:Name="borderRing" IsHitTestVisible="False" CornerRadius="{Binding CornerRadius, ElementName=border}" BorderThickness="{Binding BorderThickness, ElementName=border}" BorderBrush="{Binding Background, ElementName=border}" Margin="{Binding Margin, ElementName=border}" Visibility="{Binding Visibility, ElementName=border}" Opacity="{Binding Opacity, ElementName=border}"/><Border x:Name="border"
+                            <Grid>
+                                <!-- Raised: a soft shadow on item-free SIBLINGS under the face (an effect on the face
+                                     itself would rasterize the caption and lose ClearType). Hover lifts the button
+                                     higher, press sets it down. BarShadowOpacity is 0 on 98SE, which stays flat. -->
+                                <Border x:Name="liftRest" IsHitTestVisible="False" CornerRadius="{DynamicResource ControlCornerRadius}"
+                                        Background="Transparent" BorderBrush="Black" BorderThickness="1" Opacity="{DynamicResource BarShadowOpacity}">
+                                    <Border.Effect><DropShadowEffect Color="Black" Direction="270" ShadowDepth="1.5" BlurRadius="5" RenderingBias="Quality"/></Border.Effect>
+                                </Border>
+                                <Border x:Name="liftHover" IsHitTestVisible="False" Visibility="Collapsed" CornerRadius="{DynamicResource ControlCornerRadius}"
+                                        Background="Black" Opacity="{DynamicResource BarShadowOpacity}">
+                                    <Border.Effect><DropShadowEffect Color="Black" Direction="270" ShadowDepth="3.5" BlurRadius="10" RenderingBias="Quality"/></Border.Effect>
+                                </Border>
+                                <Border x:Name="borderRing" IsHitTestVisible="False" CornerRadius="{Binding CornerRadius, ElementName=border}" BorderThickness="{Binding BorderThickness, ElementName=border}" BorderBrush="{Binding Background, ElementName=border}" Margin="{Binding Margin, ElementName=border}" Visibility="{Binding Visibility, ElementName=border}" Opacity="{Binding Opacity, ElementName=border}"/><Border x:Name="border"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -495,15 +535,21 @@
                                     <Setter TargetName="border" Property="Background" Value="{DynamicResource OutlineHoverBrush}"/>
                                     <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource OutlineHoverBrush}"/>
                                     <Setter Property="Foreground" Value="{DynamicResource OutlineHoverTextBrush}"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Visible"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter TargetName="border" Property="Background" Value="{DynamicResource SelectionBg}"/>
                                     <Setter Property="Foreground" Value="{DynamicResource SelectionFg}"/>
                                     <Setter TargetName="bevelLight" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
                                     <Setter TargetName="bevelDark" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter Property="Opacity" Value="0.5"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -532,28 +578,6 @@
                                     <Setter TargetName="b" Property="Background" Value="{DynamicResource PaneBrush}"/>
                                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                 </DataTrigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style x:Key="TabCloseBtn" TargetType="Button">
-                <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="Margin" Value="8,0,0,0"/>
-                <Setter Property="Foreground" Value="{DynamicResource DimTextBrush}"/>
-                <Setter Property="FontSize" Value="9"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="cb" Background="Transparent" CornerRadius="{DynamicResource SmallCornerRadius}" Width="15" Height="15">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="cb" Property="Background" Value="#C42B1C"/>
-                                    <Setter Property="Foreground" Value="White"/>
-                                </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -625,6 +649,17 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Grid>
+                                <!-- Raised: a soft shadow on item-free SIBLINGS under the face (an effect on the face
+                                     itself would rasterize the caption and lose ClearType). Hover lifts the button
+                                     higher, press sets it down. BarShadowOpacity is 0 on 98SE, which stays flat. -->
+                                <Border x:Name="liftRest" IsHitTestVisible="False" CornerRadius="{DynamicResource ControlCornerRadius}"
+                                        Background="Black" Opacity="{DynamicResource BarShadowOpacity}">
+                                    <Border.Effect><DropShadowEffect Color="Black" Direction="270" ShadowDepth="1.5" BlurRadius="5" RenderingBias="Quality"/></Border.Effect>
+                                </Border>
+                                <Border x:Name="liftHover" IsHitTestVisible="False" Visibility="Collapsed" CornerRadius="{DynamicResource ControlCornerRadius}"
+                                        Background="Black" Opacity="{DynamicResource BarShadowOpacity}">
+                                    <Border.Effect><DropShadowEffect Color="Black" Direction="270" ShadowDepth="3.5" BlurRadius="10" RenderingBias="Quality"/></Border.Effect>
+                                </Border>
                                 <Border x:Name="borderRing" IsHitTestVisible="False" CornerRadius="{Binding CornerRadius, ElementName=border}" BorderThickness="{Binding BorderThickness, ElementName=border}" BorderBrush="{Binding Background, ElementName=border}" Margin="{Binding Margin, ElementName=border}" Visibility="{Binding Visibility, ElementName=border}" Opacity="{Binding Opacity, ElementName=border}"/><Border x:Name="border" Background="{TemplateBinding Background}"
                                         BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                         CornerRadius="{DynamicResource ControlCornerRadius}" Padding="{TemplateBinding Padding}">
@@ -642,15 +677,21 @@
                                      on a dark panel and the button reads as dead. (2026-07-30) -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Visible"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter TargetName="border" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
                                     <Setter TargetName="bevelLight" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
                                     <Setter TargetName="bevelDark" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter Property="Opacity" Value="0.4"/>
                                     <Setter Property="Cursor" Value="Arrow"/>
+                                    <Setter TargetName="liftRest" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="liftHover" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -826,14 +867,14 @@
                                         </MultiBinding>
                                     </Track.ViewportSize>
                                     <Track.DecreaseRepeatButton>
-                                        <RepeatButton x:Name="PageBack" Command="ScrollBar.PageUpCommand" Focusable="False" IsTabStop="False">
+                                        <RepeatButton x:Name="PageBack" Command="ScrollBar.PageUpCommand" AutomationProperties.Name="{DynamicResource Str_Scroll_PageUp}" Focusable="False" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
                                             </RepeatButton.Template>
                                         </RepeatButton>
                                     </Track.DecreaseRepeatButton>
                                     <Track.IncreaseRepeatButton>
-                                        <RepeatButton x:Name="PageForward" Command="ScrollBar.PageDownCommand" Focusable="False" IsTabStop="False">
+                                        <RepeatButton x:Name="PageForward" Command="ScrollBar.PageDownCommand" AutomationProperties.Name="{DynamicResource Str_Scroll_PageDown}" Focusable="False" IsTabStop="False">
                                             <RepeatButton.Template>
                                                 <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
                                             </RepeatButton.Template>
@@ -884,7 +925,9 @@
                                 <Trigger Property="Orientation" Value="Horizontal">
                                     <Setter TargetName="PART_Track"   Property="IsDirectionReversed" Value="False"/>
                                     <Setter TargetName="PageBack"     Property="Command" Value="ScrollBar.PageLeftCommand"/>
+                                    <Setter TargetName="PageBack"     Property="AutomationProperties.Name" Value="{DynamicResource Str_Scroll_PageLeft}"/>
                                     <Setter TargetName="PageForward"  Property="Command" Value="ScrollBar.PageRightCommand"/>
+                                    <Setter TargetName="PageForward"  Property="AutomationProperties.Name" Value="{DynamicResource Str_Scroll_PageRight}"/>
                                     <Setter TargetName="ArrowUp" Property="Grid.Row" Value="1"/>
                                     <Setter TargetName="ArrowUp" Property="Grid.Column" Value="0"/>
                                     <Setter TargetName="ArrowUp" Property="Content" Value="3"/>
@@ -921,6 +964,8 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource MenuBorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="FontFamily" Value="{DynamicResource MenuFontFamily}"/>
+                <Setter Property="FontSize" Value="{DynamicResource MenuFontSize}"/>
                 <Setter Property="Padding" Value="0,4"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -977,7 +1022,8 @@
                 <!-- TextBrush, not MenuTextBrush: menu items are body text, not secondary
                      labels. Family standard, see KillerUI/README.md surface rules. -->
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontFamily" Value="{DynamicResource MenuFontFamily}"/>
+                <Setter Property="FontSize" Value="{DynamicResource MenuFontSize}"/>
                 <!-- 8 on the left, not 24: the 16px icon gutter provides the inset now. Family
                      standard, matching KillerPDF. -->
                 <Setter Property="Padding" Value="8,6,10,6"/>
@@ -1280,8 +1326,8 @@
                                     <!-- Light/Yellow: the active or hovered glyph shows the yellow accent with the wordmark's
                                          dark halo behind it, so it reads on white. WordmarkAccentShadowOpacity is 0 on every
                                          other theme, which leaves both extra layers invisible. -->
-                                    <TextBlock Text="{TemplateBinding Content}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" SnapsToDevicePixels="True" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#D8000000" IsHitTestVisible="False" Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.RenderTransform><TranslateTransform X="1" Y="2"/></TextBlock.RenderTransform><TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="on"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
-                                    <TextBlock Text="{TemplateBinding Content}"
+                                    <TextBlock kl:GlyphInk.Center="True" Text="{TemplateBinding Content}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" SnapsToDevicePixels="True" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#D8000000" IsHitTestVisible="False" Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.RenderTransform><TranslateTransform X="1" Y="2"/></TextBlock.RenderTransform><TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="on"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+                                    <TextBlock kl:GlyphInk.Center="True" Text="{TemplateBinding Content}"
                                                FontFamily="{TemplateBinding FontFamily}"
                                                FontSize="{TemplateBinding FontSize}"
                                                TextOptions.TextFormattingMode="Display"
@@ -1306,7 +1352,7 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <TextBlock Text="{TemplateBinding Content}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" SnapsToDevicePixels="True" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource AccentLogo}" IsHitTestVisible="False" Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="on"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+                                    <TextBlock kl:GlyphInk.Center="True" Text="{TemplateBinding Content}" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" SnapsToDevicePixels="True" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource AccentLogo}" IsHitTestVisible="False" Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="on"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
                                 </Grid>
                             </Border>
                         </ControlTemplate>
@@ -1344,12 +1390,13 @@
                             <Border x:Name="bd" Background="Transparent" CornerRadius="{DynamicResource ControlCornerRadius}"
                                     Margin="-8,0,2,0" Padding="10,3,10,3">
                                 <DockPanel LastChildFill="True" Background="Transparent">
-                                    <Grid Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left">
+                                    <!-- Centered on the label's capitals for whatever font the theme uses (Controls/CapCenterMargin.cs). A fixed nudge only fits one face. -->
+                                    <Grid Width="16" Height="16" VerticalAlignment="Center" DockPanel.Dock="Left"><Grid.Margin><MultiBinding Converter="{x:Static kl:CapCenterMargin.Instance}" ConverterParameter="0,0,8,0"><Binding RelativeSource="{RelativeSource TemplatedParent}" Path="FontFamily"/><Binding RelativeSource="{RelativeSource TemplatedParent}" Path="FontSize"/></MultiBinding></Grid.Margin>
                                         <Ellipse Width="14" Height="14" Fill="Transparent"/>
                                         <Ellipse x:Name="ring" Width="14" Height="14"
                                                  Stroke="{DynamicResource DimTextBrush}" StrokeThickness="1.5"
                                                  Fill="Transparent"/>
-                                        <Ellipse x:Name="dot" Width="7" Height="7"
+                                        <Ellipse x:Name="dot" Width="6" Height="6"
                                                  Fill="{DynamicResource PrimaryBrush}" Visibility="Collapsed"/>
                                     </Grid>
                                     <ContentPresenter x:Name="label" VerticalAlignment="Center">
@@ -1412,7 +1459,8 @@
                             <Border x:Name="bd" Background="Transparent" CornerRadius="{DynamicResource ControlCornerRadius}"
                                     Margin="-8,0,2,0" Padding="10,3,10,3">
                                 <DockPanel LastChildFill="True" Background="Transparent">
-                                    <Grid Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left">
+                                    <!-- Centered on the label's capitals for whatever font the theme uses (Controls/CapCenterMargin.cs). A fixed nudge only fits one face. -->
+                                    <Grid Width="16" Height="16" VerticalAlignment="Center" DockPanel.Dock="Left"><Grid.Margin><MultiBinding Converter="{x:Static kl:CapCenterMargin.Instance}" ConverterParameter="0,0,8,0"><Binding RelativeSource="{RelativeSource TemplatedParent}" Path="FontFamily"/><Binding RelativeSource="{RelativeSource TemplatedParent}" Path="FontSize"/></MultiBinding></Grid.Margin>
                                         <Border CornerRadius="{DynamicResource ControlCornerRadius}" Width="14" Height="14" Background="Transparent"/>
                                         <Border CornerRadius="{DynamicResource ControlCornerRadius}" x:Name="ring" Width="14" Height="14"
                                                  BorderBrush="{DynamicResource DimTextBrush}" BorderThickness="1"

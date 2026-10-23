@@ -40,11 +40,25 @@ internal static class Program
             if (args.SequenceEqual(new[] { "--profiles-ui" })) { await HistoryUiTests.Run(profilesOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--menu-icons-ui" })) { await HistoryUiTests.Run(menusOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--topology" })) { await TopologyTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--csv-export" })) { await CsvExportTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--report-sort" })) { await ReportSortTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--command-line-path" })) { await CommandLinePathTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--report-logo" })) { await ReportLogoTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--outline-hover-ui" })) { await OutlineHoverThemeTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--radio-center-ui" })) { await RadioCenterUiTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--shrink-to-fit" })) { await ShrinkToFitTests.Run(); return 0; }
             Require(args.All(value => value == "--worker" || value == "--internet"), "Usage: SpeedTest.Tests.exe [--worker] [--internet]");
             await Run("Menu dividers resolve declared palettes and preserve the fallback", MenuSeparatorThemeTests.Run);
             await Run("Startup content becomes visible when its animation stalls", StartupFadeTests.Run);
             await Run("Topology radial geometry, zoom and rendered interactions", TopologyTests.RunIsolated);
             await Run("History identity, saved-data menus and contextual shortcuts", HistoryUiTests.RunIsolated);
+            await Run("CSV exports keep spreadsheet formulas inert", CsvExportTests.Run);
+            await Run("HTML report columns sort from the keyboard and expose aria-sort", ReportSortTests.Run);
+            await Run("PATH registration adds and removes only the install folder", CommandLinePathTests.Run);
+            await Run("HTML report logo returns after a theme without one", ReportLogoTests.Run);
+            await Run("Outline button hover text stays readable in every accent", OutlineHoverThemeTests.RunIsolated);
+            await Run("Radio and checkbox indicators sit on the middle of their labels", RadioCenterUiTests.RunIsolated);
+            await Run("Sidebar text shrinks a little before it is trimmed", ShrinkToFitTests.Run);
             await Run("Metric units, median, jitter and unavailable values", Metrics);
             await Run("Scan terminal progress stays on one line and results fit narrow widths", ScanPresentation);
             await Run("Terminal history survives resizing, clears and shell replacement", TerminalHistory);
@@ -389,12 +403,14 @@ internal static class Program
                 var xml = new XmlDocument();
                 xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
                 string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
-                    .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
+                    .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
+                    .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
                 var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
                 context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
                 context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
                 context.XmlnsDictionary.Add("controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan");
                 context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
+                context.XmlnsDictionary.Add("kl", "clr-namespace:KillerFamily.Layout;assembly=KillerScan");
                 app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
                 var assembly = typeof(KillerScan.App).Assembly;
                 var manager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;

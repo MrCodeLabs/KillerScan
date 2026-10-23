@@ -90,10 +90,9 @@ namespace KillerScan.Controls
             TopologyOrderButton.IsVisibleChanged += (_, _) => FitToolbarInputs();
             SubnetInput.TextChanged += (_, _) => { _active.SubnetText = Targets; StateChanged?.Invoke(this, EventArgs.Empty); };
             SubnetInput.KeyDown += (_, e) => { if (e.Key == Key.Enter) { Scan(); e.Handled = true; } };
-            Loaded += (_, _) =>
-            {
-                if (TryFindResource("GrainTileBrush") is ImageBrush grain) GrainBrush.ImageSource = grain.ImageSource;
-            };
+            ResultsGrid.PreviewKeyDown += TabOutOfGrid;
+            ServicesGrid.PreviewKeyDown += TabOutOfGrid;
+            Loaded += (_, _) => GrainTexture.Track(GrainBrush);
             if (demo) GenerateDemoScan();
         }
         private string Loc(string key) => TryFindResource(key) as string ?? key;
@@ -205,6 +204,22 @@ namespace KillerScan.Controls
             UpdateDeepScanButton();
             UpdateExportButtonAvailability();
         }
+        /// <summary>
+        /// Tab leaves a results grid in one step, as it leaves a list box, and the arrow keys
+        /// still move between cells. The grid's own Tab handling visits every cell in the row first.
+        /// </summary>
+        internal static void TabOutOfGrid(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Tab || sender is not DataGrid grid) return;
+            var modifiers = Keyboard.Modifiers;
+            if ((modifiers & ~ModifierKeys.Shift) != ModifierKeys.None) return;
+            var request = new TraversalRequest(modifiers == ModifierKeys.Shift
+                ? FocusNavigationDirection.Previous : FocusNavigationDirection.Next);
+            for (int step = 0; step < 256 && grid.IsKeyboardFocusWithin; step++)
+                if (Keyboard.FocusedElement is not UIElement focused || !focused.MoveFocus(request)) break;
+            e.Handled = !grid.IsKeyboardFocusWithin;
+        }
+
         private void RaiseDeviceAction(string action, bool beside = false)
         {
             if (_showServices && action is "Browser" or "Rdp" or "Ssh" or "SshAs")
