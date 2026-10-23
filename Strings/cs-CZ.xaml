@@ -219,11 +219,16 @@
     <sys:String x:Key="Str_Db_Updated">Aktualizováno na {0} položek.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Databázi se nepodařilo uložit: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Aktualizace selhala: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Je dostupná aktualizace: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Stahování...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Stáhnout a nainstalovat {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Aplikace se zavře a znovu se automaticky spustí.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Aktualizovat</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Je dostupná aktualizace: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Stahování...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Stáhnout a nainstalovat {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Aplikace se zavře a znovu se automaticky spustí.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Kontrolovat aktualizace při spuštění</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">Je k dispozici {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Chcete jej nyní stáhnout a nainstalovat? Aplikace se zavře a automaticky znovu otevře.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Aktualizovat</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Teď ne</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Vždy kontrolovat aktualizace při spuštění</sys:String>
     <sys:String x:Key="Str_Conflict_Title">konflikt instalace</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan je nainstalován dvakrát. Odebrat nyní druhou kopii pro tohoto uživatele?
 
@@ -363,7 +368,7 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Trace_Timeout">Bez odpovědi</sys:String>
     <sys:String x:Key="Str_Diag_Working">Kontroluje se</sys:String>
     <sys:String x:Key="Str_Diag_Refresh">Zkontrolovat znovu</sys:String>
-    <sys:String x:Key="Str_Diag_Pick">Vyberte kartu a zobrazte podrobnosti.</sys:String>
+    <sys:String x:Key="Str_Diag_Pick">Vyberte kartu a spusťte kontroly pro daný cíl.</sys:String>
     <sys:String x:Key="Str_Watch_Event">{0}: {1}</sys:String>
     <sys:String x:Key="Str_Watch_Stopped">Zastaveno</sys:String>
     <sys:String x:Key="Str_Diag_Title">Diagnostika zařízení</sys:String>
@@ -395,7 +400,7 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Vybrat vše</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Kopírovat vše</sys:String>
     <sys:String x:Key="Str_Term_Clear">Vymazat</sys:String>
-    <sys:String x:Key="Str_Workspace_EscStop">Esc pro zastaveni</sys:String>
+    <sys:String x:Key="Str_Workspace_EscStop">Esc pro zastavení</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Rozdělit panely</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Přesunout do druhého panelu</sys:String>
     <sys:String x:Key="Str_Workspace_Close">Zavřít kartu</sys:String>
@@ -492,6 +497,10 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Posunout dolů</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Posunout doleva</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Posunout doprava</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">O stránku nahoru</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">O stránku dolů</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">O stránku doleva</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">O stránku doprava</sys:String>
     <sys:String x:Key="Str_Location_Title">Lokalita</sys:String>
     <sys:String x:Key="Str_Location_Busy">Před změnou lokality zastav probíhající skenování nebo příkaz v terminálu.</sys:String>
     <sys:String x:Key="Str_Location_Legacy">Původní data (nepřiřazená)</sys:String>

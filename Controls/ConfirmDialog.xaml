@@ -86,7 +86,7 @@
                          is what a user reads - which is why they have to be resources. -->
                     <TextBlock x:Name="HeadingText" Text="{DynamicResource Str_Install_HeadUser}"
                                Foreground="{StaticResource TextBrush}"
-                               FontFamily="{DynamicResource BrandSansFont}" FontSize="18"
+                               FontFamily="{DynamicResource HeadingFont}" FontSize="18"
                                                TextOptions.TextFormattingMode="Ideal" TextWrapping="Wrap"/>
                     <TextBlock x:Name="DetailText" Foreground="{StaticResource MutedTextBrush}"
                                FontSize="12" LineHeight="19" TextWrapping="Wrap" Margin="0,10,0,0">
@@ -94,6 +94,10 @@
                         <LineBreak/>
                         <Run Text="{DynamicResource Str_Install_BulletArp}"/>
                     </TextBlock>
+                    <!-- Optional choice for a reused dialog, such as the startup update prompt's
+                         "Always check on startup". Hidden on the install prompt. -->
+                    <CheckBox x:Name="Check1" Visibility="Collapsed" Margin="0,16,0,0"
+                              Foreground="{StaticResource TextBrush}" FontSize="12"/>
 
                     <!-- All-users install: routes to the same machine-wide path winget and choco
                          already use (Program Files + HKLM), by re-running the app elevated with

@@ -22,9 +22,10 @@ namespace KillerScan.Services
     /// </summary>
     internal static class ReportExport
     {
-        /// <summary>Where the report pulls optional brand assets from. The report still works fully
-        /// without them (solid color + text wordmark fallbacks), so these can 404 safely.</summary>
-        private const string AssetBase = "https://scan.killertools.net/assets/";
+        /// <summary>Where the report loads its wordmark from: the same per-theme and per-accent SVGs
+        /// the website uses. The report still works fully without them (text wordmark fallback), so
+        /// they can fail to load safely.</summary>
+        private const string LogoBase = "https://killerscan.net/brand/killerscan-logo-";
 
         /// <summary>Comma-separated devices, IP-ordered, every field quoted.</summary>
         /// <summary>Resource lookup that survives having no Application - the CLI builds reports
@@ -37,7 +38,22 @@ namespace KillerScan.Services
         private static string Ljs(string key, string fallback) =>
             L(key, fallback).Replace("\\", "\\\\").Replace("'", "\\'");
 
-        internal static string CsvField(string? value) => "\"" + (value ?? string.Empty).Replace("\"", "\"\"") + "\"";
+        internal static string SpreadsheetSafeValue(string? value)
+        {
+            string text = value ?? string.Empty;
+            int first = 0;
+            while (first < text.Length && (char.IsWhiteSpace(text[first]) || char.IsControl(text[first])))
+                first++;
+            if (first >= text.Length || "=+-@".IndexOf(text[first]) < 0) return text;
+            // A sign with nothing after it, such as the "-" shown for a host with no open ports,
+            // is plain text to a spreadsheet and stays as written.
+            bool loneSign = (text[first] == '-' || text[first] == '+')
+                && text.Substring(first + 1).Trim().Length == 0;
+            return loneSign ? text : "'" + text;
+        }
+
+        internal static string CsvField(string? value) =>
+            "\"" + SpreadsheetSafeValue(value).Replace("\"", "\"\"") + "\"";
 
         internal static string BuildCsv(IEnumerable<NetworkDevice> devices) => BuildLocationCsv(devices, null);
 
@@ -114,6 +130,8 @@ namespace KillerScan.Services
             sb.AppendLine("table{border-collapse:collapse;width:100%;min-width:760px}");
             sb.AppendLine("th{background:var(--surface);color:var(--muted);text-align:left;padding:10px 14px;font-size:12px;font-weight:600;font-family:Consolas,monospace;letter-spacing:.3px;position:sticky;top:0;white-space:nowrap;cursor:pointer;user-select:none}");
             sb.AppendLine("th:hover{color:var(--text)}th .arrow{display:inline-block;width:10px;font-size:10px;opacity:.7}");
+            sb.AppendLine(".sortbtn{background:none;border:0;margin:0;padding:0;font:inherit;color:inherit;letter-spacing:inherit;text-align:left;white-space:nowrap;cursor:pointer}");
+            sb.AppendLine(".sortbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}");
             sb.AppendLine("td{border-top:1px solid var(--border);padding:9px 14px;font-size:13px;white-space:nowrap}");
             sb.AppendLine("td.vendor{white-space:normal}tbody tr:hover td{background:var(--hover)}");
             sb.AppendLine(".mono{font-family:Consolas,monospace}");
@@ -127,7 +145,7 @@ namespace KillerScan.Services
 
             // Header: logo (if hosted) falls back to a Consolas wordmark - Killer in text color, Scan in accent.
             sb.AppendLine("<div class='topbar'><div class='brand'>");
-            sb.AppendLine($"<img class='logo' src='{AssetBase}killerscan-wordmark.png' alt='' onload=\"document.getElementById('wm').style.display='none'\" onerror=\"this.style.display='none'\"/>");
+            sb.AppendLine("<img id='logo' class='logo' alt='KillerScan' style='display:none' onload=\"this.style.display='';document.getElementById('wm').style.display='none'\" onerror=\"this.style.display='none';document.getElementById('wm').style.display=''\"/>");
             sb.AppendLine("<span id='wm' class='wordmark'><span class='k'>Killer</span><span class='s'>Scan</span></span>");
             sb.AppendLine("</div><div class='switchers'>");
             sb.AppendLine($"<div class='swrow'><span class='swlabel'>{Esc(L("Str_Rep_Theme", "Theme"))}</span><div class='themesw' id='themesw'></div></div>");
@@ -141,12 +159,13 @@ namespace KillerScan.Services
             // The report's headers reuse the grid's own column keys, so the two never disagree.
             if (location != null) sb.AppendLine($"<p class='meta'>{Esc(L("Str_Location_Title", "Location"))}: <b>{Esc(location.Name)}</b> ({Esc(location.Id)})</p>");
             sb.AppendLine("<div class='tablewrap'><table id='tbl'><thead><tr>");
-            sb.AppendLine($"<th data-type='num'>{Esc(L("Str_Col_Ip", "IP Address"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Host", "Hostname"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Mac", "MAC Address"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Vendor", "Vendor"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Type", "Type"))} <span class='arrow'></span></th>");
-            sb.AppendLine($"<th data-type='text'>{Esc(L("Str_Col_Ports", "Open Ports"))} <span class='arrow'></span></th>");
+            // Each header holds a real button, so it takes keyboard focus and sorts on Enter and Space.
+            sb.AppendLine($"<th data-type='num'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Ip", "IP Address"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Host", "Hostname"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Mac", "MAC Address"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Vendor", "Vendor"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Type", "Type"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Ports", "Open Ports"))} <span class='arrow' aria-hidden='true'></span></button></th>");
             sb.AppendLine("</tr></thead><tbody>");
             foreach (var d in list)
             {
@@ -193,7 +212,9 @@ namespace KillerScan.Services
             ]) + "];");
             sb.AppendLine("var sw=document.getElementById('themesw');");
             sb.AppendLine("var CUSTOM_ACCENT={dark:1,light:1,black:1};");
-            sb.AppendLine("function setTheme(t){document.documentElement.className='theme-'+t;try{localStorage.setItem('ksTheme',t)}catch(e){}var k=sw.children;for(var i=0;i<k.length;i++)k[i].className=(k[i].getAttribute('data-t')===t)?'active':'';var ar=document.getElementById('accentrow');ar.style.display=CUSTOM_ACCENT[t]?'flex':'none';if(CUSTOM_ACCENT[t]){var a=null;try{a=localStorage.getItem('ksAccent')}catch(e){}if(a)document.documentElement.style.setProperty('--accent',a);}else document.documentElement.style.removeProperty('--accent');}");
+            sb.AppendLine($"var LOGO='{LogoBase}',THEMED={{blood:1,greed:1,cyanotic:1,ectoplasm:1,decay:1,malaise:1,sepulchre:1,delirium:1,mourning:1}},ACC_NAMES={{'#DD504B':'red','#E8962C':'orange','#EAD900':'yellow','#1EA54C':'green','#1FB8A8':'teal','#50AEE8':'blue','#B982E3':'purple','#FF52C9':'magenta'}};");
+            sb.AppendLine("function updateLogo(){var t=(document.documentElement.className||'').replace('theme-',''),img=document.getElementById('logo'),wm=document.getElementById('wm'),src=null;if(THEMED[t])src=LOGO+t+'.svg';else if(CUSTOM_ACCENT[t]){var a=null;try{a=localStorage.getItem('ksAccent')}catch(e){}src=LOGO+t+'-'+(ACC_NAMES[String(a||'').toUpperCase()]||'green')+'.svg';}if(!src){img.style.display='none';img.removeAttribute('src');wm.style.display='';return;}if(img.getAttribute('src')!==src)img.src=src;}");
+            sb.AppendLine("function setTheme(t){document.documentElement.className='theme-'+t;try{localStorage.setItem('ksTheme',t)}catch(e){}var k=sw.children;for(var i=0;i<k.length;i++)k[i].className=(k[i].getAttribute('data-t')===t)?'active':'';var ar=document.getElementById('accentrow');ar.style.display=CUSTOM_ACCENT[t]?'flex':'none';if(CUSTOM_ACCENT[t]){var a=null;try{a=localStorage.getItem('ksAccent')}catch(e){}if(a)document.documentElement.style.setProperty('--accent',a);}else document.documentElement.style.removeProperty('--accent');updateLogo();}");
             sb.AppendLine("THEMES.forEach(function(a){var b=document.createElement('button');b.title=a[1];b.setAttribute('data-t',a[0]);b.style.background=a[2];b.onclick=function(){setTheme(a[0])};sw.appendChild(b);});");
             sb.AppendLine("var saved=null;try{saved=localStorage.getItem('ksTheme')}catch(e){}");
             sb.AppendLine($"setTheme(saved||'{current}');");
@@ -210,7 +231,7 @@ namespace KillerScan.Services
                 $"['#FF52C9','{Ljs("Str_Accent_Magenta", "Magenta")}']",
             ]) + "];");
             sb.AppendLine("var asw=document.getElementById('accentsw');");
-            sb.AppendLine("function setAccent(c){if(c){document.documentElement.style.setProperty('--accent',c);try{localStorage.setItem('ksAccent',c)}catch(e){}}var k=asw.children;for(var i=0;i<k.length;i++)k[i].className=(k[i].getAttribute('data-c')===c)?'active':'';}");
+            sb.AppendLine("function setAccent(c){if(c){document.documentElement.style.setProperty('--accent',c);try{localStorage.setItem('ksAccent',c)}catch(e){}}var k=asw.children;for(var i=0;i<k.length;i++)k[i].className=(k[i].getAttribute('data-c')===c)?'active':'';updateLogo();}");
             sb.AppendLine("ACCENTS.forEach(function(a){var b=document.createElement('button');b.title=a[1];b.setAttribute('data-c',a[0]);b.style.background=a[0];b.onclick=function(){setAccent(a[0])};asw.appendChild(b);});");
             sb.AppendLine("var savedA=null;try{savedA=localStorage.getItem('ksAccent')}catch(e){}");
             sb.AppendLine("if(savedA&&CUSTOM_ACCENT[(document.documentElement.className||'').replace('theme-','')])setAccent(savedA);");
@@ -220,7 +241,8 @@ namespace KillerScan.Services
             sb.AppendLine("sortDir=(sortCol===i)?-sortDir:1;sortCol=i;var num=ths[i].getAttribute('data-type')==='num';");
             sb.AppendLine("var rows=Array.prototype.slice.call(tb.rows);rows.sort(function(a,b){var x,y;if(num){x=parseFloat(a.cells[i].getAttribute('data-sort'))||0;y=parseFloat(b.cells[i].getAttribute('data-sort'))||0;}else{x=a.cells[i].innerText.toLowerCase();y=b.cells[i].innerText.toLowerCase();}return (x>y?1:x<y?-1:0)*sortDir;});");
             sb.AppendLine("for(var r=0;r<rows.length;r++)tb.appendChild(rows[r]);");
-            sb.AppendLine("for(var h=0;h<ths.length;h++)ths[h].getElementsByClassName('arrow')[0].textContent='';");
+            sb.AppendLine("for(var h=0;h<ths.length;h++){ths[h].getElementsByClassName('arrow')[0].textContent='';ths[h].removeAttribute('aria-sort');}");
+            sb.AppendLine("ths[i].setAttribute('aria-sort',sortDir>0?'ascending':'descending');");
             sb.AppendLine("ths[i].getElementsByClassName('arrow')[0].textContent=sortDir>0?'\\u25B2':'\\u25BC';};})(c);}");
             sb.AppendLine("</script>");
             sb.AppendLine("</body></html>");
