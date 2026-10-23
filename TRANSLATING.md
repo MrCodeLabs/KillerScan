@@ -56,6 +56,27 @@ Each language is a single XAML `ResourceDictionary` in the `Strings/` folder, na
 - Missing keys always fall back to `Strings/en-US.xaml`, so you never have to keep a file fully in sync.
 - The Chinese and Bengali files are a machine-assisted first pass - native corrections are very welcome.
 
+## Website help
+
+The `scan-landing/` website has its own language picker and dictionaries. Translating the
+desktop XAML resources does not automatically translate the website.
+
+- Website translations live in `scan-landing/ks-i18n.js`; CLI help also reuses descriptions
+  through `scan-landing/cli-help-i18n.js`.
+- A new website language needs a `LANGS`/flag entry in `scan-landing/ks.js` and a language
+  button in each page. Slovenian currently covers the help page and shared controls;
+  untranslated content on other pages uses the existing English fallback.
+- The help page maps website language codes to XAML tags in `shortcutLocale()`.
+  Regenerate shortcut labels after adding or changing a desktop translation:
+  `python build/shortcut-catalog.py > scan-landing/shortcuts.generated.js` (write UTF-8).
+- Verify with `python build/shortcut-catalog.py --check` and
+  `node build/shortcut-catalog.test.js`. Preview `scan-landing/help.html` in a browser and
+  check the language menu, shortcut list, keyboard layers and language switching.
+
+Keep the upstream site addresses and project attribution when preparing a contribution.
+Changes in a fork become visible on the official site only after the maintainer accepts
+and deploys them.
+
 ## Questions
 
 Open a GitHub issue or comment on your pull request.
