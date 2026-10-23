@@ -5,7 +5,8 @@ namespace KillerScan.Services
     /// <summary>
     /// The theme menu's Film Grain switch, on by default. Turning it off sets GrainOpacity to 0
     /// in the application resources, which outrank every theme dictionary, so each grain layer
-    /// bound to it disappears whatever theme or accent is active. The scan history pane draws its grain at a fixed strength, so it follows FilmGrainVisibility instead. The theme is then
+    /// bound to it disappears whatever theme or accent is active. A layer drawn at a fixed
+    /// strength (the content pane's own grain) follows FilmGrainVisibility instead. The theme is then
     /// applied again so surfaces that take their grain when the theme changes redraw too.
     /// </summary>
     internal static class FilmGrain
@@ -19,7 +20,16 @@ namespace KillerScan.Services
         internal static void Initialize()
         {
             Enabled = App.GetSetting(SettingKey) != "0";
+            SystemParameters.StaticPropertyChanged -= OnSystemColorsChanged;
+            SystemParameters.StaticPropertyChanged += OnSystemColorsChanged;
             Publish();
+        }
+
+        private static void OnSystemColorsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
+        {
+            var app = Application.Current;
+            if (app == null || app.Dispatcher.HasShutdownStarted) return;
+            app.Dispatcher.BeginInvoke(new System.Action(Publish));
         }
 
         /// <summary>Shows or hides the grain on every surface and saves the choice.</summary>
@@ -36,9 +46,10 @@ namespace KillerScan.Services
         {
             var resources = Application.Current?.Resources;
             if (resources == null) return;
-            if (Enabled) resources.Remove("GrainOpacity");
+            bool visible = Enabled && !SystemParameters.HighContrast;
+            if (visible) resources.Remove("GrainOpacity");
             else resources["GrainOpacity"] = 0.0;
-            resources["FilmGrainVisibility"] = Enabled ? Visibility.Visible : Visibility.Collapsed;
+            resources["FilmGrainVisibility"] = visible ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

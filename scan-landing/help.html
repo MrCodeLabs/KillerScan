@@ -11,7 +11,7 @@
 <meta name="description" data-i18n-content="page_help_description" content="How to use KillerScan: every view, tool, workflow and keyboard shortcut explained.">
 <link rel="icon" type="image/x-icon" href="brand/ks-icon.ico">
 <script defer src="https://koya.thekiller.net/script.js" data-website-id="4589e763-30f4-42b8-a31d-3af4cc9a2882"></script>
-<link rel="stylesheet" href="ks.css?v=20260930-sidebar">
+<link rel="stylesheet" href="ks.css?v=20261017-contrast">
 <style>
 .content-inner { max-width: 880px; margin: 0 auto; padding: 0 28px 56px; }
 .help-hero { text-align: center; padding: 44px 16px 6px; }
@@ -44,6 +44,7 @@ html[data-theme="light"] .help-cat, html[data-theme="light"] .kbd-group h4 { tex
 .kbd-row { display: contents; }
 .kbd-row .k { font-family: Consolas, monospace; font-size: 12px; color: var(--text2); }
 .kbd-row .d { font-size: 13px; color: var(--text); }
+@media (max-width: 560px) { .kbd-group { grid-template-columns: minmax(100px, 130px) minmax(0, 1fr); } .kbd-row .k { overflow-wrap: anywhere; } }
 @media (min-width: 901px) { .shell { grid-template-columns: 268px 1fr; } .content { margin: 8px 8px 0 2px; } }
 .sb-tabs .on { border-bottom: 0; }
 .outline { padding: 8px 0; overflow-y: auto; flex: 1; min-height: 0; }
@@ -61,6 +62,7 @@ html[data-theme="light"] .help-cat, html[data-theme="light"] .kbd-group h4 { tex
 <img class="wm-logo tb-wm" src="brand/killerscan-logo-black-orange.svg" alt="KillerScan">
 </a>
 <a class="tb-dl" href="https://github.com/SteveTheKiller/KillerScan/releases/latest/download/KillerScan.exe"><svg viewBox="0 0 24 24"><path d="M11 4h2v7h3l-4 5-4-5h3V4zM5 18h14v2H5z"/></svg><span data-i18n="nav_dl">Download</span></a>
+<a class="tb-store" href="https://apps.microsoft.com/search?query=KillerScan" target="_blank" rel="noopener" title="Get KillerScan from the Microsoft Store"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M3 7h18v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7zm5.5 3v3h3v-3h-3zm4 0v3h3v-3h-3zm-4 4v3h3v-3h-3zm4 0v3h3v-3h-3zM8 7V5.5a4 4 0 0 1 8 0V7h-2V5.5a2 2 0 0 0-4 0V7H8z"/></svg><span>Microsoft Store</span></a>
 <a class="tb-mcp-link" href="mcp.html" aria-label="KillerMCP"><img src="mcp.png" alt="" aria-hidden="true"><span class="tb-mcp-wordmark"><span>Killer</span><span class="tb-mcp-accent">MCP</span></span></a>
 <span class="tb-spacer"></span>
 <nav class="tb-nav">
@@ -86,12 +88,12 @@ html[data-theme="light"] .help-cat, html[data-theme="light"] .kbd-group h4 { tex
 <button class="acc-toggle" id="accentToggle" aria-haspopup="true" aria-expanded="false" title="Accent color"></button>
 <div class="acc-pop" id="accentPop" hidden role="group" aria-label="Accent color">
 <span class="acc-pop-label" data-i18n="accent_label">accent:</span>
-<button class="acc" data-accent="red"    style="background:#DD504B;color:#DD504B" title="Red"></button>
+<button class="acc" data-accent="red"    style="background:#EA524C;color:#EA524C" title="Red"></button>
 <button class="acc" data-accent="orange" style="background:#E8962C;color:#E8962C" title="Orange"></button><button class="acc" data-accent="yellow" style="background:#EAD900;color:#EAD900" title="Yellow"></button>
-<button class="acc" data-accent="green"  style="background:#1EA54C;color:#1EA54C" title="Green"></button>
+<button class="acc" data-accent="green"  style="background:#22BB56;color:#22BB56" title="Green"></button>
 <button class="acc" data-accent="teal"   style="background:#1FB8A8;color:#1FB8A8" title="Teal"></button>
 <button class="acc" data-accent="blue"   style="background:#50AEE8;color:#50AEE8" title="Blue"></button>
-<button class="acc" data-accent="purple" style="background:#B982E3;color:#B982E3" title="Purple"></button><button class="acc" data-accent="magenta" style="background:#FF52C9;color:#FF52C9" title="Magenta"></button>
+<button class="acc" data-accent="purple" style="background:#C08FE6;color:#C08FE6" title="Purple"></button><button class="acc" data-accent="magenta" style="background:#FF6CD1;color:#FF6CD1" title="Magenta"></button>
 </div>
 </div>
 <div class="lang-switch" role="group" aria-label="Language">
@@ -404,6 +406,7 @@ html[data-theme="light"] .kbmap { --kc-scan:#d1105a; --kc-view:#a316b5; --kc-dev
 <button data-kblayer="ctrlshift">CTRL+SHIFT</button>
 <button data-kblayer="shift">SHIFT</button>
 <button data-kblayer="ctrlalt">CTRL+ALT</button>
+<button data-kblayer="altshift">ALT+SHIFT</button>
 <span class="kbmap-hint" data-i18n="hp_kb_hint">Hold Ctrl, Shift or Alt to preview that layer - hover a lit key for its action</span>
 </div>
 <div class="kbmap-scroll"><div class="kbmap-board" id="kbmapBoard"></div></div>
@@ -412,7 +415,7 @@ html[data-theme="light"] .kbmap { --kc-scan:#d1105a; --kc-view:#a316b5; --kc-dev
 <script src="shortcuts.generated.js?v=2"></script>
 <script>
 (function(){
-var KBL = {base:{},ctrl:{},ctrlshift:{},shift:{},ctrlalt:{}};
+var KBL = {base:{},ctrl:{},ctrlshift:{},shift:{},ctrlalt:{},altshift:{}};
 var categoryIds={Views:'view',Scan:'scan',Device:'device',Topology:'view',Toolbar:'tools',App:'file'};
 KS_SHORTCUTS.forEach(function(row,index){
   var parts=row.gesture.replace(/ /g,'').split('+'), key=parts.pop(), layer='base';
@@ -420,6 +423,7 @@ KS_SHORTCUTS.forEach(function(row,index){
   if(key==='-') key='Minus';
   if(/^[0-9]$/.test(key)) key='D'+key;
   if(parts.indexOf('Ctrl')>=0) layer=parts.indexOf('Shift')>=0?'ctrlshift':parts.indexOf('Alt')>=0?'ctrlalt':'ctrl';
+  else if(parts.indexOf('Alt')>=0 && parts.indexOf('Shift')>=0) layer='altshift';
   else if(parts.indexOf('Shift')>=0) layer='shift';
   var existing=KBL[layer][key];
   if(existing) existing[1].push(index); else KBL[layer][key]=[categoryIds[row.category],[index]];
@@ -460,7 +464,7 @@ var KBROWS = [
 [['Caps','Caps',1.8],['A','A',1],['S','S',1],['D','D',1],['F','F',1],['G','G',1],['H','H',1],['J','J',1],['K','K',1],['L','L',1],['Semi',';',1],['Quote','\'',1],['Enter','Enter',2.2]],
 [['Shift','Shift',2.3],['Z','Z',1],['X','X',1],['C','C',1],['V','V',1],['B','B',1],['N','N',1],['M','M',1],['Comma',',',1],['Period','.',1],['Slash','/',1],['RShift','Shift',2.7],['',1.6],['Up','↑',1]],
 [['Ctrl','Ctrl',1.5],['Win','Win',1.2],['Alt','Alt',1.5],['Space','',6.8],['RAlt','Alt',1.5],['Menu','☰',1],['RCtrl','Ctrl',1.5],['',0.6],['Left','←',1],['Down','↓',1],['Right','→',1]]];
-var MODS = { base:[], ctrl:['Ctrl','RCtrl'], ctrlshift:['Ctrl','RCtrl','Shift','RShift'], shift:['Shift','RShift'], ctrlalt:['Ctrl','RCtrl','Alt','RAlt'] };
+var MODS = { base:[], ctrl:['Ctrl','RCtrl'], ctrlshift:['Ctrl','RCtrl','Shift','RShift'], shift:['Shift','RShift'], ctrlalt:['Ctrl','RCtrl','Alt','RAlt'], altshift:['Alt','RAlt','Shift','RShift'] };
 var U = 46, board = document.getElementById('kbmapBoard'), detail = document.getElementById('kbmapDetail');
 var layer = 'base', keys = {}, hover = null;
 function startMarquee(h){   // a cut-off caption scrolls, marquee-style
@@ -518,7 +522,7 @@ document.querySelectorAll('.kbmap-layers button').forEach(function(b){
   b.addEventListener('click', function(){ layer = b.getAttribute('data-kblayer'); paint(); });
 });
 function sync(e){
-  var l = e.ctrlKey && e.shiftKey ? 'ctrlshift' : e.ctrlKey && e.altKey ? 'ctrlalt' : e.ctrlKey ? 'ctrl' : e.shiftKey ? 'shift' : 'base';
+  var l = e.ctrlKey && e.shiftKey ? 'ctrlshift' : e.ctrlKey && e.altKey ? 'ctrlalt' : e.ctrlKey ? 'ctrl' : e.altKey && e.shiftKey ? 'altshift' : e.shiftKey ? 'shift' : 'base';
   if (l !== layer) { layer = l; paint(); }
 }
 window.addEventListener('keydown', sync);
@@ -562,13 +566,13 @@ window.addEventListener('resize', fit);
 </div>
 <footer class="statusbar">
 <span class="left"><a href="https://github.com/SteveTheKiller/KillerScan" target="_blank" rel="noopener" data-i18n="footer_src">Source on GitHub</a> &middot; GPLv3 &middot; <span data-i18n="ui_part_of">Part of</span> <a href="https://killertools.net" target="_blank" rel="noopener">killertools.net</a></span>
-<span class="right"><span id="verEgg" title="click me">v1.8.1</span> &middot; &copy; 2026 <b><a href="https://thekiller.net" target="_blank" rel="noopener">Steve the Killer</a></b></span>
+<span class="right"><span id="verEgg" title="click me">v1.8.3</span> &middot; &copy; 2026 <b><a href="https://thekiller.net" target="_blank" rel="noopener">Steve the Killer</a></b></span>
 </footer>
 <div class="egg-toast" id="eggToast"></div>
 <div class="egg-toast" id="eggToast"></div>
-<script src="ks-i18n.js?v=23"></script>
+<script src="ks-i18n.js?v=20261023-sl"></script>
 <script src="cli-help-i18n.js?v=1"></script>
-<script src="ks.js?v=20260926-theme-sync-sl"></script>
+<script src="ks.js?v=20261023-contrast-sl"></script>
 <script>
 (function(){
   var items=[].slice.call(document.querySelectorAll('.acc-item'));

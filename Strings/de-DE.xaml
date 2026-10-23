@@ -11,7 +11,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Adapter und Verbindungsgeschwindigkeit ein- oder ausblenden</sys:String>
     <sys:String x:Key="Str_Light_Idle">Noch nichts gescannt</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Scan läuft</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan läuft</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Tiefen-Scan läuft</sys:String>
     <sys:String x:Key="Str_Light_Done">Scan abgeschlossen</sys:String>
     <sys:String x:Key="Str_TT_Export">Exportieren</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">DESIGN</sys:String>
@@ -221,11 +221,16 @@
     <sys:String x:Key="Str_Db_Updated">Auf {0} Einträge aktualisiert.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Die Datenbank konnte nicht gespeichert werden: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Aktualisierung fehlgeschlagen: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Available">Update verfügbar: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Wird heruntergeladen...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} herunterladen und installieren?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Die App wird geschlossen und automatisch neu gestartet.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Aktualisieren</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Update verfügbar: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Wird heruntergeladen...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} herunterladen und installieren?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Die App wird geschlossen und automatisch neu gestartet.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Beim Start nach Updates suchen</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} ist verfügbar</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Möchten Sie diese Version jetzt herunterladen und installieren? Die App wird geschlossen und automatisch neu geöffnet.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Aktualisieren</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Nicht jetzt</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Beim Start immer nach Updates suchen</sys:String>
     <sys:String x:Key="Str_Conflict_Title">Installationskonflikt</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan ist zweimal installiert. Die andere benutzerbezogene Kopie jetzt entfernen?
 
@@ -366,7 +371,7 @@ Ihre Einstellungen bleiben erhalten.</sys:String>
     <sys:String x:Key="Str_Trace_Timeout">Keine Antwort</sys:String>
     <sys:String x:Key="Str_Diag_Working">Wird geprüft</sys:String>
     <sys:String x:Key="Str_Diag_Refresh">Erneut prüfen</sys:String>
-    <sys:String x:Key="Str_Diag_Pick">Wählen Sie eine Karte, um Details zu sehen.</sys:String>
+    <sys:String x:Key="Str_Diag_Pick">Wählen Sie eine Karte, um Prüfungen für dieses Ziel auszuführen.</sys:String>
     <sys:String x:Key="Str_Watch_Event">{0}: {1}</sys:String>
     <sys:String x:Key="Str_Watch_Stopped">Gestoppt</sys:String>
     <sys:String x:Key="Str_Diag_Title">Gerätediagnose</sys:String>
@@ -495,4 +500,8 @@ Ihre Einstellungen bleiben erhalten.</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Nach unten scrollen</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Nach links scrollen</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Nach rechts scrollen</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Seite nach oben</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Seite nach unten</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Seite nach links</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Seite nach rechts</sys:String>
 </ResourceDictionary>

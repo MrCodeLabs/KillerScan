@@ -17,7 +17,7 @@
     <sys:String x:Key="Str_TT_FooterNetwork">Адаптер мен байланыс жылдамдығын көрсету немесе жасыру</sys:String>
     <sys:String x:Key="Str_Light_Idle">Әзірге ештеңе сканерленбеді</sys:String>
     <sys:String x:Key="Str_Light_Scanning">Сканерлеу жүріп жатыр</sys:String>
-    <sys:String x:Key="Str_Light_Deep">Deep Scan орындалуда</sys:String>
+    <sys:String x:Key="Str_Light_Deep">Терең сканерлеу орындалуда</sys:String>
     <sys:String x:Key="Str_Light_Done">Сканерлеу аяқталды</sys:String>
     <sys:String x:Key="Str_TT_Export">Экспорттау</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">ТАҚЫРЫП</sys:String>
@@ -104,18 +104,18 @@
          key for key, so the same thirteen themes read the same way across the family. SE98 is
          listed here ahead of the theme itself landing, because the name is not translated. -->
     <sys:String x:Key="Str_Theme_Dark">Қараңғы</sys:String>
-    <sys:String x:Key="Str_Theme_Light">Жарық</sys:String>
+    <sys:String x:Key="Str_Theme_Light">Ашық</sys:String>
     <sys:String x:Key="Str_Theme_Black">Қара</sys:String>
     <sys:String x:Key="Str_Theme_SE98">98SE</sys:String>
     <sys:String x:Key="Str_Theme_Blood">Қан</sys:String>
     <sys:String x:Key="Str_Theme_Greed">Ашкөздік</sys:String>
-    <sys:String x:Key="Str_Theme_Cyanotic">Цианозды</sys:String>
+    <sys:String x:Key="Str_Theme_Cyanotic">Цианоз</sys:String>
     <sys:String x:Key="Str_Theme_Ectoplasm">Эктоплазма</sys:String>
     <sys:String x:Key="Str_Theme_Decay">Ыдырау</sys:String>
-    <sys:String x:Key="Str_Theme_Malaise">Әлсіздік</sys:String>
-    <sys:String x:Key="Str_Theme_Sepulchre">Қабірхана</sys:String>
-    <sys:String x:Key="Str_Theme_Delirium">Делирий</sys:String>
-    <sys:String x:Key="Str_Theme_Mourning">Жоқтау</sys:String>
+    <sys:String x:Key="Str_Theme_Malaise">Науқастық</sys:String>
+    <sys:String x:Key="Str_Theme_Sepulchre">Кесене</sys:String>
+    <sys:String x:Key="Str_Theme_Delirium">Сандырақ</sys:String>
+    <sys:String x:Key="Str_Theme_Mourning">Аза</sys:String>
     <sys:String x:Key="Str_Theme_FilmGrain">Пленка түйіршігі</sys:String>
 
     <!-- About overlay -->
@@ -216,7 +216,7 @@
     <!-- ==== DIALOGS, UPDATES AND ERRORS ==== -->
     <sys:String x:Key="Str_About_Title">KillerScan туралы</sys:String>
     <sys:String x:Key="Str_TT_About">KillerScan туралы</sys:String>
-    <sys:String x:Key="Str_About_Aka" xml:space="preserve">AKA </sys:String>
+    <sys:String x:Key="Str_About_Aka" xml:space="preserve">ЛАҚАП АТЫ </sys:String>
     <sys:String x:Key="Str_About_Unsigned">(қол қойылмаған немесе тізбек расталмады)</sys:String>
     <sys:String x:Key="Str_About_Computing">есептелуде...</sys:String>
     <sys:String x:Key="Str_Ssh_Title">SSH тіркелгісі</sys:String>
@@ -236,11 +236,16 @@
     <sys:String x:Key="Str_Db_Failed">Жаңарту сәтсіз: {0}</sys:String>
 
     <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Жаңарту бар: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Жүктелуде...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">{0} {1} жүктеп орнату керек пе?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Қолданба автоматты түрде жабылып, қайта ашылады.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Жаңарту</sys:String>
+    <sys:String x:Key="Str_About_UpdateAvailable">Жаңарту бар: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Жүктелуде...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">{0} {1} жүктеп орнату керек пе?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Қолданба автоматты түрде жабылып, қайта ашылады.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Іске қосылғанда жаңартуларды тексеру</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} қолжетімді</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Оны қазір жүктеп, орнатқыңыз келе ме? Қолданба автоматты түрде жабылып, қайта ашылады.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Жаңарту</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Қазір емес</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Іске қосылғанда жаңартуларды әрдайым тексеру</sys:String>
 
     <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
          substituted in: a language that inflects the noun cannot take a drop-in word. -->
@@ -536,4 +541,8 @@
     <sys:String x:Key="Str_Scroll_Down">Төмен айналдыру</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Солға айналдыру</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Оңға айналдыру</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Бір бет жоғары</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Бір бет төмен</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Бір бет солға</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Бір бет оңға</sys:String>
 </ResourceDictionary>

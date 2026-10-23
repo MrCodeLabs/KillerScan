@@ -18,7 +18,48 @@ namespace KillerScan.Features.About
         /// install.</summary>
         private string? _updateTag;
 
+        /// <summary>Setting that turns the startup check off. Anything but "0" leaves it on.</summary>
+        internal const string StartupCheckSetting = "CheckForUpdatesOnStartup";
+
+        private bool _startupCheckStarted;
+        private bool _updating;
+
         internal AboutController(IAboutHost host) => _host = host;
+
+        internal static bool StartupCheckEnabled => App.GetSetting(StartupCheckSetting) != "0";
+
+        /// <summary>Saves the startup check choice from either the About checkbox or the prompt.</summary>
+        internal void SetStartupCheck(bool enabled)
+        {
+            App.SetSetting(StartupCheckSetting, enabled ? "1" : "0");
+            _host.StartupUpdateCheck = enabled;
+        }
+
+        /// <summary>Once per run, after the main window is showing: when a newer release exists, offers
+        /// it with an "Always check on startup" box so the check can be turned off right there. The
+        /// About card's checkbox turns it back on. Skipped under --demo so captures stay clean.</summary>
+        internal async void CheckOnStartup()
+        {
+            if (_startupCheckStarted || DemoData.Enabled || !StartupCheckEnabled) return;
+            _startupCheckStarted = true;
+            var tag = await UpdateService.CheckAsync(AppInfo.AssemblyVersion);
+            if (tag is null || _updating) return;
+
+            _updateTag          = tag;
+            _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
+            _host.UpdateVisible = true;
+
+            // Never stack the prompt on a dialog the user already has open.
+            if (!_host.Window.IsVisible || _host.Window.OwnedWindows.Count > 0) return;
+            var dlg = new ConfirmDialog(
+                string.Format(_host.Loc("Str_About_StartupUpdateHeading"), AppInfo.DisplayName, tag),
+                _host.Loc("Str_About_StartupUpdateDetail"),
+                _host.Loc("Str_About_UpdateNow"), _host.Loc("Str_About_NotNow"),
+                _host.Loc("Str_About_AlwaysCheckOnStartup"), StartupCheckEnabled) { Owner = _host.Window };
+            dlg.ShowDialog();
+            SetStartupCheck(dlg.Check1Checked);
+            if (dlg.Confirmed) await InstallAsync(tag);
+        }
 
         /// <summary>Fills the card in and shows it, then finishes the two slow parts in the
         /// background.</summary>
@@ -52,6 +93,7 @@ namespace KillerScan.Features.About
             _host.Thumbprint    = thumb == "(none)" ? _host.Loc("Str_Diag_Unavailable") : thumb;
             _host.Sha256        = _host.Loc("Str_About_Computing");
             _host.UpdateVisible = false;
+            _host.StartupUpdateCheck = StartupCheckEnabled;
 
             RefreshDbInfo();
             _host.DbStatus = _host.Loc("Str_About_DbHint");
@@ -130,10 +172,10 @@ namespace KillerScan.Features.About
         private async void CheckForUpdate()
         {
             var tag = await UpdateService.CheckAsync(AppInfo.AssemblyVersion);
-            if (tag is null) return;
+            if (tag is null || _updating) return;
 
             _updateTag          = tag;
-            _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+            _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
             _host.UpdateVisible = true;
         }
 
@@ -143,18 +185,24 @@ namespace KillerScan.Features.About
         internal async void Update()
         {
             var tag = _updateTag;
-            if (string.IsNullOrEmpty(tag)) return;
+            if (string.IsNullOrEmpty(tag) || _updating) return;
 
             var dlg = new ConfirmDialog(
-                string.Format(_host.Loc("Str_Upd_ConfirmHead"), AppInfo.DisplayName, tag),
-                _host.Loc("Str_Upd_ConfirmBody"),
-                _host.Loc("Str_Upd_ConfirmBtn"),
+                string.Format(_host.Loc("Str_About_UpdateHeading"), AppInfo.DisplayName, tag),
+                _host.Loc("Str_About_UpdateDetail"),
+                _host.Loc("Str_About_UpdateNow"),
                 _host.Loc("Str_Btn_Cancel")) { Owner = _host.Window };
             dlg.ShowDialog();
             if (!dlg.Confirmed) return;
+            await InstallAsync(tag!);
+        }
 
+        private async Task InstallAsync(string tag)
+        {
+            if (_updating) return;
+            _updating           = true;
             _host.UpdateEnabled = false;
-            _host.UpdateText    = _host.Loc("Str_Upd_Downloading");
+            _host.UpdateText    = _host.Loc("Str_About_Downloading");
 
             string? newExe;
             try
@@ -165,8 +213,9 @@ namespace KillerScan.Features.About
             {
                 // Offline, timed out, or verification failed: restore the button and open the
                 // releases page so the user can update by hand.
+                _updating           = false;
                 _host.UpdateEnabled = true;
-                _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+                _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
                 WebLink.Open(UpdateService.ReleasesUrl);
                 return;
             }
@@ -181,8 +230,9 @@ namespace KillerScan.Features.About
             catch
             {
                 UpdateService.DiscardDownload(newExe);
+                _updating           = false;
                 _host.UpdateEnabled = true;
-                _host.UpdateText    = string.Format(_host.Loc("Str_Upd_Available"), tag);
+                _host.UpdateText    = string.Format(_host.Loc("Str_About_UpdateAvailable"), tag);
             }
         }
     }
