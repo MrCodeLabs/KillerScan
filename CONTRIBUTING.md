@@ -60,4 +60,3 @@ Be prepared to revise an approved contribution after review. Contributions must 
 ## Project-specific guidance
 
 Keep network probing in the engine and UI behavior in the desktop app. Describe any change to emitted traffic, adapter routing, device identification, or Location ownership. Use controlled listeners for probe tests; real printers and customer networks are separate acceptance checks.
-
