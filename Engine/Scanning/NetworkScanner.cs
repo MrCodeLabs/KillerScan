@@ -180,6 +180,7 @@ namespace KillerScan.Engine
 
             // Fast parallel ping sweep (async, no blocking ARP calls)
             var semaphore = new SemaphoreSlim(200);
+            using var arpDiscoveryThrottle = new SemaphoreSlim(64);
             var scanTasks = addresses.Select(async addr =>
             {
                 await semaphore.WaitAsync(ct);
@@ -195,6 +196,16 @@ namespace KillerScan.Engine
                         alive = await probes.TcpAlive(addr);
                     if (alive)
                         discoveredHosts.TryAdd(addr.ToString(), (addr, ""));
+                    else if (options.Arp && !discoveredHosts.ContainsKey(addr.ToString()))
+                    {
+                        await arpDiscoveryThrottle.WaitAsync(ct);
+                        try
+                        {
+                            string mac = await AwaitWithCancellation(Task.Run(() => probes.DiscoverMac(addr), ct), ct);
+                            if (!string.IsNullOrEmpty(mac)) discoveredHosts.TryAdd(addr.ToString(), (addr, mac));
+                        }
+                        finally { arpDiscoveryThrottle.Release(); }
+                    }
                 }
                 catch (NetworkBindingException) { throw; }
                 catch (OperationCanceledException) { throw; }
@@ -219,6 +230,16 @@ namespace KillerScan.Engine
                 if (addressSet.Contains(entry.Key))
                     discoveredHosts.TryAdd(entry.Key, (IPAddress.Parse(entry.Key), entry.Value));
             }
+
+            // Multicast responders are discoveries in their own right, even when ICMP and
+            // the small TCP liveness set are silent. Only admit explicitly requested IPv4s.
+            try { _mdns = await mdnsTask; _mdnsObservedAtUtc = DateTimeOffset.UtcNow; } catch (NetworkBindingException) { throw; } catch (OperationCanceledException) { throw; } catch { }
+            try { _ssdp = await ssdpTask; _ssdpObservedAtUtc = DateTimeOffset.UtcNow; } catch (NetworkBindingException) { throw; } catch (OperationCanceledException) { throw; } catch { }
+            ct.ThrowIfCancellationRequested();
+            foreach (string ip in _mdns.Where(pair => pair.Value.Name.Length > 0 || pair.Value.Services.Count > 0).Select(pair => pair.Key)
+                .Concat(_ssdp.Where(pair => !string.IsNullOrWhiteSpace(pair.Value)).Select(pair => pair.Key)).Distinct())
+                if (addressSet.Contains(ip) && IPAddress.TryParse(ip, out var responder))
+                    discoveredHosts.TryAdd(ip, (responder, ""));
 
             // Resolve MAC addresses via ARP for discovered hosts (fast, they're alive)
             StatusChanged?.Invoke(new ScanStatus(ScanStage.ResolvingMacs, discoveredHosts.Count));
@@ -267,10 +288,6 @@ namespace KillerScan.Engine
             completed = 0;
             total = sortedHosts.Count;
 
-            // Collect the mDNS/SSDP results before probing (best-effort; empty maps on failure).
-            try { _mdns = await mdnsTask; _mdnsObservedAtUtc = DateTimeOffset.UtcNow; } catch (NetworkBindingException) { throw; } catch { }
-            try { _ssdp = await ssdpTask; _ssdpObservedAtUtc = DateTimeOffset.UtcNow; } catch (NetworkBindingException) { throw; } catch { }
-
             if (fullScan)
             {
                 StatusChanged?.Invoke(new ScanStatus(ScanStage.Probing, total));
@@ -317,7 +334,14 @@ namespace KillerScan.Engine
 
                         ct.ThrowIfCancellationRequested();
 
-                        // Classify even in quick scan (hostname + OUI, no ports)
+                        if (options.Mdns && _mdns.TryGetValue(device.IpAddress, out var md))
+                        {
+                            device.MdnsServices = [.. md.Services]; device.MdnsObservedAtUtc = _mdnsObservedAtUtc;
+                            if (device.Hostname.Length == 0 && md.Name.Length > 0) { device.Hostname = md.Name; device.HostnameSource = "mDNS"; }
+                        }
+                        if (options.Ssdp && _ssdp.TryGetValue(device.IpAddress, out var server))
+                        { device.SsdpServer = server; device.SsdpObservedAtUtc = _ssdpObservedAtUtc; }
+                        // Classify even in quick scan (including actual multicast evidence, no ports)
                         device.DeviceType = ClassifyForScan(device, options, "quick");
                         (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
 

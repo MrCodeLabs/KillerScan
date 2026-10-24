@@ -29,6 +29,7 @@ namespace KillerScan.Engine
             "_ipp._tcp.local", "_ipps._tcp.local", "_printer._tcp.local", "_pdl-datastream._tcp.local",
             "_sonos._tcp.local", "_spotify-connect._tcp.local", "_hap._tcp.local",
             "_homekit._tcp.local", "_hue._tcp.local", "_companion-link._tcp.local",
+            "_esphomelib._tcp.local", "_matterc._udp.local", "_mqtt._tcp.local", "_secure-mqtt._tcp.local",
             "_device-info._tcp.local", "_smb._tcp.local", "_afpovertcp._tcp.local",
         ];
 
@@ -66,7 +67,7 @@ namespace KillerScan.Engine
             return map;
         }
 
-        /// <summary>SSDP M-SEARCH, collect SERVER headers, map source IP -> server string.</summary>
+        /// <summary>SSDP M-SEARCH, retain bounded SERVER and advertised device/service types.</summary>
         public static async Task<Dictionary<string, string>> CollectSsdpAsync(CancellationToken ct, int listenMs = 1200)
         {
             var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -90,11 +91,8 @@ namespace KillerScan.Engine
                     try { r = recv.Result; } catch { break; }
                     recv = udp.ReceiveAsync();
                     string ip = r.RemoteEndPoint.Address.ToString();
-                    if (map.ContainsKey(ip)) continue;
                     string text = Encoding.ASCII.GetString(r.Buffer);
-                    string server = ExtractHeader(text, "SERVER");
-                    if (string.IsNullOrEmpty(server)) server = ExtractHeader(text, "USN");
-                    if (!string.IsNullOrEmpty(server)) map[ip] = server.Trim();
+                    RecordSsdp(map, ip, text);
                 }
             }
             catch { }
@@ -110,6 +108,20 @@ namespace KillerScan.Engine
                     return line[(c + 1)..].Trim();
             }
             return "";
+        }
+
+        internal static void RecordSsdp(Dictionary<string, string> map, string ip, string text)
+        {
+            if (!text.StartsWith("HTTP/1.1 200", StringComparison.OrdinalIgnoreCase)) return;
+            static string Bound(string value, int maximum) => new(value.Take(maximum).Select(c => char.IsControl(c) ? ' ' : c).ToArray());
+            string server = Bound(ExtractHeader(text, "SERVER"), 160), type = Bound(ExtractHeader(text, "ST"), 256);
+            string hint = string.Join(" | ", new[] { server, type.Length == 0 ? "" : "ST=" + type }.Where(value => value.Length > 0));
+            if (hint.Length == 0) hint = Bound(ExtractHeader(text, "USN"), 256);
+            if (hint.Length == 0) return;
+            // A responder may advertise several types. Keep them instead of retaining only
+            // its first generic UPnP reply; duplicates cannot grow the stored evidence.
+            map.TryGetValue(ip, out string? previous);
+            map[ip] = Bound(string.Join(" | ", (hint + " | " + previous).Split(['|']).Select(value => value.Trim()).Where(value => value.Length > 0).Distinct()), 1024);
         }
 
         // ---- minimal mDNS/DNS packet building + parsing ----
@@ -129,9 +141,11 @@ namespace KillerScan.Engine
             return ms.ToArray();
         }
 
-        private static void ParseResponse(byte[] buf, string srcIp, Dictionary<string, MdnsInfo> map)
+        internal static void ParseResponse(byte[] buf, string srcIp, Dictionary<string, MdnsInfo> map)
         {
-            if (buf.Length < 12) return;
+            // Queries, including our own multicast and known-answer sections, are not
+            // evidence that their sender is an advertised device.
+            if (buf.Length < 12 || (buf[2] & 0x80) == 0) return;
             int qd = (buf[4] << 8) | buf[5];
             int total = ((buf[6] << 8) | buf[7]) + ((buf[8] << 8) | buf[9]) + ((buf[10] << 8) | buf[11]);
             int pos = 12;
@@ -173,7 +187,7 @@ namespace KillerScan.Engine
 
                 pos = rdStart + rdlen;
             }
-            map[srcIp] = info;
+            if (info.Name.Length > 0 || info.Services.Count > 0) map[srcIp] = info;
         }
 
         // Reads a DNS name, following 0xC0 compression pointers; leaves pos just past the name.

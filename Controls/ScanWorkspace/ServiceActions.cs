@@ -77,6 +77,7 @@ namespace KillerScan.Controls
             else if (action == "Export") ExportServicesCsv_Click(sender, e);
             else if (action == "Evidence") Evidence_Click(sender, e);
             else if (action == "Access") Access_Click(sender, e);
+            else if (action == "HomeAssistant") HomeAssistant_Click(sender, e);
             else RaiseServiceAction(action);
         }
 

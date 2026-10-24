@@ -50,6 +50,7 @@ namespace KillerScan.Controls
             Add("Str_Ctx_CopyHost", "Ctrl+Alt+C", "host", 0xE8C8);
             Add("Str_History_CopyDetails", "Ctrl+Shift+Y", "details", 0xE8C8);
             Add("Str_Evidence_Title", "Ctrl+I", "evidence", 0xE946);
+            Add("Str_HA_Title", "", "ha", 0xE946);
             menu.Items.Add(new Separator());
             Add("Str_Export_Csv", "Ctrl+E", "export", 0xE896);
             Add("Str_History_ViewChanges", "Ctrl+Shift+H", "changes", 0xE8FD);
@@ -65,7 +66,7 @@ namespace KillerScan.Controls
                     item.IsEnabled = action switch
                     {
                         "ip" or "mac" or "host" or "details" => grid != null && CopyValue(action).Length > 0,
-                        "evidence" => grid != null && SelectedHistoryDevice != null,
+                        "evidence" or "ha" => grid != null && SelectedHistoryDevice != null,
                         "export" => _entry != null && VisibleGrid.Items.Count > 0,
                         "changes" => _entry != null && _showAll,
                         "all" => _entry != null && !_showAll,
@@ -100,6 +101,15 @@ namespace KillerScan.Controls
 
         private async void ExecuteAction(string action)
         {
+            if (action == "ha" && SelectedHistoryDevice is { } historical)
+            {
+                new HomeAssistantAdviceWindow(HomeAssistantText.FromHistory(historical), WebLink.Open, text =>
+                {
+                    try { Clipboard.SetText(text); }
+                    catch (COMException) { HistorySummary.Text = Loc("Str_Clipboard_Failed"); }
+                }) { Owner = Window.GetWindow(this) }.ShowDialog();
+                return;
+            }
             if (action == "evidence" && SelectedHistoryDevice is { } selected)
             {
                 new DeviceEvidenceWindow(new NetworkDevice { IpAddress = selected.IpAddress, Hostname = selected.Hostname,
@@ -127,7 +137,7 @@ namespace KillerScan.Controls
         {
             static string Cell(string value) => ReportExport.CsvField(value);
             var lines = new List<string> { string.Join(",", new[] { "Str_History_Change", "Str_Col_Ip", "Str_Col_DeviceName",
-                "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }.Select(key => Cell(Loc(key)))) + ",Location ID,Location,Identification JSON,Access JSON" };
+                "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }.Select(key => Cell(Loc(key)))) + ",Location ID,Location,Identification JSON,Access JSON,Home Assistant JSON" };
             foreach (object row in VisibleGrid.Items)
             {
                 var device = row is HistoryChangeRow change ? change.Device : ((HistoryDeviceRow)row).Device;
@@ -135,7 +145,7 @@ namespace KillerScan.Controls
                     device.IpAddress, device.Hostname, device.MacAddress, device.Vendor,
                     DeviceTypeConverter.Display(device.DeviceType), string.Join(", ", device.OpenPorts),
                     _entry?.LocationId ?? "", _entry?.LocationName ?? "",
-                    device.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Identification), System.Text.Json.JsonSerializer.Serialize(device.Access) }.Select(Cell)));
+                    device.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Identification), System.Text.Json.JsonSerializer.Serialize(device.Access), System.Text.Json.JsonSerializer.Serialize(HomeAssistantAdvisor.ForDevice(HomeAssistantText.FromHistory(device))) }.Select(Cell)));
             }
             return string.Join(Environment.NewLine, lines) + Environment.NewLine;
         }

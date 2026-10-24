@@ -44,6 +44,7 @@ namespace KillerScan.Engine
         {
             internal override IReadOnlyDictionary<string, string> ReadNeighbors() => BoundWindowsNetwork.Neighbors(run);
             internal override string ResolveMac(IPAddress address) => BoundWindowsNetwork.Mac(address, run);
+            internal override string DiscoverMac(IPAddress address) => BoundWindowsNetwork.DiscoverMac(address, run);
             internal override void FlushDns() { run.Check(); } // Direct adapter DNS queries do not use the OS resolver cache.
             internal override Task<string> Hostname(IPAddress address) => BoundDns.Hostname(address, run);
             internal override Task<int?> Ping(IPAddress address, int timeout) => Task.Run(() => BoundWindowsNetwork.Ping(address, timeout, run), run.Token);

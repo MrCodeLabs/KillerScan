@@ -95,6 +95,7 @@ internal static class ReleaseUiTests
         var output = Path.Combine(Path.GetTempPath(), "KillerScan-release-ui-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(output);
         UpstreamSyncUiChecks.Run(window);
+        HomeAssistantUiChecks.Run(window, (element, name) => Save(Render(element, name.StartsWith("HA-All-", StringComparison.Ordinal) ? 1180 : 920, 740), Path.Combine(output, name)));
         EvidenceUiChecks.Run(window, (element, name) => Save(Render(element, 820, 600), Path.Combine(output, name)));
         AccessUiChecks.Run(window, (element, name) => Save(Render(element, 900, 620), Path.Combine(output, name)));
         if (evidenceOnly) { Console.WriteLine("Evidence UI: " + output); window.Close(); return; }
@@ -168,12 +169,12 @@ internal static class ReleaseUiTests
             Require(app.FindResource("Str_Btn_Scan") is string text && text.Length > 0, locale + ": scan label resolves.");
             foreach (var (gridName, keys) in new[]
             {
-                ("ResultsGrid", new[] { "Str_Col_Ip", "Str_Col_Host", "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }),
-                ("ServicesGrid", new[] { "Str_Services_Service", "Str_Col_Ports", "Str_Col_DeviceName", "Str_Col_Ip", "Str_Col_Type" })
+                ("ResultsGrid", new[] { "Str_Col_Ip", "Str_Col_Host", "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Home Assistant", "Str_Col_Ports" }),
+                ("ServicesGrid", new[] { "Str_Services_Service", "Str_Col_Ports", "Str_Col_DeviceName", "Str_Col_Ip", "Str_Col_Type", "Home Assistant" })
             })
             {
                 var grid = (DataGrid)workspace.FindName(gridName);
-                Require(grid.Columns.Select(column => column.Header).SequenceEqual(keys.Select(key => app.FindResource(key))),
+                Require(grid.Columns.Select(column => column.Header).SequenceEqual(keys.Select(key => key == "Home Assistant" ? key : app.FindResource(key))),
                     locale + ": " + gridName + " headers follow the selected locale.");
             }
             if (locale == "SlSI")
@@ -267,7 +268,7 @@ internal static class ReleaseUiTests
         Require(!ReferenceEquals(grid.ContextMenu, devicesGrid.ContextMenu), "Services have their own context menu.");
         var actions = grid.ContextMenu.Items.OfType<MenuItem>().ToDictionary(item => (string)item.Tag);
         Require(actions.Keys.OrderBy(value => value).SequenceEqual(new[] { "Browser", "CopyEndpoint", "CopyHost", "CopyIp", "CopyPort",
-            "CopyService", "Access", "Evidence", "Export", "Rdp", "SelectAll", "Ssh", "SshAs" }.OrderBy(value => value)),
+            "CopyService", "Access", "Evidence", "HomeAssistant", "Export", "Rdp", "SelectAll", "Ssh", "SshAs" }.OrderBy(value => value)),
             "The service menu contains service actions and excludes device trust, renaming, MAC copying and type overrides.");
         var original = ((IEnumerable<KillerScan.Engine.NetworkDevice>)type.GetProperty("ScannedDevices", Instance)!.GetValue(workspace)!).ToArray();
         string originalTarget = workspace.Targets;

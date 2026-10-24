@@ -125,6 +125,7 @@ internal sealed class RecognitionAssessment
             Scope = _device.RecognitionScope, DisabledFeatures = _device.RecognitionDisabledFeatures,
             Evidence = _evidence.ToArray(), Rules = _rules.ToArray(), Candidates = candidates
         };
+        _device.HomeAssistant = HomeAssistantAdvisor.Assess(_device);
         return _manual ?? automatic;
     }
     internal void Route(string gateway, string dns) => AddFact("Route", gateway + " / DNS " + dns);

@@ -56,6 +56,7 @@ function ConvertTo-KsDevice {
         Vendor   = $Device.Vendor
         Type     = $Device.DeviceType
         Identification = $Device.Identification
+        HomeAssistant = $Device.HomeAssistant
         Access   = $Device.Access
         Ports    = @($Device.OpenPorts)
         Ttl      = $Device.Ttl

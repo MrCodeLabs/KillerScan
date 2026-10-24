@@ -51,9 +51,7 @@ namespace KillerScan.Engine
                     var message = await ReceivePinned(udp, run);
                     if (message == null) continue;
                     string text = Encoding.ASCII.GetString(message.Value.Data);
-                    string server = ExtractHeader(text, "SERVER");
-                    if (server.Length == 0) server = ExtractHeader(text, "USN");
-                    if (server.Length > 0) map[message.Value.Sender.Address.ToString()] = server.Trim();
+                    RecordSsdp(map, message.Value.Sender.Address.ToString(), text);
                 }
             }
             catch (NetworkBindingException) { throw; }

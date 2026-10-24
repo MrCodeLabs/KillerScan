@@ -27,6 +27,8 @@ namespace KillerScan.Services
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public DeviceIdentification? Identification { get; set; }
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public HomeAssistantAdvice? HomeAssistant { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public List<AccessEndpoint>? Access { get; set; }
         public List<int> OpenPorts { get; set; } = [];
     }
@@ -156,6 +158,7 @@ namespace KillerScan.Services
             Vendor = device.Vendor,
             DeviceType = device.DeviceType,
             Identification = device.Identification?.Snapshot(),
+            HomeAssistant = device.HomeAssistant?.Snapshot(),
             Access = device.Access == null ? null : [.. device.Access],
             OpenPorts = [.. device.OpenPorts.OrderBy(port => port)]
         };

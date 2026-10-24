@@ -11,6 +11,7 @@ One-click, fast network scanner built for field techs.
 - Weighted-score device classifier
 - [Recognition evidence and confidence](docs/device-identification.md), with observed sources, times, manual provenance and explicitly reported models
 - [Verified access methods](docs/verified-access.md), with captured URLs, port/protocol evidence and explicit authentication uncertainty
+- [Home Assistant integration choices](docs/home-assistant-advisor.md) directly per device, plus an all-device overview, reasons, model/account prerequisites, concrete research suggestions and ESP firmware guidance
 
 Single portable EXE. The only requirement is .NET Framework 4.8, which Windows 10 (version 1903 and later) and Windows 11 already include.
 Free, open-source, GPLv3.

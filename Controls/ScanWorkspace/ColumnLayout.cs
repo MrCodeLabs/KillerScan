@@ -11,6 +11,7 @@ namespace KillerScan.Controls
             ["ColMac"]    = ColMac,
             ["ColVendor"] = ColVendor,
             ["ColType"]   = ColType,
+            ["ColHa"]     = ColHa,
             ["ColPorts"]  = ColPorts,
         };
 
