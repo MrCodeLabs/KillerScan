@@ -30,6 +30,36 @@ namespace KillerScan.Controls
                 { Owner = Window.GetWindow(this) }.ShowDialog();
         }
 
+        private void HomeAssistant_Click(object sender, RoutedEventArgs e)
+        {
+            CreateHomeAssistantAdvice().ShowDialog();
+        }
+
+        private void HomeAssistantAll_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = CreateHomeAssistantOverview();
+            if (Window.GetWindow(this) is { } owner && PresentationSource.FromVisual(owner) != null) dialog.Owner = owner;
+            dialog.ShowDialog();
+        }
+        internal HomeAssistantOverviewWindow CreateHomeAssistantOverview() => new(ActiveDevices, WebLink.Open, CopyDeviceText);
+
+        private void HomeAssistantRow_Click(object sender, RoutedEventArgs e)
+        {
+            var value = (sender as FrameworkElement)?.DataContext;
+            var device = value as NetworkDevice ?? (value is ServiceRow row ? ActiveDevices.FirstOrDefault(item => item.IpAddress == row.IpAddress) : null);
+            if (device == null) return;
+            var dialog = new HomeAssistantAdviceWindow(device, WebLink.Open, CopyDeviceText);
+            if (Window.GetWindow(this) is { } owner && PresentationSource.FromVisual(owner) != null) dialog.Owner = owner;
+            dialog.ShowDialog();
+        }
+
+        internal HomeAssistantAdviceWindow CreateHomeAssistantAdvice()
+        {
+            var dialog = new HomeAssistantAdviceWindow(EvidenceDevice ?? new NetworkDevice(), WebLink.Open, CopyDeviceText);
+            if (Window.GetWindow(this) is { } owner && PresentationSource.FromVisual(owner) != null) dialog.Owner = owner;
+            return dialog;
+        }
+
         internal void OpenAccess(NetworkDevice device, AccessEndpoint endpoint)
         {
             if (DeviceAccess.Address(device.IpAddress, endpoint) == null) return;

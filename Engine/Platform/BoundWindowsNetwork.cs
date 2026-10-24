@@ -36,6 +36,12 @@ namespace KillerScan.Engine
             if (SendARP(Native(address), Native(run.Binding!.SourceAddress), mac, ref length) != 0 || length != 6) return "";
             return mac.All(b => b == 0) ? "" : string.Join(":", mac.Select(b => b.ToString("X2")));
         }
+        internal static string DiscoverMac(IPAddress address, ScanRun run)
+        {
+            run.CheckTarget(address);
+            return GetBestRoute(Native(address), Native(run.Binding!.SourceAddress), out var route) == 0 &&
+                route.Index == run.Binding.InterfaceIndex && route.NextHop == 0 ? Mac(address, run) : "";
+        }
         internal static int? Ping(IPAddress address, int timeout, ScanRun run)
         {
             run.CheckTarget(address);

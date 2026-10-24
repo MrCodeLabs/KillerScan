@@ -15,6 +15,14 @@ internal static class Program
             await Run("ARP output parsing keeps IPv4 entries with full MAC addresses", ArpParsing);
             await Run("Classifier honors manual types, the gateway, DNS and hostname rules", Classifier);
             await Run("Recognition keeps weak names, OUI and silent hosts uncertain", RecognitionTests.WeakSignals);
+            await Run("HA advice does not infer support from names, ports or vendor", HomeAssistantTests.WeakAndUnknown);
+            await Run("HA candidates retain protocol evidence and integration prerequisites", HomeAssistantTests.SupportedClues);
+            await Run("HA research, conflicts, snapshots and unknown-device plans stay distinct", HomeAssistantTests.ProvenanceAndManual);
+            await Run("HA picks native integrations before generic protocols and leaves unknown/conflicting devices unresolved", HomeAssistantTests.DirectChoices);
+            await Run("HA research suggestions remain actionable without upgrading vendor/name hints into compatibility", HomeAssistantTests.ResearchRecommendations);
+            await Run("Multicast-only silent devices are admitted within the requested targets", MulticastDiscoveryTests.SilentHosts);
+            await Run("SSDP preserves later specific device types and bounded evidence", MulticastDiscoveryTests.SsdpTypes);
+            await Run("ARP can discover a silent on-link host while disabled paths stay off", MulticastDiscoveryTests.ArpOnlyDiscovery);
             await Run("Access keeps endpoint evidence, login uncertainty and safe addresses", AccessTests.Evidence);
             await Run("Real HTTP retains multiple endpoints and refuses redirects/auth retries", AccessTests.HttpRoundTrip);
             await Run("Deep access records real HTTPS on a nonstandard port", AccessTests.HttpsRoundTrip);

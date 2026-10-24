@@ -698,9 +698,9 @@ namespace KillerScan.Features.Cli
         internal static string Csv(List<NetworkDevice> devices, bool header)
         {
             var sb = new StringBuilder();
-            if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports");
+            if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports,Home Assistant JSON");
             foreach (var d in devices) sb.AppendLine(string.Join(",", new[]
-                { d.IpAddress, d.Hostname, d.MacAddress, d.Vendor, d.DeviceType, d.OpenPortsDisplay }.Select(CsvCell)));
+                { d.IpAddress, d.Hostname, d.MacAddress, d.Vendor, d.DeviceType, d.OpenPortsDisplay, JsonSerializer.Serialize(HomeAssistantAdvisor.ForDevice(d)) }.Select(CsvCell)));
             return sb.ToString().TrimEnd();
         }
 

@@ -15,6 +15,13 @@ namespace KillerScan.Engine
         {
             internal virtual IReadOnlyDictionary<string, string> ReadNeighbors() => GetArpCache();
             internal virtual string ResolveMac(IPAddress address) => GetMacAddress(address);
+            internal virtual string DiscoverMac(IPAddress address)
+            {
+                // ARP can discover silent on-link devices. Never treat a routed next-hop
+                // MAC as a newly discovered remote host.
+                var route = NetworkPlatform.Current.BestRoute(address);
+                return route.HasValue && route.Value.NextHop.Length == 0 ? ResolveMac(address) : "";
+            }
             internal virtual void FlushDns() => FlushLocalDnsCache();
             internal virtual Task<string> Hostname(IPAddress address) => ResolveVerifiedHostnameAsync(address);
             internal virtual async Task<int?> Ping(IPAddress address, int timeout)

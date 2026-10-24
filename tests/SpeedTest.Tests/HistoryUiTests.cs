@@ -192,7 +192,7 @@ internal static partial class HistoryUiTests
         var menu = grid.ContextMenu;
         menu.RaiseEvent(new RoutedEventArgs(ContextMenu.OpenedEvent));
         Require(menu.Items.OfType<MenuItem>().Where(item => item.Tag is string action && new[] { "ip", "mac", "host", "details" }.Contains(action)).All(item => item.IsEnabled), "Saved row copy actions are available.");
-        Require(menu.Items.OfType<MenuItem>().All(item => !string.IsNullOrWhiteSpace(item.InputGestureText)), "Every history menu action shows its shortcut.");
+        Require(menu.Items.OfType<MenuItem>().Where(item => item.Tag as string != "ha").All(item => !string.IsNullOrWhiteSpace(item.InputGestureText)), "Existing history actions retain their shortcuts; the HA guide is available through its menu/button.");
         Require(menu.Items.OfType<MenuItem>().All(item => !new[] { "Ping", "Ssh", "Rdp", "Rescan", "Trust" }.Contains(item.Tag as string)), "Historical menus contain no live commands.");
         Save(RenderWindow(1200, 780), Path.Combine(output, "History-Black-sidebar-closed.png"));
         SaveMenu(menu, app, Path.Combine(output, "History-menu.png"));

@@ -54,6 +54,15 @@ namespace KillerScan.Services
                 { device.HttpTitle = "Embedded Web Server; model=DemoPrinter42"; device.SnmpDescr = "Printer; model=DemoPrinter42"; }
                 if (preset == "Hypervisor")
                 { device.HttpTitle = "VMware ESXi"; device.TlsSubject = "CN=VMware ESXi"; }
+                // Fabricated protocol replies for the demo only. This is fixture generation,
+                // never a production inference that a vendor/OUI proves compatibility.
+                if (preset == "Printer" && device.OpenPorts.Contains(631)) device.MdnsServices.Add("demo-printer._ipp._tcp.local");
+                if (device.Vendor == "Sonos, Inc.") device.MdnsServices.Add("demo-speaker._sonos._tcp.local");
+                if (device.Vendor == "Google LLC" && preset == "Media Streamer") device.MdnsServices.Add("demo-cast._googlecast._tcp.local");
+                if (device.Vendor == "Roku, Inc.") device.SsdpServer = "Demo Roku / MediaRenderer";
+                if (device.Vendor == "Samsung Electronics" && preset == "Smart TV") device.SsdpServer = "Demo Samsung_DTV / MediaRenderer";
+                if (device.Vendor == "LG Electronics" && preset == "Smart TV") device.SsdpServer = "Demo WebOS / MediaRenderer";
+                if (device.Vendor == "Signify Netherlands B.V.") device.HttpTitle = "Demo Philips Hue bridge";
                 NetworkScanner.IdentifyDevice(device);
                 device.Access = DeviceAccess.ForDevice(device).ToList();
                 if (preset == "Printer" && device.OpenPorts.Contains(80))
@@ -127,7 +136,9 @@ namespace KillerScan.Services
             {
                 int host;
                 do { host = rng.Next(2, 255); } while (!used.Add(host));
-                scan.Devices.Add(MakeDevice(net, host, Pool[rng.Next(Pool.Length)], rng));
+                // Always include one supported example alongside the random/unknown devices.
+                var sample = i == 0 ? Pool.First(entry => entry.Vendor == "Sonos, Inc.") : Pool[rng.Next(Pool.Length)];
+                scan.Devices.Add(MakeDevice(net, host, sample, rng));
             }
             Current = scan;
             return scan;

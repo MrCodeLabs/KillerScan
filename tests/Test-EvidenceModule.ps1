@@ -13,9 +13,18 @@ try {
     $devices=@(scan '/demo')
     if (!$devices.Count) { throw 'The actual GUI EXE returned no JSON through the module.' }
     if (@($devices | Where-Object { @($_.Access).Count -gt 0 }).Count -eq 0) { throw 'Access endpoints were lost in the actual module pipeline.' }
+    if (@($devices | Where-Object { $_.HomeAssistant.RecommendedDomain }).Count -eq 0) { throw 'The fabricated supported example lost its direct HA choice.' }
     foreach ($device in $devices) {
         if (!$device.Identification -or !$device.Identification.AutomaticType) { throw 'Recognition data was lost in the actual module pipeline.' }
         if ($device.Identification.ObservationCompletedAtUtc) { throw 'Demo invented a live capture time.' }
+        if (!$device.HomeAssistant -or !$device.HomeAssistant.CatalogueRevision -or !$device.HomeAssistant.Steps.Count) {
+            throw 'Home Assistant advice was lost in the actual module pipeline, including unknown devices.'
+        }
+        foreach ($candidate in $device.HomeAssistant.Candidates) {
+            foreach ($fact in $candidate.Evidence) {
+                if ($fact.ObservedAtUtc) { throw 'HA demo advice invented a live capture time.' }
+            }
+        }
     }
     $refused=$false
     try { probe '192.0.2.10' -LocationId 'not-a-location' | Out-Null }

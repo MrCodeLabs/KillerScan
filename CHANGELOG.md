@@ -7,6 +7,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 ## [1.8.4] - Unreleased
 
 ### Added
+- Actionable HA research suggestions for Tuya, Reolink, Denon, Proxmox VE, go-e and original eWeLink devices; ESP modules receive an explicit firmware decision path. Weak name/vendor leads remain research with no claimed compatible integration, and community HACS sources are marked. Nine additional labels in all 20 languages.
+- Offline Home Assistant integration choices per device, with captured evidence, reasons, prerequisites and explicit missing/conflicting information. The HA toolbar button prepares choices for every found device; device/service/history menus, JSON/CSV/HTML and PowerShell retain advice. New labels cover all 20 languages. No HA connection or automatic setup is performed.
 - Slovenian labels for startup update checks and scrollbar page actions, preserving complete coverage of the upstream English dictionary.
 - A unified Access list with exact captured HTTP/HTTPS endpoints, protocol/port suggestions, response and authentication evidence, and Open/Copy actions using existing clients. Deep web probes retain nonstandard endpoints; history, exports and PowerShell preserve the optional data. All 20 locales include the new labels.
 - Device recognition evidence and heuristic confidence, source/timestamp details, explicitly reported model declarations, read-only device/service/history inspection, and structured evidence in JSON/CSV/HTML and PowerShell. Missing replies alone no longer imply IoT or Mobile; a MAC vendor never establishes a model.
@@ -16,6 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 - Per-tab scan options for neighbor cache, explicit ARP, ICMP, TCP discovery, DNS, mDNS, SSDP, port scanning and individual HTTP/TLS/SSH/SNMP/NetBIOS fingerprints. Profiles save the choices; scan, quick and deep paths enforce them in the engine. CLI `/skip` and PowerShell `-Skip` provide the same choices. Existing profiles and API calls keep their defaults.
 
 ### Fixed
+- Discover mDNS/SSDP-only responders inside the requested targets and retain multicast evidence in quick scans. ARP also discovers silent on-link hosts; routed next hops are excluded. Preserve advertised SSDP device types and accept mDNS service-instance names for HA recommendations.
 - Release Sync skips development forks because the checked marketplace channels belong to the upstream publisher; release API failures report the metadata lookup error instead of an empty tag (23 October 2026).
 - The shortcuts card shows shadows at its edges when more content is out of view.
 
