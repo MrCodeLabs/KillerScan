@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using KillerScan.Controls;
@@ -12,6 +14,9 @@ namespace KillerScan.Controls
     public partial class ScanWorkspace
     {
         private string _exportContext = "scan";
+        internal Func<FileDialog, bool?>? ExportDialog { get; set; }
+        private bool? ShowExportDialog(FileDialog dialog) => ExportDialog is { } select
+            ? select(dialog) : dialog.ShowDialog(Window.GetWindow(this));
 
         /// <summary>
         /// Which view the export button is acting for. "scan" means one of this control's own
@@ -28,8 +33,24 @@ namespace KillerScan.Controls
             }
         }
 
-        private void UpdateExportButtonAvailability() =>
+        private void UpdateExportButtonAvailability()
+        {
             ExportButton.IsEnabled = _exportContext is "watch" or "terminal" or "history" || ActiveDevices.Count > 0;
+            string shortcuts = CurrentExportContext() switch
+            {
+                "services" or "history" => "CSV Ctrl+E",
+                "watch" => "CSV Ctrl+E, HTML Ctrl+Shift+E, TXT Ctrl+Shift+X, PNG Ctrl+Shift+G",
+                "terminal" => "TXT Ctrl+Shift+X",
+                "topology" => "PNG Ctrl+Shift+G, JPG Ctrl+Shift+J, SVG Ctrl+Alt+H",
+                _ => "CSV Ctrl+E, HTML Ctrl+Shift+E"
+            };
+            var tooltip = new TextBlock();
+            var caption = new Run();
+            caption.SetResourceReference(Run.TextProperty, "Str_TT_Export");
+            tooltip.Inlines.Add(caption);
+            tooltip.Inlines.Add(" (" + shortcuts + ")");
+            ExportButton.ToolTip = tooltip;
+        }
 
         private string CurrentExportContext() => _exportContext == "scan"
             ? (_showTopology ? "topology" : _showServices ? "services" : "devices")
@@ -38,11 +59,14 @@ namespace KillerScan.Controls
         /// <summary>Raised for the exports the shell owns: the Keep Alive run and the terminal.</summary>
         public event EventHandler<string>? ShellExportRequested;
 
-        private void ExportWatchCsv_Click(object sender, RoutedEventArgs e) => ShellExportRequested?.Invoke(this, "watch-csv");
-        private void ExportWatchHtml_Click(object sender, RoutedEventArgs e) => ShellExportRequested?.Invoke(this, "watch-html");
-        private void ExportWatchTxt_Click(object sender, RoutedEventArgs e) => ShellExportRequested?.Invoke(this, "watch-txt");
-        private void ExportWatchPng_Click(object sender, RoutedEventArgs e) => ShellExportRequested?.Invoke(this, "watch-png");
-        private void ExportTerminalText_Click(object sender, RoutedEventArgs e) => ShellExportRequested?.Invoke(this, "terminal-txt");
+        private void ExportCsv_Click(object sender, RoutedEventArgs e) => Export("csv");
+        private void ExportServicesCsv_Click(object sender, RoutedEventArgs e) => Export("csv");
+        private void ExportHtml_Click(object sender, RoutedEventArgs e) => Export("html");
+        private void ExportWatchCsv_Click(object sender, RoutedEventArgs e) => Export("csv");
+        private void ExportWatchHtml_Click(object sender, RoutedEventArgs e) => Export("html");
+        private void ExportWatchTxt_Click(object sender, RoutedEventArgs e) => Export("txt");
+        private void ExportWatchPng_Click(object sender, RoutedEventArgs e) => Export("png");
+        private void ExportTerminalText_Click(object sender, RoutedEventArgs e) => Export("txt");
 
         public void Export(string format)
         {
@@ -50,18 +74,18 @@ namespace KillerScan.Controls
 
             switch (CurrentExportContext(), format)
             {
-                case ("devices", "csv"): ExportCsv_Click(this, new RoutedEventArgs()); break;
-                case ("services", "csv"): ExportServicesCsv_Click(this, new RoutedEventArgs()); break;
+                case ("devices", "csv"): WriteDevicesCsv(); break;
+                case ("services", "csv"): WriteServicesCsv(); break;
                 case ("history", "csv"): ShellExportRequested?.Invoke(this, "history-csv"); break;
-                case ("watch", "csv"): ExportWatchCsv_Click(this, new RoutedEventArgs()); break;
-                case ("devices", "html"): ExportHtml_Click(this, new RoutedEventArgs()); break;
-                case ("watch", "html"): ExportWatchHtml_Click(this, new RoutedEventArgs()); break;
-                case ("watch", "txt"): ExportWatchTxt_Click(this, new RoutedEventArgs()); break;
-                case ("terminal", "txt"): ExportTerminalText_Click(this, new RoutedEventArgs()); break;
-                case ("watch", "png"): ExportWatchPng_Click(this, new RoutedEventArgs()); break;
-                case ("topology", "png"): ExportSnapshotPngAlpha_Click(this, new RoutedEventArgs()); break;
-                case ("topology", "jpg"): ExportSnapshotJpeg_Click(this, new RoutedEventArgs()); break;
-                case ("topology", "svg"): ExportSnapshotSvg_Click(this, new RoutedEventArgs()); break;
+                case ("watch", "csv"): ShellExportRequested?.Invoke(this, "watch-csv"); break;
+                case ("devices", "html"): WriteDevicesHtml(); break;
+                case ("watch", "html"): ShellExportRequested?.Invoke(this, "watch-html"); break;
+                case ("watch", "txt"): ShellExportRequested?.Invoke(this, "watch-txt"); break;
+                case ("terminal", "txt"): ShellExportRequested?.Invoke(this, "terminal-txt"); break;
+                case ("watch", "png"): ShellExportRequested?.Invoke(this, "watch-png"); break;
+                case ("topology", "png"): ExportSnapshot(SnapshotFormat.PngTransparent); break;
+                case ("topology", "jpg"): ExportSnapshot(SnapshotFormat.Jpeg); break;
+                case ("topology", "svg"): ExportSnapshot(SnapshotFormat.Svg); break;
             }
         }
 
@@ -80,10 +104,8 @@ namespace KillerScan.Controls
             string context = CurrentExportContext();
 
             static Visibility When(bool shown) => shown ? Visibility.Visible : Visibility.Collapsed;
-            bool table = context is "devices" or "services";
-
-            ExportCsvItem.Visibility          = When(table);
-            ExportHtmlItem.Visibility         = When(table);
+            ExportCsvItem.Visibility          = When(context == "devices");
+            ExportHtmlItem.Visibility         = When(context == "devices");
             ExportServicesCsvItem.Visibility  = When(context == "services");
             ExportTopologyPngItem.Visibility  = When(context == "topology");
             ExportTopologyJpegItem.Visibility = When(context == "topology");
@@ -100,17 +122,18 @@ namespace KillerScan.Controls
             ExportButton.ContextMenu.IsOpen = true;
         }
 
-        private void ExportCsv_Click(object sender, RoutedEventArgs e)
+        private void WriteDevicesCsv()
         {
             var dlg = new FileDialog(FileDialogMode.Save)
             {
                 Filter = Loc("Str_Filter_Csv") + "|*.csv",
                 FileName = $"KillerScan_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
             };
-            if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
             try
             {
-                File.WriteAllText(dlg.FileName, ReportExport.BuildLocationCsv(ActiveDevices, Locations.Current), Encoding.UTF8);
+                string csv = ReportExport.BuildCsv(ActiveDevices);
+                if (ShowExportDialog(dlg) != true) return;
+                ExportFile.WriteText(dlg.FileName, csv, Encoding.UTF8);
                 StatusText.Text = string.Format(Loc("Str_St_Exported"), Path.GetFileName(dlg.FileName));
             }
             catch (Exception ex)
@@ -121,45 +144,45 @@ namespace KillerScan.Controls
         /// The service view's own export: one row per open port, as the grid shows it, rather
         /// than one row per device with the ports packed into a single cell.
         /// </summary>
-        private void ExportServicesCsv_Click(object sender, RoutedEventArgs e)
+        private void WriteServicesCsv()
         {
             var dlg = new FileDialog(FileDialogMode.Save)
             {
                 Filter = Loc("Str_Filter_Csv") + "|*.csv",
                 FileName = $"KillerScan_Services_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
             };
-            if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
             try
             {
                 // English headers and blanket quoting, matching ReportExport.BuildCsv so both
                 // exports open the same way in a spreadsheet.
                 var text = new StringBuilder();
-                text.AppendLine("Service,Port,Name,IP Address,Type,Location ID,Location,Identification JSON,Access JSON,Home Assistant JSON");
+                text.AppendLine("Service,Port,Name,IP Address,Type");
                 foreach (var row in ServicesGrid.Items.OfType<ServiceRow>())
                     text.AppendLine(string.Join(",", ReportExport.CsvField(row.Service), ReportExport.CsvField(row.Port.ToString()),
-                        ReportExport.CsvField(row.DeviceName), ReportExport.CsvField(row.IpAddress), ReportExport.CsvField(row.DeviceTypeDisplay),
-                        ReportExport.CsvField(Locations.Current.Id), ReportExport.CsvField(Locations.Current.Name),
-                        ReportExport.CsvField(row.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(row.Identification)), ReportExport.CsvField(System.Text.Json.JsonSerializer.Serialize(row.Access)), ReportExport.CsvField(System.Text.Json.JsonSerializer.Serialize(row.HomeAssistant))));
-                File.WriteAllText(dlg.FileName, text.ToString(), Encoding.UTF8);
+                        ReportExport.CsvField(row.DeviceName), ReportExport.CsvField(row.IpAddress), ReportExport.CsvField(row.DeviceTypeDisplay)));
+                if (ShowExportDialog(dlg) != true) return;
+                ExportFile.WriteText(dlg.FileName, text.ToString(), Encoding.UTF8);
                 StatusText.Text = string.Format(Loc("Str_St_Exported"), Path.GetFileName(dlg.FileName));
             }
             catch (Exception ex)
             { MessageBox.Show(string.Format(Loc("Str_Err_Export"), ex.Message), AppInfo.DisplayName, MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
-        private void ExportHtml_Click(object sender, RoutedEventArgs e)
+        private void WriteDevicesHtml()
         {
             var dlg = new FileDialog(FileDialogMode.Save)
             {
                 Filter = Loc("Str_Filter_Html") + "|*.html",
                 FileName = $"KillerScan_{DateTime.Now:yyyyMMdd_HHmmss}.html"
             };
-            if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
             try
             {
-                string html = ReportExport.BuildLocationHtml(
-                    ActiveDevices, SubnetInput.Text, ThemeManager.Current.ToString().ToLowerInvariant(), Locations.Current);
-                File.WriteAllText(dlg.FileName, html, Encoding.UTF8);
+                string html = ReportExport.BuildSnapshotHtml(
+                    ActiveDevices, _active.ScannedSubnet, ThemeManager.Current.ToString().ToLowerInvariant(),
+                    _active.ScannedAt, _active.Completion, _active.Refresh,
+                    _location.IsTemporary ? string.Empty : LocationName, _active.Adapter);
+                if (ShowExportDialog(dlg) != true) return;
+                ExportFile.WriteText(dlg.FileName, html, Encoding.UTF8);
                 StatusText.Text = string.Format(Loc("Str_St_Exported"), Path.GetFileName(dlg.FileName));
             }
             catch (Exception ex)

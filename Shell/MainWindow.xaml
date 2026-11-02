@@ -1,7 +1,9 @@
 <Window x:Class="KillerScan.Shell.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:theme="clr-namespace:KillerFamily.Theming"
         xmlns:a11y="clr-namespace:KillerFamily.Accessibility"
+        xmlns:kl="clr-namespace:KillerFamily.Layout"
         xmlns:icons="clr-namespace:KillerScan.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -123,13 +125,12 @@
                             <TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect>
                             <Run Text="Killer" Foreground="Transparent"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="#D8000000"/>
                         </TextBlock>
-                        <TextBlock FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
+                        <TextBlock theme:Bevel.Enabled="True" FontFamily="{DynamicResource WordmarkFont}" FontSize="{DynamicResource TitleWordmarkSize}"><Run Text="Killer" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="{DynamicResource TitleWordmarkBoldSize}" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
                     </Grid>
-                    <!-- On the wordmark baseline in Killer Sans, like KillerPDF's titlebar filename. -->
-                    <TextBlock x:Name="SubtitleText" Text="{DynamicResource Str_Subtitle}" Foreground="{DynamicResource MutedTextBrush}"
-                               FontFamily="{DynamicResource FileNameFont}" FontSize="{DynamicResource FileNameFontSize}"
-                               RenderTransform="{DynamicResource FileNameTransform}" TextOptions.TextFormattingMode="Ideal"
-                               VerticalAlignment="Center" Margin="16,0,0,0"/>
+                    <!-- The active view's bar rides after the wordmark. The classic theme moves
+                         this same host below the caption so its controls remain full-sized. -->
+                    <Border x:Name="TitleToolbarHost" VerticalAlignment="Center" Margin="{DynamicResource ScanTitleToolbarMargin}"
+                            WindowChrome.IsHitTestVisibleInChrome="True"/>
                 </StackPanel>
 
                 <!-- The shortcuts, language and theme buttons used to sit here, left of the
@@ -139,22 +140,52 @@
                      the wordmark and the window controls only. -->
 
                 <!-- Window Controls (Segoe MDL2 glyphs, matched to KillerPDF) -->
-                <!-- CaptionButtonsMargin: 0 on every flat theme so the buttons run flush to the
-                     window edge; on 98SE it insets them from the raised frame. VerticalAlignment
-                     is Top rather than Stretch because the 98SE buttons are 16px in a 22px bar and
-                     must sit against the top, not be stretched down it. -->
+                <!-- The classic caption gives its buttons the original two-pixel insets. -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                             Margin="{DynamicResource ScanCaptionButtonsMargin}"
                             WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button Content="&#xE921;" Click="MinimizeBtn_Click" Style="{StaticResource ChromeButton}" ToolTip="{DynamicResource Str_Sys_Minimize}"/>
-                    <Button x:Name="MaximizeBtn" Content="&#xE922;" Click="MaximizeBtn_Click" Style="{StaticResource ChromeButton}" ToolTip="{DynamicResource Str_Sys_Maximize}"/>
-                    <Button Content="&#xE8BB;" Click="CloseBtn_Click" Style="{StaticResource ChromeCloseButton}" ToolTip="{DynamicResource Str_Sys_Close}"/>
+                    <!-- The device filter, where KillerShell keeps its search: left of the window
+                         controls (Shell/Workspace.cs moves it here from the scan bar). -->
+                    <StackPanel x:Name="TitleTools" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <Button VerticalAlignment="Top" Click="MinimizeBtn_Click" Style="{StaticResource ChromeButton}" ToolTip="{DynamicResource Str_Sys_Minimize}">
+                        <Grid Height="{DynamicResource CaptionButtonHeight}">
+                            <TextBlock x:Name="MinimizeGlyph" Text="&#xE921;" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="ClassicMinimizeGlyph" Width="6" Height="2" Fill="{DynamicResource CaptionGlyphBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,3" SnapsToDevicePixels="True" Visibility="Collapsed"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="MaximizeBtn" VerticalAlignment="Top" Click="MaximizeBtn_Click" Style="{StaticResource ChromeButton}" ToolTip="{DynamicResource Str_Sys_Maximize}">
+                        <Grid>
+                            <TextBlock x:Name="MaximizeGlyph" Text="&#xE922;"/>
+                            <Grid x:Name="ClassicMaximizeGlyph" Width="9" Height="9" Margin="0,0,0,1" SnapsToDevicePixels="True" Visibility="Collapsed">
+                                <Rectangle Stroke="{DynamicResource CaptionGlyphBrush}" StrokeThickness="1" Fill="Transparent"/>
+                                <Rectangle Height="2" Fill="{DynamicResource CaptionGlyphBrush}" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid x:Name="ClassicRestoreGlyph" Width="10" Height="9" SnapsToDevicePixels="True" Visibility="Collapsed">
+                                <Border Width="7" Height="7" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{DynamicResource CaptionButtonBrush}" BorderBrush="{DynamicResource CaptionGlyphBrush}" BorderThickness="1,2,1,1"/>
+                                <Border Width="7" Height="7" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="{DynamicResource CaptionButtonBrush}" BorderBrush="{DynamicResource CaptionGlyphBrush}" BorderThickness="1,2,1,1"/>
+                            </Grid>
+                        </Grid>
+                    </Button>
+                    <Button VerticalAlignment="Top" Click="CloseBtn_Click" Style="{StaticResource ChromeCloseButton}" ToolTip="{DynamicResource Str_Sys_Close}">
+                        <Grid>
+                            <TextBlock x:Name="CloseGlyph" Text="&#xE8BB;"/>
+                            <Grid x:Name="ClassicCloseGlyph" Width="8" Height="8" Visibility="Collapsed">
+                                <Rectangle Width="10" Height="2" Fill="{DynamicResource CaptionGlyphBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Rectangle.RenderTransform><RotateTransform Angle="45" CenterX="5" CenterY="1"/></Rectangle.RenderTransform>
+                                </Rectangle>
+                                <Rectangle Width="10" Height="2" Fill="{DynamicResource CaptionGlyphBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Rectangle.RenderTransform><RotateTransform Angle="-45" CenterX="5" CenterY="1"/></Rectangle.RenderTransform>
+                                </Rectangle>
+                            </Grid>
+                        </Grid>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- The workspace host and theme-aware icon rail share the content area. -->
-        <Grid x:Name="ScaleHost" Grid.Row="1" Grid.RowSpan="2">
+        <kl:UnclippedGrid x:Name="ScaleHost" Grid.Row="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>   <!-- 0: scan toolbar -->
                 <RowDefinition Height="*"/>      <!-- 1: devices pane -->
@@ -215,9 +246,11 @@
                                         ViewportUnits="Absolute" Viewport="0,0,256,256" Stretch="None"/>
                         </Border.Background>
                     </Border>
+                    <!-- The theme column fills the menu (*) so the hover rows reach across
+                         when the menu is wider than the list; the margin is set in Theme.cs. -->
                     <Grid x:Name="ThemeMenuContent">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
@@ -230,7 +263,7 @@
                              Order is presentation, deliberately NOT the enum's order, and matches
                              KillerShell and KillerNotes so the family lists themes the same way.
                              98SE slots in after Black when it lands. -->
-                        <StackPanel x:Name="ThemeRadios" Grid.Column="0" Width="120">
+                        <StackPanel x:Name="ThemeRadios" Grid.Column="0" MinWidth="120">
                             <RadioButton Style="{StaticResource ThemeRadio}" GroupName="ThemeGroup" Tag="Dark"      Content="{DynamicResource Str_Theme_Dark}"      Checked="ThemeRadio_Checked"/>
                             <RadioButton Style="{StaticResource ThemeRadio}" GroupName="ThemeGroup" Tag="Light"     Content="{DynamicResource Str_Theme_Light}"     Checked="ThemeRadio_Checked"/>
                             <RadioButton Style="{StaticResource ThemeRadio}" GroupName="ThemeGroup" Tag="Black"     Content="{DynamicResource Str_Theme_Black}"     Checked="ThemeRadio_Checked"/>
@@ -256,14 +289,14 @@
                                     <RowDefinition Height="*"/><RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/><RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <Button x:Name="AccentStripDot0" Grid.Row="0" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot1" Grid.Row="1" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot2" Grid.Row="2" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot3" Grid.Row="3" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot4" Grid.Row="4" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot5" Grid.Row="5" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot6" Grid.Row="6" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" Click="AccentSwatch_Click"/>
-                                <Button x:Name="AccentStripDot7" Grid.Row="7" Style="{StaticResource ThemeSwatch}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0" Click="AccentSwatch_Click"/>
+                                <Border x:Name="AccentStripDot0" Grid.Row="0" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot1" Grid.Row="1" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot2" Grid.Row="2" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot3" Grid.Row="3" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot4" Grid.Row="4" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot5" Grid.Row="5" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot6" Grid.Row="6" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0,0,0,8" MouseLeftButtonUp="AccentStripDot_Click"/>
+                                <Border x:Name="AccentStripDot7" Grid.Row="7" Style="{StaticResource AccentDot}" Width="26" Height="Auto" VerticalAlignment="Stretch" Margin="0" MouseLeftButtonUp="AccentStripDot_Click"/>
                             </Grid>
                         </Grid>
                         <!-- Film Grain: one switch for the grain texture on every surface
@@ -293,7 +326,7 @@
         <!-- ==== HISTORY SIDEBAR (column 0, behind the rail) ==============================
              Clipped so the panel can be frozen at full width and wiped by the column tween
              rather than reflowing to nothing as it closes. -->
-        <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,24,0" ClipToBounds="True">
+        <Grid x:Name="SidebarClip" Grid.Row="1" Grid.Column="0" Margin="0,0,24,0" ClipToBounds="True">
             <Grid x:Name="HistorySidebar" Margin="0,4,0,4" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
@@ -317,13 +350,31 @@
                      width, so a long translation ran off both sides of the sidebar. Here the title
                      gets the width beside the glyph and wraps to a second centered line when the
                      language needs it; short titles still size to their text and stay centered. -->
-                <DockPanel x:Name="HistorySidebarHeader" Grid.Row="0" HorizontalAlignment="Center" Margin="8,0,8,6">
-                    <a11y:Glyph x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
-                               Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="SidebarHeading" Text="{DynamicResource Str_History_Title}" TextAlignment="Center"
-                               Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource HeadingFont}"
-                               FontSize="20" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                </DockPanel>
+                <StackPanel Grid.Row="0">
+                    <DockPanel x:Name="HistorySidebarHeader" HorizontalAlignment="Center" Margin="8,0,8,6">
+                        <a11y:Glyph x:Name="SidebarSectionIcon" DockPanel.Dock="Left" Text="&#xE81C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Margin="0,0,6,0"
+                                   Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="SidebarHeading" Text="{DynamicResource Str_History_Title}" TextAlignment="Center"
+                                   Foreground="{DynamicResource PrimaryBrush}" FontFamily="{DynamicResource HeadingFont}"
+                                   FontSize="20" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <!-- The Locations section's actions: a standard "+ New" button, then Import.
+                         Saving a scan is in the Location picker. -->
+                    <Grid x:Name="LocationsFooter" Margin="14,0,5,6" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="NewLocationButton" Style="{StaticResource SurfaceButton}" Click="NewLocation_Click"
+                                Content="{DynamicResource Str_Loc_NewShort}" HorizontalAlignment="Left"
+                                Height="26" FontSize="12" Padding="10,0" VerticalContentAlignment="Center">
+                            <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_Loc_NewTitle}"/><Run Text=" (Ctrl+Alt+S)"/></TextBlock></Button.ToolTip>
+                        </Button>
+                        <Button Grid.Column="1" Style="{StaticResource SurfaceButton}" FontFamily="Segoe MDL2 Assets" FontSize="13"
+                                Content="&#xE8B5;" Width="34" Height="26" Padding="0" Margin="6,0,0,0" Click="ImportLocation_Click"
+                                ToolTip="{DynamicResource Str_Loc_Import}"/>
+                    </Grid>
+                </StackPanel>
                 <ListBox x:Name="HistoryList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_History_Title}" Background="Transparent" BorderThickness="0"
                          Margin="14,0,5,0" HorizontalContentAlignment="Stretch"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -373,7 +424,7 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <TextBlock Text="{Binding Target}" FontSize="11"
+                                <TextBlock Text="{Binding DisplayName}" FontSize="11"
                                            TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
@@ -387,75 +438,123 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
+                                <!-- Only filled when History lists every Location. -->
+                                <TextBlock Text="{Binding LocationName}" FontSize="11"
+                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding LocationName}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                    <Setter Property="Foreground" Value="{DynamicResource SelectionFg}"/>
+                                                    <Setter Property="Opacity" Value="0.78"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <!-- Second section, sharing the row so the two cross-fade in place. -->
-                <ListBox x:Name="ProfilesList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_Profiles_Title}" Background="Transparent" BorderThickness="0"
-                         Margin="14,0,5,0" HorizontalContentAlignment="Stretch" Visibility="Collapsed"
-                         PreviewMouseRightButtonDown="ProfileList_RightClick"
-                         PreviewMouseLeftButtonUp="ProfileList_Activate"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ItemContainerStyle="{Binding ItemContainerStyle, ElementName=HistoryList}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <StackPanel.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="{DynamicResource Str_Profiles_Run}" InputGestureText="Enter" Click="ProfileRun_Click">
-                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE768;"/></MenuItem.Icon>
+
+                <!-- Third section: every Location, opened from Manage Locations in the Location
+                     picker. A flat list for managing them: a click selects, a double-click or
+                     Enter switches, and the right-click menu edits, exports or deletes. The
+                     current Location carries a check. Saved scans live in the picker, not here
+                     (LocationsSidebar.cs). -->
+                <ListBox x:Name="LocationsList" Grid.Row="1" AutomationProperties.Name="{DynamicResource Str_Loc_ManageTitle}"
+                         Background="Transparent" Foreground="{DynamicResource TextBrush}" BorderThickness="0" Margin="14,0,5,0" Visibility="Collapsed"
+                         HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         MouseDoubleClick="LocationList_DoubleClick" PreviewKeyDown="LocationList_KeyDown">
+                    <ListBox.Resources>
+                        <!-- On the row container, not inside the template, so the Menu key and Shift+F10
+                             open it for the focused row. -->
+                        <ContextMenu x:Key="LocationRowMenu" x:Shared="False">
+                                        <MenuItem Header="{DynamicResource Str_Loc_Open}" InputGestureText="Enter" Click="LocationOpen_Click">
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE707;"/></MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="{DynamicResource Str_Profiles_Load}" InputGestureText="Ctrl+L" Click="ProfileLoad_Click">
-                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8E5;"/></MenuItem.Icon>
+                                        <MenuItem Header="{DynamicResource Str_Loc_Edit}" InputGestureText="F2" Click="LocationRename_Click">
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE70F;"/></MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Header="{DynamicResource Str_Profiles_Deep}" IsCheckable="True"
-                                                  InputGestureText="Ctrl+Alt+D" IsChecked="{Binding DeepScanAfter, Mode=OneWay}" Click="ProfileDeep_Click">
-                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE9D9;"/></MenuItem.Icon>
+                                        <MenuItem Header="{DynamicResource Str_Loc_Export}" Click="LocationExport_Click">
+                                            <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE896;"/></MenuItem.Icon>
                                         </MenuItem>
                                         <Separator/>
-                                        <MenuItem Header="{DynamicResource Str_Profiles_Delete}" InputGestureText="Delete" Click="ProfileDelete_Click">
+                                        <MenuItem Header="{DynamicResource Str_Loc_Delete}" InputGestureText="Delete" Click="LocationDelete_Click">
                                             <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE74D;"/></MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
-                                </StackPanel.ContextMenu>
-                                <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
-                                    <TextBlock.Style>
-                                        <!-- Setter, not an attribute: see the history list above. -->
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+                    </ListBox.Resources>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="9,4"/>
+                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                            <Setter Property="AutomationProperties.Name" Value="{Binding}"/>
+                            <Setter Property="ContextMenu" Value="{StaticResource LocationRowMenu}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bg" Background="Transparent" Margin="0,0,0,2"
+                                                CornerRadius="{DynamicResource ControlCornerRadius}">
+                                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource RowHoverBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource SelectionBg}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource SelectionFg}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:LocationRow}">
+                            <DockPanel ToolTip="{Binding Tip}">
+                                <!-- The check marks the Location this scan is in. -->
+                                <a11y:Glyph DockPanel.Dock="Right" Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                            VerticalAlignment="Center" Margin="6,0,0,0">
+                                    <a11y:Glyph.Style>
+                                        <Style TargetType="a11y:Glyph">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                                                    <Setter Property="Foreground" Value="{DynamicResource SelectionFg}"/>
+                                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBlock Text="{Binding Target}" FontSize="11"
-                                           TextTrimming="CharacterEllipsis" controls:ShrinkToFit.MinScale="0.85">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                                                    <Setter Property="Foreground" Value="{DynamicResource SelectionFg}"/>
-                                                    <Setter Property="Opacity" Value="0.78"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </StackPanel>
+                                    </a11y:Glyph.Style>
+                                </a11y:Glyph>
+                                <a11y:Glyph Text="{Binding Glyph}" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                            VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Detail}" FontSize="11" Opacity="0.7" TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Detail}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <Button x:Name="SaveProfileButton" Grid.Row="2" Content="{DynamicResource Str_Profiles_Save}"
-                        HorizontalAlignment="Left" Margin="9,8,0,0" FontSize="11" Visibility="Collapsed"
-                        Style="{StaticResource LinkButton}" ToolTip="Ctrl+Alt+S" Click="SaveProfile_Click"/>
             </Grid>
         </Grid>
 
@@ -468,7 +567,7 @@
             <Thumb.Template>
                 <ControlTemplate TargetType="Thumb">
                     <Border Background="Transparent">
-                        <Rectangle x:Name="hint" Width="1" HorizontalAlignment="Right" Opacity="0"
+                        <Rectangle x:Name="hint" Width="1" HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource TemplatedParent}}" Opacity="0"
                                    Fill="{DynamicResource PaneBorderBrush}"/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -484,8 +583,11 @@
             </Thumb.Template>
         </Thumb>
 
+        <Border x:Name="SidebarToggleStrip" Grid.Row="1" Grid.Column="0" Panel.ZIndex="20"
+                HorizontalAlignment="Right" Width="{DynamicResource RailWidth}" Background="Transparent">
+        <Grid>
         <!-- Chevron: pinned to the top of the rail on its own, per the family rail order. -->
-        <Button x:Name="SidebarToggleBtn" Grid.Row="1" Grid.Column="0" Style="{StaticResource RailButton}"
+        <Button x:Name="SidebarToggleBtn" Style="{StaticResource RailButton}"
                 Content="&#xE76C;" FontSize="16" Panel.ZIndex="20"
                 VerticalAlignment="Top" HorizontalAlignment="Right" Margin="2,10,2,0"
                 Click="SidebarToggle_Click"
@@ -494,15 +596,16 @@
         <!-- Right-aligned inside the sidebar lane, so it rides the panel's inner lip and stays
              put at the window edge while the panel is collapsed. Width is pinned to the rail so
              the glyphs stay centred on their own strip however wide the lane gets. -->
-        <StackPanel x:Name="RailButtons" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Panel.ZIndex="20"
+        <StackPanel x:Name="RailButtons" VerticalAlignment="Bottom" Panel.ZIndex="20"
                     HorizontalAlignment="Right" Width="{DynamicResource RailWidth}" Margin="2,0,0,6">
             <Button x:Name="SpeedTestButton" Style="{StaticResource RailButton}" Content="&#xE9D2;"
                     FontSize="15" Click="SpeedTestButton_Click" Margin="0,0,0,10">
                 <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_TT_SpeedTest}"/><Run Text=" (F4)"/></TextBlock></Button.ToolTip>
             </Button>
-            <Button x:Name="ProfilesButton" Style="{StaticResource RailButton}" Content="&#xE728;"
-                    FontSize="15" Click="ProfilesButton_Click" Margin="0,0,0,10">
-                <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_Profiles_Title}"/><Run Text=" (Ctrl+Shift+P)"/></TextBlock></Button.ToolTip>
+            <!-- Locations took the saved-scans slot when the two merged (2026-10-26). -->
+            <Button x:Name="LocationsButton" Style="{StaticResource RailButton}" Content="&#xE707;"
+                    FontSize="15" Click="LocationsButton_Click" Margin="0,0,0,10">
+                <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_Loc_ManageTitle}"/><Run Text=" (Ctrl+Shift+P)"/></TextBlock></Button.ToolTip>
             </Button>
             <Button x:Name="HistoryButton" Style="{StaticResource RailButton}"
                     Content="&#xE81C;" FontSize="15"
@@ -513,6 +616,8 @@
                                   Click="HistorySettings_Click">
                             <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE81C;"/></MenuItem.Icon>
                         </MenuItem>
+                        <MenuItem x:Name="HistoryAllLocationsItem" Header="{DynamicResource Str_History_AllLocations}"
+                                  IsCheckable="True" Click="HistorySettingsMenu_LocationsClick"/>
                     </ContextMenu>
                 </Button.ContextMenu>
                 <Button.ToolTip>
@@ -535,13 +640,15 @@
                     Content="&#xE790;" FontSize="15"
                     Click="ThemeButton_Click" ToolTip="{DynamicResource Str_TT_Theme}"/>
         </StackPanel>
+        </Grid>
+        </Border>
 
         <!-- Devices pane - the lightest tier, lifted above the chrome with an outward drop shadow
              (kept tight to the bars; the shadow overlays them rather than adding gap) -->
         <!-- Named so the shadow can be switched off. Windows 98 had no drop shadows anywhere, and
              PaneShadow is a StaticResource effect that a palette cannot reach - so Theme.cs nulls
              the Effect on 98SE and restores it otherwise. Same approach KillerShell takes. -->
-        <Grid x:Name="WorkspaceHost" Grid.Row="1" Grid.Column="1"
+        <kl:UnclippedGrid x:Name="WorkspaceHost" Grid.Row="1" Grid.Column="1"
               Margin="{DynamicResource DevicesPaneMargin}" Panel.ZIndex="10">
         <Border x:Name="DevicesPaneShadow" Grid.Row="1" IsHitTestVisible="False"
                 Background="{DynamicResource ScanContentPaneBrush}"
@@ -573,9 +680,9 @@
                 Margin="{DynamicResource PaneBevelInnerMargin}"
                 BorderBrush="{DynamicResource PaneBevelLight2Brush}"
                 BorderThickness="{DynamicResource PaneBevel2DarkThickness}"/>
-        </Grid>
+        </kl:UnclippedGrid>
 
-        </Grid>
+        </kl:UnclippedGrid>
         <!-- end ScaleHost -->
 
         <!-- Status Bar -->
@@ -624,6 +731,7 @@
                          because the unknown-device list is read, not glanced at. -->
                     <!-- No fixed MaxWidth: FitFooterStatus measures the room up to the badge. -->
                     <TextBlock x:Name="StatusText" Text="Ready" TextTrimming="CharacterEllipsis"
+                               AutomationProperties.LiveSetting="Polite"
                                Margin="{DynamicResource FooterCellPadding}" HorizontalAlignment="Left"
                                Foreground="{DynamicResource MutedTextBrush}" FontFamily="{DynamicResource BrandSansFont}"
                                FontSize="16" TextOptions.TextFormattingMode="Ideal" VerticalAlignment="Center"
@@ -730,7 +838,7 @@
                 <Rectangle Canvas.Left="6"  Canvas.Top="10" Width="2" Height="2" Fill="{DynamicResource DimTextBrush}"/>
                 <Rectangle Canvas.Left="10" Canvas.Top="10" Width="2" Height="2" Fill="{DynamicResource DimTextBrush}"/>
             </Canvas>
-            <Canvas Visibility="{DynamicResource GripHatchVisibility}">
+            <Canvas Visibility="{DynamicResource GripLinesVisibility}">
                 <Canvas.Resources>
                     <Style TargetType="Line">
                         <Setter Property="StrokeThickness" Value="1"/>
@@ -764,7 +872,7 @@
                      FlyoutCornerRadius with 0,0,4,4 - a dropdown shape that hangs off a button, so
                      this centered card came out with square top corners. PanelCornerRadius is 6 on
                      every flat theme and 0 on 98SE, which is the shape a card wants. -->
-                <Border Background="{DynamicResource OverlayWindowBrush}" BorderBrush="{DynamicResource AppBorderBrush}"
+                <Border Background="{DynamicResource OverlayWindowBrush}" BorderBrush="{DynamicResource OverlayEdgeBrush}"
                         BorderThickness="1" CornerRadius="{DynamicResource PanelCornerRadius}">
                     <Grid>
                         <Border IsHitTestVisible="False" CornerRadius="{DynamicResource PanelCornerRadius}"
@@ -837,7 +945,7 @@
                                         <StackPanel x:Name="ShortcutRightColumn" Grid.Column="2"/>
                                     </Grid>
                                     <TextBlock x:Name="ShortcutsHint" Foreground="{DynamicResource MutedTextBrush}"
-                                               FontSize="11" TextWrapping="Wrap" Margin="0,14,0,0"/>
+                                               FontSize="11" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0"/>
                                 </StackPanel>
                             </ScrollViewer>
                             <Viewbox x:Name="ShortcutMapHost" Grid.Row="1" Visibility="Collapsed"
@@ -925,7 +1033,7 @@
                                                    Opacity="{DynamicResource WordmarkShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="2"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="#C0000000"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#C0000000"/></TextBlock>
                                         <TextBlock FontFamily="{DynamicResource WordmarkFont}" Margin="1,2,0,0" IsHitTestVisible="False"
                                                    Opacity="{DynamicResource WordmarkAccentShadowOpacity}"><TextBlock.Effect><BlurEffect Radius="3"/></TextBlock.Effect><Run Text="Killer" FontSize="17.21" Foreground="Transparent"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="#D8000000"/></TextBlock>
-                                        <TextBlock FontFamily="{DynamicResource WordmarkFont}"><Run Text="Killer" FontSize="17.21" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
+                                        <TextBlock theme:Bevel.Enabled="True" FontFamily="{DynamicResource WordmarkFont}"><Run Text="Killer" FontSize="17.21" Foreground="{DynamicResource TextBrush}"/><Run FontFamily="{DynamicResource WordmarkAccentFont}" Text="Scan" FontSize="25.85" Foreground="{DynamicResource AccentLogo}"/></TextBlock>
                                     </Grid>
                                     <TextBlock FontSize="12" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"><Run Text="{DynamicResource Str_About_DescA}"/><Run Text="GPLv3 "/><Hyperlink NavigateUri="https://killertools.net" RequestNavigate="AboutLink_Navigate" Foreground="{DynamicResource PrimaryBrush}" TextDecorations="None">Killer Tools</Hyperlink><Run Text="{DynamicResource Str_About_DescB}"/></TextBlock>
                                 </StackPanel>
@@ -1029,11 +1137,21 @@
                             </Grid>
 
                             <!-- About options sit below the identity pane, the startup check first. -->
-                            <StackPanel Margin="0,12,0,0" HorizontalAlignment="Left">
+                            <Grid Margin="0,12,0,0" Width="{Binding ActualWidth, ElementName=AboutInfoGrid}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <CheckBox x:Name="AboutStartupUpdateCheck"
-                                          Content="{DynamicResource Str_About_StartupUpdateCheck}"
-                                          FontSize="11" Click="AboutStartupUpdateCheck_Click"/>
-                            </StackPanel>
+                                          FontSize="11" Click="AboutStartupUpdateCheck_Click">
+                                    <TextBlock Text="{DynamicResource Str_About_StartupUpdateCheck}" TextWrapping="Wrap"/>
+                                </CheckBox>
+                                <CheckBox x:Name="AboutShowShortcutsInMenus" Grid.Column="2" FontSize="11"
+                                          IsChecked="{Binding Source={x:Static kl:ShortcutHints.Current}, Path=Enabled, Mode=TwoWay}">
+                                    <TextBlock Text="{DynamicResource Str_About_ShowShortcutsInMenus}" TextWrapping="Wrap"/>
+                                </CheckBox>
+                            </Grid>
 
                             <!-- Update notice: shown only when a newer release is found -->
                             <Button x:Name="AboutUpdateButton" Style="{StaticResource OutlineButton}" Padding="14,7" Visibility="Collapsed" Margin="0,14,0,0"

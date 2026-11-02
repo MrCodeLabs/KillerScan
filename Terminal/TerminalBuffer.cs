@@ -15,6 +15,9 @@ namespace KillerScan.Terminal
         public int Ch;          // codepoint; 0 is an empty cell
         public int Fg, Bg;      // see TerminalBuffer.DefaultColor / Rgb
         public CellFlags Flags;
+        public string? Cluster;
+        public byte Width;
+        public string Text => Ch < 0 ? string.Empty : Cluster ?? (Ch == 0 ? " " : char.ConvertFromUtf32(Ch));
     }
 
     internal sealed class TerminalBuffer : IVtHandler
@@ -35,7 +38,20 @@ namespace KillerScan.Terminal
         private Cell[][]? _altScreen;                       // non-null while the alt buffer is up
         private readonly List<Cell[]> _scrollback = [];
 
-        public int ScrollbackLimit { get; set; } = int.MaxValue;
+        /// <summary>Lines of history kept above the screen. Bounded like Windows Terminal's 9001: a
+        /// ping -t or a chatty session left open for days must not grow without end.</summary>
+        public int ScrollbackLimit { get; set; } = 10000;
+
+        /// <summary>Longest text one cell keeps for a base character and what joins it.</summary>
+        private const int MaxClusterLength = 32;
+
+        // Trims in batches, so a session at the limit is not a full list shift on every line.
+        private void TrimScrollback()
+        {
+            // Written as a difference: ScrollbackLimit + 512 overflows when the limit is int.MaxValue.
+            if (_scrollback.Count - ScrollbackLimit > 512)
+                _scrollback.RemoveRange(0, _scrollback.Count - ScrollbackLimit);
+        }
 
         public int ScrollbackCount => _scrollback.Count;
 
@@ -43,6 +59,7 @@ namespace KillerScan.Terminal
 
         public int CursorRow { get; private set; }
         public int CursorCol { get; private set; }
+        internal int InsertionCol => CursorCol + (_pendingWrap ? 1 : 0);
         public bool CursorVisible { get; private set; } = true;
         public bool CursorBlink { get; private set; } = true;
         public int CursorShape { get; private set; }        // 0 block, 1 underline, 2 bar
@@ -79,6 +96,20 @@ namespace KillerScan.Terminal
 
         public TerminalBuffer(int cols, int rows) => Resize(cols, rows);
 
+        /// <summary>
+        /// A random value this session's own prompt wrapper and speedtest command put in their
+        /// private OSC 133 marks. Anything else printed to the terminal, such as a remote SSH host or
+        /// a device banner, cannot know it, so it cannot pose as a ready prompt or ask for a speed test.
+        /// </summary>
+        internal string PromptToken { get; } = NewPromptToken();
+
+        private static string NewPromptToken()
+        {
+            var bytes = new byte[16];
+            using (var random = System.Security.Cryptography.RandomNumberGenerator.Create()) random.GetBytes(bytes);
+            return BitConverter.ToString(bytes).Replace("-", "");
+        }
+
         public Cell[] LineAt(int index)
         {
             if (index < 0) return _screen[0];
@@ -94,6 +125,7 @@ namespace KillerScan.Terminal
             int last = previous.TotalLines - 1;
             while (last >= 0 && Array.TrueForAll(previous.LineAt(last), cell => cell.Ch == 0 || cell.Ch == ' ')) last--;
             for (int row = 0; row <= last; row++) _scrollback.Add((Cell[])previous.LineAt(row).Clone());
+            TrimScrollback();
             Version++;
         }
 
@@ -102,8 +134,7 @@ namespace KillerScan.Terminal
             int last = Rows - 1;
             while (last >= 0 && Array.TrueForAll(_screen[last], cell => cell.Ch == 0 || cell.Ch == ' ')) last--;
             for (int row = 0; row <= last; row++) _scrollback.Add((Cell[])_screen[row].Clone());
-            if (_scrollback.Count > ScrollbackLimit)
-                _scrollback.RemoveRange(0, _scrollback.Count - ScrollbackLimit);
+            TrimScrollback();
             Version++;
         }
 
@@ -114,10 +145,15 @@ namespace KillerScan.Terminal
             if (cols == Cols && rows == Rows) return;
 
             var old = _screen;
+            int logicalCursor = CursorCol + (_pendingWrap ? 1 : 0);
+            bool wasPendingWrap = _pendingWrap;
             int oldRows = Rows;
             int removed = Math.Max(0, oldRows - rows);
             if (_altScreen == null)
+            {
                 for (int r = 0; r < removed; r++) _scrollback.Add(old[r]);
+                TrimScrollback();
+            }
             _screen = New(cols, rows);
             for (int r = 0; r < Math.Min(oldRows, rows); r++)
             {
@@ -129,18 +165,33 @@ namespace KillerScan.Terminal
 
             if (_altScreen != null)
             {
-                var oldAlt = _altScreen;
+                // The saved main screen (under vim, less or htop) resizes the way the main screen
+                // does: anchored at the bottom, where the latest output and prompt are, with rows
+                // that no longer fit moved into history and wide lines kept whole. Its saved cursor
+                // moves with it.
+                var oldMain = _altScreen;
+                int mainRemoved = Math.Max(0, oldRows - rows);
+                for (int r = 0; r < mainRemoved; r++) _scrollback.Add(oldMain[r]);
+                TrimScrollback();
                 _altScreen = New(cols, rows);
                 for (int r = 0; r < Math.Min(oldRows, rows); r++)
-                    Array.Copy(oldAlt[r], _altScreen[r], Math.Min(Cols, cols));
+                {
+                    var source = oldMain[r + mainRemoved];
+                    _altScreen[r] = NewLine(Math.Max(cols, source.Length));
+                    Array.Copy(source, _altScreen[r], source.Length);
+                }
+                _savedRow = Math.Max(0, _savedRow - mainRemoved);
             }
 
             Cols = cols;
             Rows = rows;
+            if (_altScreen != null)
+                foreach (var line in _altScreen) NormalizeClusters(line);
             _top = 0;
             _bottom = rows - 1;
             CursorRow = Math.Min(CursorRow, rows - 1);
-            CursorCol = Math.Min(CursorCol, cols - 1);
+            CursorCol = Math.Min(logicalCursor, cols - 1);
+            _pendingWrap = wasPendingWrap && logicalCursor >= cols;
             ResetTabs();
             Version++;
         }
@@ -167,9 +218,53 @@ namespace KillerScan.Terminal
 
         public void Print(int cp)
         {
-            if (cp == 0) return;
+            if (cp <= 0 || cp > 0x10ffff || cp is >= 0xd800 and <= 0xdfff) return;
 
-            if (_pendingWrap)
+            var previousLine = _screen[CursorRow];
+            int previous = _pendingWrap ? CursorCol : CursorCol - 1;
+            if (previous >= 0 && previousLine[previous].Ch < 0) previous--;
+            bool extension = TerminalWidth.IsExtension(cp);
+            if (previous >= 0 && previousLine[previous].Ch > 0)
+            {
+                var cell = previousLine[previous];
+                string cluster = cell.Text;
+                bool join = TerminalWidth.IsEmoji(cell.Ch) && cluster.EndsWith("\u200d", StringComparison.Ordinal) && TerminalWidth.IsEmoji(cp);
+                bool regional = TerminalWidth.IsRegional(cell.Ch) && TerminalWidth.IsRegional(cp) && cluster.Length == 2;
+                if (extension || join || regional)
+                {
+                    // Real clusters (the longest family emoji) stay well under this. A stream of
+                    // combining marks stops growing the cell here instead of costing a longer string
+                    // copy and text layout per mark until the window stalls.
+                    if (cluster.Length < MaxClusterLength) cell.Cluster = cluster + char.ConvertFromUtf32(cp);
+                    int width = cell.Width;
+                    if ((cp == 0xfe0f && TerminalWidth.IsEmoji(cell.Ch)) || join) width = 2;
+                    if (width > cell.Width)
+                    {
+                        if (previous + width > Cols && _autoWrap && Cols > 1)
+                        {
+                            previousLine[previous] = new Cell { Fg = DefaultColor, Bg = _curBg };
+                            CursorCol = 0; _pendingWrap = false; LineFeed();
+                            previousLine = _screen[CursorRow]; previous = 0;
+                        }
+                        width = Math.Min(width, Cols - previous);
+                        if (width == 2)
+                        {
+                            ClearCluster(previousLine, previous + 1);
+                            previousLine[previous + 1] = new Cell { Ch = -1, Fg = cell.Fg, Bg = cell.Bg, Flags = cell.Flags };
+                        }
+                        CursorCol = Math.Min(Cols - 1, previous + width);
+                        _pendingWrap = previous + width >= Cols;
+                    }
+                    cell.Width = (byte)width;
+                    previousLine[previous] = cell;
+                    Version++; return;
+                }
+            }
+            // A standalone mark gets a visible base and consumes one column.
+            string? standalone = extension ? "\u25cc" + char.ConvertFromUtf32(cp) : null;
+            int cellWidth = extension ? 1 : Math.Min(Cols, TerminalWidth.Of(cp));
+
+            if (_pendingWrap || (cellWidth == 2 && CursorCol == Cols - 1))
             {
                 if (_autoWrap)
                 {
@@ -182,18 +277,44 @@ namespace KillerScan.Terminal
             if (CursorCol >= Cols) CursorCol = Cols - 1;
 
             var line = _screen[CursorRow];
-            if (_insertMode && CursorCol < Cols - 1)
-                Array.Copy(line, CursorCol, line, CursorCol + 1, Cols - CursorCol - 1);
+            if (CursorCol + cellWidth > Cols) cellWidth = 1;
+            if (_insertMode) InsertChars(cellWidth);
+            ClearCluster(line, CursorCol);
+            if (cellWidth == 2) ClearCluster(line, CursorCol + 1);
 
-            line[CursorCol].Ch = cp;
+            line[CursorCol].Ch = extension ? 0x25cc : cp;
+            line[CursorCol].Cluster = standalone;
+            line[CursorCol].Width = (byte)cellWidth;
             line[CursorCol].Fg = _curFg;
             line[CursorCol].Bg = _curBg;
             line[CursorCol].Flags = _curFlags;
 
-            if (CursorCol == Cols - 1) _pendingWrap = true;
-            else CursorCol++;
+            if (cellWidth == 2)
+                line[CursorCol + 1] = new Cell { Ch = -1, Fg = _curFg, Bg = _curBg, Flags = _curFlags };
+            _pendingWrap = CursorCol + cellWidth >= Cols;
+            CursorCol = Math.Min(Cols - 1, CursorCol + cellWidth);
 
             Version++;
+        }
+
+        private void ClearCluster(Cell[] line, int col)
+        {
+            if (col < 0 || col >= line.Length) return;
+            if (line[col].Ch < 0 && col > 0) col--;
+            int width = Math.Max(1, (int)line[col].Width);
+            for (int c = col; c < Math.Min(line.Length, col + width); c++)
+                line[c] = new Cell { Fg = DefaultColor, Bg = _curBg };
+        }
+
+        private void NormalizeClusters(Cell[] line)
+        {
+            for (int c = 0; c < Math.Min(Cols, line.Length); c++)
+            {
+                if (line[c].Ch < 0 && (c == 0 || line[c - 1].Width != 2))
+                    line[c] = new Cell { Fg = DefaultColor, Bg = _curBg };
+                else if (line[c].Width == 2 && (c + 1 >= Cols || line[c + 1].Ch != -1))
+                    line[c] = new Cell { Fg = DefaultColor, Bg = _curBg };
+            }
         }
 
         public void Execute(byte b)
@@ -232,6 +353,9 @@ namespace KillerScan.Terminal
 
         private void ScrollUp(int n)
         {
+            // More than the region's height only adds blank lines; a remote ESC[65535S must not
+            // turn eight bytes into tens of thousands of lines.
+            n = Math.Min(n, _bottom - _top + 1);
             bool wholeScreen = _top == 0 && _bottom == Rows - 1 && _altScreen == null;
             for (int i = 0; i < n; i++)
             {
@@ -239,8 +363,7 @@ namespace KillerScan.Terminal
                 if (wholeScreen)
                 {
                     _scrollback.Add(gone);
-                    if (_scrollback.Count > ScrollbackLimit)
-                        _scrollback.RemoveRange(0, _scrollback.Count - ScrollbackLimit);
+                    TrimScrollback();
                 }
                 for (int r = _top; r < _bottom; r++) _screen[r] = _screen[r + 1];
                 _screen[_bottom] = wholeScreen ? NewLine(Cols) : Blank(gone);
@@ -250,6 +373,7 @@ namespace KillerScan.Terminal
 
         private void ScrollDown(int n)
         {
+            n = Math.Min(n, _bottom - _top + 1);
             for (int i = 0; i < n; i++)
             {
                 var gone = _screen[_bottom];
@@ -264,6 +388,8 @@ namespace KillerScan.Terminal
             for (int c = 0; c < reuse.Length; c++)
             {
                 reuse[c].Ch = 0;
+                reuse[c].Cluster = null;
+                reuse[c].Width = 0;
                 reuse[c].Fg = DefaultColor;
                 reuse[c].Bg = _curBg;      // so a colored background fills the new line too
                 reuse[c].Flags = CellFlags.None;
@@ -376,8 +502,20 @@ namespace KillerScan.Terminal
 
                 case 'b':                                            // repeat the last glyph
                     {
-                        int prev = CursorCol > 0 ? _screen[CursorRow][CursorCol - 1].Ch : 0;
-                        if (prev != 0) for (int i = 0; i < P(0); i++) Print(prev);
+                        int col = _pendingWrap ? CursorCol : CursorCol - 1;
+                        var line = _screen[CursorRow];
+                        if (col >= 0 && line[col].Ch < 0) col--;
+                        if (col >= 0 && line[col].Ch > 0)
+                        {
+                            string cluster = line[col].Text;
+                            // At most a screenful: more repeats only overwrite what they just wrote.
+                            for (int repeat = 0, times = Math.Min(P(0), Cols * Rows); repeat < times; repeat++)
+                                for (int index = 0; index < cluster.Length; index++)
+                                {
+                                    int scalar = char.ConvertToUtf32(cluster, index);
+                                    Print(scalar); if (scalar > 0xffff) index++;
+                                }
+                        }
                     }
                     break;
 
@@ -465,12 +603,14 @@ namespace KillerScan.Terminal
             _pendingWrap = false;
             switch (mode)
             {
+                // A row can be wider than the pane after narrowing (its old cells stay reachable by
+                // horizontal scroll), so "to the end" means the row's own end, not the visible width.
                 case 0:
-                    ClearRun(_screen[CursorRow], CursorCol, Cols - 1);
-                    for (int r = CursorRow + 1; r < Rows; r++) ClearRun(_screen[r], 0, Cols - 1);
+                    ClearRun(_screen[CursorRow], CursorCol, _screen[CursorRow].Length - 1);
+                    for (int r = CursorRow + 1; r < Rows; r++) ClearRun(_screen[r], 0, _screen[r].Length - 1);
                     break;
                 case 1:
-                    for (int r = 0; r < CursorRow; r++) ClearRun(_screen[r], 0, Cols - 1);
+                    for (int r = 0; r < CursorRow; r++) ClearRun(_screen[r], 0, _screen[r].Length - 1);
                     ClearRun(_screen[CursorRow], 0, CursorCol);
                     break;
                 case 3:
@@ -488,17 +628,21 @@ namespace KillerScan.Terminal
         {
             _pendingWrap = false;
             var line = _screen[CursorRow];
-            if (mode == 0) ClearRun(line, CursorCol, Cols - 1);
+            if (mode == 0) ClearRun(line, CursorCol, line.Length - 1);
             else if (mode == 1) ClearRun(line, 0, CursorCol);
-            else ClearRun(line, 0, Cols - 1);
+            else ClearRun(line, 0, line.Length - 1);
             Version++;
         }
 
-        private void ClearRun(Cell[] line, int from, int to)
+        private void ClearRun(Cell[] line, int from, int to, bool wholeClusters = true)
         {
-            for (int c = Math.Max(0, from); c <= Math.Min(to, Cols - 1); c++)
+            if (wholeClusters && from >= 0 && from < line.Length && line[from].Ch < 0) from--;
+            if (wholeClusters && to >= 0 && to < line.Length && line[to].Width == 2) to++;
+            for (int c = Math.Max(0, from); c <= Math.Min(to, line.Length - 1); c++)
             {
                 line[c].Ch = 0;
+                line[c].Cluster = null;
+                line[c].Width = 0;
                 line[c].Fg = DefaultColor;
                 line[c].Bg = _curBg;
                 line[c].Flags = CellFlags.None;
@@ -539,7 +683,8 @@ namespace KillerScan.Terminal
             n = Math.Min(n, Cols - CursorCol);
             if (n <= 0) return;
             Array.Copy(line, CursorCol, line, CursorCol + n, Cols - CursorCol - n);
-            ClearRun(line, CursorCol, CursorCol + n - 1);
+            ClearRun(line, CursorCol, CursorCol + n - 1, false);
+            NormalizeClusters(line);
             Version++;
         }
 
@@ -549,13 +694,14 @@ namespace KillerScan.Terminal
             n = Math.Min(n, Cols - CursorCol);
             if (n <= 0) return;
             Array.Copy(line, CursorCol + n, line, CursorCol, Cols - CursorCol - n);
-            ClearRun(line, Cols - n, Cols - 1);
+            ClearRun(line, Cols - n, Cols - 1, false);
+            NormalizeClusters(line);
             Version++;
         }
 
         private void EraseChars(int n)
         {
-            ClearRun(_screen[CursorRow], CursorCol, CursorCol + Math.Max(1, n) - 1);
+            ClearRun(_screen[CursorRow], CursorCol, Math.Min(CursorCol + Math.Max(1, n) - 1, Cols - 1));
             Version++;
         }
 
@@ -623,8 +769,8 @@ namespace KillerScan.Terminal
             switch (cmd)
             {
                 case 133:
-                    if (data == "B") PromptReady?.Invoke();
-                    else if (data == "KillerScan;SpeedTest") SpeedTestRequested?.Invoke();
+                    if (data == "B;" + PromptToken) PromptReady?.Invoke();
+                    else if (data == "KillerScan;SpeedTest;" + PromptToken) SpeedTestRequested?.Invoke();
                     break;
                 case 0: case 2:
                     Title = data;

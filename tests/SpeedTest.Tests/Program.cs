@@ -29,44 +29,116 @@ internal static class Program
     {
         try
         {
-            if (args.SequenceEqual(new[] { "--evidence-ui" })) { await ReleaseUiTests.Run(evidenceOnly: true); return 0; }
-            if (args.SequenceEqual(new[] { "--location-profiles-ui" })) { await LocationProfilePilot.RunIsolated(); return 0; }
-            if (args.Length == 3 && args[0] == "--location-profiles-phase") { LocationProfilePilot.RunPhase(args[1], args[2]); return 0; }
-            if (args.SequenceEqual(new[] { "--locations" })) { LocationTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--scan-presentation" })) { await ScanPresentation(); return 0; }
+            if (args.SequenceEqual(new[] { "--fork-upgrade" })) { await ForkUpgradeTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--installation-cleanup" }))
+            {
+                InstallationCleanupTests.Run();
+                UpdateHandoffTests.Run();
+                UpdateHelperLaunchTests.Run();
+                ReleaseIdentityTests.Run();
+                return 0;
+            }
+            if (args.SequenceEqual(new[] { "--loopback-headers" })) { await LoopbackHeaders(); return 0; }
+            if (args.SequenceEqual(new[] { "--transfer-sequence" }))
+            {
+                await Run("Adaptive per-connection warmup", () => Adaptive(Mode.SlowDownload, 8));
+                await Run("Adaptive shared-bandwidth warmup", () => Adaptive(Mode.SharedDownload, 8));
+                await Run("Adaptive warmup cancellation", AdaptiveCancel);
+                await Run("Empty download rejection", () => Reject(Mode.NoPayload, SpeedTestFailureKind.TransferFailed));
+                await Run("Unacknowledged upload rejection", () => Reject(Mode.NoAck, SpeedTestFailureKind.TransferFailed));
+                return 0;
+            }
+            if (args.SequenceEqual(new[] { "--worker-loopback" })) { await Worker(); Console.WriteLine("PASS: actual Worker loopback exchange."); return 0; }
+            if (args.SequenceEqual(new[] { "--empty-transfers" }))
+            {
+                await Reject(Mode.NoPayload, SpeedTestFailureKind.TransferFailed);
+                await Reject(Mode.NoAck, SpeedTestFailureKind.TransferFailed);
+                Console.WriteLine("PASS: empty download and unacknowledged upload rejection."); return 0;
+            }
+            if (args.SequenceEqual(new[] { "--terminal-memory" })) { TerminalMemoryTests.Run(); return 0; }
+            if (args.Length == 2 && args[0] == "--terminal-memory-child") { TerminalMemoryTests.Child(args[1]); return 0; }
+            if (args.SequenceEqual(new[] { "--terminal-unicode" })) { TerminalUnicodeTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--terminal-accessibility" })) { TerminalAccessibilityTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--history-retention" })) { HistoryRetentionTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--preference-persistence" })) { PreferencePersistenceTests.Run(); return 0; }
+            if (args.Length == 2 && args[0] == "--profile-lock-child") { ProfilePersistenceTests.HoldUntilKilled(args[1]); return 0; }
+            if (args.SequenceEqual(new[] { "--demo-stores" })) { DemoStoreTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--osc-parser" })) { OscParserTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--terminal-safety" })) { TerminalSafetyTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--terminal-paste" })) { TerminalPasteTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--conpty-backpressure" })) { ConPtyBackpressureTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--scan-lifecycle" })) { await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.Length == 4 && args[0] == "--history-writer") { HistoryRetentionTests.WriteConcurrent(args[1], args[2], args[3]); return 0; }
+            if (args.Length == 3 && args[0] == "--observe-writer") { LocationTests.ObserveOnce(args[1], args[2]); return 0; }
+            if (args.Length == 3 && args[0] == "--import-then-die") { LocationTests.ImportThenDie(args[1], args[2]); return 0; }
+            if (args.SequenceEqual(new[] { "--scan-presentation" })) { await ScanPresentation(); Console.WriteLine("PASS: scan presentation regression suite (1 selected)."); return 0; }
             if (args.SequenceEqual(new[] { "--terminal" })) { await View(); return 0; }
-            if (args.SequenceEqual(new[] { "--menu-separators" })) { await MenuSeparatorThemeTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--startup-fade" })) { await StartupFadeTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--menu-separators" })) { await MenuSeparatorThemeTests.Run(); Console.WriteLine("PASS: menu separator regression suite (1 selected)."); return 0; }
+            if (args.SequenceEqual(new[] { "--startup-fade" })) { await StartupFadeTests.Run(); Console.WriteLine("PASS: startup fade regression suite (1 selected)."); return 0; }
             if (args.SequenceEqual(new[] { "--release-ui" })) { await ReleaseUiTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--scan-options-ui" })) { await ReleaseUiTests.Run(scanOptionsOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--history-ui" })) { await HistoryUiTests.Run(); return 0; }
             if (args.SequenceEqual(new[] { "--history-settings-ui" })) { await HistoryUiTests.Run(true); return 0; }
             if (args.SequenceEqual(new[] { "--history-table-ui" })) { await HistoryUiTests.Run(tableOnly: true); return 0; }
-            if (args.SequenceEqual(new[] { "--profiles-ui" })) { await HistoryUiTests.Run(profilesOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--menu-icons-ui" })) { await HistoryUiTests.Run(menusOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--topology" })) { await TopologyTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--report-language" })) { HistoryUiTests.Isolated = ReportLanguageTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--device-table" })) { HistoryUiTests.Isolated = DeviceTableTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--topology-keyboard" })) { HistoryUiTests.Isolated = TopologyKeyboardTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--topology-stream" })) { HistoryUiTests.Isolated = TopologyStreamTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--csv-export" })) { await CsvExportTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--export-publication" })) { ExportPublicationTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--history-load" })) { HistoryLoadTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--run-evidence" })) { HistoryUiTests.Isolated = RunEvidenceTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--locations" })) { LocationTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--locations-sidebar" })) { HistoryUiTests.Isolated = LocationsSidebarTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--sidebar-placement" })) { HistoryUiTests.Isolated = SidebarPlacementTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--keyboard-focus" })) { HistoryUiTests.Isolated = KeyboardFocusTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--contrast-transitions" })) { await ContrastTransitionTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--picker-selection" })) { HistoryUiTests.Isolated = PickerSelectionTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--location-workspace" })) { HistoryUiTests.Isolated = LocationWorkspaceTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--access-ui" })) { HistoryUiTests.Isolated = AccessUiTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--theme-dump" })) { HistoryUiTests.Isolated = ThemeDumpTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
+            if (args.SequenceEqual(new[] { "--recognition-ui" })) { HistoryUiTests.Isolated = RecognitionUiTests.Run; await HistoryUiTests.Run(lifecycleOnly: true); return 0; }
             if (args.SequenceEqual(new[] { "--report-sort" })) { await ReportSortTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--command-line-path" })) { await CommandLinePathTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--report-logo" })) { await ReportLogoTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--outline-hover-ui" })) { await OutlineHoverThemeTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--radio-center-ui" })) { await RadioCenterUiTests.Run(); return 0; }
-            if (args.SequenceEqual(new[] { "--shrink-to-fit" })) { await ShrinkToFitTests.Run(); return 0; }
-            Require(args.All(value => value == "--worker" || value == "--internet"), "Usage: SpeedTest.Tests.exe [--worker] [--internet]");
-            await Run("Location identities, legacy migration and cross-location data isolation", LocationTests.RunIsolated);
-            await Run("Menu dividers resolve declared palettes and preserve the fallback", MenuSeparatorThemeTests.Run);
-            await Run("Startup content becomes visible when its animation stalls", StartupFadeTests.Run);
-            await Run("Topology radial geometry, zoom and rendered interactions", TopologyTests.RunIsolated);
-            await Run("History identity, saved-data menus and contextual shortcuts", HistoryUiTests.RunIsolated);
-            await Run("CSV exports keep spreadsheet formulas inert", CsvExportTests.Run);
-            await Run("HTML report columns sort from the keyboard and expose aria-sort", ReportSortTests.Run);
-            await Run("PATH registration adds and removes only the install folder", CommandLinePathTests.Run);
-            await Run("HTML report logo returns after a theme without one", ReportLogoTests.Run);
-            await Run("Outline button hover text stays readable in every accent", OutlineHoverThemeTests.RunIsolated);
-            await Run("Radio and checkbox indicators sit on the middle of their labels", RadioCenterUiTests.RunIsolated);
-            await Run("Sidebar text shrinks a little before it is trimmed", ShrinkToFitTests.Run);
-            await Run("Metric units, median, jitter and unavailable values", Metrics);
-            await Run("Scan terminal progress stays on one line and results fit narrow widths", ScanPresentation);
-            await Run("Terminal history survives resizing, clears and shell replacement", TerminalHistory);
+            if (args.SequenceEqual(new[] { "--command-line-path" })) { await CommandLinePathTests.Run(); SystemToolsTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--executable-deployment" })) { await ExecutableDeploymentTests.Run(); return 0; }
+            if (args.Length == 2 && args[0] == "--executable-deployment" && int.TryParse(args[1], out int publicationError)
+                && (publicationError == 1176 || publicationError == 1177)) { await ExecutableDeploymentTests.RunPartial(publicationError); return 0; }
+            if (args.SequenceEqual(new[] { "--report-logo" })) { await ReportLogoTests.Run(); Console.WriteLine("PASS: report logo regression suite (1 selected)."); return 0; }
+            if (args.SequenceEqual(new[] { "--outline-hover-ui" })) { await OutlineHoverThemeTests.Run(); Console.WriteLine("PASS: outline hover regression suite (1 selected)."); return 0; }
+            if (args.SequenceEqual(new[] { "--radio-center-ui" })) { await RadioCenterUiTests.Run(); Console.WriteLine("PASS: radio alignment regression suite (1 selected)."); return 0; }
+            if (args.SequenceEqual(new[] { "--shrink-to-fit" })) { await ShrinkToFitTests.Run(); Console.WriteLine("PASS: shrink-to-fit regression suite (1 selected)."); return 0; }
+            if (args.SequenceEqual(new[] { "--rail-order" })) { await RailOrderTests.Run(); Console.WriteLine("PASS: rail order regression suite (1 selected)."); return 0; }
+            Require(args.All(value => value == "--worker" || value == "--internet" || value == "--speed-loopback"),
+                "Usage: SpeedTest.Tests.exe [--speed-loopback] [--worker] [--internet]");
+            if (!args.Contains("--speed-loopback"))
+            {
+                await Run("Menu dividers resolve declared palettes and preserve the fallback", MenuSeparatorThemeTests.Run);
+                await Run("Startup content becomes visible when its animation stalls", StartupFadeTests.Run);
+                await Run("Topology radial geometry, zoom and rendered interactions", TopologyTests.RunIsolated);
+                await Run("History identity, saved-data menus and contextual shortcuts", HistoryUiTests.RunIsolated);
+                await Run("CSV exports keep spreadsheet formulas inert", CsvExportTests.Run);
+                await Run("HTML report columns sort from the keyboard and expose aria-sort", ReportSortTests.Run);
+                await Run("PATH registration adds and removes only the install folder", CommandLinePathTests.Run);
+                await Run("Device actions start Windows tools by full path", () => { SystemToolsTests.Run(); return Task.CompletedTask; });
+                await Run("Executable deployment verifies staging and preserves recovery files", ExecutableDeploymentTests.Run);
+                await Run("Owned cleanup preserves unrelated files and completion commands parse", () =>
+                { InstallationCleanupTests.Run(); return Task.CompletedTask; });
+                await Run("Elevated update handoff rejects untrusted targets before launch", () =>
+                { UpdateHandoffTests.Run(); return Task.CompletedTask; });
+                await Run("Updates need the installed publisher and a newer release, and refused staging is removed", () =>
+                { ReleaseIdentityTests.Run(); return Task.CompletedTask; });
+                await Run("HTML report logo returns after a theme without one", ReportLogoTests.Run);
+                await Run("Outline button hover text stays readable in every accent", OutlineHoverThemeTests.RunIsolated);
+                await Run("Radio and checkbox indicators sit on the middle of their labels", RadioCenterUiTests.RunIsolated);
+                await Run("Sidebar text shrinks a little before it is trimmed", ShrinkToFitTests.Run);
+                await Run("Theme, language and shortcuts hold the rail edge; other rail buttons keep a saved order", RailOrderTests.Run);
+                await Run("Metric units, median, jitter and unavailable values", Metrics);
+                await Run("Scan terminal progress stays on one line and results fit narrow widths", ScanPresentation);
+                await Run("Terminal history survives resizing, clears and shell replacement", TerminalHistory);
+            }
+            await Run("Loopback headers remain bounded and responsive on reused connections", LoopbackHeaders);
             await Run("Cloudflare upload response is accepted only for the exact official endpoint", CloudflareAcknowledgment);
             await Run("Public endpoint profile reduces request pressure without shortening the test", PublicProfile);
             await Run("Adaptive warmup adds streams on a per-connection bottleneck", () => Adaptive(Mode.SlowDownload, 8));
@@ -89,6 +161,8 @@ internal static class Program
             await Run("Measured rate limit never retries or waits inside throughput timing", MeasurementRateLimit);
             await Run("Loaded-latency rate limit stops payload traffic", () => Reject(Mode.LoadedRate, SpeedTestFailureKind.RateLimited));
             await Run("HTTP 503 classified as HTTP error", () => Reject(Mode.Unavailable, SpeedTestFailureKind.HttpError));
+            await Run("Cloudflare challenge on upload is named as a challenge", () => Reject(Mode.Challenge, SpeedTestFailureKind.Challenged));
+            await Run("Rejected upload acknowledgment reports what came back", RejectedAckDetail);
             await Run("Stalled response bounded by request timeout", Timeout);
             await Run("No measured download bytes is a failure, not completion", () => Reject(Mode.NoPayload, SpeedTestFailureKind.TransferFailed));
             await Run("Unacknowledged uploads cannot produce a speed result", () => Reject(Mode.NoAck, SpeedTestFailureKind.TransferFailed));
@@ -98,7 +172,8 @@ internal static class Program
                 await Run("Compiled engine exchanges exact payloads with the real Worker", Worker);
             if (args.Contains("--internet"))
                 await Run("Live KillerScan endpoint completes native measurements", Internet);
-            await Run("Themed terminal renders managed output and routes cancel, rerun and disposal", View);
+            if (!args.Contains("--speed-loopback"))
+                await Run("Themed terminal renders managed output and routes cancel, rerun and disposal", View);
             Console.WriteLine("PASS: " + _passed + " speed-test regression checks.");
             return 0;
         }
@@ -318,8 +393,7 @@ internal static class Program
 
     private static async Task Worker()
     {
-        var directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "KillerScan.csproj"))) directory = directory.Parent;
+        var directory = TestRepository.Find();
         Require(directory != null, "Repository containing the real Worker found");
         string script = Path.Combine(directory!.FullName, "server", "speedtest", "loopback.mjs");
         Require(File.Exists(script), "Worker loopback adapter exists");
@@ -396,20 +470,21 @@ internal static class Program
         {
             try
             {
-                var directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                while (directory != null && !File.Exists(Path.Combine(directory.FullName, "KillerScan.csproj"))) directory = directory.Parent;
+                var directory = TestRepository.Find();
                 Require(directory != null, "Repository app resources found");
                 // WPF has already inferred the console entry assembly. Redirect only this test
                 // process before any pack resources load, so the real theme loader resolves them.
                 typeof(Application).GetField("_resourceAssembly", BindingFlags.NonPublic | BindingFlags.Static)!
                     .SetValue(null, typeof(KillerScan.App).Assembly);
+                KillerScan.Services.AppTheme.Configure();
                 var app = new TestApplication();
                 SynchronizationContext.SetSynchronizationContext(new System.Windows.Threading.DispatcherSynchronizationContext());
                 var xml = new XmlDocument();
                 xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
                 string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
                     .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
-                    .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
+                    .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"")
+                    .Replace("clr-namespace:KillerFamily.Controls\"", "clr-namespace:KillerFamily.Controls;assembly=KillerScan\"");
                 var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
                 context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
                 context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
@@ -510,7 +585,7 @@ internal static class Program
                     "About update button is the family outline button");
                 var confirmXml = new XmlDocument();
                 confirmXml.Load(Path.Combine(directory.FullName, "Controls", "ConfirmDialog.xaml"));
-                Require(confirmXml.OuterXml.Contains("Background=\"{DynamicResource InputDialogTitleBrush}\"") &&
+                Require(confirmXml.OuterXml.Contains("Background=\"{DynamicResource DialogTitleBarBrush}\"") &&
                     confirmXml.OuterXml.Contains("Style=\"{StaticResource OverlayCloseButton}\"") &&
                     confirmXml.OuterXml.Contains("BorderThickness=\"{DynamicResource FrameOuterLightThickness}\""),
                     "98SE confirmation dialogs use the themed caption, close control, and bevel");
@@ -605,7 +680,8 @@ internal static class Program
                     (Action<Exception>)(ex => throw new InvalidOperationException("Shell launch failed", ex)));
                 var windowType = assembly.GetType("KillerScan.Shell.MainWindow", true)!;
                 string promptArgs = (string)windowType.GetMethod("PromptArgs", BindingFlags.Static | BindingFlags.NonPublic)!
-                    .Invoke(null, new[] { terminalType.GetProperty("ManagedShellSetup")!.GetValue(terminal) })!;
+                    .Invoke(null, new[] { terminalType.GetProperty("ManagedShellSetup")!.GetValue(terminal),
+                        terminalType.GetProperty("PromptToken", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(terminal) })!;
                 string palettePath = (string)windowType.GetProperty("PromptPalettePath", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
                 var primary = ((SolidColorBrush)app.FindResource("PrimaryBrush")).Color;
                 Require(File.ReadAllText(palettePath).Contains($"ACCENT=#{primary.R:X2}{primary.G:X2}{primary.B:X2}"),
@@ -864,6 +940,31 @@ internal static class Program
             "Phase completion updates carry final measured counts");
     }
 
+    private static async Task LoopbackHeaders()
+    {
+        for (int attempt = 0; attempt < 8; attempt++)
+        {
+            using var server = new LoopbackServer(Mode.SlowDownload);
+            using var stop = new CancellationTokenSource();
+            var options = Options(server);
+            options.MaximumStreams = 8;
+            options.Endpoint = new Uri(server.Endpoint, new string('p', 8192) + "/");
+            int samples = 0;
+            var progress = new CallbackProgress(update =>
+            {
+                if (update.Phase == SpeedTestPhase.IdleLatency) { samples++; stop.Cancel(); }
+            });
+            try
+            {
+                await new SpeedTestEngine().RunAsync(options, progress, stop.Token);
+                throw new InvalidOperationException("Idle cancellation returned a result.");
+            }
+            catch (OperationCanceledException)
+            { Require(samples == 1, "Preflight and its reused idle response complete within the unchanged request timeout."); }
+        }
+        Console.WriteLine("PASS: buffered loopback acquisition handles long bounded headers and connection reuse.");
+    }
+
     private static async Task AdaptiveCancel()
     {
         using var server = new LoopbackServer(Mode.SlowDownload);
@@ -954,10 +1055,23 @@ internal static class Program
         Require(result.Download.StreamCount == 4, "Four concurrent streams used");
     }
 
-    private static async Task Reject(Mode mode, SpeedTestFailureKind expected)
+    private static async Task RejectedAckDetail()
+    {
+        var ex = await Reject(Mode.WrongAck, SpeedTestFailureKind.InvalidResponse);
+        Require(ex.Message.Contains("HTTP 200") && ex.Message.Contains("application/json") && ex.Message.Contains("{\"bytes\":"),
+            "Acknowledgment failure names status, content type and body: " + ex.Message);
+        ex = await Reject(Mode.HtmlAck, SpeedTestFailureKind.InvalidResponse);
+        Require(ex.Message.Contains("text/html") && ex.Message.Contains("<html>blocked</html>") && !ex.Message.Contains("\n"),
+            "Non-JSON acknowledgment names content type and a single-line body: " + ex.Message);
+    }
+
+    private static async Task<SpeedTestException> Reject(Mode mode, SpeedTestFailureKind expected)
     {
         using var server = new LoopbackServer(mode);
         var options = Options(server);
+        var clock = Stopwatch.StartNew();
+        var phases = new ConcurrentDictionary<SpeedTestPhase, long>();
+        var progress = new CallbackProgress(value => phases.TryAdd(value.Phase, clock.ElapsedMilliseconds));
         if (mode == Mode.LoadedRate)
         {
             options.ByteBudgetPerPhase = 16 * 1024 * 1024;
@@ -965,10 +1079,17 @@ internal static class Program
         }
         try
         {
-            await new SpeedTestEngine().RunAsync(options, null, CancellationToken.None);
+            await new SpeedTestEngine().RunAsync(options, progress, CancellationToken.None);
             throw new InvalidOperationException("Invalid endpoint response was accepted: " + mode);
         }
-        catch (SpeedTestException ex) { Require(ex.Kind == expected, mode + " returned " + ex.Kind + " instead of " + expected); }
+        catch (SpeedTestException ex)
+        {
+            Require(ex.Kind == expected, mode + " returned " + ex.Kind + " instead of " + expected
+                + "; elapsedMs=" + clock.ElapsedMilliseconds + "; phases="
+                + string.Join(",", phases.OrderBy(pair => pair.Value).Select(pair => pair.Key + "@" + pair.Value))
+                + "; requests=" + string.Join(",", server.Requests));
+            return ex;
+        }
     }
 
     private static async Task Timeout()
@@ -1022,7 +1143,7 @@ internal static class Program
     }
 
     private enum Mode { Normal, SlowDownload, SharedDownload, WrongAck, StringAck, ShortDownload, Compressed, RateLimited, Unavailable, Stall, NoPayload, NoAck,
-        FirstRetry, RepeatedRetry, LongRetry, MeasuredRate, LoadedRate }
+        FirstRetry, RepeatedRetry, LongRetry, MeasuredRate, LoadedRate, Challenge, HtmlAck }
 
     private sealed class LoopbackServer : IDisposable
     {
@@ -1066,7 +1187,7 @@ internal static class Program
             catch (SocketException) when (_stop.IsCancellationRequested) { }
         }
 
-        private static async Task<string?> HeaderAsync(NetworkStream stream, CancellationToken token)
+        private static async Task<string?> HeaderAsync(Stream stream, CancellationToken token)
         {
             var data = new List<byte>();
             var next = new byte[1];
@@ -1088,10 +1209,12 @@ internal static class Program
                 try
                 {
                     var stream = client.GetStream();
+                    // Buffer reads only. Uploads must consume any bytes prefetched with their headers.
+                    using var input = new BufferedStream(stream, 8192);
                     var buffer = new byte[4096];
                     while (!_stop.IsCancellationRequested)
                     {
-                        var header = await HeaderAsync(stream, _stop.Token);
+                        var header = await HeaderAsync(input, _stop.Token);
                         if (header == null) return;
                         var lines = header.Split(new[] { "\r\n" }, StringSplitOptions.None);
                         var parts = lines[0].Split(' ');
@@ -1124,16 +1247,24 @@ internal static class Program
                             int remaining = int.Parse(contentLength.Substring(contentLength.IndexOf(':') + 1).Trim(), CultureInfo.InvariantCulture);
                             while (remaining > 0)
                             {
-                                int read = await stream.ReadAsync(buffer, 0, Math.Min(buffer.Length, remaining), _stop.Token);
+                                int read = await input.ReadAsync(buffer, 0, Math.Min(buffer.Length, remaining), _stop.Token);
                                 if (read == 0) return;
                                 remaining -= read;
                                 Interlocked.Add(ref _uploadBytes, read);
                             }
                             if (_mode == Mode.NoAck) { await Task.Delay(3000, _stop.Token); return; }
+                            if (_mode == Mode.Challenge || _mode == Mode.HtmlAck)
+                            {
+                                byte[] page = Encoding.UTF8.GetBytes("<html>blocked</html>\n");
+                                await WriteHeader(stream, _mode == Mode.Challenge ? "403 Forbidden" : "200 OK", page.Length,
+                                    "Content-Type: text/html; charset=UTF-8\r\n" + (_mode == Mode.Challenge ? "cf-mitigated: challenge\r\n" : ""));
+                                await stream.WriteAsync(page, 0, page.Length, _stop.Token);
+                                continue;
+                            }
                             string json = _mode == Mode.StringAck ? "{\"bytes\":\"wrong\"}" :
                                 "{\"bytes\":" + (_mode == Mode.WrongAck ? requested + 1 : requested) + "}";
                             byte[] response = Encoding.UTF8.GetBytes(json);
-                            await WriteHeader(stream, "200 OK", response.Length);
+                            await WriteHeader(stream, "200 OK", response.Length, "Content-Type: application/json; charset=utf-8\r\n");
                             await stream.WriteAsync(response, 0, response.Length, _stop.Token);
                         }
                         else

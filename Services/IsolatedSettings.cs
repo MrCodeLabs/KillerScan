@@ -17,9 +17,10 @@ namespace KillerScan.Services
         {
             lock (Gate)
             {
+                using var lease = ProfileLock.Acquire("IsolatedSettings", FilePath, TimeSpan.FromSeconds(10), "Settings are busy in another process.");
                 var values = Read();
                 if (value == null) values.Remove(name); else values[name] = value;
-                LocationCatalog.WriteAtomic(FilePath, JsonSerializer.Serialize(values));
+                DevelopmentData.WriteAtomic(FilePath, JsonSerializer.Serialize(values));
             }
         }
     }

@@ -1,0 +1,292 @@
+using System.IO;
+
+namespace KillerScan.Services
+{
+    /// <summary>
+    /// The app's Locations: the catalog, one shared data set per open Location (so two tabs on
+    /// the same site see each other's changes), and the Location a new tab starts in.
+    /// </summary>
+    internal static class LocationService
+    {
+        /// <summary>Where Locations live. Isolated tests point it at a scratch folder before loading.</summary>
+        internal static string Root { get; set; } = Path.Combine(DevelopmentData.Root);
+        private static LocationCatalog? _catalog;
+        private static LocationData? _fallback;
+        private static readonly List<LocationInfo> DemoLocations = [];
+        private static readonly Dictionary<string, LocationData> Open = new(StringComparer.Ordinal);
+
+        /// <summary>False until <see cref="Load"/> runs. Hosts that never load keep the app-wide stores.</summary>
+        public static bool Loaded { get; private set; }
+
+        /// <summary>Why the catalog is unavailable. The original app-wide files stay in use meanwhile.</summary>
+        public static string? LoadError => _catalog?.LoadError;
+        public static string? SaveError => _catalog?.SaveError;
+
+        /// <summary>Every Location, or just the original data as Unassigned when the catalog is unavailable.</summary>
+        public static IReadOnlyList<LocationInfo> Items =>
+            DemoData.Enabled ? DemoLocations : _fallback?.Info is { } fallback ? [fallback] : _catalog?.Items ?? [];
+
+        public static event EventHandler? Changed;
+
+        private static string _unassignedName = string.Empty;
+
+        public static void Load(string unassignedName)
+        {
+            _unassignedName = unassignedName;
+            Open.Clear();
+            DemoLocations.Clear();
+            _fallback = null;
+            Loaded = true;
+            if (DemoData.Enabled)
+            {
+                // Demo mode never creates or migrates real Locations.
+                _catalog = null;
+                foreach (var profile in DemoData.Profiles())
+                {
+                    var info = new LocationInfo
+                    {
+                        Id = "demo-" + DemoLocations.Count, Name = profile.Name,
+                        LastTargets = profile.Target, Icon = "office"
+                    };
+                    DemoLocations.Add(info);
+                    var data = LocationData.Demo(info);
+                    data.SavedScans.Save(profile);
+                    Open[info.Id] = data;
+                }
+                return;
+            }
+            _catalog = new LocationCatalog(Root);
+            _catalog.Load(unassignedName);
+            // Another window replacing the catalog can make one read fail; a moment later it reads.
+            for (int retry = 0; retry < 3 && _catalog.LoadError != null && _catalog.Published; retry++)
+            {
+                System.Threading.Thread.Sleep(150);
+                _catalog.Load(unassignedName);
+            }
+            if (_catalog.LoadError == null) { MigrateSavedScans(); ForgetLearnedGateways(); return; }
+            if (_catalog.Published)
+            {
+                // After migration the app-wide files are a stale backup, so writing there would
+                // split a site's data in two. Until the catalog reads again, scans are Temporary:
+                // nothing is read or saved, and LoadError says why.
+                _fallback = LocationData.Temporary();
+                return;
+            }
+            // Migration has not happened yet: the app-wide files are still the live data.
+            _fallback = LocationData.Shared(new LocationInfo { Id = LocationCatalog.UnassignedId, Name = unassignedName });
+            DevicePreferences.Load(); DeviceOverrides.Load(); DeviceLogins.Load(); ScanProfiles.Load(); ScanHistory.Load();
+        }
+
+        /// <summary>
+        /// Scan profiles from before Locations: the app-wide profiles.json, which the catalog's own
+        /// first-run migration moves into Unassigned. A profile is a saved scan (a target and its
+        /// settings), so each one becomes a saved scan, keeping its name, inside one Location named
+        /// "Saved scans" (localized), from where the user drags each to its real Location. It is
+        /// removed from Unassigned only once it is saved there; with none left this does nothing,
+        /// and no empty Location is made.
+        /// </summary>
+        private const string ImportedScansSetting = "ImportedScansLocation";
+
+        /// <summary>The Location the old scan profiles were migrated into.</summary>
+        internal static bool IsImportedScans(LocationInfo info) => App.GetSetting(ImportedScansSetting) == info.Id;
+
+        /// <summary>
+        /// Deletes the migrated "Saved scans" Location once its last saved scan has been moved out
+        /// or deleted: it is a holding pen, not a place. Through the normal delete, so its folder
+        /// is kept in the Locations "deleted" folder.
+        /// </summary>
+        internal static bool RetireImportedScansIfEmpty()
+        {
+            if (!Editable || Items.FirstOrDefault(IsImportedScans) is not { } held) return false;
+            if (Get(held).SavedScans.Items.Count > 0) return false;
+            if (!Delete(held, out _)) return false;
+            App.SetSetting(ImportedScansSetting, string.Empty);
+            return true;
+        }
+
+        private static void MigrateSavedScans()
+        {
+            if (ForkCompatibility.SelectedLocation(Root) != null) return; // Root files are preserved backups from the fork migration.
+
+            if (!Editable) return;
+            if (Items.FirstOrDefault(item => item.Id == LocationCatalog.UnassignedId) is not { } unassigned) return;
+            var source = Get(unassigned).SavedScans;
+            var old = source.Items.Where(scan => scan.Target.Trim().Length > 0).ToList();
+            if (old.Count == 0) return;
+            string name = System.Windows.Application.Current?.TryFindResource("Str_Loc_ImportedScans") as string ?? "Saved scans";
+            // By the id an earlier pass remembered, never by name: a Location the user made and
+            // happened to call "Saved scans" must not become the holding pen.
+            string? heldId = App.GetSetting(ImportedScansSetting);
+            var home = string.IsNullOrEmpty(heldId) ? null : Items.FirstOrDefault(item => item.Id == heldId);
+            if (home == null && (!Create(name, out home) || home == null)) return;
+            // Remembered by id (a rename keeps it): this holding Location never learns a router,
+            // since it mixes every old site (IsImportedScans).
+            App.SetSetting(ImportedScansSetting, home.Id);
+            var target = Get(home).SavedScans;
+            foreach (var scan in old)
+            {
+                string label = scan.Name.Trim().Length > 0 ? scan.Name.Trim() : scan.Target.Trim();
+                // Names can meet once trimmed ("Office" and "Office "), and a save over a taken
+                // name would replace that scan, so a later one gets a number instead.
+                string unique = label;
+                for (int n = 2; target.Items.Any(item => string.Equals(item.Name, unique, StringComparison.OrdinalIgnoreCase)); n++)
+                    unique = label + " (" + n.ToString(System.Globalization.CultureInfo.CurrentCulture) + ")";
+                var moved = new ScanProfile
+                {
+                    Name = unique, Target = scan.Target.Trim(), Options = scan.Options ?? new ScanOptions(),
+                    DeepScanAfter = scan.DeepScanAfter, Adapter = scan.Adapter ?? string.Empty
+                };
+                if (target.Save(moved)) source.Delete(scan);
+            }
+        }
+
+        /// <summary>
+        /// Once: clears every gateway Locations learned from runs that merely finished there. From
+        /// 2026-10-26 a Location learns a gateway only from a saved scan, so the old ones (Home
+        /// "knowing" a router nobody saved there) were never the user's choice.
+        /// </summary>
+        private static void ForgetLearnedGateways()
+        {
+            if (!Editable || App.GetSetting("GatewaysFromSavesOnly") == "1") return;
+            bool cleared = true;
+            foreach (var item in Items.Where(item => item.GatewayMacs.Count > 0).ToList())
+                cleared &= _catalog!.ClearGatewayMacs(item.Id);
+            // A clear that failed (busy catalog, write error) is tried again on the next start.
+            if (cleared) App.SetSetting("GatewaysFromSavesOnly", "1");
+        }
+
+        /// <summary>The data for a Location, shared by every tab that has it open.</summary>
+        public static LocationData Get(LocationInfo info)
+        {
+            if (DemoData.Enabled && Open.TryGetValue(info.Id, out var demo)) return demo;
+            if (_fallback != null) return _fallback;
+            if (!Loaded || _catalog == null) return LocationData.Shared(info);
+            if (!Open.TryGetValue(info.Id, out var data))
+                Open[info.Id] = data = _catalog.Open(info);
+            return data;
+        }
+
+        /// <summary>
+        /// Where a new tab starts: the last Location used, then Unassigned, which only an upgraded
+        /// install has. A fresh install has neither and starts as a Temporary scan, which saves
+        /// nothing and says so. Hosts that never loaded Locations get the app-wide stores, as
+        /// before Locations existed.
+        /// </summary>
+        public static LocationData Initial()
+        {
+            if (!Loaded) return LocationData.Shared();
+            if (DemoData.Enabled) return DemoLocations.Count > 0 ? Get(DemoLocations[0]) : LocationData.Shared();
+            string? last = App.GetSetting("LastLocation") ?? ForkCompatibility.SelectedLocation(Root);
+            var info = Items.FirstOrDefault(item => item.Id == last)
+                ?? Items.FirstOrDefault(item => item.Id == LocationCatalog.UnassignedId);
+            return info == null ? LocationData.Temporary() : Get(info);
+        }
+
+        /// <summary>Remembers the Location picked most recently, for the next new tab.</summary>
+        public static void Remember(LocationData data)
+        {
+            if (!Loaded || DemoData.Enabled) return;
+            App.SetSetting("LastLocation", data.Info?.Id ?? string.Empty);
+        }
+
+        public static bool Create(string name, out LocationInfo? created)
+        {
+            created = null;
+            if (_catalog == null || _fallback != null) return false;
+            bool ok = _catalog.Create(name, out created);
+            if (ok) Changed?.Invoke(null, EventArgs.Empty);
+            return ok;
+        }
+
+        public static bool Delete(LocationInfo info, out string? kept)
+        {
+            kept = null;
+            if (!Editable || !_catalog!.Delete(info.Id, out kept)) return false;
+            Open.Remove(info.Id);
+            Changed?.Invoke(null, EventArgs.Empty);
+            return true;
+        }
+
+        /// <summary>
+        /// Drops a Location that something outside this process deleted: the catalog is read again,
+        /// so lists stop showing it, and its open data is released so nothing writes into it.
+        /// </summary>
+        public static void Forget(string id)
+        {
+            if (_catalog == null || _fallback != null) return;
+            _catalog.Load(_unassignedName);
+            Open.Remove(id);
+            Changed?.Invoke(null, EventArgs.Empty);
+        }
+
+        public static bool Rename(LocationInfo info, string name) => Notify(_catalog != null && _fallback == null && _catalog.Rename(info.Id, name));
+        public static bool SetNotes(LocationInfo info, string notes) => Notify(_catalog != null && _fallback == null && _catalog.SetNotes(info.Id, notes));
+        public static bool SetIcon(LocationInfo info, string icon) => Notify(_catalog != null && _fallback == null && _catalog.SetIcon(info.Id, icon));
+
+        /// <summary>Whether Locations can be created, renamed, exported and imported right now.</summary>
+        public static bool Editable => Loaded && !DemoData.Enabled && _catalog != null && _fallback == null && _catalog.LoadError == null;
+
+        /// <summary>What <see cref="Export"/> reads, taken on the UI thread so the file work can run
+        /// off it: the catalog entry as it is now and the Location's folder. Null when Locations are
+        /// unavailable.</summary>
+        public static (LocationInfo Info, string Directory)? ExportSource(LocationInfo info) =>
+            Editable ? (Find(info.Id) ?? info, _catalog!.DirectoryFor(info)) : null;
+
+        public static byte[]? Export(LocationInfo info, bool includeUsernames) =>
+            Editable ? LocationTransfer.Export(Find(info.Id) ?? info, _catalog!.DirectoryFor(info), includeUsernames) : null;
+
+        /// <summary>The file half of an import (read, check, stage), safe off the UI thread: it never
+        /// touches the catalog. <see cref="CommitImport"/> finishes it on the UI thread.</summary>
+        public static LocationTransfer.Prepared? PrepareImport(byte[] bytes, out string? error)
+        {
+            if (!Editable) { error = LoadError ?? "Locations are unavailable."; return null; }
+            return LocationTransfer.Prepare(_catalog!, bytes, out error);
+        }
+
+        /// <summary>Adds a prepared import to the catalog. UI thread only, like every catalog change.</summary>
+        public static bool CommitImport(LocationTransfer.Prepared prepared, out LocationInfo? imported, out string? error)
+        {
+            imported = null;
+            if (!Editable) { prepared.Dispose(); error = LoadError ?? "Locations are unavailable."; return false; }
+            bool ok = LocationTransfer.Commit(_catalog!, prepared, out imported, out error);
+            if (ok) Changed?.Invoke(null, EventArgs.Empty);
+            return ok;
+        }
+
+        public static void NotifyChanged() => Changed?.Invoke(null, EventArgs.Empty);
+
+        /// <summary>Records a gateway MAC seen by a completed scan in this Location.</summary>
+        public static void AddGatewayMac(LocationInfo info, string mac)
+        {
+            if (Editable) _catalog!.AddGatewayMac(info.Id, mac);
+        }
+
+        /// <summary>Remembers a Location's last targets and settings. Quiet: nothing on screen depends on it.</summary>
+        public static void SetLastUsed(LocationInfo info, string targets, ScanOptions options, string adapter = "")
+        {
+            if (_catalog != null && _fallback == null) _catalog.SetLastUsed(info.Id, targets, options, adapter);
+        }
+
+        private static bool Notify(bool changed)
+        {
+            if (changed) Changed?.Invoke(null, EventArgs.Empty);
+            return changed;
+        }
+
+        /// <summary>
+        /// Whether a Location is still in the catalog on disk, read afresh, so a change made by
+        /// another window since this process loaded is seen. A catalog that cannot be read
+        /// counts as still there, because nothing proves it was deleted.
+        /// </summary>
+        public static bool StillExists(string id)
+        {
+            if (!Loaded || DemoData.Enabled || _catalog == null || !_catalog.Published) return true;
+            var fresh = new LocationCatalog(Root);
+            fresh.Load(string.Empty);
+            return fresh.LoadError != null || fresh.Items.Any(item => item.Id == id);
+        }
+
+        /// <summary>The current catalog entry for an ID, after renames and reloads.</summary>
+        public static LocationInfo? Find(string id) => Items.FirstOrDefault(item => item.Id == id);
+    }
+}

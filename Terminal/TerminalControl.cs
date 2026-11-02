@@ -22,6 +22,7 @@ namespace KillerScan.Terminal
         private readonly TerminalBuffer _buf;
         private readonly VtParser _parser;
         private ConPtySession? _pty;
+        private TerminalInputWriter? _input;
         private TerminalPalette _palette;
 
         private readonly Queue<byte[]> _incoming = new();
@@ -198,6 +199,7 @@ namespace KillerScan.Terminal
             {
                 _pty = ConPtySession.Start(commandLine, workingDirectory,
                     (short)_buf.Cols, (short)_buf.Rows);
+                _input = new TerminalInputWriter(_pty.Input);
             }
             catch (Exception ex)
             {
@@ -311,7 +313,7 @@ namespace KillerScan.Terminal
             {
                 line.Clear();
                 foreach (var cell in _buf.LineAt(i))
-                    line.Append(cell.Ch == 0 ? ' ' : char.ConvertFromUtf32(cell.Ch));
+                    line.Append(cell.Text);
                 text.AppendLine(line.ToString().TrimEnd());
             }
             // A terminal is mostly empty space below the cursor; keep the transcript, drop the rest.
@@ -324,13 +326,22 @@ namespace KillerScan.Terminal
             if (IsManaged) { ManagedInput?.Invoke(s); return; }
             if (_pty == null || _pty.HasExited || string.IsNullOrEmpty(s)) return;
             if (s.Contains("\r") || s.Contains("\n") || s.Contains("\u0003")) _atPrompt = false;
-            try
-            {
-                var b = Encoding.UTF8.GetBytes(s);
-                _pty.Input.Write(b, 0, b.Length);
-                _pty.Input.Flush();
-            }
-            catch { /* the shell went away between keystroke and write */ }
+            // Written in the background and in order: a busy child that is not reading input can
+            // make each write wait, which on this thread froze the window during large pastes.
+            if (_input?.Enqueue(Encoding.UTF8.GetBytes(s)) == false) RefuseInput();
+        }
+
+        /// <summary>
+        /// Raised when input could not be queued, because the shell has not read what is already
+        /// waiting or a paste is larger than the queue holds. The input is not sent, so the host
+        /// says so instead of letting it vanish.
+        /// </summary>
+        public event Action? InputRefused;
+
+        private void RefuseInput()
+        {
+            System.Media.SystemSounds.Beep.Play();
+            InputRefused?.Invoke();
         }
 
         public void Stop() => Dispose();
@@ -348,10 +359,13 @@ namespace KillerScan.Terminal
             _pump?.Stop();
             _blink?.Stop();
             SelectionMouseUp();
+            _automationTimer?.Stop();
             Disposed?.Invoke();
             _bridge?.Dispose();
             ManagedInput = null;
             Disposed = null;
+            _input?.Dispose();
+            _input = null;
             var session = _pty;
             _pty = null;
             // Closing a pseudoconsole can block until its output is drained.
@@ -393,6 +407,7 @@ namespace KillerScan.Terminal
 
         protected override void OnRender(DrawingContext dc)
         {
+            QueueAutomationUpdate();
             _drawnVersion = _buf.Version;
 
             var rect = new Rect(0, 0, ActualWidth, ActualHeight);
@@ -470,7 +485,27 @@ namespace KillerScan.Terminal
             int c = 0;
             while (c < line.Length)
             {
-                if (line[c].Ch == 0 || line[c].Ch == ' ') { c++; continue; }
+                if (line[c].Ch <= 0 || (line[c].Ch == ' ' && line[c].Cluster == null)) { c++; continue; }
+
+                if (line[c].Cluster != null || line[c].Width == 2)
+                {
+                    var cell = line[c];
+                    double clusterX = c * _cellW, width = Math.Max(1, (int)cell.Width) * _cellW;
+                    var clusterBrush = new SolidColorBrush(CellFg(cell));
+                    if ((cell.Flags & CellFlags.Faint) != 0) clusterBrush.Opacity = 0.6;
+                    var typeface = new Typeface(new FontFamily(_fontFamily),
+                        (cell.Flags & CellFlags.Italic) != 0 ? FontStyles.Italic : FontStyles.Normal,
+                        (cell.Flags & CellFlags.Bold) != 0 ? FontWeights.Bold : FontWeights.Normal, FontStretches.Normal);
+                    var text = new FormattedText(cell.Text, System.Globalization.CultureInfo.InvariantCulture,
+                        FlowDirection.LeftToRight, typeface, _fontSize, clusterBrush, _pixelsPerDip);
+                    dc.PushClip(new RectangleGeometry(new Rect(clusterX, y, width, _cellH)));
+                    dc.DrawText(text, new Point(clusterX, y + _baseline - text.Baseline));
+                    if ((cell.Flags & CellFlags.Underline) != 0)
+                        dc.DrawRectangle(clusterBrush, null, new Rect(clusterX, y + _baseline + 1.5, width, 1));
+                    if ((cell.Flags & CellFlags.Strike) != 0)
+                        dc.DrawRectangle(clusterBrush, null, new Rect(clusterX, y + _baseline * 0.65, width, 1));
+                    dc.Pop(); c++; continue;
+                }
 
                 var fg = CellFg(line[c]);
                 var flags = line[c].Flags;
@@ -482,7 +517,8 @@ namespace KillerScan.Terminal
                 var indices = new List<ushort>();
                 var widths = new List<double>();
 
-                while (c < line.Length && line[c].Ch != 0 && line[c].Ch != ' '
+                while (c < line.Length && line[c].Ch > 0 && line[c].Ch != ' '
+                       && line[c].Cluster == null && line[c].Width != 2
                        && CellFg(line[c]) == fg && line[c].Flags == flags
                        && ReferenceEquals(FaceFor(gt, line[c].Ch), face)
 
@@ -549,6 +585,22 @@ namespace KillerScan.Terminal
 
         private static readonly Dictionary<int, GlyphTypeface?> _sysFaceCache = [];
 
+        // Every installed family's regular face, resolved once. Looking a codepoint up is then a map
+        // check per face rather than building a Typeface for every font, inside OnRender, each time
+        // output shows a codepoint not seen before.
+        private static readonly Lazy<List<(string Name, GlyphTypeface Face)>> _systemFaces = new(() =>
+        {
+            var faces = new List<(string, GlyphTypeface)>();
+            foreach (var fam in Fonts.SystemFontFamilies)
+                try
+                {
+                    if (new Typeface(fam, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal).TryGetGlyphTypeface(out var face))
+                        faces.Add((fam.Source ?? string.Empty, face));
+                }
+                catch { /* a face that will not resolve is just not a candidate */ }
+            return faces;
+        });
+
         private static GlyphTypeface? SystemFaceFor(int cp)
         {
             lock (_sysFaceCache)
@@ -560,13 +612,12 @@ namespace KillerScan.Terminal
                 if (cp is >= 0xE000 and <= 0xF8FF)
                 {
 
-                    foreach (var fam in Fonts.SystemFontFamilies)
+                    foreach (var (name, face) in _systemFaces.Value)
                     {
-                        string name = fam.Source ?? string.Empty;
                         if (name.IndexOf("Nerd Font", StringComparison.OrdinalIgnoreCase) < 0
                             && name.IndexOf("NerdFont", StringComparison.OrdinalIgnoreCase) < 0
                             && !name.EndsWith(" NF", StringComparison.OrdinalIgnoreCase)) continue;
-                        if (TryFaceFor(fam, cp, out found)) break;
+                        if (face.CharacterToGlyphMap.ContainsKey(cp)) { found = face; break; }
                     }
                 }
                 else
@@ -576,13 +627,18 @@ namespace KillerScan.Terminal
                         if (TryFaceFor(new FontFamily(name), cp, out found)) break;
 
                     if (found == null)
-                        foreach (var fam in Fonts.SystemFontFamilies)
-                            if (TryFaceFor(fam, cp, out found)) break;
+                        foreach (var (_, face) in _systemFaces.Value)
+                            if (face.CharacterToGlyphMap.ContainsKey(cp)) { found = face; break; }
                 }
             }
             catch { found = null; }
 
-            lock (_sysFaceCache) _sysFaceCache[cp] = found;
+            lock (_sysFaceCache)
+            {
+                // Bounded: output full of distinct rare codepoints must not grow it without end.
+                if (_sysFaceCache.Count >= 8192) _sysFaceCache.Clear();
+                _sysFaceCache[cp] = found;
+            }
             return found;
         }
 
@@ -616,20 +672,33 @@ namespace KillerScan.Terminal
         {
             if (!_buf.CursorVisible || !_cursorOn || _scroll != 0 || !IsKeyboardFocusWithin) return;
 
-            double x = _buf.CursorCol * _cellW;
+            var cursorLine = _buf.LineAt(_buf.ScrollbackCount + _buf.CursorRow);
+            int cursorColumn = _buf.CursorCol;
+            if (cursorLine[cursorColumn].Ch < 0 && cursorColumn > 0) cursorColumn--;
+            var cell = cursorLine[cursorColumn];
+            double cursorWidth = Math.Max(1, (int)cell.Width) * _cellW;
+            double x = cursorColumn * _cellW;
             double y = _buf.CursorRow * _cellH;
             var b = new SolidColorBrush(_palette.Cursor);
             b.Freeze();
 
             switch (_buf.CursorShape)
             {
-                case 1: dc.DrawRectangle(b, null, new Rect(x, y + _cellH - 2, _cellW, 2)); break;
+                case 1: dc.DrawRectangle(b, null, new Rect(x, y + _cellH - 2, cursorWidth, 2)); break;
                 case 2: dc.DrawRectangle(b, null, new Rect(x, y, 2, _cellH)); break;
                 default:
-                    dc.DrawRectangle(b, null, new Rect(x, y, _cellW, _cellH));
+                    dc.DrawRectangle(b, null, new Rect(x, y, cursorWidth, _cellH));
 
-                    var cell = _buf.LineAt(_buf.ScrollbackCount + _buf.CursorRow)[_buf.CursorCol];
-                    if (cell.Ch != 0 && cell.Ch != ' ' && _glyphs != null)
+                    if ((cell.Cluster != null || cell.Width == 2) && cell.Ch > 0)
+                    {
+                        var text = new FormattedText(cell.Text, System.Globalization.CultureInfo.InvariantCulture,
+                            FlowDirection.LeftToRight, new Typeface(_fontFamily), _fontSize,
+                            new SolidColorBrush(_palette.Background), _pixelsPerDip);
+                        dc.PushClip(new RectangleGeometry(new Rect(x, y, cursorWidth, _cellH)));
+                        dc.DrawText(text, new Point(x, y + _baseline - text.Baseline));
+                        dc.Pop();
+                    }
+                    else if (cell.Ch > 0 && cell.Ch != ' ' && _glyphs != null)
                     {
                         var face = FaceFor(_glyphs, cell.Ch);
                         if (face.CharacterToGlyphMap.TryGetValue(cell.Ch, out ushort gi))
@@ -861,15 +930,29 @@ namespace KillerScan.Terminal
             return null;
         }
 
+        private bool ConfirmMultiLinePaste(string text)
+        {
+            string Loc(string key, string fallback) => TryFindResource(key) as string ?? fallback;
+            int lines = text.Replace("\r\n", "\n").TrimEnd('\n', '\r').Split('\n', '\r').Length;
+            var dialog = new KillerScan.Controls.ConfirmDialog(Loc("Str_Term_PasteTitle", "Paste several lines?"),
+                string.Format(Loc("Str_Term_PasteDetail", "This text has {0} lines. Pasted here, each line runs as soon as it arrives."), Math.Max(2, lines)),
+                Loc("Str_Term_Paste", "Paste"), Loc("Str_Btn_Cancel", "Cancel")) { Owner = Window.GetWindow(this) };
+            dialog.ShowDialog();
+            return dialog.Confirmed;
+        }
+
         private void Paste()
         {
             try
             {
                 if (!Clipboard.ContainsText()) return;
 
-                string text = Clipboard.GetText().Replace("\r\n", "\r").Replace('\n', '\r');
-
-                Send(_buf.BracketedPaste ? Csi + "200~" + text + Csi + "201~" : text);
+                string text = Clipboard.GetText();
+                // Without bracketed paste every line break is Enter, so several lines would run at
+                // once, unseen. Asked first, as Windows Terminal does.
+                if (!_buf.BracketedPaste && text.IndexOfAny(['\r', '\n']) >= 0 && !ConfirmMultiLinePaste(text)) return;
+                string framed = TerminalPaste.Frame(text, _buf.BracketedPaste);
+                if (framed.Length > 0) Send(framed);
                 _scroll = 0;
             }
             catch { /* another app holding the clipboard is not our problem */ }

@@ -73,7 +73,7 @@ internal static class HomeAssistantText
         (HomeAssistantAdvisor.Best(advice) ?? HomeAssistantAdvisor.ResearchChoice(advice)) is { } selected &&
         (selected.Basis == "Research" || selected.Requirements.Contains("CommunitySource")) ? L("ResearchNext") : L("Next");
     internal static string Reason(HomeAssistantAdvice advice) => L(HomeAssistantAdvisor.ChoiceReason(advice));
-    internal static string Time(DateTimeOffset? time) => time?.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'", CultureInfo.InvariantCulture) ?? AccessText.L("NoTime");
+    internal static string Time(DateTimeOffset? time) => time?.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'", CultureInfo.InvariantCulture) ?? Application.Current?.TryFindResource("Str_Access_NoTime") as string ?? "Unknown";
     internal static string Describe(NetworkDevice device, HomeAssistantAdvice advice, HomeAssistantContext? context = null)
     {
         var text = new StringBuilder().AppendLine(L("Title")).AppendLine(device.IpAddress + "  " + device.Hostname)
@@ -105,10 +105,9 @@ internal static class HomeAssistantText
         return text.AppendLine(HomeAssistantAdvisor.CatalogueUrl).ToString();
     }
     internal static NetworkDevice FromHistory(HistoricalDevice device) => new()
-    { IpAddress = device.IpAddress, Hostname = device.Hostname, Vendor = device.Vendor, DeviceType = device.DeviceType,
-        OpenPorts = [.. device.OpenPorts], Identification = device.Identification, HomeAssistant = device.HomeAssistant };
-    internal static NetworkDevice Freeze(NetworkDevice device) => new()
-    { IpAddress = device.IpAddress, Hostname = device.Hostname, Vendor = device.Vendor, DeviceType = device.DeviceType, OpenPorts = [.. device.OpenPorts], Identification = device.Identification?.Snapshot(),
-        HomeAssistant = device.HomeAssistant?.Snapshot(), HttpTitle = device.HttpTitle, HttpServer = device.HttpServer,
-        SnmpDescr = device.SnmpDescr, SsdpServer = device.SsdpServer, MdnsServices = [.. device.MdnsServices] };
+    { IpAddress = device.IpAddress, Hostname = device.Hostname, MacAddress = device.MacAddress,
+      Vendor = device.Vendor, DeviceType = device.DeviceType, OpenPorts = [.. device.OpenPorts],
+      Recognition = device.Recognition, Access = device.Access, Identification = device.Identification, HomeAssistant = device.HomeAssistant };
+    internal static NetworkDevice Freeze(NetworkDevice device) => System.Text.Json.JsonSerializer.Deserialize<NetworkDevice>(
+        System.Text.Json.JsonSerializer.Serialize(device))!;
 }

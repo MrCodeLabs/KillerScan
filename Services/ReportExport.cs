@@ -22,10 +22,21 @@ namespace KillerScan.Services
     /// </summary>
     internal static class ReportExport
     {
-        /// <summary>Where the report loads its wordmark from: the same per-theme and per-accent SVGs
-        /// the website uses. The report still works fully without them (text wordmark fallback), so
-        /// they can fail to load safely.</summary>
-        private const string LogoBase = "https://killerscan.net/brand/killerscan-logo-";
+        /// <summary>The report's logo, carried inside the report so opening one contacts nothing.
+        /// One copy of the website's artwork with its colors as CSS variables (--lg0 to --lg4);
+        /// ReportLogoColors holds each theme and accent's colors. Both come from
+        /// tools\Build-ReportLogo.ps1. Empty if the resource is missing, which leaves the text
+        /// wordmark.</summary>
+        private static readonly Lazy<string> LogoSvg = new(() =>
+        {
+            using var stream = typeof(ReportExport).Assembly.GetManifestResourceStream("KillerScan.ReportLogo.svg");
+            if (stream == null) return string.Empty;
+            using var reader = new System.IO.StreamReader(stream);
+            return reader.ReadToEnd().Trim();
+        });
+
+        private static string LogoTable() => "{" + string.Join(",", ReportLogoColors.Variants.Select(v =>
+            "'" + v.Key + "':[" + string.Join(",", v.Value.Select(c => "'" + c + "'")) + "]")) + "}";
 
         /// <summary>Comma-separated devices, IP-ordered, every field quoted.</summary>
         /// <summary>Resource lookup that survives having no Application - the CLI builds reports
@@ -35,8 +46,21 @@ namespace KillerScan.Services
             System.Windows.Application.Current?.TryFindResource(key) as string ?? fallback;
 
         /// <summary>L, escaped to sit inside a single-quoted JavaScript string literal.</summary>
-        private static string Ljs(string key, string fallback) =>
-            L(key, fallback).Replace("\\", "\\\\").Replace("'", "\\'");
+        private static string Ljs(string key, string fallback)
+        {
+            // A translation can come from a --lang-file, so every character that could end the
+            // string or the script element (quotes, backslash, < > &, line breaks, U+2028/9 and
+            // other controls) is written as a \u escape.
+            string text = L(key, fallback);
+            var sb = new StringBuilder(text.Length);
+            foreach (char c in text)
+            {
+                if (c < 0x20 || c is '\\' or '\'' or '"' or '<' or '>' or '&' or '\u007f' || c == (char)0x2028 || c == (char)0x2029)
+                    sb.Append("\\u").Append(((int)c).ToString("x4", System.Globalization.CultureInfo.InvariantCulture));
+                else sb.Append(c);
+            }
+            return sb.ToString();
+        }
 
         internal static string SpreadsheetSafeValue(string? value)
         {
@@ -55,18 +79,24 @@ namespace KillerScan.Services
         internal static string CsvField(string? value) =>
             "\"" + SpreadsheetSafeValue(value).Replace("\"", "\"\"") + "\"";
 
-        internal static string BuildCsv(IEnumerable<NetworkDevice> devices) => BuildLocationCsv(devices, null);
+        internal const string CsvHeader = "IP Address,Hostname,MAC Address,Vendor,Type,Open Ports,Confidence,Evidence,Access,Recognition confidence,Reported model,Identification JSON,Access JSON,Home Assistant JSON,Location ID,Location";
 
-        internal static string BuildLocationCsv(IEnumerable<NetworkDevice> devices, ScanLocation? location, bool header = true)
+        internal static string?[] CsvValues(NetworkDevice device) =>
+            [device.IpAddress, device.Hostname, device.MacAddress, device.Vendor, device.DeviceType, device.OpenPortsDisplay,
+                device.Recognition?.Confidence.ToString(), RecognitionText.Csv(device.Recognition), AccessWording.Csv(device),
+                device.Identification?.EffectiveConfidence, device.Identification?.ReportedModel,
+                device.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Identification),
+                device.Access == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Access),
+                device.HomeAssistant == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.HomeAssistant), device.LocationId, device.LocationName];
+
+        internal static string BuildCsv(IEnumerable<NetworkDevice> devices)
         {
             var sb = new StringBuilder();
-            if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports" + (location == null ? "" : ",Location ID,Location") + ",Recognition confidence,Reported model,Identification JSON,Access JSON,Home Assistant JSON");
+            // Confidence, Evidence and Access come last, so scripts that read the first six
+            // columns by position keep working.
+            sb.AppendLine(CsvHeader);
             foreach (var d in devices.OrderBy(d => d.IpSortKey))
-                sb.AppendLine(string.Join(",", CsvField(d.IpAddress), CsvField(d.Hostname),
-                    CsvField(d.MacAddress), CsvField(d.Vendor), CsvField(d.DeviceType), CsvField(d.OpenPortsDisplay)) +
-                    (location == null ? "" : "," + CsvField(location.Id) + "," + CsvField(location.Name)) + "," +
-                    CsvField(d.Identification?.EffectiveConfidence) + "," + CsvField(d.Identification?.ReportedModel) + "," +
-                    CsvField(d.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(d.Identification)) + "," + CsvField(System.Text.Json.JsonSerializer.Serialize(DeviceAccess.ForDevice(d))) + "," + CsvField(System.Text.Json.JsonSerializer.Serialize(HomeAssistantAdvisor.ForDevice(d))));
+                sb.AppendLine(string.Join(",", CsvValues(d).Select(CsvField)));
             return sb.ToString();
         }
 
@@ -75,19 +105,23 @@ namespace KillerScan.Services
         /// click-to-sort columns. <paramref name="themeKey"/> is the theme the report opens in,
         /// lower-case ("dark", "black", ...); every app palette is embedded either way.
         /// </summary>
-        internal static string BuildHtml(IEnumerable<NetworkDevice> devices, string subnetText, string themeKey) =>
-            BuildLocationHtml(devices, subnetText, themeKey, null);
+        internal static string BuildHtml(IEnumerable<NetworkDevice> devices, string subnetText, string themeKey)
+            => BuildSnapshotHtml(devices, subnetText, themeKey, DateTimeOffset.Now, ScanCompletion.Complete);
 
-        internal static string BuildLocationHtml(IEnumerable<NetworkDevice> devices, string subnetText, string themeKey, ScanLocation? location)
+        internal static string BuildSnapshotHtml(IEnumerable<NetworkDevice> devices, string subnetText, string themeKey,
+            DateTimeOffset scannedAt, ScanCompletion completion, KillerScan.Models.ScanRefresh? refresh = null,
+            string location = "", string adapter = "")
         {
             string current = string.IsNullOrEmpty(themeKey) ? "dark" : themeKey.ToLowerInvariant();
             var list = devices.OrderBy(d => d.IpSortKey).ToList();
             var sb = new StringBuilder();
 
             sb.AppendLine("<!DOCTYPE html>");
+            // The report is written in the app's language, so it says so for screen readers,
+            // spell checkers and translation tools.
             sb.AppendLine($"<html lang='{Esc(LocaleManager.LanguageTag)}' class='theme-{current}'><head><meta charset='utf-8'/>");
             sb.AppendLine("<meta name='viewport' content='width=device-width, initial-scale=1'/>");
-            sb.AppendLine($"<title>KillerScan - {Esc(L("Str_Filter_Html", "HTML Report"))}</title>");
+            sb.AppendLine($"<title>{Esc(L("Str_Rep_Title", "KillerScan Report"))}</title>");
             sb.AppendLine("<style>");
 
             // Per-theme variable blocks (built without string interpolation to avoid brace escaping).
@@ -115,7 +149,7 @@ namespace KillerScan.Services
             sb.AppendLine(".wrap{max-width:1100px;margin:0 auto}");
             sb.AppendLine(".topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px}");
             sb.AppendLine(".brand{display:flex;align-items:center;gap:10px;min-height:38px}");
-            sb.AppendLine(".logo{height:36px;display:block}");
+            sb.AppendLine(".logo svg{height:36px;width:auto;display:block}.logo.noshadow .lgshadow{filter:none}.logo.nooutline .lgoutline{display:none}");
             sb.AppendLine(".wordmark{font-family:Consolas,'Courier New',monospace;font-size:27px;font-weight:700;letter-spacing:.5px}");
             sb.AppendLine(".wordmark .k{color:var(--text)}.wordmark .s{color:var(--accent)}");
             sb.AppendLine(".switchers{display:flex;flex-direction:column;gap:6px;align-items:flex-end}");
@@ -143,9 +177,10 @@ namespace KillerScan.Services
             sb.AppendLine("@media(max-width:640px){body{padding:12px}.wordmark{font-size:22px}th,td{padding:8px 10px;font-size:12px}}");
             sb.AppendLine("</style></head><body><div class='wrap'>");
 
-            // Header: logo (if hosted) falls back to a Consolas wordmark - Killer in text color, Scan in accent.
+            // Header: the embedded logo in the theme's colors, or the Consolas wordmark (Killer in text color,
+            // Scan in accent) for a theme without one, such as 98SE.
             sb.AppendLine("<div class='topbar'><div class='brand'>");
-            sb.AppendLine("<img id='logo' class='logo' alt='KillerScan' style='display:none' onload=\"this.style.display='';document.getElementById('wm').style.display='none'\" onerror=\"this.style.display='none';document.getElementById('wm').style.display=''\"/>");
+            sb.AppendLine("<span id='logo' class='logo' style='display:none'>" + LogoSvg.Value + "</span>");
             sb.AppendLine("<span id='wm' class='wordmark'><span class='k'>Killer</span><span class='s'>Scan</span></span>");
             sb.AppendLine("</div><div class='switchers'>");
             sb.AppendLine($"<div class='swrow'><span class='swlabel'>{Esc(L("Str_Rep_Theme", "Theme"))}</span><div class='themesw' id='themesw'></div></div>");
@@ -154,10 +189,26 @@ namespace KillerScan.Services
 
             // Three separate words rather than one sentence with the values substituted in: the
             // bold values sit between them, so a language that reorders the clause still gets to.
-            sb.AppendLine($"<p class='meta'>{Esc(L("Str_Rep_Subnet", "Subnet"))} <b>{Esc(subnetText)}</b> &middot; {Esc(L("Str_Rep_Scanned", "Scanned"))} <b>{DateTime.Now:yyyy-MM-dd HH:mm}</b> &middot; {Esc(L("Str_View_Devices", "Devices"))}: <b>{list.Count}</b></p>");
+            string state = completion switch
+            {
+                ScanCompletion.Canceled => L("Str_St_ScanCanceled", "Scan canceled"),
+                ScanCompletion.Partial => L("Str_History_Partial", "Partial scan"),
+                _ => string.Empty
+            };
+            string status = state.Length == 0 ? string.Empty : " &middot; <b>" + Esc(state) + "</b>";
+            // Where the scan was run from, so a ticket shows which site and which network card.
+            if (location.Length > 0) status += $" &middot; {Esc(L("Str_Rep_Location", "Location"))} <b>{Esc(location)}</b>";
+            if (adapter.Length > 0) status += $" &middot; {Esc(L("Str_Rep_Adapter", "Adapter"))} <b>{Esc(adapter)}</b>";
+            // Manual rescans changed some rows after the scan time above, so say when and how many.
+            if (refresh != null)
+            {
+                status += $" &middot; {Esc(L("Str_Rep_Refreshed", "Refreshed later"))} <b>{refresh.At:yyyy-MM-dd HH:mm}</b>" +
+                    $" &middot; <b>{refresh.Refreshed}</b> {Esc(L("Str_Rep_Devices", "devices"))}";
+                if (refresh.Partial) status += " &middot; <b>" + Esc(L("Str_Rep_RefreshPartial", "Partial refresh")) + "</b>";
+            }
+            sb.AppendLine($"<p class='meta'>{Esc(L("Str_Rep_Subnet", "Subnet"))} <b>{Esc(subnetText)}</b> &middot; {Esc(L("Str_Rep_Scanned", "Scanned"))} <b>{scannedAt:yyyy-MM-dd HH:mm}</b> &middot; <b>{list.Count}</b> {Esc(L("Str_Rep_Devices", "devices"))}{status}</p>");
 
             // The report's headers reuse the grid's own column keys, so the two never disagree.
-            if (location != null) sb.AppendLine($"<p class='meta'>{Esc(L("Str_Location_Title", "Location"))}: <b>{Esc(location.Name)}</b> ({Esc(location.Id)})</p>");
             sb.AppendLine("<div class='tablewrap'><table id='tbl'><thead><tr>");
             // Each header holds a real button, so it takes keyboard focus and sorts on Enter and Space.
             sb.AppendLine($"<th data-type='num'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Ip", "IP Address"))} <span class='arrow' aria-hidden='true'></span></button></th>");
@@ -166,6 +217,7 @@ namespace KillerScan.Services
             sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Vendor", "Vendor"))} <span class='arrow' aria-hidden='true'></span></button></th>");
             sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Type", "Type"))} <span class='arrow' aria-hidden='true'></span></button></th>");
             sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(L("Str_Col_Ports", "Open Ports"))} <span class='arrow' aria-hidden='true'></span></button></th>");
+            sb.AppendLine($"<th data-type='text'><button type='button' class='sortbtn'>{Esc(HomeAssistantText.L("BestChoice"))} <span class='arrow' aria-hidden='true'></span></button></th>");
             sb.AppendLine("</tr></thead><tbody>");
             foreach (var d in list)
             {
@@ -178,12 +230,11 @@ namespace KillerScan.Services
                     $"<td class='vendor'>{Esc(d.Vendor)}</td>" +
                     // The CLASS above keeps the English slug (that is what the CSS matches); only
                     // the visible cell is translated.
-                    $"<td class='{cls}'>{Esc(Controls.DeviceTypeConverter.Display(d.DeviceType))}" +
-                    $"<details><summary>{Esc(L("Str_Evidence_Title", "Recognition evidence"))}: {Esc(IdentificationText.Confidence(d.Identification))}</summary>" +
-                    $"<pre style='white-space:pre-wrap'>{Esc(IdentificationText.Describe(d))}</pre></details>" +
-                    $"<details><summary>{Esc(AccessText.L("Title"))}</summary><pre style='white-space:pre-wrap'>{Esc(AccessText.DescribeDevice(d))}</pre></details>" +
-                    $"<details><summary>{Esc(HomeAssistantText.L("Title"))}</summary><pre style='white-space:pre-wrap'>{Esc(HomeAssistantText.Describe(d, HomeAssistantAdvisor.ForDevice(d)))}</pre></details></td>" +
-                    $"<td class='mono'>{Esc(d.OpenPortsDisplay)}</td></tr>");
+                    // Hovering the type shows the same evidence summary as the app's tooltip.
+                    $"<td class='{cls}' title='{Esc(RecognitionText.Tooltip(d.Recognition))}'>{Esc(Controls.DeviceTypeConverter.Display(d.DeviceType))}</td>" +
+                    // Hovering the ports lists each endpoint and what it answered.
+                    $"<td class='mono' title='{Esc(string.Join("\n", DeviceAccess.ForDevice(d).Select(AccessWording.Item)))}'>{Esc(d.OpenPortsDisplay)}</td>" +
+                    $"<td title='{Esc(HomeAssistantText.Describe(d, HomeAssistantAdvisor.ForDevice(d)))}'>{Esc(HomeAssistantText.Choice(HomeAssistantAdvisor.ForDevice(d)))}</td></tr>");
             }
             sb.AppendLine("</tbody></table></div>");
 
@@ -214,8 +265,9 @@ namespace KillerScan.Services
             ]) + "];");
             sb.AppendLine("var sw=document.getElementById('themesw');");
             sb.AppendLine("var CUSTOM_ACCENT={dark:1,light:1,black:1};");
-            sb.AppendLine($"var LOGO='{LogoBase}',THEMED={{blood:1,greed:1,cyanotic:1,ectoplasm:1,decay:1,malaise:1,sepulchre:1,delirium:1,mourning:1}},ACC_NAMES={{'#DD504B':'red','#E8962C':'orange','#EAD900':'yellow','#1EA54C':'green','#1FB8A8':'teal','#50AEE8':'blue','#B982E3':'purple','#FF52C9':'magenta'}};");
-            sb.AppendLine("function updateLogo(){var t=(document.documentElement.className||'').replace('theme-',''),img=document.getElementById('logo'),wm=document.getElementById('wm'),src=null;if(THEMED[t])src=LOGO+t+'.svg';else if(CUSTOM_ACCENT[t]){var a=null;try{a=localStorage.getItem('ksAccent')}catch(e){}src=LOGO+t+'-'+(ACC_NAMES[String(a||'').toUpperCase()]||'green')+'.svg';}if(!src){img.style.display='none';img.removeAttribute('src');wm.style.display='';return;}if(img.getAttribute('src')!==src)img.src=src;}");
+            sb.AppendLine("var LOGOS=" + (LogoSvg.Value.Length == 0 ? "{}" : LogoTable()) + ";");
+            sb.AppendLine($"var THEMED={{blood:1,greed:1,cyanotic:1,ectoplasm:1,decay:1,malaise:1,sepulchre:1,delirium:1,mourning:1}},ACC_NAMES={{'#DD504B':'red','#E8962C':'orange','#EAD900':'yellow','#1EA54C':'green','#1FB8A8':'teal','#50AEE8':'blue','#B982E3':'purple','#FF52C9':'magenta'}};");
+            sb.AppendLine("function updateLogo(){var t=(document.documentElement.className||'').replace('theme-',''),logo=document.getElementById('logo'),wm=document.getElementById('wm'),key=null;if(THEMED[t])key=t;else if(CUSTOM_ACCENT[t]){var a=null;try{a=localStorage.getItem('ksAccent')}catch(e){}key=t+'-'+(ACC_NAMES[String(a||'').toUpperCase()]||'green');}var c=key&&LOGOS[key];if(!c){logo.style.display='none';wm.style.display='';return;}for(var i=0;i<5;i++)logo.style.setProperty('--lg'+i,c[i]);logo.className='logo'+(c[5]==='1'?'':' noshadow')+(c[4]==='none'?' nooutline':'');logo.style.display='';wm.style.display='none';}");
             sb.AppendLine("function setTheme(t){document.documentElement.className='theme-'+t;try{localStorage.setItem('ksTheme',t)}catch(e){}var k=sw.children;for(var i=0;i<k.length;i++)k[i].className=(k[i].getAttribute('data-t')===t)?'active':'';var ar=document.getElementById('accentrow');ar.style.display=CUSTOM_ACCENT[t]?'flex':'none';if(CUSTOM_ACCENT[t]){var a=null;try{a=localStorage.getItem('ksAccent')}catch(e){}if(a)document.documentElement.style.setProperty('--accent',a);}else document.documentElement.style.removeProperty('--accent');updateLogo();}");
             sb.AppendLine("THEMES.forEach(function(a){var b=document.createElement('button');b.title=a[1];b.setAttribute('data-t',a[0]);b.style.background=a[2];b.onclick=function(){setTheme(a[0])};sw.appendChild(b);});");
             sb.AppendLine("var saved=null;try{saved=localStorage.getItem('ksTheme')}catch(e){}");

@@ -7,8 +7,7 @@ namespace KillerScan.Terminal
 {
     internal sealed partial class TerminalControl
     {
-        private static readonly string FontPreferencePath = Path.Combine(
-            Services.Locations.DataRoot, "terminal-font.json");
+        private static readonly string FontPreferencePath = Path.Combine(global::KillerScan.Services.DevelopmentData.Root, "terminal-font.json");
 
         private sealed class FontPreference
         {

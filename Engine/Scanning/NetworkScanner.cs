@@ -5,13 +5,19 @@ using System.Net.NetworkInformation;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace KillerScan.Engine
 {
-    public partial class NetworkScanner
+    public class NetworkScanner
     {
+        private readonly IScanDiscovery _discovery;
+        public NetworkScanner() : this(new MulticastScanDiscovery()) { }
+        public NetworkScanner(IScanDiscovery discovery) => _discovery = discovery ?? throw new ArgumentNullException(nameof(discovery));
+        private static readonly SemaphoreSlim NativeMacSlots = new(8);
+
         // Common ports to probe for device type detection
         private static readonly int[] ProbePorts = [
             22,    // SSH
@@ -69,6 +75,7 @@ namespace KillerScan.Engine
         public event Action<ScanStatus>? StatusChanged;
         public event Action<int>? ProgressChanged;
         public event Action<NetworkDevice>? DeviceFound;
+        protected void ReportDeviceFound(NetworkDevice device) => DeviceFound?.Invoke(device);
 
         /// <summary>
         /// A manual device type keyed by MAC address. When it returns a value, that type wins over
@@ -77,34 +84,88 @@ namespace KillerScan.Engine
         public static Func<string, string?>? ManualTypeLookup { get; set; }
 
         /// <summary>
+        /// The adapter this scanner's probes are sent from, or null to let Windows pick the
+        /// route. While set, targets outside the adapter's network are refused.
+        /// </summary>
+        /// <summary>The adapter scans go out of. A different one means a different network, so the
+        /// multicast names and services a scan collected are dropped with the change.</summary>
+        public ScanBinding? Binding
+        {
+            get => _binding;
+            set { if (!Equals(_binding, value)) { _mdns = []; _ssdp = []; } _binding = value; }
+        }
+        private ScanBinding? _binding;
+
+        /// <summary>Tests only: the NetBIOS port and the deep sweep's port list.</summary>
+        internal static int? UdpPortOverride { get; set; }
+        internal static int[]? DeepPortsOverride { get; set; }
+
+        // Applies the binding to this run, after checking every target is on the adapter's network.
+        private void BeginRun(IEnumerable<IPAddress> targets)
+        {
+            if (Binding is { } binding)
+            {
+                foreach (var address in targets)
+                    if (!binding.Reaches(address, out string route))
+                        throw new ArgumentException(binding.Unreachable(address, route) +
+                            " A bound scan only reaches its own network and what Windows routes through it.");
+            }
+            ScanSource.Current = Binding;
+        }
+
+        /// <summary>
         /// Runs on every finished device before it is reported, so the host can apply saved
         /// preferences such as a user-given name. Set once by the host.
         /// </summary>
         public static Action<NetworkDevice>? DeviceCompleted { get; set; }
 
-        /// <summary>Per-scanner host preferences; unset retains the static API defaults.</summary>
-        public Func<string, string?>? ManualTypeResolver { get; set; }
-        public Action<NetworkDevice>? DeviceFinalizer { get; set; }
+        /// <summary>
+        /// This scanner's own manual types. When set it replaces <see cref="ManualTypeLookup"/>,
+        /// so hosts that keep separate saved data per site can run scanners side by side.
+        /// </summary>
+        public Func<string, string?>? ManualTypes { get; set; }
+
+        /// <summary>This scanner's own completion hook. When set it replaces <see cref="DeviceCompleted"/>.</summary>
+        public Action<NetworkDevice>? Completed { get; set; }
+
+        private void Finish(NetworkDevice device)
+        {
+            // A scan bound to another adapter is on another network: the default adapter's gateway
+            // is not its router, so no device there is made Router by that address.
+            bool foreign = Binding != null && IPAddress.TryParse(GatewayIp, out var gateway) && !Binding.Contains(gateway);
+            device.Recognition = AssessDevice(device, ManualTypes ?? ManualTypeLookup, foreign ? string.Empty : GatewayIp, foreign ? string.Empty : DnsIp);
+            device.DeviceType = device.Recognition.Type;
+            device.MdnsObservedAtUtc = device.MdnsServices.Count > 0 ? _mdnsCaptured : null;
+            device.SsdpObservedAtUtc = device.SsdpServer.Length > 0 ? _ssdpCaptured : null;
+            device.ObservationCompletedAtUtc = DateTimeOffset.UtcNow;
+            ForkRecognition.Capture(device);
+            (Completed ?? DeviceCompleted)?.Invoke(device);
+        }
 
         // Network-wide service discovery results (collected once per scan, keyed by IP).
         private Dictionary<string, MulticastDiscovery.MdnsInfo> _mdns = [];
         private Dictionary<string, string> _ssdp = [];
-        private DateTimeOffset? _mdnsObservedAtUtc, _ssdpObservedAtUtc;
+        private DateTimeOffset? _mdnsCaptured, _ssdpCaptured;
 
         /// <summary>
         /// Parse a CIDR subnet string into a list of IP addresses.
         /// </summary>
         public static List<IPAddress> GetAddressesInSubnet(string cidr)
         {
+            if (string.IsNullOrWhiteSpace(cidr))
+                throw new ArgumentException("An IPv4 subnet is required.", nameof(cidr));
             var parts = cidr.Trim().Split('/');
-            var ip = IPAddress.Parse(parts[0]);
-            int prefixLen = parts.Length > 1 ? int.Parse(parts[1]) : 24;
+            if (parts.Length > 2 || !IPAddress.TryParse(parts[0], out var ip) || ip.AddressFamily != AddressFamily.InterNetwork)
+                throw new ArgumentException("The subnet must contain an IPv4 address and an optional prefix.", nameof(cidr));
+            int prefixLen = 24;
+            if (parts.Length == 2 && !int.TryParse(parts[1], out prefixLen))
+                throw new ArgumentException("The CIDR prefix must be an integer between 0 and 32.", nameof(cidr));
             if (prefixLen < 0 || prefixLen > 32)
                 throw new ArgumentOutOfRangeException(nameof(cidr), "CIDR prefix must be between 0 and 32.");
             long hostCount = prefixLen >= 31 ? 0 : (1L << (32 - prefixLen)) - 2;
             if (hostCount > ScanTargets.MaxAddresses)
                 throw new ArgumentOutOfRangeException(nameof(cidr),
-                    $"Subnet expands to {hostCount:N0} hosts, exceeding the {ScanTargets.MaxAddresses:N0} address limit.");
+                    $"Subnet expands to {hostCount.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)} hosts, exceeding the {ScanTargets.MaxAddresses.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)} address limit.");
             if (hostCount == 0) return [];
 
             byte[] ipBytes = ip.GetAddressBytes();
@@ -128,31 +189,29 @@ namespace KillerScan.Engine
         /// <summary>
         /// Scan all hosts in the given subnet using ARP + ping combined approach.
         /// </summary>
-        public Task<List<NetworkDevice>> ScanSubnetAsync(string cidr, CancellationToken ct, bool fullScan = true) =>
+        public virtual Task<List<NetworkDevice>> ScanSubnetAsync(string cidr, CancellationToken ct, bool fullScan = true) =>
             ScanSubnetAsync(cidr, ct, new ScanOptions(), fullScan);
 
-        public async Task<List<NetworkDevice>> ScanSubnetAsync(
+        public virtual async Task<List<NetworkDevice>> ScanSubnetAsync(
             string cidr, CancellationToken ct, ScanOptions options, bool fullScan = true)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            using var run = new ScanRun(_binding, ct);
-            try { return await ScanSubnetCoreAsync(cidr, run.Token, options, fullScan, run, ProbesFor(run)); }
-            catch (OperationCanceledException) when (run.ConnectionChanged) { throw run.Changed(); }
-        }
-
-        private async Task<List<NetworkDevice>> ScanSubnetCoreAsync(string cidr, CancellationToken ct, ScanOptions options, bool fullScan, ScanRun run, ScanProbes probes)
-        {
-            ct.ThrowIfCancellationRequested();
-            if (options.ReverseDns) probes.FlushDns();
-            // Clear previous enrichment even if a disabled or failed collector returns no data.
-            _mdns = []; _mdnsObservedAtUtc = null;
-            _ssdp = []; _ssdpObservedAtUtc = null;
             // ScanTargets handles one or many comma-separated targets (CIDR, single host, or a
-            // range) and de-duplicates overlaps. The UI validates the same string before getting
-            // here, so a parse failure at this point yields an empty list rather than throwing.
+            // range) and de-duplicates overlaps. Bad input is refused before any side effect.
             var parsed = ScanTargets.Parse(cidr);
+            if (!parsed.Ok)
+                throw new ArgumentException(parsed.Error switch
+                {
+                    TargetError.Empty => "No scan target was given.",
+                    TargetError.TooLarge => $"The targets cover {parsed.Detail} addresses; the ceiling is {ScanTargets.MaxAddresses:N0}.",
+                    _ => $"\"{parsed.Detail}\" is not a CIDR block, host, or range."
+                }, nameof(cidr));
+            BeginRun(parsed.Addresses);
+            ct.ThrowIfCancellationRequested();
+            if (options.ReverseDns) FlushLocalDnsCache();
+            _mdns = [];
+            _ssdp = [];
             var addresses = parsed.Addresses;
-            foreach (var address in addresses) run.CheckTarget(address);
             // Status text uses the short summary ("192.168.9.0/24 +2"), not the raw box contents,
             // so a long multi-target list does not overrun the status bar.
             string label = parsed.Summary.Length > 0 ? parsed.Summary : cidr;
@@ -164,8 +223,10 @@ namespace KillerScan.Engine
             StatusChanged?.Invoke(new ScanStatus(ScanStage.Discovering, addresses.Count, label));
             var discoveredHosts = new System.Collections.Concurrent.ConcurrentDictionary<string, (IPAddress Addr, string Mac)>();
 
-            // Grab existing ARP cache first (instant, catches IoT devices)
-            var arpCache = options.NeighborCache ? probes.ReadNeighbors() : new Dictionary<string, string>();
+            // Grab existing ARP cache first (catches IoT devices). It starts arp.exe, so it runs on the
+            // pool: this is still the synchronous start of the scan, on the caller's UI thread.
+            IReadOnlyDictionary<string, string> arpCache = options.NeighborCache
+                ? await Task.Run(GetArpCache, ct) : new Dictionary<string, string>();
             var addressSet = new HashSet<string>(addresses.Select(a => a.ToString()));
             foreach (var entry in arpCache)
             {
@@ -175,40 +236,32 @@ namespace KillerScan.Engine
 
             // Kick off network-wide service discovery (mDNS + SSDP) to run alongside the ping sweep;
             // results are awaited before the probe phase and mapped to hosts by source IP.
-            var mdnsTask = options.Mdns ? probes.Mdns(ct) : Task.FromResult(new Dictionary<string, MulticastDiscovery.MdnsInfo>());
-            var ssdpTask = options.Ssdp ? probes.Ssdp(ct) : Task.FromResult(new Dictionary<string, string>());
+            var mdnsTask = options.Mdns ? _discovery.CollectMdnsAsync(ct)
+                : Task.FromResult(new Dictionary<string, MulticastDiscovery.MdnsInfo>());
+            var ssdpTask = options.Ssdp ? _discovery.CollectSsdpAsync(ct)
+                : Task.FromResult(new Dictionary<string, string>());
 
             // Fast parallel ping sweep (async, no blocking ARP calls)
             var semaphore = new SemaphoreSlim(200);
-            using var arpDiscoveryThrottle = new SemaphoreSlim(64);
             var scanTasks = addresses.Select(async addr =>
             {
                 await semaphore.WaitAsync(ct);
                 try
                 {
-                    ct.ThrowIfCancellationRequested();
-                    bool alive = options.Icmp && (await probes.Ping(addr, 500)).HasValue;
+                    bool alive = false;
+                    if (options.Icmp)
+                    {
+                        alive = (await ScanSource.PingAsync(addr, 500)).Success;
+                    }
                     // ICMP is commonly blocked (Windows Firewall default), and ARP can't reach a host
                     // across a routed/VPN link, so a silent host isn't necessarily down. Fall back to a
                     // quick TCP connect on a few common ports - anything that answers is alive even when
                     // it drops ping. This is what closes the "20 found vs 200 real" gap over a VPN.
                     if (!alive && options.TcpLiveness)
-                        alive = await probes.TcpAlive(addr);
+                        alive = await TcpAliveAsync(addr);
                     if (alive)
                         discoveredHosts.TryAdd(addr.ToString(), (addr, ""));
-                    else if (options.Arp && !discoveredHosts.ContainsKey(addr.ToString()))
-                    {
-                        await arpDiscoveryThrottle.WaitAsync(ct);
-                        try
-                        {
-                            string mac = await AwaitWithCancellation(Task.Run(() => probes.DiscoverMac(addr), ct), ct);
-                            if (!string.IsNullOrEmpty(mac)) discoveredHosts.TryAdd(addr.ToString(), (addr, mac));
-                        }
-                        finally { arpDiscoveryThrottle.Release(); }
-                    }
                 }
-                catch (NetworkBindingException) { throw; }
-                catch (OperationCanceledException) { throw; }
                 catch { }
                 finally
                 {
@@ -224,22 +277,13 @@ namespace KillerScan.Engine
             // Second ARP cache read: the ping wave stimulates ARP responses from devices
             // that are too slow (or don't reply to ICMP at all). Reading the cache again
             // catches them without requiring a second full scan.
-            var arpCache2 = options.NeighborCache ? probes.ReadNeighbors() : new Dictionary<string, string>();
+            IReadOnlyDictionary<string, string> arpCache2 = options.NeighborCache
+                ? await Task.Run(GetArpCache, ct) : new Dictionary<string, string>();
             foreach (var entry in arpCache2)
             {
                 if (addressSet.Contains(entry.Key))
                     discoveredHosts.TryAdd(entry.Key, (IPAddress.Parse(entry.Key), entry.Value));
             }
-
-            // Multicast responders are discoveries in their own right, even when ICMP and
-            // the small TCP liveness set are silent. Only admit explicitly requested IPv4s.
-            try { _mdns = await mdnsTask; _mdnsObservedAtUtc = DateTimeOffset.UtcNow; } catch (NetworkBindingException) { throw; } catch (OperationCanceledException) { throw; } catch { }
-            try { _ssdp = await ssdpTask; _ssdpObservedAtUtc = DateTimeOffset.UtcNow; } catch (NetworkBindingException) { throw; } catch (OperationCanceledException) { throw; } catch { }
-            ct.ThrowIfCancellationRequested();
-            foreach (string ip in _mdns.Where(pair => pair.Value.Name.Length > 0 || pair.Value.Services.Count > 0).Select(pair => pair.Key)
-                .Concat(_ssdp.Where(pair => !string.IsNullOrWhiteSpace(pair.Value)).Select(pair => pair.Key)).Distinct())
-                if (addressSet.Contains(ip) && IPAddress.TryParse(ip, out var responder))
-                    discoveredHosts.TryAdd(ip, (responder, ""));
 
             // Resolve MAC addresses via ARP for discovered hosts (fast, they're alive)
             StatusChanged?.Invoke(new ScanStatus(ScanStage.ResolvingMacs, discoveredHosts.Count));
@@ -248,7 +292,8 @@ namespace KillerScan.Engine
                 var addr = IPAddress.Parse(ip);
                 string mac = discoveredHosts[ip].Mac;
                 if (options.Arp && string.IsNullOrEmpty(mac))
-                    mac = await AwaitWithCancellation(Task.Run(() => probes.ResolveMac(addr), ct), ct);
+                    mac = await ResolveMacAsync(addr, ct);
+                ct.ThrowIfCancellationRequested();
                 discoveredHosts[ip] = (addr, mac);
             });
             await Task.WhenAll(macTasks);
@@ -270,7 +315,9 @@ namespace KillerScan.Engine
                 foreach (var ip in discoveredHosts.Keys.ToList())
                 {
                     var (hAddr, hMac) = discoveredHosts[ip];
-                    if (!string.IsNullOrEmpty(hMac) && bogusMacs.Contains(hMac))
+                    // The gateway is the one host that really owns that MAC: off-link hosts
+                    // resolve to it, so it keeps its own and the rest lose the borrowed copy.
+                    if (!string.IsNullOrEmpty(hMac) && bogusMacs.Contains(hMac) && ip != GatewayIp)
                         discoveredHosts[ip] = (hAddr, "");
                 }
             }
@@ -288,6 +335,10 @@ namespace KillerScan.Engine
             completed = 0;
             total = sortedHosts.Count;
 
+            // Collect the mDNS/SSDP results before probing (best-effort; empty maps on failure).
+            try { _mdns = await mdnsTask; _mdnsCaptured = DateTimeOffset.UtcNow; } catch { }
+            try { _ssdp = await ssdpTask; _ssdpCaptured = DateTimeOffset.UtcNow; } catch { }
+
             if (fullScan)
             {
                 StatusChanged?.Invoke(new ScanStatus(ScanStage.Probing, total));
@@ -297,9 +348,9 @@ namespace KillerScan.Engine
                     await probeSemaphore.WaitAsync(ct);
                     try
                     {
-                        var device = await ProbeHostAsync(entry.Addr, entry.Mac, ct, options, probes);
+                        var device = await ProbeHostAsync(entry.Addr, entry.Mac, ct, options);
                         ct.ThrowIfCancellationRequested();
-                        DeviceFound?.Invoke(device);
+                        ReportDeviceFound(device);
                         int done = Interlocked.Increment(ref completed);
                         ProgressChanged?.Invoke(40 + (int)(done * 60.0 / total));
                         return device;
@@ -322,30 +373,33 @@ namespace KillerScan.Engine
                     {
                         var device = new NetworkDevice
                         {
-                            ObservationStartedAtUtc = DateTimeOffset.UtcNow,
+                            ObservationStartedAtUtc = DateTimeOffset.UtcNow, RecognitionScope = "quick",
+                            RecognitionDisabledFeatures = ScanOptions.Features.Where(feature => !options.IsEnabled(feature)).ToArray(),
                             IpAddress = entry.Addr.ToString(),
                             MacAddress = entry.Mac,
-                            HostnameSource = options.ReverseDns ? "DNS" : "",
-                            Hostname = options.ReverseDns ? await AwaitWithCancellation(probes.Hostname(entry.Addr), ct) : string.Empty
+                            Hostname = options.ReverseDns
+                                ? await AwaitWithCancellation(ResolveVerifiedHostnameAsync(entry.Addr), ct) : string.Empty
                         };
 
                         if (!string.IsNullOrEmpty(entry.Mac))
                             device.Vendor = ResolveVendor(entry.Mac);
+                        // The multicast replies were already collected above, so a quick scan
+                        // uses them too: .local names and service types cost nothing more here.
+                        if (options.Mdns && _mdns.TryGetValue(device.IpAddress, out var quickMd))
+                        {
+                            device.MdnsServices = DeviceText.Services(quickMd.Services);
+                            if (string.IsNullOrEmpty(device.Hostname) && !string.IsNullOrEmpty(quickMd.Name))
+                                device.Hostname = quickMd.Name;
+                        }
+                        if (options.Ssdp && _ssdp.TryGetValue(device.IpAddress, out var quickSrv))
+                            device.SsdpServer = quickSrv;
 
                         ct.ThrowIfCancellationRequested();
 
-                        if (options.Mdns && _mdns.TryGetValue(device.IpAddress, out var md))
-                        {
-                            device.MdnsServices = [.. md.Services]; device.MdnsObservedAtUtc = _mdnsObservedAtUtc;
-                            if (device.Hostname.Length == 0 && md.Name.Length > 0) { device.Hostname = md.Name; device.HostnameSource = "mDNS"; }
-                        }
-                        if (options.Ssdp && _ssdp.TryGetValue(device.IpAddress, out var server))
-                        { device.SsdpServer = server; device.SsdpObservedAtUtc = _ssdpObservedAtUtc; }
-                        // Classify even in quick scan (including actual multicast evidence, no ports)
-                        device.DeviceType = ClassifyForScan(device, options, "quick");
-                        (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
+                        // Classify even in quick scan (hostname + OUI, no ports)
+                        Finish(device);
 
-                        DeviceFound?.Invoke(device);
+                        ReportDeviceFound(device);
                         int done = Interlocked.Increment(ref completed);
                         ProgressChanged?.Invoke(40 + (int)(done * 60.0 / total));
                         return device;
@@ -362,17 +416,44 @@ namespace KillerScan.Engine
             return devices;
         }
 
-        /// <summary>The neighbor (ARP) cache from the platform.</summary>
+        /// <summary>The neighbor (ARP) cache from the platform; a bound run reads only its own adapter's.</summary>
         private static IReadOnlyDictionary<string, string> GetArpCache() =>
-            NetworkPlatform.Current.ReadNeighborCache();
+            ScanSource.Current?.Neighbors() ?? NetworkPlatform.Current.ReadNeighborCache();
 
         /// <summary>
         /// Probe a single host for hostname, open ports, fingerprints, and device type.
         /// </summary>
+        // Windows name lookups cannot be canceled and some never answer. Each lookup gets a time
+        // budget, after which the device simply has no name and the scan moves on. A lookup that
+        // is still running keeps its slot until it really returns, so a network full of silent
+        // resolvers can tie up at most this many threads; beyond that, devices go unnamed.
+        private static readonly TimeSpan HostnameBudget = TimeSpan.FromSeconds(3);
+        internal const int MaxPendingHostnameLookups = 64;
+        private static readonly SemaphoreSlim HostnameSlots = new(MaxPendingHostnameLookups, MaxPendingHostnameLookups);
+
+        /// <summary>Replaces the reverse-then-forward lookup in tests.</summary>
+        internal static Func<IPAddress, Task<string>>? HostnameResolverOverride { get; set; }
+
         private static async Task<string> ResolveVerifiedHostnameAsync(IPAddress addr)
+        {
+            var deadline = Task.Delay(HostnameBudget);
+            var slot = HostnameSlots.WaitAsync();
+            if (await Task.WhenAny(slot, deadline) != slot)
+            {
+                // Release a slot this abandoned wait may still be granted later.
+                _ = slot.ContinueWith(_ => HostnameSlots.Release(), TaskScheduler.Default);
+                return string.Empty;
+            }
+            var lookup = LookupHostnameAsync(addr);
+            _ = lookup.ContinueWith(_ => HostnameSlots.Release(), TaskScheduler.Default);
+            return await Task.WhenAny(lookup, deadline) == lookup ? await lookup : string.Empty;
+        }
+
+        private static async Task<string> LookupHostnameAsync(IPAddress addr)
         {
             try
             {
+                if (HostnameResolverOverride is { } resolve) return await resolve(addr) ?? string.Empty;
                 var reverse = await Dns.GetHostEntryAsync(addr);
                 string hostname = reverse.HostName?.Trim() ?? string.Empty;
                 if (hostname.Length == 0 || string.Equals(
@@ -388,6 +469,19 @@ namespace KillerScan.Engine
             }
         }
 
+        private static async Task<string> ResolveMacAsync(IPAddress address, CancellationToken ct)
+        {
+            await NativeMacSlots.WaitAsync(ct);
+            // A started native call owns its slot until it actually returns, even when the
+            // caller has canceled and a later scan is waiting for the same capacity.
+            var lookup = Task.Run(() =>
+            {
+                try { ct.ThrowIfCancellationRequested(); return GetMacAddress(address); }
+                finally { NativeMacSlots.Release(); }
+            });
+            return await AwaitWithCancellation(lookup, ct);
+        }
+
         private static async Task AwaitWithCancellation(Task task, CancellationToken token)
         {
             if (task.IsCompleted)
@@ -399,7 +493,7 @@ namespace KillerScan.Engine
 
             if (await Task.WhenAny(task, Task.Delay(Timeout.Infinite, token)) != task)
             {
-                _ = task.ContinueWith(t => { _ = t.Exception; }, TaskContinuationOptions.OnlyOnFaulted);
+                _ = task.ObserveFault();
                 token.ThrowIfCancellationRequested();
             }
 
@@ -413,26 +507,52 @@ namespace KillerScan.Engine
             return await task;
         }
 
-        private async Task<NetworkDevice> ProbeHostAsync(IPAddress addr, string cachedMac, CancellationToken token, ScanOptions options, ScanProbes probes)
+        private async Task<NetworkDevice> ProbeHostAsync(
+            IPAddress addr, string cachedMac, CancellationToken token, ScanOptions options)
         {
             token.ThrowIfCancellationRequested();
             var device = new NetworkDevice
             {
                 ObservationStartedAtUtc = DateTimeOffset.UtcNow,
+                RecognitionScope = "full", RecognitionDisabledFeatures = ScanOptions.Features.Where(feature => !options.IsEnabled(feature)).ToArray(),
                 IpAddress = addr.ToString(),
                 MacAddress = cachedMac
             };
 
-            var dnsTask = options.ReverseDns ? ResolveName() : Task.CompletedTask;
-            async Task ResolveName() { device.Hostname = await probes.Hostname(addr); if (device.Hostname.Length > 0) device.HostnameSource = "DNS"; }
-            var ttlTask = options.Icmp ? ResolveTtl() : Task.CompletedTask;
-            async Task ResolveTtl() => device.Ttl = await probes.Ping(addr, 400);
+            // Resolve hostname + capture TTL (OS family hint) in parallel with port scan.
+            var dnsTask = options.ReverseDns ? Task.Run(async () =>
+            {
+                device.Hostname = await ResolveVerifiedHostnameAsync(addr);
+            }) : Task.CompletedTask;
 
+            var ttlTask = options.Icmp ? Task.Run(async () =>
+            {
+                try
+                {
+                    var reply = await ScanSource.PingAsync(addr, 400);
+                    if (reply.Success && reply.Ttl > 0) device.Ttl = reply.Ttl;
+                }
+                catch { }
+            }) : Task.CompletedTask;
+
+            // Port scan (parallel, short timeout)
             var portTasks = (options.Ports ? ProbePorts : Array.Empty<int>()).Select(async port =>
             {
-                token.ThrowIfCancellationRequested();
-                return await probes.Connect(addr, port, 200) ? port : -1;
+                try
+                {
+                    using var client = ScanSource.Tcp();
+                    var connectTask = client.ConnectAsync(addr, port).ObserveFault();
+                    if (await Task.WhenAny(connectTask, Task.Delay(200, token)) == connectTask
+                        && client.Connected)
+                    {
+                        return port;
+                    }
+                }
+                catch (OperationCanceledException) { throw; }
+                catch { }
+                return -1;
             });
+
             var results = await AwaitWithCancellation(Task.WhenAll(portTasks), token);
             device.OpenPorts = [.. results.Where(p => p > 0).OrderBy(p => p)];
 
@@ -446,34 +566,33 @@ namespace KillerScan.Engine
             // Attach network-wide discovery results + name fallback (reverse DNS -> mDNS .local name).
             if (options.Mdns && _mdns.TryGetValue(device.IpAddress, out var md))
             {
-                device.MdnsServices = [.. md.Services]; device.MdnsObservedAtUtc = _mdnsObservedAtUtc;
+                device.MdnsServices = DeviceText.Services(md.Services);
                 if (string.IsNullOrEmpty(device.Hostname) && !string.IsNullOrEmpty(md.Name))
-                { device.Hostname = md.Name; device.HostnameSource = "mDNS"; }
+                    device.Hostname = md.Name;
             }
             if (options.Ssdp && _ssdp.TryGetValue(device.IpAddress, out var srv))
-                { device.SsdpServer = srv; device.SsdpObservedAtUtc = _ssdpObservedAtUtc; }
+                device.SsdpServer = srv;
 
             // -- Fingerprint probes: run in parallel, each is gated on relevant open ports --
             var fpTasks = new List<Task>();
-            if (options.Http && device.OpenPorts.Any(p => DeviceAccess.SuggestedWebProtocol(p) != null))
-                fpTasks.Add(probes.Http(device, addr, false, token));
+            if (options.Http && device.OpenPorts.Any(p => p == 80 || p == 443 || p == 8006 || p == 8080 || p == 8443 || p == 5000 || p == 5001 || p == 8123))
+                fpTasks.Add(ProbeHttpAsync(device, addr, ct: token));
             if (options.Ssh && device.OpenPorts.Contains(22))
-                fpTasks.Add(probes.Ssh(device, addr));
-            if (options.Tls && device.OpenPorts.Any(p => p == 443 || p == 8443 || p == 8006 || p == 902))
-                fpTasks.Add(probes.Tls(device, addr, false));
+                fpTasks.Add(ProbeSshBannerAsync(device, addr));
+            if (options.Tls && HasStandardTlsPort(device))
+                fpTasks.Add(ProbeTlsCertAsync(device, addr, ct: token));
             // NetBIOS + SNMP are UDP -- we probe regardless of TCP state (ports 137/161 UDP).
-            if (options.Netbios) fpTasks.Add(probes.Netbios(device, addr));
-            if (options.Snmp) fpTasks.Add(probes.Snmp(device, addr));
+            if (options.Netbios) fpTasks.Add(ProbeNetbiosAsync(device, addr));
+            if (options.Snmp) fpTasks.Add(ProbeSnmpAsync(device, addr));
 
             await AwaitWithCancellation(Task.WhenAll(fpTasks), token);
 
             // Last-resort name: NetBIOS computer name when reverse DNS and mDNS both came up empty.
             if (string.IsNullOrEmpty(device.Hostname) && !string.IsNullOrEmpty(device.NetbiosName))
-            { device.Hostname = device.NetbiosName; device.HostnameSource = "NetBIOS"; }
+                device.Hostname = device.NetbiosName;
 
             // Classify device type using weighted scoring over all signals.
-            device.DeviceType = ClassifyForScan(device, options, "full");
-            (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
+            Finish(device);
 
             return device;
         }
@@ -486,50 +605,60 @@ namespace KillerScan.Engine
         // per host) on purpose - it targets one host on demand, not a whole /24.
         // Reuses the last full scan's multicast (mDNS/SSDP) results for naming.
         // -------------------------------------------------------------------
-        public Task<NetworkDevice> DeepProbeHostAsync(
+        public virtual Task<NetworkDevice> DeepProbeHostAsync(
             string ip, CancellationToken ct, int portConcurrency = 256,
             bool flushLocalDnsCache = true) =>
             DeepProbeHostAsync(ip, ct, new ScanOptions(), portConcurrency, flushLocalDnsCache);
 
-        public async Task<NetworkDevice> DeepProbeHostAsync(
+        public virtual async Task<NetworkDevice> DeepProbeHostAsync(
             string ip, CancellationToken ct, ScanOptions options, int portConcurrency = 256,
             bool flushLocalDnsCache = true)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            using var run = new ScanRun(_binding, ct);
-            try { return await DeepProbeCoreAsync(ip, run.Token, options, portConcurrency, flushLocalDnsCache, run, ProbesFor(run)); }
-            catch (OperationCanceledException) when (run.ConnectionChanged) { throw run.Changed(); }
-        }
-
-        private async Task<NetworkDevice> DeepProbeCoreAsync(string ip, CancellationToken ct, ScanOptions options, int portConcurrency, bool flushLocalDnsCache, ScanRun run, ScanProbes probes)
-        {
+            if (portConcurrency < 1)
+                throw new ArgumentOutOfRangeException(nameof(portConcurrency), portConcurrency, "Port concurrency must be at least 1.");
+            if (ip == null || !IPAddress.TryParse(ip, out var addr) || addr.AddressFamily != AddressFamily.InterNetwork)
+                throw new ArgumentException($"\"{ip}\" is not an IPv4 address.", nameof(ip));
+            // IPAddress.TryParse also takes shorthand such as "192.168.1" or a bare number; the record
+            // and every lookup use the address that is actually probed.
+            ip = addr.ToString();
+            BeginRun([addr]);
             ct.ThrowIfCancellationRequested();
-            if (options.ReverseDns && flushLocalDnsCache) probes.FlushDns();
-            var addr = IPAddress.Parse(ip);
-            run.CheckTarget(addr);
+            if (flushLocalDnsCache && options.ReverseDns) FlushLocalDnsCache();
             var device = new NetworkDevice
             {
                 ObservationStartedAtUtc = DateTimeOffset.UtcNow,
+                RecognitionScope = "deep", RecognitionDisabledFeatures = ScanOptions.Features.Where(feature => !options.IsEnabled(feature)).ToArray(),
                 IpAddress  = ip,
                 // Fresh MAC via ARP.
-                MacAddress = options.Arp ? await AwaitWithCancellation(Task.Run(() => probes.ResolveMac(addr), ct), ct) : string.Empty
+                MacAddress = options.Arp ? await ResolveMacAsync(addr, ct) : string.Empty
             };
 
-            var dnsTask = options.ReverseDns ? ResolveName() : Task.CompletedTask;
-            async Task ResolveName() { device.Hostname = await probes.Hostname(addr); if (device.Hostname.Length > 0) device.HostnameSource = "DNS"; }
-            var ttlTask = options.Icmp ? ResolveTtl() : Task.CompletedTask;
-            async Task ResolveTtl() => device.Ttl = await probes.Ping(addr, 800);
+            // Hostname + TTL alongside the port sweep.
+            var dnsTask = options.ReverseDns ? Task.Run(async () =>
+            {
+                device.Hostname = await ResolveVerifiedHostnameAsync(addr);
+            }, ct) : Task.CompletedTask;
+            var ttlTask = options.Icmp ? Task.Run(async () =>
+            {
+                try
+                {
+                    var reply = await ScanSource.PingAsync(addr, 800);
+                    if (reply.Success && reply.Ttl > 0) device.Ttl = reply.Ttl;
+                }
+                catch { }
+            }, ct) : Task.CompletedTask;
 
             // Exhaustive TCP sweep. Bounded concurrency keeps the open-socket count sane;
             // each port gets a generous timeout and one retry so slow/loaded hosts still answer.
             using var gate = new SemaphoreSlim(portConcurrency);
-            var portTasks = (options.Ports ? DeepPortList : Array.Empty<int>()).Select(async port =>
+            var portTasks = (options.Ports ? DeepPortsOverride ?? DeepPortList : Array.Empty<int>()).Select(async port =>
             {
                 await gate.WaitAsync(ct);
                 try
                 {
-                    if (await probes.Connect(addr, port, 700)) return port;
-                    if (await probes.Connect(addr, port, 900)) return port;   // retry catches slow responders
+                    if (await TryConnectAsync(addr, port, 700)) return port;
+                    if (await TryConnectAsync(addr, port, 900)) return port;   // retry catches slow responders
                     return -1;
                 }
                 finally { gate.Release(); }
@@ -546,33 +675,34 @@ namespace KillerScan.Engine
             // Reuse the last full scan's network-wide multicast results for naming.
             if (options.Mdns && _mdns.TryGetValue(ip, out var md))
             {
-                device.MdnsServices = [.. md.Services]; device.MdnsObservedAtUtc = _mdnsObservedAtUtc;
+                device.MdnsServices = DeviceText.Services(md.Services);
                 if (string.IsNullOrEmpty(device.Hostname) && !string.IsNullOrEmpty(md.Name))
-                { device.Hostname = md.Name; device.HostnameSource = "mDNS"; }
+                    device.Hostname = md.Name;
             }
             if (options.Ssdp && _ssdp.TryGetValue(ip, out var srv))
-                { device.SsdpServer = srv; device.SsdpObservedAtUtc = _ssdpObservedAtUtc; }
+                device.SsdpServer = srv;
 
-            // Full fingerprint pass. Deep mode widens HTTP/TLS to every open port (not just the
-            // standard web/TLS ones), so services on non-standard ports still get fingerprinted.
+            // Full fingerprint pass. Unknown open ports stay connect-only unless the caller opts in
+            // to widening HTTP/TLS to them; raw services are skipped either way.
             var fpTasks = new List<Task>();
-            if (options.Netbios) fpTasks.Add(probes.Netbios(device, addr));
-            if (options.Snmp) fpTasks.Add(probes.Snmp(device, addr));
+            if (options.Netbios) fpTasks.Add(ProbeNetbiosAsync(device, addr));
+            if (options.Snmp) fpTasks.Add(ProbeSnmpAsync(device, addr));
             if (device.OpenPorts.Count > 0)
             {
-                if (options.Http) fpTasks.Add(probes.Http(device, addr, true, ct));
-                if (options.Tls) fpTasks.Add(probes.Tls(device, addr, true));
+                bool wide = options.ProbeUnknownPorts;
+                // A deep pass checks every web port, so each one has its own access evidence.
+                if (options.Http) fpTasks.Add(ProbeHttpAsync(device, addr, deep: wide, everyPort: true, ct));
+                if (options.Tls) fpTasks.Add(ProbeTlsCertAsync(device, addr, deep: wide, ct: ct));
             }
             if (options.Ssh && device.OpenPorts.Contains(22))
-                fpTasks.Add(probes.Ssh(device, addr));
+                fpTasks.Add(ProbeSshBannerAsync(device, addr));
             await AwaitWithCancellation(Task.WhenAll(fpTasks), ct);
             ct.ThrowIfCancellationRequested();
 
             if (string.IsNullOrEmpty(device.Hostname) && !string.IsNullOrEmpty(device.NetbiosName))
-            { device.Hostname = device.NetbiosName; device.HostnameSource = "NetBIOS"; }
+                device.Hostname = device.NetbiosName;
 
-            device.DeviceType = ClassifyForScan(device, options, "deep");
-            (DeviceFinalizer ?? DeviceCompleted)?.Invoke(device);
+            Finish(device);
             return device;
         }
 
@@ -592,8 +722,8 @@ namespace KillerScan.Engine
         {
             try
             {
-                using var client = new TcpClient();
-                var connect = client.ConnectAsync(addr, port);
+                using var client = ScanSource.Tcp();
+                var connect = client.ConnectAsync(addr, port).ObserveFault();
                 if (await Task.WhenAny(connect, Task.Delay(timeoutMs)) == connect && client.Connected)
                     return true;
             }
@@ -706,7 +836,8 @@ namespace KillerScan.Engine
         /// <summary>
         /// Weighted-score classifier. Each signal contributes points to candidate
         /// device types; the highest-scoring type above the threshold wins.
-        /// Records source evidence; names are weak hints and manual assignments remain separate.
+        /// A manual type and the default gateway role decide before scoring; a hostname
+        /// keyword is a heavy hint that clearer protocol evidence can still outvote.
         ///
         /// Signal strength rough guide:
         ///   15+  strong positive (protocol banner, TLS cert, specific HTTP title)
@@ -714,98 +845,168 @@ namespace KillerScan.Engine
         ///   4-7  weak supporting signal (TTL, generic port presence)
         ///   1-3  tie-breaker only
         /// </summary>
-        public static string ClassifyDevice(NetworkDevice device) =>
-            ClassifyDeviceForNetwork(device, GatewayIp, DnsIp, ManualTypeLookup);
-
-        /// <summary>Assess supplied observations without probing, global routing hints or saved manual preferences.</summary>
         public static DeviceIdentification IdentifyDevice(NetworkDevice device)
         {
-            device.DeviceType = ClassifyDeviceForNetwork(device, "", "", null);
+            device.Recognition = AssessDevice(device, ManualTypeLookup);
+            device.DeviceType = device.Recognition.Type;
+            ForkRecognition.Capture(device);
             return device.Identification!;
         }
 
-        internal static string ClassifyDeviceForNetwork(NetworkDevice device, string gatewayIp, string dnsIp, Func<string, string?>? manualLookup)
+        public static string ClassifyDevice(NetworkDevice device) => ClassifyDevice(device, ManualTypeLookup);
+
+        /// <summary>Classifies with the given manual types instead of <see cref="ManualTypeLookup"/>.</summary>
+        public static string ClassifyDevice(NetworkDevice device, Func<string, string?>? manualTypes) =>
+            AssessDevice(device, manualTypes).Type;
+
+        /// <summary>
+        /// The type, the signals behind it, close alternatives and a confidence grade. Reads only
+        /// the fields already on <paramref name="device"/>: it sends nothing and changes nothing.
+        /// </summary>
+        public static DeviceRecognition AssessDevice(NetworkDevice device, Func<string, string?>? manualTypes) =>
+            AssessDevice(device, manualTypes, GatewayIp, DnsIp);
+
+        /// <summary>As above, with the gateway and DNS server of the network the device was scanned on.</summary>
+        public static DeviceRecognition AssessDevice(NetworkDevice device, Func<string, string?>? manualTypes, string gatewayIp, string dnsIp)
         {
-            // 1. Manual override always wins.
-            var manual = manualLookup?.Invoke(device.MacAddress);
-            var assessment = new RecognitionAssessment(device, manual);
+            var automatic = AssessAutomatic(device, gatewayIp ?? string.Empty, dnsIp ?? string.Empty);
+            var manual = manualTypes?.Invoke(device.MacAddress);
+            if (manual != null)
+            {
+                automatic.Type = manual;
+                automatic.Confidence = RecognitionConfidence.Manual;
+            }
+            return automatic;
+        }
 
+        /// <summary>Types that are refinements of each other, so one scoring close to another is not a conflict.</summary>
+        private static readonly string[][] RelatedTypes =
+        [
+            ["Windows", "Windows Server"],
+            ["Network", "Router", "Switch/AP"],
+            ["iPhone", "Apple Device", "Apple TV"],
+            ["Smart TV", "Media Streamer", "Apple TV", "Apple Device"],
+        ];
+
+        private static bool Related(string a, string b) =>
+            a == b || RelatedTypes.Any(group => group.Contains(a) && group.Contains(b));
+
+        // Observed values can be long or hostile; evidence keeps a bounded, single-line copy.
+        private static string Clip(string value)
+        {
+            var clean = new string([.. value.Select(c => char.IsControl(c) ? ' ' : c)]).Trim();
+            return clean.Length <= 80 ? clean : clean[..80];
+        }
+
+        private static string PortList(params int[] ports) => string.Join(", ", ports);
+
+        private static DeviceRecognition AssessAutomatic(NetworkDevice device, string gatewayIp, string dnsIp)
+        {
             var ports = device.OpenPorts;
-            string host = RecognitionAssessment.Bounded(device.Hostname).ToLowerInvariant();
-            string title = RecognitionAssessment.Bounded(device.HttpTitle).ToLowerInvariant();
-            string server = RecognitionAssessment.Bounded(device.HttpServer).ToLowerInvariant();
-            string tls = RecognitionAssessment.Bounded(device.TlsSubject).ToLowerInvariant();
-            string ssh = RecognitionAssessment.Bounded(device.SshBanner).ToLowerInvariant();
-            string snmp = RecognitionAssessment.Bounded(device.SnmpDescr).ToLowerInvariant();
-            string nbName = RecognitionAssessment.Bounded(device.NetbiosName).ToLowerInvariant();
-            string ssdp = RecognitionAssessment.Bounded(device.SsdpServer).ToLowerInvariant();
+            string host = device.Hostname.ToLowerInvariant();
+            string title = device.HttpTitle.ToLowerInvariant();
+            string server = device.HttpServer.ToLowerInvariant();
+            string tls = device.TlsSubject.ToLowerInvariant();
+            string ssh = device.SshBanner.ToLowerInvariant();
+            string snmp = device.SnmpDescr.ToLowerInvariant();
+            string nbName = device.NetbiosName.ToLowerInvariant();
+            string ssdp = device.SsdpServer.ToLowerInvariant();
 
-            // 1b. The default gateway is the router. Surface that role (plus DNS when it serves it),
-            //     ahead of the port heuristics that would otherwise label it just "DNS Server".
+            DeviceRecognition Decided(string type, RecognitionConfidence confidence, string source, string detail) => new()
+            {
+                Type = type,
+                Confidence = confidence,
+                AutomaticType = type,
+                AutomaticConfidence = confidence,
+                Signals = [new RecognitionSignal { Source = source, Detail = detail }],
+            };
+
+            // 1. The default gateway is the router. Surface that role (plus DNS when it serves it),
+            //    ahead of the port heuristics that would otherwise label it just "DNS Server".
+            //    Windows' own routing table says so, which is firmer than anything the device reports.
             if (!string.IsNullOrEmpty(gatewayIp) && device.IpAddress == gatewayIp)
             {
                 // Only "Router/DNS" when the gateway IS the configured DNS server. A router that just
                 // has port 53 open (forwarding) but points DNS at a Pi-hole stays plain "Router".
                 bool isDnsServer = !string.IsNullOrEmpty(dnsIp) && device.IpAddress == dnsIp;
-                assessment.Route(gatewayIp, dnsIp); return assessment.Finish(isDnsServer ? "Router/DNS" : "Router");
+                return Decided(isDnsServer ? "Router/DNS" : "Router", RecognitionConfidence.High,
+                    RecognitionSources.Gateway, isDnsServer ? "gateway-dns" : "gateway");
             }
 
-            // 2. Names are weak hints, not a reason to ignore contradictory protocol evidence.
+            // 2. Score candidate types from all signals.
+            var scores = new Dictionary<string, int>();
+            var signals = new List<(string Type, RecognitionSignal Signal)>();
+            void Add(string type, int s, string source, string detail)
+            {
+                scores[type] = scores.TryGetValue(type, out int total) ? total + s : s;
+                signals.Add((type, new RecognitionSignal { Source = source, Detail = Clip(detail), Weight = s }));
+            }
+
+            // Hostname keywords are a heavy hint: a name someone chose usually says what the
+            // device is, but a clear protocol answer that disagrees can still win.
             foreach (var (pattern, type) in HostnameKeywords)
             {
                 if (host.Contains(pattern))
-                    assessment.Add(type, 6, "Name");
+                {
+                    Add(type, 20, RecognitionSources.Hostname, device.Hostname);
+                    break;
+                }
             }
 
-            // 3. OUI vendor with known-bad corrections.
-            string vendor = RecognitionAssessment.Bounded(device.Vendor).ToLowerInvariant();
+            // OUI vendor with known-bad corrections.
+            string vendor = device.Vendor.ToLowerInvariant();
+            string vendorShown = device.Vendor;
             if (!string.IsNullOrEmpty(device.MacAddress) && device.MacAddress.Length >= 8)
             {
                 string prefix = device.MacAddress[..8].ToUpperInvariant();
                 if (OuiBadMap.TryGetValue(prefix, out var corrected))
-                { vendor = corrected.ToLowerInvariant(); assessment.Vendor(corrected); }
+                {
+                    vendor = corrected.ToLowerInvariant();
+                    vendorShown = corrected;
+                }
             }
-
-            // 4. Score candidate types from observed signals.
-            void Add(string type, int weight, params string[] sources) => assessment.Add(type, weight, sources);
 
             bool hasWorkstationPorts = ports.Contains(3389) || ports.Contains(445);
             bool hasPrintProtocol = ports.Contains(9100) || ports.Contains(515) || ports.Contains(631);
             bool hasActiveDirectoryPorts = ports.Contains(88) && ports.Contains(389) && ports.Contains(445);
+            const string P = RecognitionSources.Ports, V = RecognitionSources.Vendor, H = RecognitionSources.Http,
+                T = RecognitionSources.Tls, S = RecognitionSources.Ssh, N = RecognitionSources.Snmp;
+            string Open(params int[] wanted) => PortList([.. wanted.Where(ports.Contains)]);
 
             // -- Hypervisor --
-            if (ports.Contains(8006)) Add("Hypervisor", 15, "TCP");
-            if (title.Contains("proxmox")) Add("Hypervisor", 15, "HTTP");
-            if (tls.Contains("vmware")) Add("Hypervisor", 15, "TLS");
-            if (title.Contains("vmware esxi")) Add("Hypervisor", 15, "HTTP");
-            if (ports.Contains(902) && ports.Contains(443) && !hasWorkstationPorts) Add("Hypervisor", 10, "TCP");
-            if (ports.Contains(2179) && (ports.Contains(5985) || ports.Contains(5986)) && !hasWorkstationPorts) Add("Hypervisor", 8, "TCP");
-            if (tls.Contains("xenserver")) Add("Hypervisor", 15, "TLS");
-            if (title.Contains("xenserver")) Add("Hypervisor", 15, "HTTP");
+            if (ports.Contains(8006)) Add("Hypervisor", 15, P, "8006");
+            if (title.Contains("proxmox")) Add("Hypervisor", 15, H, device.HttpTitle);
+            if (tls.Contains("vmware")) Add("Hypervisor", 15, T, device.TlsSubject);
+            else if (title.Contains("vmware esxi")) Add("Hypervisor", 15, H, device.HttpTitle);
+            if (ports.Contains(902) && ports.Contains(443) && !hasWorkstationPorts) Add("Hypervisor", 10, P, "902, 443");
+            if (ports.Contains(2179) && (ports.Contains(5985) || ports.Contains(5986)) && !hasWorkstationPorts) Add("Hypervisor", 8, P, Open(2179, 5985, 5986));
+            if (tls.Contains("xenserver")) Add("Hypervisor", 15, T, device.TlsSubject);
+            else if (title.Contains("xenserver")) Add("Hypervisor", 15, H, device.HttpTitle);
 
             // -- Windows workstation --
-            if (ports.Contains(3389) && ports.Contains(445)) Add("Windows", 6, "TCP");
-            if (server.Contains("microsoft-iis")) Add("Windows", 6, "HTTP");
-            if (!string.IsNullOrEmpty(nbName) && ports.Contains(445)) Add("Windows", 4, "NetBIOS", "TCP");
-            if (device.Ttl is >= 120 and <= 128 && ports.Contains(445)) Add("Windows", 3, "TCP", "ICMP");
+            if (ports.Contains(3389) && ports.Contains(445)) Add("Windows", 6, P, "3389, 445");
+            if (server.Contains("microsoft-iis")) Add("Windows", 6, H, device.HttpServer);
+            if (!string.IsNullOrEmpty(nbName) && ports.Contains(445)) Add("Windows", 4, RecognitionSources.NetBios, device.NetbiosName);
+            if (device.Ttl is >= 120 and <= 128 && ports.Contains(445)) Add("Windows", 3, RecognitionSources.Ttl, device.Ttl.ToString()!);
 
             // -- Windows Server --
             if (ports.Contains(3389) && ports.Contains(445) && (ports.Contains(80) || ports.Contains(443) || ports.Contains(53)))
-                Add("Windows Server", 6, "TCP");
-            if (hasActiveDirectoryPorts) Add("Windows Server", 20, "TCP");
-            if (ports.Contains(53) && ports.Contains(88) && ports.Contains(389)) Add("Windows Server", 16, "TCP");
+                Add("Windows Server", 6, P, Open(3389, 445, 80, 443, 53));
+            if (hasActiveDirectoryPorts) Add("Windows Server", 20, P, "88, 389, 445");
+            if (ports.Contains(53) && ports.Contains(88) && ports.Contains(389)) Add("Windows Server", 16, P, "53, 88, 389");
             if (ports.Contains(445) && (ports.Contains(636) || ports.Contains(3268) || ports.Contains(3269)))
-                Add("Windows Server", 14, "TCP");
-            if (ports.Contains(135) && ports.Contains(445) && ports.Contains(3389)) Add("Windows Server", 8, "TCP");
-            if (title.Contains("exchange") || server.Contains("exchange")) Add("Windows Server", 10, "HTTP");
-            if (snmp.Contains("windows server")) Add("Windows Server", 15, "SNMP");
+                Add("Windows Server", 14, P, Open(445, 636, 3268, 3269));
+            if (ports.Contains(135) && ports.Contains(445) && ports.Contains(3389)) Add("Windows Server", 8, P, "135, 445, 3389");
+            if (title.Contains("exchange")) Add("Windows Server", 10, H, device.HttpTitle);
+            else if (server.Contains("exchange")) Add("Windows Server", 10, H, device.HttpServer);
+            if (snmp.Contains("windows server")) Add("Windows Server", 15, N, device.SnmpDescr);
 
             // -- Linux / SSH --
             // Windows boxes with OpenSSH Server advertise "OpenSSH_for_Windows" -- score Windows, not Linux.
             bool sshIsWindows = ssh.Contains("for_windows");
-            if (sshIsWindows) Add("Windows", 15, "SSH");
-            if (!sshIsWindows && (ssh.StartsWith("ssh-2.0-openssh") || ssh.StartsWith("ssh-1.99-openssh"))) Add("Linux/SSH", 8, "SSH");
-            if (device.Ttl is >= 60 and <= 64 && ports.Contains(22) && !sshIsWindows) Add("Linux/SSH", 3, "TCP", "ICMP");
+            if (sshIsWindows) Add("Windows", 15, S, device.SshBanner);
+            if (!sshIsWindows && (ssh.StartsWith("ssh-2.0-openssh") || ssh.StartsWith("ssh-1.99-openssh"))) Add("Linux/SSH", 8, S, device.SshBanner);
+            if (device.Ttl is >= 60 and <= 64 && ports.Contains(22) && !sshIsWindows) Add("Linux/SSH", 3, RecognitionSources.Ttl, device.Ttl.ToString()!);
 
             // -- Network gear (switches, routers, firewalls, APs) --
             bool isNetworkVendor = vendor.Contains("cisco") || vendor.Contains("ubiquiti")
@@ -814,56 +1015,67 @@ namespace KillerScan.Engine
                 || vendor.Contains("juniper") || vendor.Contains("mikrotik") || vendor.Contains("gl technologies")
                 || vendor.Contains("gl.inet") || vendor.Contains("draytek") || vendor.Contains("zyxel")
                 || vendor.Contains("linksys") || vendor.Contains("sonicwall") || vendor.Contains("watchguard");
-            if (isNetworkVendor) Add("Network", 8, "OUI");
-            if (ssh.Contains("cisco") || ssh.Contains("routeros") || ssh.Contains("mikrotik")) Add("Network", 15, "SSH");
+            if (isNetworkVendor) Add("Network", 8, V, vendorShown);
+            if (ssh.Contains("cisco") || ssh.Contains("routeros") || ssh.Contains("mikrotik")) Add("Network", 15, S, device.SshBanner);
             if (title.Contains("unifi") || title.Contains("fortigate") || title.Contains("sonicwall")
-                || title.Contains("pfsense") || title.Contains("opnsense") || title.Contains("mikrotik")) Add("Network", 15, "HTTP");
-            if (snmp.Contains("cisco ios") || snmp.Contains("juniper") || snmp.Contains("fortigate")) Add("Network", 12, "SNMP");
+                || title.Contains("pfsense") || title.Contains("opnsense") || title.Contains("mikrotik")) Add("Network", 15, H, device.HttpTitle);
+            if (snmp.Contains("cisco ios") || snmp.Contains("juniper") || snmp.Contains("fortigate")) Add("Network", 12, N, device.SnmpDescr);
 
             // Router vs Switch/AP disambiguation within network gear.
-            if (isNetworkVendor && ports.Contains(53)) Add("Router", 10, "TCP", "OUI");
-            if (isNetworkVendor && ports.Contains(161) && !ports.Contains(53)) Add("Switch/AP", 8, "TCP", "OUI");
+            if (isNetworkVendor && ports.Contains(53)) Add("Router", 10, P, "53");
+            if (isNetworkVendor && ports.Contains(161) && !ports.Contains(53)) Add("Switch/AP", 8, P, "161");
 
             // -- Printer --
             bool isPrinterVendor = vendor.Contains("canon") || vendor.Contains("epson")
                 || vendor.Contains("brother") || vendor.Contains("xerox") || vendor.Contains("lexmark")
                 || vendor.Contains("ricoh") || vendor.Contains("konica") || vendor.Contains("kyocera");
             // HP vendor alone is ambiguous (laptops, servers, printers). Only trust with printer ports.
-            if (ports.Contains(9100)) Add("Printer", 10, "TCP");
-            if (!hasActiveDirectoryPorts && (ports.Contains(515) || ports.Contains(631))) Add("Printer", 4, "TCP");
-            if (isPrinterVendor && hasPrintProtocol) Add("Printer", 12, "TCP", "OUI");
-            if (isPrinterVendor && ports.Count <= 3) Add("Printer", 6, "OUI");
-            if (vendor.Contains("hewlett packard") && ports.Contains(9100)) Add("Printer", 12, "TCP", "OUI");
-            if (snmp.Contains("laserjet") || snmp.Contains("officejet") || snmp.Contains("printer")) Add("Printer", 15, "SNMP");
-            if (title.Contains("embedded web server") || title.Contains("web image monitor")) Add("Printer", 10, "HTTP");
+            if (ports.Contains(9100)) Add("Printer", 10, P, "9100");
+            if (!hasActiveDirectoryPorts && (ports.Contains(515) || ports.Contains(631))) Add("Printer", 4, P, Open(515, 631));
+            if (isPrinterVendor && hasPrintProtocol) Add("Printer", 12, V, vendorShown);
+            if (isPrinterVendor && ports.Count <= 3) Add("Printer", 6, V, vendorShown);
+            if (vendor.Contains("hewlett packard") && ports.Contains(9100)) Add("Printer", 12, V, vendorShown);
+            if (snmp.Contains("laserjet") || snmp.Contains("officejet") || snmp.Contains("printer")) Add("Printer", 15, N, device.SnmpDescr);
+            if (title.Contains("embedded web server") || title.Contains("web image monitor")) Add("Printer", 10, H, device.HttpTitle);
 
             // -- NAS --
             if (vendor.Contains("synology") || vendor.Contains("qnap") || vendor.Contains("asustor")
                 || vendor.Contains("drobo") || vendor.Contains("buffalo") || vendor.Contains("terramaster"))
-                Add("NAS", 12, "OUI");
+                Add("NAS", 12, V, vendorShown);
             if (title.Contains("diskstation") || title.Contains("synology") || title.Contains("dsm "))
-                Add("NAS", 15, "HTTP");
+                Add("NAS", 15, H, device.HttpTitle);
             if (title.Contains("qts") || title.Contains("qnap") || title.Contains("truenas") || title.Contains("freenas"))
-                Add("NAS", 15, "HTTP");
-            if (ports.Contains(548)) Add("NAS", 4, "TCP");
+                Add("NAS", 15, H, device.HttpTitle);
+            if (ports.Contains(548)) Add("NAS", 4, P, "548");
 
             // -- Apple iDevice (iPhone / iPad) --
             bool isApple = vendor.Contains("apple");
             // Port 62078 is the Apple iDevice sync/tether port -- exclusively iPhones and iPads.
-            // Score regardless of OUI so randomized-MAC devices can still be suggested.
-            if (ports.Contains(62078)) Add("iPhone", 15, "TCP");
-            if (isApple && ports.Contains(62078)) Add("iPhone", 5, "TCP", "OUI");  // OUI bonus
-            if (device.MdnsServices.Take(16).Select(value => RecognitionAssessment.Bounded(value).ToLowerInvariant()).Any(s => s.Contains("_airplay") || s.Contains("_raop") || s.Contains("_airport")))
-                Add("Apple Device", 10, "mDNS");
+            // Score regardless of OUI so randomized-MAC iDevices are still caught.
+            if (ports.Contains(62078)) Add("iPhone", 15, P, "62078");
+            if (isApple && ports.Contains(62078)) Add("iPhone", 5, V, vendorShown);  // OUI bonus
+            if (isApple && ports.Count <= 2) Add("iPhone", 6, V, vendorShown);
+            string? FirstSvc(params string[] wanted) => device.MdnsServices.FirstOrDefault(s => wanted.Any(s.Contains));
+            if (FirstSvc("_airplay", "_raop", "_airport") is { } appleSvc)
+                Add("Apple Device", 10, RecognitionSources.Mdns, appleSvc);
+
+            // -- Android / Mobile --
+            bool isMobileVendor = vendor.Contains("samsung") || vendor.Contains("oneplus")
+                || vendor.Contains("xiaomi") || vendor.Contains("huawei") || vendor.Contains("motorola")
+                || vendor.Contains("oppo") || vendor.Contains("vivo") || vendor.Contains("zte")
+                || vendor.Contains("lg electronics") || vendor.Contains("google")
+                || vendor.Contains("bbk electronics") || vendor.Contains("realme")
+                || vendor.Contains("nothing technology") || vendor.Contains("fairphone");
+            if (isMobileVendor && ports.Count <= 3) Add("Android", 8, V, vendorShown);
 
             // -- Surveillance camera --
             if (vendor.Contains("hikvision") || vendor.Contains("dahua") || vendor.Contains("axis")
                 || vendor.Contains("amcrest") || vendor.Contains("reolink") || vendor.Contains("foscam"))
-                Add("Camera", 12, "OUI");
+                Add("Camera", 12, V, vendorShown);
             if (title.Contains("hikvision") || title.Contains("dahua") || title.Contains("camera")
                 || title.Contains("dvr") || title.Contains("nvr") || title.Contains("ipcam"))
-                Add("Camera", 12, "HTTP");
-            if (ports.Contains(554)) Add("Camera", 4, "TCP");
+                Add("Camera", 12, H, device.HttpTitle);
+            if (ports.Contains(554)) Add("Camera", 4, P, "554");
 
             // -- IoT / smart home --
             if (vendor.Contains("espressif") || vendor.Contains("tuya") || vendor.Contains("sonoff")
@@ -871,41 +1083,114 @@ namespace KillerScan.Engine
                 || vendor.Contains("signify") || vendor.Contains("lutron") || vendor.Contains("wemo")
                 || vendor.Contains("wyze") || vendor.Contains("aqara") || vendor.Contains("linkplay")
                 || vendor.Contains("wiim") || vendor.Contains("govee"))
-                Add("IoT", 10, "OUI");
+                Add("IoT", 10, V, vendorShown);
 
             // -- Home Assistant --
-            if (ports.Contains(8123)) Add("Home Assistant", 12, "TCP");
-            if (title.Contains("home assistant")) Add("Home Assistant", 15, "HTTP");
-            if (host.Contains("homeassistant") || host.Contains("home-assistant")) Add("Home Assistant", 6, "Name");
+            if (ports.Contains(8123)) Add("Home Assistant", 12, P, "8123");
+            if (title.Contains("home assistant")) Add("Home Assistant", 15, H, device.HttpTitle);
 
             // -- DNS server (Pi-hole, AdGuard, BIND) --
-            if (title.Contains("pi-hole") || title.Contains("pihole")) Add("DNS Server", 15, "HTTP");
-            if (title.Contains("adguard")) Add("DNS Server", 15, "HTTP");
-            if (ports.Contains(53) && ports.Contains(80) && !isNetworkVendor) Add("DNS Server", 6, "TCP");
+            if (title.Contains("pi-hole") || title.Contains("pihole")) Add("DNS Server", 15, H, device.HttpTitle);
+            if (title.Contains("adguard")) Add("DNS Server", 15, H, device.HttpTitle);
+            if (ports.Contains(53) && ports.Contains(80) && !isNetworkVendor) Add("DNS Server", 6, P, "53, 80");
 
             // -- mDNS (Bonjour) service types: the strongest, most specific signals --
-            bool HasSvc(string s) => device.MdnsServices.Take(16).Select(value => RecognitionAssessment.Bounded(value).ToLowerInvariant()).Any(x => x.Contains(s));
-            if (HasSvc("_googlecast")) Add("Smart TV", 14, "mDNS");
-            if (HasSvc("_printer") || HasSvc("_ipp") || HasSvc("_pdl-datastream")) Add("Printer", 14, "mDNS");
-            if (HasSvc("_sonos") || HasSvc("_spotify-connect")) Add("Media Streamer", 12, "mDNS");
-            if (HasSvc("_airplay") || HasSvc("_raop")) Add("Media Streamer", 8, "mDNS");
-            if (HasSvc("_hap") || HasSvc("_homekit") || HasSvc("_hue")) Add("IoT", 10, "mDNS");
+            const string M = RecognitionSources.Mdns;
+            if (FirstSvc("_googlecast") is { } cast) Add("Smart TV", 14, M, cast);
+            if (FirstSvc("_printer", "_ipp", "_pdl-datastream") is { } print) Add("Printer", 14, M, print);
+            if (FirstSvc("_sonos", "_spotify-connect") is { } speaker) Add("Media Streamer", 12, M, speaker);
+            if (FirstSvc("_airplay", "_raop") is { } airplay) Add("Media Streamer", 8, M, airplay);
+            if (FirstSvc("_hap", "_homekit", "_hue") is { } home) Add("IoT", 10, M, home);
 
             // -- SSDP / UPnP SERVER string --
-            if (ssdp.Contains("roku")) Add("Smart TV", 12, "SSDP");
-            if (ssdp.Contains("synology") || ssdp.Contains("qnap")) Add("NAS", 12, "SSDP");
-            if (ssdp.Contains("plex")) Add("Media Streamer", 12, "SSDP");
-            if (ssdp.Contains("sonos") || ssdp.Contains("dlna") || ssdp.Contains("mediaserver")) Add("Media Streamer", 8, "SSDP");
-            if (ssdp.Contains("samsung") && ssdp.Contains("tv")) Add("Smart TV", 10, "SSDP");
+            const string U = RecognitionSources.Ssdp;
+            if (ssdp.Contains("roku")) Add("Smart TV", 12, U, device.SsdpServer);
+            if (ssdp.Contains("synology") || ssdp.Contains("qnap")) Add("NAS", 12, U, device.SsdpServer);
+            if (ssdp.Contains("plex")) Add("Media Streamer", 12, U, device.SsdpServer);
+            if (ssdp.Contains("sonos") || ssdp.Contains("dlna") || ssdp.Contains("mediaserver")) Add("Media Streamer", 8, U, device.SsdpServer);
+            if (ssdp.Contains("samsung") && ssdp.Contains("tv")) Add("Smart TV", 10, U, device.SsdpServer);
 
             // -- New ports --
-            if (ports.Contains(32400)) Add("Media Streamer", 12, "TCP");          // Plex
-            if (ports.Contains(1883) || ports.Contains(8883)) Add("IoT", 6, "TCP"); // MQTT brokers
+            if (ports.Contains(32400)) Add("Media Streamer", 12, P, "32400");          // Plex
+            if (ports.Contains(1883) || ports.Contains(8883)) Add("IoT", 6, P, Open(1883, 8883)); // MQTT brokers
 
             // -- Generic web device (catch-all) --
-            if (ports.Contains(80) || ports.Contains(443) || ports.Contains(8080)) Add("Web Device", 2, "TCP");
+            if (ports.Contains(80) || ports.Contains(443) || ports.Contains(8080)) Add("Web Device", 2, P, Open(80, 443, 8080));
 
-            return assessment.Finish();
+            // Pick highest-scoring candidate above threshold. Ties go to the type scored first,
+            // which is the order of the rules above, so the result does not depend on hashing.
+            var ranked = scores.Select((pair, order) => (pair.Key, pair.Value, order))
+                .OrderByDescending(entry => entry.Value).ThenBy(entry => entry.order).ToList();
+            if (ranked.Count > 0 && ranked[0].Value >= 6)
+            {
+                var (winner, score, _) = ranked[0];
+                // Generic "Network" gear with no Router/Switch disambiguation is most likely a switch/AP.
+                string shown = winner == "Network" ? "Switch/AP" : winner;
+                // Signals for a refinement of the winner support it too: the network-vendor hint
+                // behind "Router" counts toward Network gear.
+                var support = signals.Where(s => Related(s.Type == "Network" ? "Switch/AP" : s.Type, shown)).Select(s => s.Signal)
+                    .OrderByDescending(s => s.Weight).ToList();
+                var others = ranked.Skip(1).Where(entry => entry.Value >= 6 && entry.Key != "Web Device")
+                    .Select(entry => new RecognitionCandidate { Type = entry.Key == "Network" ? "Switch/AP" : entry.Key, Score = entry.Value })
+                    .Where(candidate => candidate.Type != shown).Take(3).ToList();
+                bool conflict = others.Any(candidate => !Related(candidate.Type, shown) && candidate.Score * 3 >= score * 2);
+
+                int protocols = support.Select(s => s.Source).Where(RecognitionSources.IsProtocol).Distinct().Count();
+                var confidence = protocols >= 2 ? RecognitionConfidence.High
+                    : protocols == 1 || score >= 15 ? RecognitionConfidence.Medium
+                    : RecognitionConfidence.Low;
+                // A close, unrelated rival takes one step off: the evidence disagrees with itself.
+                if (conflict && confidence != RecognitionConfidence.Low) confidence--;
+
+                return new DeviceRecognition
+                {
+                    Type = shown,
+                    Confidence = confidence,
+                    AutomaticType = shown,
+                    AutomaticConfidence = confidence,
+                    Signals = support,
+                    Alternatives = others,
+                    Conflict = conflict,
+                };
+            }
+
+            // Nothing cleared the threshold: fall back to a broad guess, always Low.
+            DeviceRecognition Guess(string type, string rule)
+            {
+                var guess = Decided(type, RecognitionConfidence.Low, RecognitionSources.Fallback, rule);
+                guess.Signals.AddRange(signals.Select(s => s.Signal).OrderByDescending(s => s.Weight));
+                return guess;
+            }
+
+            // Randomized / locally-administered MAC with no responsive ports is almost
+            // always a phone or tablet using iOS/Android private Wi-Fi addressing.
+            bool localAdminMac = false;
+            if (!string.IsNullOrEmpty(device.MacAddress) && device.MacAddress.Length >= 2
+                && byte.TryParse(device.MacAddress[..2], System.Globalization.NumberStyles.HexNumber, null, out var firstByte))
+            {
+                localAdminMac = (firstByte & 0x02) != 0;
+            }
+            if (localAdminMac && ports.Count <= 3) return Guess("Mobile", RecognitionRules.PrivateMacFewPorts);
+
+            // Fallback heuristics when no candidate cleared threshold.
+            if (ports.Contains(22)) return Guess("Linux/SSH", RecognitionRules.SshPort);
+            if (ports.Contains(445) || ports.Contains(3389)) return Guess("Windows", RecognitionRules.WindowsPorts);
+            if (ports.Contains(80) || ports.Contains(443)) return Guess("Web Device", RecognitionRules.WebPort);
+            // Known PC/workstation makers with no open ports are idle/standby computers, not IoT.
+            // (A business micro in modern standby still answers ARP but blocks every inbound TCP port.)
+            bool isPcVendor = vendor.Contains("dell") || vendor.Contains("hewlett") || vendor.Contains("hp inc")
+                || vendor.Contains("lenovo") || vendor.Contains("micro-star") || vendor.Contains("asustek")
+                || vendor.Contains("asrock") || vendor.Contains("gigabyte") || vendor.Contains("giga-byte")
+                || vendor.Contains("framework") || vendor.Contains("fujitsu") || vendor.Contains("acer")
+                || vendor.Contains("clevo");
+            if (ports.Count == 0 && isPcVendor) return Guess("Windows", RecognitionRules.PcVendorNoPorts);
+
+            // Responds to ARP/ping but exposes zero TCP ports -- almost always a
+            // smart bulb, plug, sensor, or other IoT endpoint. Even with a blank
+            // OUI (Govee and similar use unregistered prefixes), IoT beats Unknown.
+            if (ports.Count == 0 && !string.IsNullOrEmpty(device.MacAddress)) return Guess("IoT", RecognitionRules.NoPortsWithMac);
+            if (ports.Count == 0) return Guess("Unknown", RecognitionRules.NoEvidence);
+            return Guess("Other", RecognitionRules.OpenPortsOnly);
         }
 
         // ===================================================================
@@ -920,15 +1205,30 @@ namespace KillerScan.Engine
         // a web service on a non-standard port.
         private static readonly int[] TlsLikelyPorts = [443, 8443, 8006, 902, 5001, 9443, 4443, 10000, 8834];
 
-        private static Task ProbeHttpAsync(NetworkDevice device, IPAddress addr, bool deep = false) =>
-            ProbeHttpWithCancellationAsync(device, addr, deep, CancellationToken.None);
+        // Services that act on whatever bytes arrive: JetDirect raw printing (9100-9103) and
+        // LPD (515) print an HTTP GET or ClientHello as a page. Deep fingerprinting never sends
+        // payloads to them, matching Nmap's default exclusion of 9100.
+        private static readonly int[] RawServicePorts = [515, 9100, 9101, 9102, 9103];
 
-        internal static async Task ProbeHttpWithCancellationAsync(NetworkDevice device, IPAddress addr, bool deep, CancellationToken token)
+        /// <summary>True when a deep fingerprint may send HTTP or TLS bytes to this extra port.</summary>
+        public static bool IsPayloadSafe(int port) => !RawServicePorts.Contains(port);
+
+        public static Task ProbeHttpAsync(NetworkDevice device, IPAddress addr, bool deep = false, CancellationToken ct = default) =>
+            ProbeHttpAsync(device, addr, deep, everyPort: false, ct);
+
+        /// <summary>
+        /// Fetches the root page of the device's web ports. The first useful title and Server
+        /// header feed classification. Every response is also recorded in
+        /// <see cref="NetworkDevice.Access"/>, with whether it asked for a login. Normal scans stop
+        /// at the first useful page; with <paramref name="everyPort"/> (deep scans) every web
+        /// port is tried so each gets its own evidence. No credentials are ever sent.
+        /// </summary>
+        internal static async Task ProbeHttpAsync(NetworkDevice device, IPAddress addr, bool deep, bool everyPort, CancellationToken ct)
         {
             (int port, bool https)[] standard =
             [
                 (80, false), (8080, false), (5000, false), (8123, false),
-                (443, true), (8443, true), (8006, true), (5001, true), (5357, false), (32400, false),
+                (443, true), (8443, true), (8006, true), (5001, true),
             ];
 
             // Normal scan: only the known web ports. Deep rescan: also treat every other open
@@ -939,17 +1239,12 @@ namespace KillerScan.Engine
             if (deep)
             {
                 candidates.AddRange(device.OpenPorts
-                    .Where(p => !standard.Any(s => s.port == p))
+                    .Where(p => !standard.Any(s => s.port == p) && IsPayloadSafe(p))
                     .Take(12)
-                    .SelectMany(p => new[] { (port: p, https: TlsLikelyPorts.Contains(p)), (port: p, https: !TlsLikelyPorts.Contains(p)) }));
+                    .Select(p => (port: p, https: TlsLikelyPorts.Contains(p))));
             }
 
-            using var handler = new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
-                AllowAutoRedirect = false, UseProxy = false, UseCookies = false,
-                MaxAutomaticRedirections = 2,
-            };
+            using var handler = CreateFingerprintHandler();
             using var client = new HttpClient(handler)
             {
                 Timeout = TimeSpan.FromMilliseconds(deep ? 1000 : 1500),
@@ -959,21 +1254,204 @@ namespace KillerScan.Engine
 
             foreach (var (port, https) in candidates)
             {
-                token.ThrowIfCancellationRequested();
+                ct.ThrowIfCancellationRequested();
                 try
                 {
-                    if (device.Access?.Any(item => item.Port == port && item.Verification == "HttpResponse" && item.HttpStatus is not (400 or 426)) == true) continue;
                     var scheme = https ? "https" : "http";
-                    using var resp = await client.GetAsync($"{scheme}://{addr}:{port}/", HttpCompletionOption.ResponseHeadersRead, token);
-                    HttpAccessObservation.Record(device, port, https, (int)resp.StatusCode, resp.Headers.ToString(), "");
+                    var (resp, final, redirectStatus) = await GetDeviceResponseAsync(client, new Uri($"{scheme}://{addr}:{port}/"), addr, ct);
+                    // A redirect is a server answering at this endpoint. What it led to is
+                    // recorded under the endpoint that gave that answer, never under this one.
+                    if (redirectStatus is { } moved) RecordWeb(device, scheme, port, moved, AccessLogin.Unknown, string.Empty);
+                    if (resp == null) continue;
+                    using (resp)
+                    {
+                        var body = await resp.Content.ReadAsStringAsync();
+                        ct.ThrowIfCancellationRequested();
+                        int status = (int)resp.StatusCode;
+                        string authScheme = resp.Headers.WwwAuthenticate.Select(a => a.Scheme).FirstOrDefault(IsTokenSafe) ?? string.Empty;
+                        var login = status == 401 ? AccessLogin.Requested : HasLoginForm(body) ? AccessLogin.LoginForm : AccessLogin.Unknown;
+                        // A same-address redirect to another root path still answers for that endpoint.
+                        RecordWeb(device, final.Scheme, final.Port, status, login, authScheme);
 
-                    var body = await HttpAccessObservation.ReadBody(resp.Content, deep ? 1000 : 1500, token);
-                    HttpAccessObservation.Record(device, port, https, (int)resp.StatusCode, resp.Headers.ToString(), body);
+                        // Classification reads the first useful page; later ports only add evidence.
+                        if (device.HttpTitle.Length == 0 && device.HttpServer.Length == 0)
+                        {
+                            if (resp.Headers.TryGetValues("Server", out var serverVals))
+                                device.HttpServer = string.Join(", ", serverVals).Trim();
+                            // Bounded like HasLoginForm: the body is the device's, up to 256 KB, and a
+                            // run of "<title" with no ">" backtracks for seconds on .NET Framework.
+                            try
+                            {
+                                var m = Regex.Match(body, @"<title[^>]*>([^<]+)</title>", RegexOptions.IgnoreCase, HtmlScanLimit);
+                                if (m.Success)
+                                    device.HttpTitle = WebUtility.HtmlDecode(m.Groups[1].Value).Trim();
+                            }
+                            catch (RegexMatchTimeoutException) { }
+                        }
+                    }
+
+                    if (!everyPort && (device.HttpTitle.Length > 0 || device.HttpServer.Length > 0))
+                        return;
                 }
-                catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
                 catch { }
             }
+            ct.ThrowIfCancellationRequested();
         }
+
+        // Direct (no proxy, which would answer in the device's place), no automatic redirects,
+        // and, for a bound run, connections made from the adapter's address.
+        private static HttpMessageHandler CreateFingerprintHandler()
+        {
+#if NET
+            if (ScanSource.Current is { } binding)
+            {
+                var local = binding.LocalAddress;
+                return new SocketsHttpHandler
+                {
+                    AllowAutoRedirect = false,
+                    UseProxy = false,
+                    SslOptions = { RemoteCertificateValidationCallback = (_, _, _, _) => true },
+                    ConnectCallback = async (context, token) =>
+                    {
+                        var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) { NoDelay = true };
+                        try
+                        {
+                            socket.Bind(new IPEndPoint(local, 0));
+                            await socket.ConnectAsync(context.DnsEndPoint, token);
+                            return new NetworkStream(socket, ownsSocket: true);
+                        }
+                        catch { socket.Dispose(); throw; }
+                    }
+                };
+            }
+#endif
+            return new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
+                AllowAutoRedirect = false,
+                // A system or PAC proxy would answer in the device's place.
+                UseProxy = false,
+            };
+        }
+
+        private static readonly object AccessLock = new();
+
+        private static void RecordWeb(NetworkDevice device, string scheme, int port, int status, AccessLogin login, string authScheme)
+        {
+            lock (AccessLock)
+            {
+                device.Access ??= [];
+                device.Access.RemoveAll(e => e.Protocol == scheme && e.Port == port);
+                device.Access.Add(new AccessEndpoint
+                {
+                    Protocol = scheme, Port = port, Evidence = AccessEvidence.HttpResponse, HttpStatus = status,
+                    Login = login, AuthScheme = authScheme, ObservedAt = DateTimeOffset.UtcNow,
+                });
+            }
+        }
+
+        // An auth scheme is a short token such as Basic, Digest, NTLM or Negotiate.
+        private static bool IsTokenSafe(string scheme) =>
+            scheme.Length is > 0 and <= 32 && scheme.All(c => c < 128 && (char.IsLetterOrDigit(c) || c is '-' or '_'));
+
+        private static readonly TimeSpan HtmlScanLimit = TimeSpan.FromMilliseconds(200);
+
+        /// <summary>
+        /// True when the page has a form with a password field: a sign-in page, which says a
+        /// login exists, not that one would work. Comments, scripts and styles are ignored, and
+        /// a login built by JavaScript or single sign-on is missed.
+        /// </summary>
+        internal static bool HasLoginForm(string html)
+        {
+            try
+            {
+                string page = Regex.Replace(html, @"<!--.*?-->|<(script|style)\b[^>]*>.*?</\1\s*>", " ",
+                    RegexOptions.Singleline | RegexOptions.IgnoreCase, HtmlScanLimit);
+                return Regex.Matches(page, @"<form\b[^>]*>(.*?)</form\s*>", RegexOptions.Singleline | RegexOptions.IgnoreCase, HtmlScanLimit)
+                    .Cast<Match>()
+                    .Any(form => Regex.IsMatch(form.Groups[1].Value, @"<input\b[^>]*\btype\s*=\s*[""']?password\b",
+                        RegexOptions.Singleline | RegexOptions.IgnoreCase, HtmlScanLimit));
+            }
+            catch (RegexMatchTimeoutException) { return false; }
+        }
+
+        /// <summary>
+        /// The device's own response, following up to two redirects that stay on the same
+        /// address. <c>Final</c> is where the response came from, which a redirect can move to
+        /// another port or scheme. <c>RedirectStatus</c> is the first redirect's status, if any.
+        /// A redirect it will not follow returns no response.
+        /// </summary>
+        private static async Task<(HttpResponseMessage? Response, Uri Final, int? RedirectStatus)> GetDeviceResponseAsync(HttpClient client, Uri uri, IPAddress address, CancellationToken ct)
+        {
+            int? firstRedirect = null;
+            for (int hop = 0; hop <= 2; hop++)
+            {
+                ct.ThrowIfCancellationRequested();
+                HttpResponseMessage response;
+                try { response = await SendFingerprintAsync(client, uri, ct); }
+                catch (Exception) when (firstRedirect != null && !ct.IsCancellationRequested)
+                {
+                    // The redirect was an answer at this endpoint, even when the hop it pointed to
+                    // fails or times out (HttpClient reports its own timeout as a cancellation).
+                    return (null, uri, firstRedirect);
+                }
+                int status = (int)response.StatusCode;
+                if (status < 300 || status >= 400) return (response, uri, firstRedirect);
+                firstRedirect ??= status;
+                Uri? location = response.Headers.Location;
+                response.Dispose();
+                if (hop == 2 || status is not (301 or 302 or 303 or 307 or 308) || location == null ||
+                    !Uri.TryCreate(uri, location, out var next) ||
+                    (next.Scheme != Uri.UriSchemeHttp && next.Scheme != Uri.UriSchemeHttps) ||
+                    next.UserInfo.Length != 0 || !IPAddress.TryParse(next.Host, out var target) || !target.Equals(address) ||
+                    // A redirect to a raw print port would make the GET print, like any payload there.
+                    !IsPayloadSafe(next.Port))
+                    return (null, uri, firstRedirect);
+                uri = next;
+            }
+            return (null, uri, firstRedirect);
+        }
+
+#if NETFRAMEWORK
+        // .NET Framework connects through a service point shared by every request to the same
+        // scheme, host and port, and its bind delegate is read when the connection opens. One
+        // lock per stripe of endpoints keeps a bound and an unbound request to the same endpoint
+        // from swapping each other's delegate in between.
+        private static readonly SemaphoreSlim[] ServicePointLocks = [.. Enumerable.Range(0, 32).Select(_ => new SemaphoreSlim(1, 1))];
+#endif
+
+        /// <summary>
+        /// One fingerprint request. It closes its connection afterwards, so a connection opened
+        /// from one adapter is never reused by a later request that should go from another.
+        /// </summary>
+        private static async Task<HttpResponseMessage> SendFingerprintAsync(HttpClient client, Uri uri, CancellationToken ct)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.ConnectionClose = true;
+#if NETFRAMEWORK
+            var gate = ServicePointLocks[(uri.Scheme + uri.Authority).GetHashCode() & 31];
+            await gate.WaitAsync(ct);
+            try
+            {
+                var local = ScanSource.Current?.LocalAddress;
+                ServicePointManager.FindServicePoint(uri).BindIPEndPointDelegate =
+                    local == null ? null : (_, _, retry) => BindOnce(local, retry);
+                return await client.SendAsync(request, ct);
+            }
+            finally { gate.Release(); }
+#else
+            return await client.SendAsync(request, ct);
+#endif
+        }
+
+#if NETFRAMEWORK
+        // The service point calls the delegate again after each failed bind. Retrying the same
+        // address would spin, and returning null would let Windows pick another adapter, so a
+        // second call fails the request instead.
+        private static IPEndPoint BindOnce(IPAddress local, int retry) =>
+            retry == 0 ? new IPEndPoint(local, 0) : throw new InvalidOperationException("The bound adapter's address " + local + " is no longer available.");
+#endif
 
         /// <summary>
         /// Read SSH server banner (first line after TCP connect) from port 22.
@@ -983,67 +1461,86 @@ namespace KillerScan.Engine
         {
             try
             {
-                using var tcp = new TcpClient();
-                var connect = tcp.ConnectAsync(addr, 22);
+                using var tcp = ScanSource.Tcp();
+                var connect = tcp.ConnectAsync(addr, 22).ObserveFault();
                 if (await Task.WhenAny(connect, Task.Delay(1000)) != connect || !tcp.Connected)
                     return;
                 using var stream = tcp.GetStream();
                 stream.ReadTimeout = 1500;
                 var buf = new byte[256];
-                var readTask = stream.ReadAsync(buf, 0, buf.Length);
+                var readTask = stream.ReadAsync(buf, 0, buf.Length).ObserveFault();
                 if (await Task.WhenAny(readTask, Task.Delay(1500)) != readTask) return;
                 int n = readTask.Result;
                 if (n <= 0) return;
-                string banner = Encoding.ASCII.GetString(buf, 0, n).Trim();
-                if (banner.StartsWith("SSH-"))
-                {
-                    int nl = banner.IndexOfAny(['\r', '\n']);
-                    device.SshBanner = nl > 0 ? banner[..nl] : banner;
-                }
+                // RFC 4253 4.2 lets a server send other lines before its version line.
+                string? banner = Encoding.ASCII.GetString(buf, 0, n)
+                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Trim())
+                    .FirstOrDefault(line => line.StartsWith("SSH-", StringComparison.Ordinal));
+                if (banner != null) device.SshBanner = banner;
             }
             catch { }
         }
 
+        /// <summary>The ports a normal scan reads certificates from, 5001 being Synology DSM HTTPS.</summary>
+        private static readonly int[] StandardTlsPorts = [443, 8443, 8006, 902, 5001];
+
+        /// <summary>Whether a normal scan should run the TLS probe at all. It reads the same list
+        /// the probe walks, so the gate cannot skip a port the probe would have read.</summary>
+        internal static bool HasStandardTlsPort(NetworkDevice device) =>
+            device.OpenPorts.Any(StandardTlsPorts.Contains);
+
         /// <summary>
         /// Pull TLS certificate Subject from the first responsive TLS port.
         /// </summary>
-        private static async Task ProbeTlsCertAsync(NetworkDevice device, IPAddress addr, bool deep = false)
+        public static async Task ProbeTlsCertAsync(NetworkDevice device, IPAddress addr, bool deep = false, CancellationToken ct = default)
         {
-            int[] standardTls = [443, 8443, 8006, 902, 5001];
+            int[] standardTls = StandardTlsPorts;
 
             // Normal scan: the known TLS ports only. Deep rescan: attempt a TLS handshake on every
             // open port (a non-TLS port just fails fast), so certs on non-standard ports are caught.
             int[] tlsPorts = deep
                 ? [.. standardTls.Where(device.OpenPorts.Contains)
-                    .Concat(device.OpenPorts.Where(p => !standardTls.Contains(p)).Take(12))]
+                    .Concat(device.OpenPorts.Where(p => !standardTls.Contains(p) && IsPayloadSafe(p)).Take(12))]
                 : standardTls;
             foreach (var port in tlsPorts)
             {
+                ct.ThrowIfCancellationRequested();
                 if (!device.OpenPorts.Contains(port)) continue;
                 try
                 {
-                    using var tcp = new TcpClient();
-                    var connect = tcp.ConnectAsync(addr, port);
-                    if (await Task.WhenAny(connect, Task.Delay(1500)) != connect || !tcp.Connected)
+                    using var tcp = ScanSource.Tcp();
+                    using var cancellation = ct.Register(() => tcp.Dispose());
+                    var connect = tcp.ConnectAsync(addr, port).ObserveFault();
+                    if (await AwaitWithCancellation(Task.WhenAny(connect, Task.Delay(1500, ct)), ct) != connect)
                         continue;
+                    await connect;
+                    ct.ThrowIfCancellationRequested();
                     using var ssl = new SslStream(tcp.GetStream(), false, (_, _, _, _) => true);
-                    var auth = ssl.AuthenticateAsClientAsync(addr.ToString(), null, SslProtocols.None, false);
-                    if (await Task.WhenAny(auth, Task.Delay(1500)) != auth) continue;
+                    var auth = ssl.AuthenticateAsClientAsync(addr.ToString(), null, SslProtocols.None, false).ObserveFault();
+                    if (await AwaitWithCancellation(Task.WhenAny(auth, Task.Delay(1500, ct)), ct) != auth) continue;
+                    await auth;
+                    ct.ThrowIfCancellationRequested();
                     if (ssl.RemoteCertificate != null)
                     {
                         device.TlsSubject = ssl.RemoteCertificate.Subject;
                         return;
                     }
                 }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
                 catch { }
             }
+            ct.ThrowIfCancellationRequested();
         }
 
         /// <summary>
         /// UDP NetBIOS name service query (NBSTAT, port 137). Returns the machine's
         /// NetBIOS name for any Windows host that answers NBT, even when SMB is locked down.
         /// </summary>
-        private static async Task ProbeNetbiosAsync(NetworkDevice device, IPAddress addr, ScanRun? run = null)
+        public static Task ProbeNetbiosAsync(NetworkDevice device, IPAddress addr) => ProbeNetbiosAsync(device, addr, UdpPortOverride ?? 137);
+
+        // Windows NetBT owns UDP 137 on this machine, so fixtures pass their own port.
+        internal static async Task ProbeNetbiosAsync(NetworkDevice device, IPAddress addr, int port)
         {
             // NBSTAT query for the wildcard name "*" (encoded as 32-byte level-2 name).
             byte[] query =
@@ -1057,37 +1554,25 @@ namespace KillerScan.Engine
                 0x00, 0x01,
             ];
 
+            // A random transaction ID plus a connected socket ties the reply to this query and host.
+            var identity = new byte[2];
+            using (var random = RandomNumberGenerator.Create()) random.GetBytes(identity);
+            query[0] = identity[0];
+            query[1] = identity[1];
+            int transactionId = (identity[0] << 8) | identity[1];
             try
             {
-                run?.CheckTarget(addr);
-                using var udp = run?.Udp() ?? new UdpClient();
+                using var udp = ScanSource.Udp();
                 udp.Client.SendTimeout = 500;
                 udp.Client.ReceiveTimeout = 800;
-                await udp.SendAsync(query, query.Length, new IPEndPoint(addr, 137));
+                udp.Connect(addr, port);
+                await udp.SendAsync(query, query.Length);
 
-                var recvTask = ReceiveProbeAsync(udp, addr, 137, run);
+                var recvTask = udp.ReceiveAsync().ObserveFault();
                 if (await Task.WhenAny(recvTask, Task.Delay(800)) != recvTask) return;
-                var resp = recvTask.Result.Buffer;
-                if (resp.Length < 57) return;
-
-                int numNames = resp[56];
-                for (int i = 0; i < numNames && 57 + (i * 18) + 18 <= resp.Length; i++)
-                {
-                    int off = 57 + (i * 18);
-                    byte suffix = resp[off + 15];
-                    if (suffix == 0x00 || suffix == 0x20)
-                    {
-                        string name = Encoding.ASCII.GetString(resp, off, 15).TrimEnd(' ', '\0');
-                        if (!string.IsNullOrWhiteSpace(name) && !name.Contains('\x01') && !name.Contains('\x02'))
-                        {
-                            device.NetbiosName = name;
-                            return;
-                        }
-                    }
-                }
+                if (NetbiosResponse.TryDecode(recvTask.Result.Buffer, transactionId, out var name))
+                    device.NetbiosName = name;
             }
-            catch (NetworkBindingException) { throw; }
-            catch (OperationCanceledException) { throw; }
             catch { }
         }
 
@@ -1095,9 +1580,9 @@ namespace KillerScan.Engine
         /// SNMPv1 GET of sysDescr.0 (1.3.6.1.2.1.1.1.0) with community "public".
         /// Works on most network gear, printers, and UPSes that expose SNMP.
         /// </summary>
-        private static async Task ProbeSnmpAsync(NetworkDevice device, IPAddress addr, ScanRun? run = null)
+        public static async Task ProbeSnmpAsync(NetworkDevice device, IPAddress addr)
         {
-            // Precomputed SNMPv1 GetRequest for sysDescr.0, community "public".
+            // SNMPv1 GetRequest for sysDescr.0, community "public".
             byte[] query =
             [
                 0x30, 0x29,
@@ -1113,36 +1598,24 @@ namespace KillerScan.Engine
                 0x05, 0x00,
             ];
 
+            var identity = new byte[4];
+            using (var random = RandomNumberGenerator.Create()) random.GetBytes(identity);
+            identity[0] = (byte)((identity[0] & 0x3f) | 0x40);
+            Array.Copy(identity, 0, query, 17, identity.Length);
+            int requestId = (identity[0] << 24) | (identity[1] << 16) | (identity[2] << 8) | identity[3];
             try
             {
-                run?.CheckTarget(addr);
-                using var udp = run?.Udp() ?? new UdpClient();
+                using var udp = ScanSource.Udp();
                 udp.Client.SendTimeout = 500;
                 udp.Client.ReceiveTimeout = 1000;
-                await udp.SendAsync(query, query.Length, new IPEndPoint(addr, 161));
+                udp.Connect(addr, 161);
+                await udp.SendAsync(query, query.Length);
 
-                var recvTask = ReceiveProbeAsync(udp, addr, 161, run);
+                var recvTask = udp.ReceiveAsync().ObserveFault();
                 if (await Task.WhenAny(recvTask, Task.Delay(1000)) != recvTask) return;
                 var resp = recvTask.Result.Buffer;
-                if (resp.Length < 30) return;
-
-                // The response's last OCTET STRING tag is sysDescr. Walk backward for
-                // a 0x04 tag whose payload is long enough to plausibly be a description
-                // and whose content doesn't match "public" (the community echo).
-                for (int i = resp.Length - 2; i >= 0; i--)
-                {
-                    if (resp[i] != 0x04) continue;
-                    int len = resp[i + 1];
-                    if (len < 5 || i + 2 + len > resp.Length) continue;
-                    string s = Encoding.UTF8.GetString(resp, i + 2, len);
-                    if (s.Equals("public", StringComparison.Ordinal)) continue;
-                    if (s.Any(c => c < 0x20 && c != '\r' && c != '\n' && c != '\t')) continue;
-                    device.SnmpDescr = s.Trim();
-                    return;
-                }
+                if (SnmpResponse.TryDecode(resp, requestId, out var description)) device.SnmpDescr = description;
             }
-            catch (NetworkBindingException) { throw; }
-            catch (OperationCanceledException) { throw; }
             catch { }
         }
 
@@ -1158,8 +1631,8 @@ namespace KillerScan.Engine
             {
                 try
                 {
-                    using var client = new TcpClient();
-                    var connect = client.ConnectAsync(addr, port);
+                    using var client = ScanSource.Tcp();
+                    var connect = client.ConnectAsync(addr, port).ObserveFault();
                     if (await Task.WhenAny(connect, Task.Delay(300)) == connect && client.Connected)
                         return true;
                 }
@@ -1174,6 +1647,6 @@ namespace KillerScan.Engine
         /// <summary>
         /// Get MAC address of a host using ARP.
         /// </summary>
-        private static string GetMacAddress(IPAddress addr) => NetworkPlatform.Current.ResolveMac(addr);
+        private static string GetMacAddress(IPAddress addr) => ScanSource.ResolveMac(addr);
     }
 }

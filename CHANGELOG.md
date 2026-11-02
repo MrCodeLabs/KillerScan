@@ -1,26 +1,233 @@
-# Changelog
+# KillerScan Changelog
 
 All notable changes to KillerScan are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.4] - Unreleased
+## [1.9.0] - 2026-11-01
 
-### Added
-- Actionable HA research suggestions for Tuya, Reolink, Denon, Proxmox VE, go-e and original eWeLink devices; ESP modules receive an explicit firmware decision path. Weak name/vendor leads remain research with no claimed compatible integration, and community HACS sources are marked. Nine additional labels in all 20 languages.
-- Offline Home Assistant integration choices per device, with captured evidence, reasons, prerequisites and explicit missing/conflicting information. The HA toolbar button prepares choices for every found device; device/service/history menus, JSON/CSV/HTML and PowerShell retain advice. New labels cover all 20 languages. No HA connection or automatic setup is performed.
-- Slovenian labels for startup update checks and scrollbar page actions, preserving complete coverage of the upstream English dictionary.
-- A unified Access list with exact captured HTTP/HTTPS endpoints, protocol/port suggestions, response and authentication evidence, and Open/Copy actions using existing clients. Deep web probes retain nonstandard endpoints; history, exports and PowerShell preserve the optional data. All 20 locales include the new labels.
-- Device recognition evidence and heuristic confidence, source/timestamp details, explicitly reported model declarations, read-only device/service/history inspection, and structured evidence in JSON/CSV/HTML and PowerShell. Missing replies alone no longer imply IoT or Mobile; a MAC vendor never establishes a model.
-- Location controls and GUI error guidance in all 20 supported languages, plus a two-process location/profile GUI persistence check. Classic input dialog titles follow the action being performed.
-- Explicit location identities, per-location device data/history/profiles, safe copy-and-backup migration of legacy files, location-aware CLI/PowerShell and export metadata. Changing location clears transient results and is locked during scans.
-- Explicit Windows IPv4 interface selection for scan tabs, profiles, CLI and the terminal toolbar, with pinned TCP/UDP/multicast, source-aware ARP/ICMP/DNS, per-interface classification and cancellation on link changes. Missing selections never fall back to a different adapter.
-- Per-tab scan options for neighbor cache, explicit ARP, ICMP, TCP discovery, DNS, mDNS, SSDP, port scanning and individual HTTP/TLS/SSH/SNMP/NetBIOS fingerprints. Profiles save the choices; scan, quick and deep paths enforce them in the engine. CLI `/skip` and PowerShell `-Skip` provide the same choices. Existing profiles and API calls keep their defaults.
+Locations keep each customer site separate, scan settings choose which checks run, Slovenian joins the languages, and updates, installs and network probes are hardened throughout.
 
 ### Fixed
-- Discover mDNS/SSDP-only responders inside the requested targets and retain multicast evidence in quick scans. ARP also discovers silent on-link hosts; routed next hops are excluded. Preserve advertised SSDP device types and accept mDNS service-instance names for HA recommendations.
-- Release Sync skips development forks because the checked marketplace channels belong to the upstream publisher; release API failures report the metadata lookup error instead of an empty tag (23 October 2026).
-- The shortcuts card shows shadows at its edges when more content is out of view.
+- Concurrent Windows sessions sharing a profile keep each other's successful changes to settings, Locations and scan history.
+- Rescan selected and Deep Scan All honor the chosen adapter again after it disconnects or changes, and refuse off-network results before probing.
+- Picking a saved scan keeps its Deep Scan setting for each run and clears it when another saved scan or Location is selected.
+- Command-line CSV exports include recognition confidence, evidence and access details, matching the app's exports.
+- An all-users update reopens KillerScan for the signed-in user at normal rights, whether it finishes or stops early. Windows was refusing that relaunch, so the app stayed closed. Files left behind by earlier failed updates are cleared when the next update is staged.
+- Toolbar controls, tabs, links and tables show keyboard focus. Contrast refreshes avoid duplicate work and restore frame colors. Picker selections keep text and icons shadow-free.
+- Demo mode shows sample Locations in the sidebar and picker instead of an empty panel and the old profile-only menu.
+- 98SE uses the original caption proportions and classic symbols, with scan controls below the caption. The topology background menu opens at the clicked point without using the zoomed canvas as its anchor.
+- All-users uninstall commands quote their nested helper correctly in both silent and interactive modes.
+- A command-line value of `uiscan`, such as a filter or Location name, no longer opens the app and starts a different scan.
+- A scan that finds one device says "1 device", in the footer, the status bar, the terminal and the command line.
+- When another window deletes a Location, the tab's message no longer calls the results a Temporary scan, which was not always true.
+- Save results to Location moves a scan only once all of it is on disk in the destination. A run the destination's history limit would delete, or a Location deleted in another window, is refused with the reason, a stopped scan's results are saved as a canceled run and can be saved from the menu, a Temporary scan's names and device types all go with it, a save that fails leaves the results and the tab where they were, and saving again finishes the move without doubling anything.
+- Retry after a failed rename or delete in History repeats that change, a failed one no longer empties the list, and two KillerScans open on the same Location each alert on devices the other never saw.
+- A Location appears in the list only once its imported files are in place, even if KillerScan is killed mid-import. Deleting a Location finishes or changes nothing, so a locked file or a blocked recovery folder can no longer crash it or leave files no list points to. Imported history with empty fields can no longer crash History's copy menu.
+- An mDNS answer relayed by a reflector puts each service on the device its records name, so one packet can no longer give a printer a speaker's services or lose the speaker.
+- A Location learns only the router of the adapter a saved scan is actually on, so a VPN, a second adapter or a remote target can no longer teach it someone else's router.
+- History compares a scan only with earlier scans of the same network, identified by its router or adapter, so two sites sharing 192.168.1.0/24 in one Location no longer show each other's devices as added or removed.
+- A finished Temporary scan says it is not saved and points to Save scan, because closing KillerScan loses it, and leaving one asks first even when the table is empty. A footer status too long to fit reads in full in its tooltip and is announced to screen readers.
+- Renaming a run in History keeps that run selected, so a Delete right after it cannot remove the wrong one.
+- An uninstall refused because KillerScan was running no longer leaves a copy of the app in the install folder after the next uninstall finishes.
+- Dialog title bars match the rest of the dialog in every theme except 98SE. They had their own band, a lighter strip in Light and a gradient in several dark themes, and the title bar painted its film grain twice.
+- Update and uninstall helpers load PowerShell modules only from Windows' own folder, so a module planted in your Documents cannot run inside them as administrator; a failed uninstall reports the real reason and retries when a copy is still running; a stalled update says so; and the window no longer freezes while an update is handed off.
+- The terminal keeps 10,000 lines of history, so a ping -t or a long SSH session no longer grows memory without end; a flood of combining marks cannot stall it; resizing during vim or less no longer loses the latest output; and pasting several lines asks first when the shell would run them at once.
+- Ping and SSH from a device ask before replacing a command still running in the terminal, and the terminal keeps Ctrl+E, Ctrl+T and the other readline keys instead of the app taking them.
+- In History, Enter on a button or the Locations list works again, deleting a run clears it from the pane, and screen readers now get the view tabs as tabs.
+- A web page title from a device can no longer stall a scan, unresolved ARP entries no longer appear as phantom printers, a router from another network is no longer labelled on the current one, and quick scans use the mDNS and SSDP names they already collected.
+- The prompt's git status runs without the repository's fsmonitor or hooks, so changing into a downloaded repository cannot run its code.
+- Clearing a device's custom name brings back the name the scan found, and a blank rename clears it.
+- The command line escapes control characters in device names when it prints CSV to a live console.
+- HTML reports exported with `/theme 98se` open in the selected theme, and command-line help distinguishes saved scans from probes that only read Location annotations.
+- An update that cannot finish because KillerScan did not close says so in its recovery report, the Update button stays off once an update has started, and a translation file can no longer give a setting the wrong kind of value.
+- Topology builds once per refresh when card sizes have not changed, and a card resizes with its border when the theme changes.
+- A device can add at most 64 mDNS service names, each bounded in length, however many it announces.
+- A copy of KillerScan saved under another name, such as KillerScan (1).exe, keeps its terminal colors while another copy is open.
+- Save results to Location from Unassigned moves the run on screen, never another window's newer run, and moves nothing when the table is empty.
+- Exporting and importing a Location keep the window responsive, and an import changes the Location list only on the window's own thread.
+- Results on screen in Unassigned are no longer cleared when the network changes to one a Location recognizes, and a canceled scan in a Location deleted elsewhere leaves it like a finished one.
+- Moving earlier versions' saved scans into Locations never replaces one scan with another of the same name, keeps each scan's Deep Scan choice, and never takes over a Location you happened to name Saved scans.
+- The elevated part of an update compiles its helper code in a folder only administrators can open, so another program running as you cannot slip code into it, and an update that finished is no longer reported as failed when KillerScan cannot be reopened afterward.
+- Renaming a saved scan keeps it, keeps its Deep Scan setting, and refuses a name another saved scan already uses instead of replacing that scan.
+- A scan run whose save failed is no longer written to history twice, and deleting it stays deleted. A renamed run keeps its name when it is saved to a Location.
+- SSH in the built-in terminal starts Windows' own ssh.exe by its full path, never a file of that name sitting beside a portable copy.
+- An adapter reporting a 0.0.0.0 mask no longer becomes the network to scan; the next adapter is used.
+- The Locations list answers Enter, F2, Delete and the menu key itself instead of passing them to the device table.
+- Topology cards with long names no longer overlap their neighbors or hang off the edge of the map; every row and ring is spaced for its widest card.
+- The F1 keyboard map shows the arrow keys, so Alt+Shift+Up and Alt+Shift+Down (tabs at the top or bottom) appear on it.
+- The tray icon's menu opens from the pointer upward, out of the notification area, the same way in every Killer app. A short menu no longer covers the tray icons and a taller one no longer floats about 40 pixels above them.
+- Self-update checks the downloaded and staged copies for the publisher's signature inside the helper, keeps every parent folder pinned while it publishes, refuses redirected paths and malformed requests, and offers only stable releases.
+- The close button on dialogs now works from the keyboard and screen readers, the window menu opens at the right spot while the window is maximized, and the file dialog's folder tree no longer jumps back to an older folder after a quick change of folder.
+- A Location only recognizes a network you saved a scan into, so the switch suggestion no longer names a Location that merely had a scan run in it. A Location is recognized by its router's hardware address, never by a common subnet.
+- On Cyanotic, Greed and Blood, selected rows and buttons use the theme's cream with dark text, and an unapproved device stays visible on a selected row.
+- New Location, rename and notes prompts show the app icon, and New Location no longer shows the current Location as if it were the name.
+- Dialogs have their padding back, and their title bars, icons and buttons match the rest of the family.
+- A window on a network a Location knows now opens in that Location, matched by gateway or by subnet.
+- A speed test blocked by a Cloudflare security challenge now says so, and a rejected upload reply shows its status, content type and the start of its body instead of only "invalid response" (#4).
+- Website carousel and slide descriptions are translated in every supported language.
+- In 98SE, long paths in the file dialog no longer run under the recent-locations arrow.
+- Black table headers match the content surface, and softer grain keeps dark surfaces from looking gray.
+- Machine update and uninstall helpers reject unsafe inherited permissions before creating elevated staging.
+- Per-user and portable updates no longer run their helper from a script in the temp folder.
+- Installation cleanup preserves unrelated files and folders; registered silent uninstall waits for owned removal and reports failures.
+- Elevated updates use the signed installed helper and verify the release identity, digest and publisher in protected staging.
+- Scans, Remote Desktop, and SSH or ping in their own window start arp, mstsc, ping and Windows' ssh from System32, so a program with the same name beside a portable copy can never run in their place. A stalled arp no longer holds up a scan, and reading the device table no longer pauses the window as a scan starts.
+- Per-user and portable updates now require the same publisher signature, product and newer version as all-users updates, instead of only a matching checksum. An all-users update checks the download before copying it into the installation folder, removes a staged copy that fails verification, and accepts the download only from an ordinary file on a local drive.
+- Preference and history saves preserve existing files on failure, keep unsaved edits for retry, and report when changes could not be saved.
+- Concurrent app instances preserve saved scans and retention changes instead of overwriting newer history.
+- On a shared computer, another account can no longer block your settings, history and Locations from saving by holding the locks that protect them.
+- File dialogs stay responsive on slow or crowded folders, cancel stale loads and identify incomplete listings.
+- Vendor database updates preserve the prior complete file on failure and keep lookups available throughout reloads.
+- Vendor database updates stop at a size limit, including a small compressed download that would expand without end, and refuse a list redirected away from HTTPS.
+- Host names, page titles, server headers, banners and descriptions a device reports are limited in length, so one reply cannot swell a scan, its history or a report.
+- Executable installation and self-updates verify complete copies and preserve recovery files after replacement failures. Update reports support non-English folders.
+- Reports keep the scanned target, timestamp and captured results when pending input or live results change during export.
+- Demo device types and SSH usernames stay in memory without reading or changing saved real-device values.
+- Scan history includes empty results and final automatic deep-profile results, with canceled or partial runs labeled.
+- HTTP fingerprints follow bounded redirects only on the scanned IP, preserving local panels without contacting or labeling another device.
+- SNMP fingerprints preserve long descriptions and reject malformed or mismatched response identities.
+- Deep scans never send HTTP or TLS data to raw print ports (9100 to 9103 and 515), so a rescan cannot print junk pages, including when a web page redirects to one of those ports.
+- HTTP fingerprints connect to the device directly, so a system or PAC proxy can no longer answer and have its page reported as the device.
+- NetBIOS names are accepted only from validated replies sent by the queried host.
+- Bonjour (mDNS) names and services land only on the device they describe. Another device's question no longer names the device that asked, a relayed answer from a mesh router or Bonjour gateway goes to the device it names instead of the router, and a scan bound to one adapter ignores answers from other networks.
+- A vendor database update skips manufacturer blocks of unusual sizes instead of filing them under a wider block, so they no longer replace the real owner of that wider block.
+- The broadcast and multicast rows Windows keeps in its ARP table are no longer reported as devices when a scan range covers those addresses.
+- A virtual adapter that reports no subnet mask, or that Windows fails to describe, no longer leaves the subnet box empty. KillerScan moves on to the next adapter, so the gateway and DNS server are still recognized.
+- A normal scan reads the certificate from a Synology NAS that only answers on DSM's HTTPS port 5001. Before, only a deep rescan did.
+- A bad latency reply that arrives just as a speed-test phase ends no longer throws away the finished download or upload measurement.
+- Port checks and discovery listeners that time out no longer leave thousands of unhandled socket errors behind for .NET to report later. One deep probe of a single host used to leave about 2,000.
+- Uninstalling, or moving from a per-user to an all-users install, works on a shared PC while another user has KillerScan open. Their copy can't be inspected, and before this the whole uninstall gave up because of it.
+- An all-users install no longer reports failure and skips the relaunch when the per-user copy it replaces has lost its registry entries. That copy's files are still removed, and anything that can't be removed is offered again at the next start.
+- A per-user or portable copy run as administrator can update itself. Before, it downloaded the update and then quietly refused to install it.
+- The per-user update helper waits for KillerScan to close for at most a minute and checks the process start time, so a recycled process ID can no longer leave it waiting forever.
+- Command-line errors show in the console when only the output is redirected, as in `killerscan /scan /json > devices.json`. Before, a mistyped option left an empty file and no message.
+- Diagnose (F3) on a Network Tools window that isn't watching anything yet starts watching and opens the device's card. Before, it only added the address to the target box.
+- The terminal no longer prints stray text such as `2::255:0:0m` from tools that send colors and underline styles in the colon form (bat, delta, neovim). Those particular styles are skipped for now.
+- Clearing the terminal or a line after making the pane narrower also clears the text beyond the new width, so old output no longer turns up when you scroll sideways.
+- The terminal's prompt palette files no longer pile up in `%LOCALAPPDATA%\KillerScan\prompt`, one per launch. Each start removes the files left by copies that have closed.
+- With a screen reader running, a terminal holding a long scrollback no longer stutters. Text positions are worked out once per change instead of from the first line on every update and query.
+- Starting or finishing a scan while a Location import is still running no longer loses changes to the Locations list, and can no longer crash the app.
+- When another window or another copy of KillerScan deletes the Location a tab is in, the tab turns into a Temporary scan and says why. It keeps its results, which you can still save to a Location. Before, renames, approvals and finished scans kept writing into a hidden copy of the deleted Location that no list showed.
+- When a saved names, types, logins or scans file can't be read, the "Could not save changes" prompt now names that file. KillerScan still won't overwrite it, so you can repair, restore or remove it yourself.
+- Resizing the window or sliding the sidebar with a large topology diagram open no longer stutters. The diagram is redrawn a few times during the resize instead of on every frame.
+- On killerscan.net, Escape closes the language menu, and closing it or picking a language returns keyboard focus to the language button.
+- History settings tell a screen reader why OK did nothing, such as a retention value out of range, and put focus on the field to fix.
+- An upgrade installed while KillerScan was running (winget, Chocolatey or an RMM tool) no longer leaves a full-size `.bak` copy of the old exe behind for good. The next install, update or uninstall removes it.
+- Uninstalling an all-users copy from Settings asks whether you're sure before the administrator prompt, not after it, and the question no longer runs as administrator.
+- When an all-users update can't be installed, KillerScan opens again on the version you had instead of staying closed with nothing said.
+- Update downloads no longer pile up in the temp folder. A successful all-users update removes its download right away, and leftovers from refused or interrupted attempts are cleared by the next update.
+- The published source zip now matches the tagged release. It used to be built before the README picked up the new version, so it carried the previous release's source link.
+- A metadata repair of the KillerScan.Engine NuGet package can change only the package description, tags and links. A change to the engine project that affects what gets compiled, or which dependency versions ship, now stops the repair.
+- The PowerShell `scan` and `probe` commands return device objects instead of nothing, and failures, timeouts and usage errors throw with the app's message and exit code. Arguments such as a folder path ending in a backslash reach the app intact.
+- The engine's scan APIs refuse malformed or oversized targets and a port concurrency below 1 before any network or DNS cache work, instead of reporting an empty scan or waiting forever.
+- Saving an export over an existing file keeps the old file intact if the save fails partway. This covers CSV, HTML, SVG, PNG and JPEG exports, history CSV, Keep Alive and terminal saves, and command-line `/export`.
+- A scan history file that cannot be read (damaged, locked or access denied) is reported at startup with its location and a Retry, and History says it could not be read instead of showing no scans. The file is never overwritten.
+- Saving a profile over an existing name, in any letter case, keeps its Deep Scan choice instead of turning it off.
+- History compares a scan only with an earlier completed scan of the same full target list, with the same checks and the same normal or deep pass. Different lists that share a "first +N" caption no longer compare, and older entries saved with only that caption are not used as baselines.
+- A canceled or partial scan never reports devices or ports as removed, since it did not check everything.
+- Rescanning selected devices reports how many actually refreshed and how many did not respond, instead of counting every selected host. HTML reports keep the original scan time and add when devices were refreshed later and whether that refresh was partial.
+- Device names, approvals, type overrides and SSH usernames no longer carry over between customer sites that reuse the same IP addresses. Each now belongs to a Location.
+- Removing the last approved device no longer approves every device on the next scan.
+- The public subnet helper rejects IPv6 addresses and malformed CIDR suffixes before expanding hosts.
+- Terminal tables display escaped network control characters without changing raw scan data or JSON exports.
+- Terminal combining marks, wide characters and common emoji clusters keep consistent columns through drawing, editing, copying and resizing.
+- Stopping a scan cancels active HTTP and TLS fingerprint connections and prevents probes of later ports.
+- Stopping during MAC resolution returns promptly, skips queued lookups and keeps native work bounded across scans.
+- A remote SSH host or a device banner shown in the terminal can no longer pose as a ready prompt or start a speed test. Only the terminal's own shell, which knows a per-session value, can.
+- Terminal title sequences accept BEL and ESC-backslash terminators across split reads and preserve UTF-8 titles.
+- Pasting into the terminal drops control characters other than tab and line breaks, so pasted text can no longer end a bracketed paste early and run the rest as typed commands.
+- A large paste into the terminal no longer freezes the window while the shell is busy. Input is written in the background in order, so a 16 MB paste returns at once instead of blocking for many seconds. Input the terminal cannot take, such as a paste over 64 MB, beeps and says so instead of vanishing.
+- Topology and Services no longer redraw everything for each device a scan finds. Updates are grouped, so a large scan stays responsive with either view open.
+- Topology devices can be used from the keyboard. The diagram is one Tab stop, and arrow keys move between devices and select the one they land on, so Enter and the device shortcuts act on it; Ctrl+arrow keys move without changing the selection, Space selects and Ctrl+Space adds to it, Shift+arrow keys move a device, and screen readers announce each device and whether it is selected. Focus stays on the same device when the diagram updates.
+- The device table's MAC column is never narrower than a full address in the current font, so a dragged or older saved width can no longer cut addresses off.
+- A device name lookup that never answers no longer holds up a scan. Each lookup gets three seconds, and stalled lookups are capped so they cannot pile up.
+- Device and Services column headers follow a language change, and HTML reports declare the app's language and have a translated title. (#5) (Thanks @MrCodeLabs)
+- Keep Alive and Diagnose add new targets to a running watch without resetting existing cards or counters.
+- Export menus, shortcuts and tooltips match the active view, with one filtered CSV action for Services.
+- Terminal output exposes readable text, selection and caret ranges to accessibility tools, with a visible keyboard focus outline.
+- Closed website accent pickers stay out of keyboard and accessibility navigation, and return focus to their trigger when dismissed.
+- A silent install or update that finds KillerScan running exits with 1618, which Intune, Configuration Manager and RMM tools retry, instead of a general failure.
+- Release dependency checks stop on restore or audit failure, malformed results, missing engine coverage and vulnerable packages.
+- Repeated same-version Publish refreshes the source ZIP and fails clearly if the archive cannot be replaced.
+- Release monitoring includes KillerScan.Engine on NuGet and reports missing or failed publication.
+- Chocolatey publishing reports failure when validation is still failing after a retry.
+- Chocolatey and WinGet publishing accept only a release whose exe matches its published checksum and carries a valid release signature, skip prereleases, run the WinGet tool only when its hash matches, and treat release tags as data with read-only repository access.
+- Window resize minimums stay within the current monitor's work area on small or scaled displays.
+- The shortcuts card shows shadows at its edges when more content is out of view. Its border follows gradient themes, and its hint sits centered closer to the bottom edge.
+- Sidebar fades leave the scrollbar clear and disappear at the start and end of each list.
+- File pickers use theme content colors and app icons; 98SE dialogs have full bevels and compact fields. Text buttons, menus, tooltips and shortcuts use the embedded interface font, including separate windows.
+- 98SE menu highlights follow the selected accent.
+- Film grain has crisper specks and fades midtones across app themes without dimming bright highlights.
+- The website's film grain is lighter, matching KillerTools, and the theme menu can turn it off (Alt+Shift+G). The top bar no longer leaves extra space above the page on narrower windows, and the release details box lifts with an accent border on hover.
+- Balanced the Technical page columns by moving the glossary to the left.
+- The file picker's Accept button can no longer fire twice: it stays off while a folder is loading or an accept is already running. A mistyped folder path now returns to the last folder that worked instead of leaving an empty list.
+- The file picker's recent locations and places lists are named for screen readers.
+
+### Added
+- Move the History and Locations sidebar to either side, independently of tab placement.
+- Locations can carry an icon (Home, Office, Shop, School, Server room, Cloud, Wi-Fi spot or the pin), picked from a button beside the name in New and Rename Location, and shown in the Locations list and on the Location button.
+- Save to puts the unsaved scan on screen into an existing Location, with an optional name.
+- Scans in history can be named (right-click Rename scan, or F2); an unnamed scan shows its target.
+- Delete a scan from Scan history with right-click Delete or the Delete key.
+- Hold Alt and drag anywhere in a window to move it.
+- Speed test, Saved scans and History can be dragged into any order on the rail, and the order is kept. Theme, language and shortcuts stay at the bottom edge, as in the other Killer apps.
+- Scan settings beside Scan selects discovery and fingerprint checks, saves them with profiles, and applies them to normal and deep scans. (#6) (Thanks @MrCodeLabs)
+- Added Slovenian across the app, installation prompts, website and help. (#5) (Thanks @MrCodeLabs)
+- Scan settings can let deep scans fingerprint unknown open ports. It is off by default, so unknown ports get a connection check only.
+- The PowerShell `scan` command takes `-Demo` for fabricated screenshot data.
+- Locations keep each customer site's saved scans, device names, approvals, type overrides, SSH usernames and history separate. Pick one from the Location button beside the target box, or run a Temporary scan that saves nothing. Changing Location clears the results on screen, so a rename or approval never lands in the wrong site, and leaving unsaved Temporary results asks first. On first start, everything you already had moves into a Location named Unassigned, and the original files are left in place.
+- The first scan in a Location sets a baseline of Known devices without approving any. Later scans flag devices that are new since that baseline, and the device mark shows approved, new and known.
+- Saved scans belong to a Location and are listed in the Location button's dropdown under the Locations. Clicking one loads its target, settings and adapter into the scan bar without scanning. Save scan, Rename scan and Delete scan are in the same dropdown. Picking a Location restores its last targets and settings without scanning.
+- Each Location has notes for the gateway, VLANs, quirks or who to call, shown in the Location button's tooltip.
+- Export Location saves a Location to one `.ksloc` file to import on another PC. Remembered SSH usernames are left out unless you tick the box, and passwords are never stored. Import always adds a new Location and never runs or scans anything. It reads the file in the background and refuses files over 256 MB.
+- When the network's gateway has been seen in a Location, a banner offers to switch to it. It never switches by itself, offers nothing when more than one Location matches beyond listing them, and Dismiss hides it until KillerScan restarts. It reads the gateway from Windows' own ARP cache, so checking sends nothing, and screen readers announce it.
+- Scan settings has a Network adapter choice. Picking an adapter sends every probe from it, so Ethernet, Wi-Fi and VPN adapters on the same PC no longer mix results. A bound scan reaches the adapter's own network and anything Windows already routes through it, such as hosts behind a VPN adapter; a target Windows would send out another adapter is refused with a message naming both. Saved scans keep their adapter, and if it is not connected KillerScan asks before using the adapter Windows chooses. A bound scan finds hosts only in its own adapter's ARP table. Each run records the adapter it used, and HTML reports show the Location and adapter.
+- Save results to Location moves a Temporary scan's history and any names you typed into a Location, without approving anything.
+- Manage Locations on the Location button opens a sidebar list of every Location, with a check on the current one. A click selects a Location, and a double-click or Enter switches to it. Each can be renamed, given notes, exported or deleted from its right-click menu. Deleting moves the Location's files aside to a deleted folder rather than erasing them. The Profiles section is now called Saved scans.
+- History lists the current Location's scans. Right-click the History button and choose Show all Locations to list every Location's scans, each labeled with its Location.
+- `/scan` and `/probe` take `/location <name or ID>`, and the PowerShell `scan` and `probe` commands take `-Location`. An unknown or shared name is a usage error. The terminal's Scan button scans in the current Location.
+- `killerscan locations` lists the saved Locations with their IDs, customers, and last targets and adapters, as a table or with `/json`, and changes nothing. The PowerShell `locations` command returns them as objects.
+- `/scan` and `/probe` take `/skip <checks>`, and the PowerShell `scan` and `probe` commands take `-Skip`, to turn off the same checks Scan settings offers. The terminal's Scan button uses the current Scan settings.
+- `/scan` and `/probe` take `/adapter <name or address>`, and the PowerShell commands take `-Adapter`, to send every probe from one adapter. An unknown adapter, or a target that is neither on its network nor routed through it, is a usage error, and the terminal's Scan button uses the adapter chosen in Scan settings.
+
+- Each device type now explains itself. Hover over the type for its confidence (Low, Medium, High or Set manually) and its strongest evidence, or right-click and choose Why This Type? (Ctrl+I) for every signal, its source, close alternatives and any conflict. Opening it sends nothing to the device. A manual type keeps the automatic result alongside, HTML reports show the same summary on hover, and CLI JSON and the PowerShell module carry the full evidence.
+- Device CSV exports add Confidence and Evidence columns after the existing six.
+- Right-click a device and choose Access to see every way into it: each web port and what it answered (a status, a login request or a sign-in page), the SSH banner, and every other open port. Clicking an entry opens it in the browser, SSH or Remote Desktop on that port, and Copy Address copies any of them. Nothing is claimed beyond what was seen, no credentials are ever sent, and opening the menu sends nothing. Deep scans now check every web port so each has its own evidence. CSV adds an Access column, HTML reports list the endpoints when hovering a device's ports, and CLI JSON and the PowerShell module carry the full list.
+- About groups settings in two columns and can hide shortcut hints in menus and tooltips without disabling keyboard shortcuts. Hover tooltips clear large pointers while preserving custom placement.
+
+### Changed
+- Refreshed the bundled MAC vendor database to 58,645 assignments.
+- KillerScan is per-monitor DPI aware, so text and icons stay sharp when the window moves between monitors with different scaling, instead of being stretched by Windows.
+- HTML reports carry their own logo in every theme and accent, so opening a report no longer contacts killerscan.net.
+- Confirmation prompts, including the install prompt, use the family dialog frame shared with KillerShell, and dragging a pinned place in the file dialog shows the plain arrow.
+- Scan profiles from earlier versions become saved scans, each keeping its name, target and settings, inside one Location named Saved scans. Load one and use Save scan to put it into its own Location. Nothing new can be saved into Saved scans, and it removes itself once it is empty.
+- Scan is the app's largest button: the filled accent button with its label in the wordmark's lettering.
+- Edit Location replaces Rename and Location notes: name, icon and notes in one dialog, which New Location shares. The dialogs are tighter and their text larger.
+- Each Location can keep several saved scans, each a target with its settings, labeled by its subnet or a nickname. They are listed under the Location in the tree and load into the scan bar with a click. Every run stays in Scan history.
+- The sidebar starts closed instead of reopening History on every launch.
+- The Locations sidebar is a tree in the family folder-tree style: each Location expands to its scans, newest first; click a scan to open it in Scan history, right-click to rename or delete it.
+- The file picker uses the family's own buttons, fields and menus instead of a private copy of them, so it matches the rest of the app.
+- The five views are permanent tabs below the table, or above it from the tab menu (Alt+Shift+Up and Alt+Shift+Down).
+- The scan bar moved into the title bar, the filter sits beside the window buttons, and topology settings moved into the topology pane.
+- Saved scans are Locations now: each saved scan became a Location with its target, settings and adapter. The Location button opens the Locations sidebar, which carries New and Import.
+- Unsaved scans keep their history without appearing as a Location, and Temporary scan is gone.
+- Topology cards are sized to their text, centered, and drawn in the tab shape with a fading accent edge.
+- Buttons are bare until hovered, fill with the accent on hover and press, and Malaise uses peach for selection.
+- KillerScan now shares the family's theme engine, control styles and palettes with KillerShell and the KillerUI template, so its colors, grain and geometry match the rest of the family. Visible differences: dialogs, the footer and the title bar use the family spacing, combo boxes and Light's text fields use the family field colors, menus fade in, the window has the family 1px edge, the close button is gray until hovered, selected table rows use the family highlight, and 98SE uses the family's thinner bevels and smaller caption buttons.
+- Light is shades of gray with nothing white: the background, sidebar and footer are the darkest gray (#cccccc), menus and bars a step lighter, then panes, then fields.
+- Open in Browser opens the web port that actually answered, HTTPS first, instead of always `http://` on port 80. The Services view opens a port with the scheme it answered with, including on non-standard ports.
+- A name containing a device keyword, such as "synology" or "pihole", is now heavy evidence rather than the final word, so clearer protocol answers can outvote it. A UniFi or UBNT name now shows Switch/AP instead of the generic Network type.
+- Trusted devices are now called approved devices, and approving is always a choice you make.
+- Command-line scans without `/location` no longer apply saved device names or types, and save nothing.
+- Updated the app and engine JSON dependency to 10.0.14.
+- Updated and pinned the build/release actions to current compatible stable versions.
+- Clarified sent-byte upload throughput and its acknowledgment requirement in the app, engine and website documentation.
+- Hovered menu and list items show their text in the theme accent, lightened or darkened only as far as needed to stay readable on the hover fill.
+- The speed-test server's loopback check (`server\speedtest\engine-loopback.ps1`) runs again. It still looked for the speed-test engine under its name from before the engine split.
+- The deployment guide explains that automatic updates and the registered uninstall do not work where Windows PowerShell runs in Constrained Language Mode, and how to update and remove KillerScan there.
+- Wordmarks and headings are raised with a subtle bevel in their own color instead of a dark outline; wordmarks keep their drop shadow. The Dark theme's red accent is the brand red again instead of a pink tint.
+- Theme menu hover rows reach the right edge with the same inset as the left.
 
 ## [1.8.3] - 2026-10-19
 

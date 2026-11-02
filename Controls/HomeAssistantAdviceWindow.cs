@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using KillerScan.Engine;
 using KillerScan.Services;
-using AccessText = KillerScan.Services.AccessText;
+
 
 namespace KillerScan.Controls;
 
@@ -45,7 +45,7 @@ internal sealed class HomeAssistantAdviceWindow : Window
         System.Windows.Automation.AutomationProperties.SetName(IdentityInput, HomeAssistantText.L("Identity")); inputs.Children.Add(IdentityInput);
         var fields = new WrapPanel();
         fields.Children.Add(Field(HomeAssistantText.L("Protocol"), ProtocolInput));
-        ProtocolInput.Items.Add(new ComboBoxItem { Content = AccessText.L("Unknown"), Tag = "" });
+        ProtocolInput.Items.Add(new ComboBoxItem { Content = Application.Current.TryFindResource("Str_Access_Unknown") as string ?? "Unknown", Tag = "" });
         foreach (string domain in new[] { "matter", "homekit_controller", "mqtt", "dlna_dmr", "rest", "snmp", "zha", "zwave_js", "bluetooth" })
             ProtocolInput.Items.Add(new ComboBoxItem { Content = HomeAssistantAdvisor.Integration(domain)!.Name, Tag = domain });
         ProtocolInput.SelectedIndex = 0;

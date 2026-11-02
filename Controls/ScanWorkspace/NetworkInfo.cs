@@ -10,11 +10,6 @@ namespace KillerScan.Controls
             if (net is null) return;
 
             SubnetInput.Text    = net.Subnet;
-            ShowNetworkInfo(net);
-        }
-
-        private void ShowNetworkInfo(LocalNet net)
-        {
             LocalIpLabel.Text   = net.LocalIp;
             InterfaceLabel.Text = net.InterfaceLabel switch
             {
@@ -24,8 +19,8 @@ namespace KillerScan.Controls
             };
             InterfaceIcon.Text = InterfaceGlyph(net.Wireless);
 
-            GatewayLabel.Text = net.Gateway;
-            DnsLabel.Text = net.Dns;
+            if (net.Gateway.Length > 0) GatewayLabel.Text = net.Gateway;
+            if (net.Dns.Length > 0)     DnsLabel.Text     = net.Dns;
 
             FooterNetLabel.Text   = net.LocalIp;
             FooterNetAdapter.Text = Segment(net.AdapterName);
@@ -45,7 +40,7 @@ namespace KillerScan.Controls
             if (IsScanning) return;
 
             string status = _scanCompleted
-                ? string.Format(Loc("Str_St_ScanComplete"), _active.Devices.Count)
+                ? string.Format(Loc(ScanStatusText.Counted("Str_St_ScanComplete", _active.Devices.Count)), _active.Devices.Count)
                 : Loc("Str_St_Ready");
             _active.Status = status;
             StatusText.Text = status;
@@ -62,7 +57,7 @@ namespace KillerScan.Controls
         private void StartVendorNoticeTimer()
         {
             string notice = _active.Status;
-            var timer = new System.Windows.Threading.DispatcherTimer
+            var timer = _vendorNoticeTimer = new System.Windows.Threading.DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(VendorNoticeSeconds)
             };
@@ -78,6 +73,9 @@ namespace KillerScan.Controls
         }
 
         private const int VendorNoticeSeconds = 6;
+
+        // A running dispatcher timer is held by the dispatcher, so Dispose stops it.
+        private System.Windows.Threading.DispatcherTimer? _vendorNoticeTimer;
 
         /// <summary>Wired or wireless glyph for the interface, shared with the footer and demo mode.</summary>
         internal static string InterfaceGlyph(bool wireless) => wireless ? "\uE701" : "\uE839";

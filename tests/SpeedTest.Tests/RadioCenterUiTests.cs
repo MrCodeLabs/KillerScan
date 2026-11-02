@@ -44,17 +44,18 @@ internal static class RadioCenterUiTests
 
     private static void Check()
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "KillerScan.csproj"))) directory = directory.Parent;
+        var directory = TestRepository.Find();
         if (directory == null) throw new InvalidOperationException("Repository app resources found.");
         var assembly = typeof(KillerScan.App).Assembly;
         typeof(Application).GetField("_resourceAssembly", BindingFlags.NonPublic | BindingFlags.Static)!.SetValue(null, assembly);
         var app = new TestApplication();
+        KillerScan.Services.AppTheme.Configure();
         var xml = new XmlDocument();
         xml.Load(Path.Combine(directory.FullName, "App.xaml"));
         string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
             .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
-            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"")
+            .Replace("clr-namespace:KillerFamily.Controls\"", "clr-namespace:KillerFamily.Controls;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
@@ -157,6 +158,10 @@ internal static class RadioCenterUiTests
         root.LayoutTransform = new ScaleTransform(zoom, zoom);
         // Only the indicator outline and the label are colored, so the scan sees nothing else.
         root.Resources["DimTextBrush"] = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+        // On 98SE the checkbox is a sunken well whose bevel covers the ring, so the bevel is the
+        // indicator's outline there and is colored the same.
+        foreach (string bevel in new[] { "PaneBevelDarkBrush", "PaneBevelLightBrush", "PaneBevelDark2Brush", "PaneBevelLight2Brush" })
+            root.Resources[bevel] = new SolidColorBrush(Color.FromRgb(255, 0, 0));
         root.Resources["TextBrush"] = new SolidColorBrush(Color.FromRgb(0, 0, 255));
         root.Resources["PrimaryBrush"] = Brushes.Transparent;
         root.Resources["IconShadowOpacity"] = 0.0;

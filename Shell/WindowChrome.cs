@@ -102,12 +102,13 @@ namespace KillerScan.Shell
         /// matching KillerNotes, then falls back through AppBorderBrush and PaneBorderBrush.
         /// follows the palette instead of staying system gray. Call at SourceInitialized
         /// and again after every theme change. (Family standard, ported from KillerFind.)</summary>
-        internal static void ApplyThemeBorder(Window w)
+        internal static void ApplyThemeBorder(Window w, Action<IntPtr, int>? writeBorder = null)
         {
             try
             {
                 var hwnd = new WindowInteropHelper(w).Handle;
                 if (hwnd == IntPtr.Zero) return;
+                DwmChrome.ObserveThemeBorder(w, () => ApplyThemeBorder(w, writeBorder));
                 object? candidate = Application.Current.TryFindResource("WindowEdgeBrush");
                 // KillerScan keeps a transparent WindowEdgeBrush in Defaults so the WPF edge is
                 // absent on flat themes. Unlike KillerNotes, it does not republish that key from
@@ -125,7 +126,8 @@ namespace KillerScan.Shell
                     int colorref = b.Color.A == 0
                         ? unchecked((int)0xFFFFFFFE)
                         : b.Color.R | (b.Color.G << 8) | (b.Color.B << 16);
-                    DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref colorref, sizeof(int));
+                    if (writeBorder != null) writeBorder(hwnd, colorref);
+                    else DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, ref colorref, sizeof(int));
                 }
             }
             catch { /* pre-Win11: attribute unsupported */ }
@@ -207,7 +209,7 @@ namespace KillerScan.Shell
             // Square the corners when maximized (flush to screen edges), round when floating.
             SyncWindowCorners();
             // Maximize glyph toggles to a restore glyph when maximized (matches KillerPDF).
-            MaximizeBtn?.Content = WindowState == WindowState.Maximized ? "" : "";
+            UpdateCaptionGlyphs();
         }
 
         // ---- Content fade-in on open ----
@@ -273,9 +275,9 @@ namespace KillerScan.Shell
                 double sx = src?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
                 double sy = src?.CompositionTarget?.TransformToDevice.M22 ?? 1.0;
                 if (!double.IsNaN(MinWidth) && MinWidth > 0)
-                    mmi.ptMinTrackSize.x = (int)Math.Ceiling(MinWidth * sx);
+                    mmi.ptMinTrackSize.x = Math.Min(mmi.ptMaxSize.x, (int)Math.Ceiling(MinWidth * sx));
                 if (!double.IsNaN(MinHeight) && MinHeight > 0)
-                    mmi.ptMinTrackSize.y = (int)Math.Ceiling(MinHeight * sy);
+                    mmi.ptMinTrackSize.y = Math.Min(mmi.ptMaxSize.y, (int)Math.Ceiling(MinHeight * sy));
 
                 Marshal.StructureToPtr(mmi, lParam, true);
             }

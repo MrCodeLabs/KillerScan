@@ -15,16 +15,11 @@ namespace KillerScan.Controls
 
         private void UpdateDeepScanButton()
         {
-            if (InterfaceSelectionButton != null)
-            {
-                InterfaceSelectionButton.IsEnabled = !IsScanning;
-                if (IsScanning && InterfaceSelectionButton.ContextMenu != null) InterfaceSelectionButton.ContextMenu.IsOpen = false;
-            }
-            if (ScanOptionsButton != null)
-            {
-                ScanOptionsButton.IsEnabled = !IsScanning;
-                if (IsScanning && ScanOptionsButton.ContextMenu != null) ScanOptionsButton.ContextMenu.IsOpen = false;
-            }
+            ScanOptionsButton.IsEnabled = !IsScanning;
+            LocationButton.IsEnabled = !IsScanning;
+            if (IsScanning && LocationButton.ContextMenu != null) LocationButton.ContextMenu.IsOpen = false;
+            if (IsScanning && ScanOptionsButton.ContextMenu != null)
+                ScanOptionsButton.ContextMenu.IsOpen = false;
             if (DeepScanAllButton == null) return;
             DeepScanAllButton.Visibility = !DemoMode && ActiveDevices.Count > 0 && _active.Cts == null
                 ? Visibility.Visible
@@ -48,7 +43,7 @@ namespace KillerScan.Controls
             var selected = GetSelectedDevice();
             foreach (var item in ResultsGrid.ContextMenu.Items.OfType<MenuItem>())
                 if (item != RescanMenuItem) item.IsEnabled = selected != null;
-            ((System.Windows.Shapes.Ellipse)TrustDeviceMenuItem.Icon).Fill = (System.Windows.Media.Brush)new TrustMarkConverter().Convert(
+            ((System.Windows.Shapes.Ellipse)TrustDeviceMenuItem.Icon).Fill = (System.Windows.Media.Brush)_trustMark.Convert(
                 selected!, typeof(System.Windows.Media.Brush), null!, System.Globalization.CultureInfo.CurrentCulture);
             TrustDeviceMenuItem.IsEnabled = selected != null;
         }
@@ -62,9 +57,8 @@ namespace KillerScan.Controls
                 .OrderBy(d => d.IpSortKey)
                 .ToList();
             if (targets.Count == 0) return;
-
-            using var locationRun = Locations.BeginRun();
-            EngineHost.CapturePreferences(_active.Scanner);
+            var refreshTargets = ScanTargets.Parse(string.Join(",", targets.Select(d => d.IpAddress)));
+            if (!refreshTargets.Ok || !AdapterAllowsScan(refreshTargets.Summary, refreshTargets.Addresses, out _)) return;
 
             var s = _active;
             var scanner = s.Scanner;
@@ -75,9 +69,10 @@ namespace KillerScan.Controls
 
             ScanProgress.Value = 0;
             ScanProgress.Visibility = Visibility.Visible;
-            int done = 0;
+            int done = 0, refreshed = 0;
+            bool canceled = false;
             var options = s.Options;
-            if (options.ReverseDns && scanner.Binding == null) NetworkScanner.FlushLocalDnsCache();
+            if (options.ReverseDns) NetworkScanner.FlushLocalDnsCache();
 
             try
             {
@@ -94,21 +89,20 @@ namespace KillerScan.Controls
                         ct.ThrowIfCancellationRequested();
                     }
                     catch (OperationCanceledException) { throw; }
-                    catch (NetworkBindingException) { _rescanCts.Cancel(); throw; }
                     catch { done++; ScanProgress.Value = done * 100.0 / targets.Count; continue; }
 
                     int idx = s.Devices.IndexOf(old);
-                    if (idx >= 0) s.Devices[idx] = fresh;
+                    if (idx >= 0) { s.Devices[idx] = fresh; refreshed++; }
 
                     done++;
                     ScanProgress.Value = done * 100.0 / targets.Count;
                 }
-                StatusText.Text = string.Format(Loc("Str_St_RescanDone"), targets.Count);
+                StatusText.Text = RescanSummary(refreshed, targets.Count);
             }
-            catch (OperationCanceledException) { if (!_disposed) StatusText.Text = Loc("Str_St_ScanCanceled"); }
-            catch (NetworkBindingException ex) { if (!_disposed) StatusText.Text = ex.Message; }
+            catch (OperationCanceledException) { canceled = true; if (!_disposed) StatusText.Text = Loc("Str_St_ScanCanceled"); }
             finally
             {
+                NoteRefresh(s, refreshed, targets.Count - refreshed, canceled);
                 _rescanCts.Dispose();
                 _rescanCts = null;
                 FinishRescanUi();
@@ -116,6 +110,24 @@ namespace KillerScan.Controls
         }
 
         private async void DeepScanAll_Click(object sender, RoutedEventArgs e)
+            => await DeepScanAllAsync();
+
+        // "N refreshed" only when every host answered; otherwise how many did and did not.
+        private string RescanSummary(int refreshed, int total) => refreshed == total
+            ? string.Format(Loc("Str_St_RescanDone"), refreshed)
+            : string.Format(Loc("Str_St_RescanPartial"), refreshed, total, total - refreshed);
+
+        // Manual refreshes keep the scan's own time and completion and are noted beside them.
+        // Canceled hosts that were never reached count as not refreshed.
+        private static void NoteRefresh(ScanSession session, int refreshed, int failed, bool canceled)
+        {
+            if (refreshed == 0 && failed == 0) return;
+            var now = DateTimeOffset.Now;
+            session.Refresh = session.Refresh?.Then(now, refreshed, failed, canceled)
+                ?? new ScanRefresh(now, refreshed, failed, canceled);
+        }
+
+        private async Task DeepScanAllAsync(bool recordProfile = false)
         {
             if (_rescanCts != null)
             {
@@ -124,28 +136,31 @@ namespace KillerScan.Controls
             }
             if (_disposed || _active.Cts != null || ActiveDevices.Count == 0) return;
 
-            using var locationRun = Locations.BeginRun();
-            EngineHost.CapturePreferences(_active.Scanner);
-
             var s = _active;
             var scanner = s.Scanner;
             var targets = s.Devices.OrderBy(d => d.IpSortKey).ToList();
+            // The automatic deep phase belongs to the run that already validated its adapter.
+            if (!recordProfile)
+            {
+                var refreshTargets = ScanTargets.Parse(string.Join(",", targets.Select(d => d.IpAddress)));
+                if (!refreshTargets.Ok || !AdapterAllowsScan(refreshTargets.Summary, refreshTargets.Addresses, out _)) return;
+            }
             _rescanCts = new CancellationTokenSource();
             var ct = _rescanCts.Token;
             using var hostGate = new SemaphoreSlim(8);
             int done = 0;
             int refreshed = 0;
+            var completion = ScanCompletion.Partial;
+            var options = s.Options;
 
             ScanBtn.IsEnabled = false;
             ScanProgress.Value = 0;
             ScanProgress.Visibility = Visibility.Visible;
             UpdateDeepScanButton();
             StateChanged?.Invoke(this, EventArgs.Empty);
-            var options = s.Options;
-            if (options.ReverseDns && scanner.Binding == null) NetworkScanner.FlushLocalDnsCache();
-
             try
             {
+                if (options.ReverseDns) NetworkScanner.FlushLocalDnsCache();
                 var tasks = targets.Select(async old =>
                 {
                     await hostGate.WaitAsync(ct);
@@ -162,7 +177,6 @@ namespace KillerScan.Controls
                         }
                     }
                     catch (OperationCanceledException) { throw; }
-                    catch (NetworkBindingException) { _rescanCts.Cancel(); throw; }
                     catch { }
                     finally
                     {
@@ -178,18 +192,38 @@ namespace KillerScan.Controls
                 });
 
                 await Task.WhenAll(tasks);
-                if (!_disposed) StatusText.Text = string.Format(Loc("Str_St_RescanDone"), refreshed);
+                completion = refreshed == targets.Count ? ScanCompletion.Complete : ScanCompletion.Partial;
+                if (!_disposed) StatusText.Text = RescanSummary(refreshed, targets.Count);
             }
             catch (OperationCanceledException)
             {
+                completion = ScanCompletion.Canceled;
                 if (!_disposed) StatusText.Text = Loc("Str_St_ScanCanceled");
             }
-            catch (NetworkBindingException ex) { if (!_disposed) StatusText.Text = ex.Message; }
+            catch (Exception ex)
+            {
+                if (!_disposed) StatusText.Text = string.Format(Loc("Str_Err_Scan"), ex.Message);
+            }
             finally
             {
-                _rescanCts.Dispose();
-                _rescanCts = null;
-                FinishRescanUi();
+                try
+                {
+                    if (recordProfile)
+                    {
+                        _scanCompleted = completion == ScanCompletion.Complete;
+                        LeaveDeletedLocation();
+                        RecordCompletedRun(options, deep: true, completion);
+                    }
+                    // A manual Deep Scan All refreshes an existing snapshot; an automatic one is
+                    // part of the run it just recorded.
+                    else NoteRefresh(s, refreshed, targets.Count - refreshed, completion == ScanCompletion.Canceled);
+                }
+                finally
+                {
+                    _rescanCts.Dispose();
+                    _rescanCts = null;
+                    FinishRescanUi();
+                }
             }
         }
 

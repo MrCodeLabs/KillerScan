@@ -1,5 +1,9 @@
 # Home Assistant integration advice
 
+Retained on the upstream **1.9.0** base on **2 November 2026**. See
+[fork synchronization and data compatibility](fork-upstream-1.9.md) for old JSON,
+Location and history behavior. The unpublished survey development is separate.
+
 Implemented on **23 October 2026**; publication review **24 October 2026**. Catalogue revision
 `2026-10-23.3`; advice schema version `2`.
 

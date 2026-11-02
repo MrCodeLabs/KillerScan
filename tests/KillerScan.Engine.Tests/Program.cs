@@ -5,45 +5,42 @@ internal static class Program
 {
     private static int _passed;
 
-    private static async Task<int> Main()
+    private static async Task<int> Main(string[] args)
     {
         try
         {
+            if (args.SequenceEqual(new[] { "--vendor-db" })) { await VendorDatabaseTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--vendor-snapshot" })) { await VendorSnapshotTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--subnet" })) { await Subnet(); Console.WriteLine("PASS: IPv4 subnet boundaries."); return 0; }
+            if (args.SequenceEqual(new[] { "--fingerprint-cancellation" })) { await EngineBehaviorTests.HttpFingerprintCancellation(); await EngineBehaviorTests.TlsFingerprintCancellation(); Console.WriteLine("PASS: active HTTP/TLS cancellation closes I/O and skips later ports."); return 0; }
+            if (args.SequenceEqual(new[] { "--http-redirects" })) { await HttpRedirectTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--mac-cancellation" })) { await MacCancellationTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--snmp" })) { await SnmpTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--upload-accounting" })) { await UploadAccountingTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--scan-options" })) { await ScanOptionsTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--safe-probes" })) { await SafeProbeTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--netbios" })) { await NetbiosTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--mdns" })) { await MdnsTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--api-contract" })) { await ApiContractTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--dns-budget" })) { await DnsBudgetTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--binding" })) { await BindingTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--recognition" })) { await RecognitionTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--access" })) { await AccessTests.Run(); return 0; }
+            if (args.SequenceEqual(new[] { "--home-assistant" })) { await ForkIntegrationTests.Run(); return 0; }
+            await Run("Fork HA advice, old JSON and captured provenance", ForkIntegrationTests.Run);
+            await Run("Scan options preserve defaults and validate feature choices", ScanOptionsTests.Run);
             await Run("Targets parse ranges, de-duplicate overlaps and refuse bad input", Targets);
             await Run("The address ceiling counts unique addresses and keeps first-seen order", TargetCeiling);
             await Run("CIDR expansion excludes the network and broadcast addresses", Subnet);
-            await Run("ARP output parsing keeps IPv4 entries with full MAC addresses", ArpParsing);
+            await Run("ARP output parsing keeps IPv4 device entries with full MAC addresses", ArpParsing);
+            await Run("Local network detection skips an adapter without a mask and uses the next one", LocalNetworkPick);
             await Run("Classifier honors manual types, the gateway, DNS and hostname rules", Classifier);
-            await Run("Recognition keeps weak names, OUI and silent hosts uncertain", RecognitionTests.WeakSignals);
-            await Run("HA advice does not infer support from names, ports or vendor", HomeAssistantTests.WeakAndUnknown);
-            await Run("HA candidates retain protocol evidence and integration prerequisites", HomeAssistantTests.SupportedClues);
-            await Run("HA research, conflicts, snapshots and unknown-device plans stay distinct", HomeAssistantTests.ProvenanceAndManual);
-            await Run("HA picks native integrations before generic protocols and leaves unknown/conflicting devices unresolved", HomeAssistantTests.DirectChoices);
-            await Run("HA research suggestions remain actionable without upgrading vendor/name hints into compatibility", HomeAssistantTests.ResearchRecommendations);
-            await Run("Multicast-only silent devices are admitted within the requested targets", MulticastDiscoveryTests.SilentHosts);
-            await Run("SSDP preserves later specific device types and bounded evidence", MulticastDiscoveryTests.SsdpTypes);
-            await Run("ARP can discover a silent on-link host while disabled paths stay off", MulticastDiscoveryTests.ArpOnlyDiscovery);
-            await Run("Access keeps endpoint evidence, login uncertainty and safe addresses", AccessTests.Evidence);
-            await Run("Real HTTP retains multiple endpoints and refuses redirects/auth retries", AccessTests.HttpRoundTrip);
-            await Run("Deep access records real HTTPS on a nonstandard port", AccessTests.HttpsRoundTrip);
-            await Run("Stop cancels HTTP and prevents later access probes", AccessTests.StopRequests);
-            await Run("Recognition requires corroboration and exposes contradictory evidence", RecognitionTests.CorroborationAndConflict);
-            await Run("Reported models require explicit declarations and bounded evidence", RecognitionTests.ModelsAndUntrustedValues);
-            await Run("Manual labels, frozen inference, timestamps and JSON remain distinct", RecognitionTests.ManualAndSnapshots);
-            await Run("Full, quick and deep scans retain provenance and cached timestamps", RecognitionTests.ScanProvenance);
+            await Run("Recognition grades a labeled corpus and records its evidence", RecognitionTests.Run);
+            await Run("Access records what each endpoint answered", AccessTests.Run);
             await Run("Bundled vendor database loads from the engine assembly", Vendors);
             await Run("Status text is English, numeric and free of double hyphens", StatusText);
             await Run("Quick scan reports stages, devices and host hooks through a fake platform", QuickScan);
             await Run("A canceled token stops the scan", Canceled);
-            await Run("Disabled probes start no I/O in full, quick or deep mode", ScanOptionsTests.DisabledProbes);
-            await Run("Default API behavior and per-scan enrichment isolation", ScanOptionsTests.CompatibilityAndIsolation);
-            await Run("Scan options preserve old JSON defaults and immutable choices", ScanOptionsTests.ProfileSerialization);
-            await Run("Concurrent scanners isolate instance preferences from static location callbacks", LocationHostTests.InstancePreferences);
-            await Run("Explicit interface scope and disconnects fail closed across scan paths", InterfaceBindingTests.ScopeAndDisconnect);
-            await Run("Real loopback TCP/UDP sockets pin source, index and received scope", InterfaceBindingTests.PinnedSockets);
-            await Run("Source-bound native ICMP and per-interface classification", InterfaceBindingTests.BoundIcmpAndClassification);
-            await Run("Bound HTTP fingerprints retain results and never follow redirects", InterfaceBindingTests.BoundHttp);
-            await Run("Bound DNS uses adapter sockets and verifies PTR against A", InterfaceBindingTests.BoundDnsRoundTrip);
             await Run("Full scan preserves HTTP results, manual classification and saved names", EngineBehaviorTests.FullScan);
             await Run("HTTP fingerprint extracts the controlled title and Server header", EngineBehaviorTests.HttpFingerprintResults);
             await Run("Stop cancels a deep probe before device completion", EngineBehaviorTests.DeepProbeCancellation);
@@ -106,13 +103,22 @@ internal static class Program
 
     private static Task Subnet()
     {
+        foreach (string invalid in new[] { "2001:db8::/24", "::ffff:192.0.2.1/30", "2001:db8::/32", "192.0.2.0/24/30", "192.0.2.0/", "192.0.2.0/no", "", "invalid" })
+        {
+            bool rejected = false;
+            try { NetworkScanner.GetAddressesInSubnet(invalid); }
+            catch (ArgumentException) { rejected = true; }
+            catch (FormatException) { rejected = true; }
+            Require(rejected, "Invalid or non-IPv4 subnet must be rejected: " + invalid);
+        }
+        Require(NetworkScanner.GetAddressesInSubnet("192.0.2.0/31").Count == 0, "A /31 retains the existing empty-host contract.");
         foreach (string cidr in new[] { "10.0.0.0/15", "0.0.0.0/0" })
         {
             bool rejected = false;
             try { NetworkScanner.GetAddressesInSubnet(cidr); }
             catch (ArgumentOutOfRangeException ex)
             {
-                rejected = ex.ParamName == "cidr" && ex.Message.Contains(ScanTargets.MaxAddresses.ToString("N0"), StringComparison.Ordinal);
+                rejected = ex.ParamName == "cidr" && ex.Message.Contains("65,536", StringComparison.Ordinal);
             }
             Require(rejected, cidr + " should be rejected before its hosts are allocated");
         }
@@ -135,11 +141,36 @@ internal static class Program
             "  Internet Address      Physical Address      Type\r\n" +
             "  192.168.1.1           00-00-0c-12-34-56     dynamic\r\n" +
             "  192.168.1.255         ff-ff-ff-ff-ff-ff     static\r\n" +
-            "  224.0.0.22            01-00-5e            static\r\n";
+            "  224.0.0.22            01-00-5e            static\r\n" +
+            "  224.0.0.251           01-00-5e-00-00-fb     static\r\n" +
+            "  239.255.255.250       01-00-5e-7f-ff-fa     static\r\n" +
+            "  192.168.1.40          00-11-32-aa-bb-cc     static\r\n";
         var cache = ArpOutput.Parse(output);
         Require(cache.TryGetValue("192.168.1.1", out var mac) && mac == "00:00:0C:12:34:56", "Gateway MAC should normalize");
-        Require(cache.ContainsKey("192.168.1.255"), "Broadcast row is kept as the cache reports it");
+        Require(!cache.ContainsKey("192.168.1.255"), "The broadcast row is not a device");
+        Require(!cache.ContainsKey("224.0.0.251") && !cache.ContainsKey("239.255.255.250"), "Multicast rows are not devices");
+        Require(cache.TryGetValue("192.168.1.40", out mac) && mac == "00:11:32:AA:BB:CC", "A static entry for a real device is kept");
         Require(!cache.ContainsKey("224.0.0.22"), "Short MAC rows are rejected");
+        return Task.CompletedTask;
+    }
+
+    private static Task LocalNetworkPick()
+    {
+        var maskless = new LocalNetwork.Candidate
+        {
+            Type = System.Net.NetworkInformation.NetworkInterfaceType.Ethernet,
+            Address = System.Net.IPAddress.Parse("172.20.0.5"), Mask = null, Gateway = "172.20.0.1"
+        };
+        var wifi = new LocalNetwork.Candidate
+        {
+            Type = System.Net.NetworkInformation.NetworkInterfaceType.Wireless80211,
+            Address = System.Net.IPAddress.Parse("192.168.1.20"), Mask = System.Net.IPAddress.Parse("255.255.255.0"),
+            Gateway = "192.168.1.1", Dns = "192.168.1.1", Description = "Test Wi-Fi"
+        };
+        var net = LocalNetwork.Pick(new[] { maskless, wifi });
+        Require(net != null && net.Subnet == "192.168.1.0/24" && net.Gateway == "192.168.1.1" && net.InterfaceLabel == "Wi-Fi",
+            "A maskless adapter must not hide the next good one: " + (net?.Subnet ?? "null"));
+        Require(LocalNetwork.Pick(new[] { maskless }) == null, "Only a maskless adapter means no local network");
         return Task.CompletedTask;
     }
 
@@ -225,7 +256,7 @@ internal static class Program
             int completedHook = 0;
             NetworkScanner.DeviceCompleted = _ => completedHook++;
 
-            var scanner = new NetworkScanner();
+            var scanner = new NetworkScanner(new IsolatedDiscovery());
             var stages = new List<ScanStage>();
             var found = new List<NetworkDevice>();
             int lastProgress = -1;
@@ -234,8 +265,7 @@ internal static class Program
             scanner.ProgressChanged += p => lastProgress = p;
 
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
-            var devices = await scanner.ScanSubnetAsync("127.0.0.1", cts.Token,
-                new ScanOptions().Without("mdns,ssdp"), fullScan: false);
+            var devices = await scanner.ScanSubnetAsync("127.0.0.1", cts.Token, fullScan: false);
 
             Require(fake.Flushes == 1, "Scan should flush the DNS cache once");
             Require(devices.Count == 1 && found.Count == 1, "Loopback should be found once, got " + devices.Count);
@@ -264,7 +294,7 @@ internal static class Program
             cts.Cancel();
             try
             {
-                await new NetworkScanner().ScanSubnetAsync("127.0.0.1", cts.Token, fullScan: false);
+                await new NetworkScanner(new IsolatedDiscovery()).ScanSubnetAsync("127.0.0.1", cts.Token, fullScan: false);
             }
             catch (OperationCanceledException)
             {

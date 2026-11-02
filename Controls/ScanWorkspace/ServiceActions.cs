@@ -18,9 +18,22 @@ namespace KillerScan.Controls
             return scheme == null ? null : new UriBuilder(scheme, address.ToString(), port).Uri;
         }
 
+        /// <summary>
+        /// The address Open in Browser uses. For a port, the scheme that port actually answered
+        /// with, or the one its number suggests. For the device, the web endpoint that answered
+        /// (HTTPS first), falling back to http://address/ when none did.
+        /// </summary>
+        internal static string? BrowserAddress(NetworkDevice device, int? port = null)
+        {
+            if (!IPAddress.TryParse(device.IpAddress, out var address)) return null;
+            var web = DeviceAccess.BestWeb(device, port);
+            if (web != null) return DeviceAccess.Address(device.IpAddress, web);
+            return port == null ? new UriBuilder("http", address.ToString()).Uri.AbsoluteUri : null;
+        }
+
         private static bool CanOpenService(ServiceRow row, string action) => action switch
         {
-            "Browser" => row.BrowserAddress != null,
+            "Browser" => row.WebAddress != null,
             "Ssh" or "SshAs" => row.Port == 22,
             "Rdp" => row.Port == 3389,
             _ => false
@@ -73,11 +86,14 @@ namespace KillerScan.Controls
         {
             if (sender is not MenuItem { Tag: string action }) return;
             if (action.StartsWith("Copy", StringComparison.Ordinal)) CopyServiceText(action);
+            else if (action == "HomeAssistant")
+            {
+                var row = ServicesGrid.CurrentItem as ServiceRow ?? ServicesGrid.SelectedItem as ServiceRow;
+                var device = row == null ? null : ActiveDevices.FirstOrDefault(item => item.IpAddress == row.IpAddress);
+                if (device != null) { var dialog = CreateHomeAssistantAdvice(device); dialog.Owner = Window.GetWindow(this); dialog.ShowDialog(); }
+            }
             else if (action == "SelectAll") ServicesGrid.SelectAll();
             else if (action == "Export") ExportServicesCsv_Click(sender, e);
-            else if (action == "Evidence") Evidence_Click(sender, e);
-            else if (action == "Access") Access_Click(sender, e);
-            else if (action == "HomeAssistant") HomeAssistant_Click(sender, e);
             else RaiseServiceAction(action);
         }
 

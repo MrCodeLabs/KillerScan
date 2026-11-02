@@ -29,8 +29,17 @@ namespace KillerScan.Controls
 
         private double TopologyScale => double.Parse(_topologyOptions["NodeScale"], CultureInfo.InvariantCulture) / 100;
         private double TopologyFontSize => double.Parse(_topologyOptions["FontSize"], CultureInfo.InvariantCulture);
-        private double TopologyNodeWidth => 126 * TopologyScale;
-        private double TopologyNodeHeight => Math.Max(40 * TopologyScale, TopologyFontSize * 2.8 + 9);
+        private double DefaultTopologyNodeWidth => 126 * TopologyScale;
+        private double TopologyNodeWidth => Math.Max(DefaultTopologyNodeWidth, _topologyCardSize.Width);
+        // Just the two lines, the 3px ring and 2px of air: no fixed floor, so a card only grows
+        // when the topology font does.
+        private double DefaultTopologyNodeHeight => Math.Ceiling(TopologyFontSize * 2.66 + 7);
+        private double TopologyNodeHeight => Math.Max(DefaultTopologyNodeHeight, _topologyCardSize.Height);
+
+        /// <summary>The largest card the last build measured. Cards size to their text, so a long
+        /// name is wider than the default slot; the layout spaces by this so none overlap or leave
+        /// the canvas (RefreshTopology).</summary>
+        private Size _topologyCardSize;
         private bool TopologyHorizontal => _topologyOptions["Orientation"] == "Horizontal";
 
         private void LoadTopologySettings()
@@ -151,8 +160,9 @@ namespace KillerScan.Controls
             TopologyCanvas.Focus();
             UpdateTopologyOrderUi();
             var menu = TopologyOrderButton.ContextMenu;
-            menu.PlacementTarget = TopologyCanvas;
-            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+            menu.PlacementTarget = TopologyScrollViewer;
+            menu.PlacementRectangle = new Rect(e.GetPosition(TopologyScrollViewer), new Size());
+            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.RelativePoint;
             menu.IsOpen = true;
             e.Handled = true;
         }

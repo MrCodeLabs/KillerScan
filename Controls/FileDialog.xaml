@@ -20,13 +20,61 @@
         SnapsToDevicePixels="True"
         WindowStartupLocation="CenterOwner">
 
-    <!-- The picker's styles are merged HERE, not into App.xaml. LocaleManager owns application
-         merged-dictionary slot [2] - it assigns the locale override there and, for English,
-         REMOVES it - so anything parked at [2] is deleted at startup. That is what "Cannot find
-         resource named 'DarkTextBox'" was. These styles are the picker's own, so scoping them to
-         the picker removes the index coupling entirely rather than competing for a slot. -->
+    <!-- Every picker style lives in the family Controls.xaml. Only the recent-locations arrow,
+         which no other control uses, is kept here. -->
     <Window.Resources>
-        <ResourceDictionary Source="pack://application:,,,/Controls/PickerStyles.xaml"/>
+        <Style x:Key="PickerComboArrowBtn" TargetType="Button">
+            <Setter Property="Width" Value="{DynamicResource ComboButtonSize}"/>
+            <Setter Property="Height" Value="{DynamicResource ComboButtonHeight}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource ComboChevFont}"/>
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="face" Background="{DynamicResource ComboButtonBrush}"/>
+                            <Border x:Name="bevelLight" IsHitTestVisible="False"
+                                    BorderBrush="{DynamicResource BevelLightBrush}"
+                                    BorderThickness="{DynamicResource BevelLightThickness}"/>
+                            <Border x:Name="bevelDark" IsHitTestVisible="False"
+                                    BorderBrush="{DynamicResource BevelDarkBrush}"
+                                    BorderThickness="{DynamicResource BevelDarkThickness}"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="face" Property="Background" Value="{DynamicResource ComboButtonHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bevelLight" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
+                                <Setter TargetName="bevelDark" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- The four-layer sunken edge as one control, for the picker's wells. Every thickness is
+             zero on the flat themes, so it draws nothing there. -->
+        <Style x:Key="PaneBevelOverlay" TargetType="{x:Type Control}">
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Control}">
+                        <Grid>
+                            <Border BorderBrush="{DynamicResource PaneBevelDarkBrush}" BorderThickness="{DynamicResource PaneBevelLightThickness}"/>
+                            <Border BorderBrush="{DynamicResource PaneBevelLightBrush}" BorderThickness="{DynamicResource PaneBevelDarkThickness}"/>
+                            <Border Margin="{DynamicResource PaneBevelInnerMargin}" BorderBrush="{DynamicResource PaneBevelDark2Brush}" BorderThickness="{DynamicResource PaneBevel2LightThickness}"/>
+                            <Border Margin="{DynamicResource PaneBevelInnerMargin}" BorderBrush="{DynamicResource PaneBevelLight2Brush}" BorderThickness="{DynamicResource PaneBevel2DarkThickness}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <!-- NO shell:WindowChrome. On an AllowsTransparency window it fills its own non-client area,
@@ -76,7 +124,7 @@
 
         <!-- Corner radius follows the theme, not a hardcoded 6: a square-cornered palette was
              getting a rounded card, and its square bevel then cut across the corners. -->
-        <kui:PickerBorder x:Name="RootBorder" BorderBrush="{DynamicResource DialogFrameBrush}" BorderThickness="{DynamicResource DialogFrameThickness}"
+        <kui:PickerBorder x:Name="RootBorder" Tag="{DynamicResource UseDialogCaption}" BorderBrush="{DynamicResource DialogFrameBrush}" BorderThickness="{DynamicResource DialogFrameThickness}"
                 Background="{DynamicResource BackgroundBrush}"
                 CornerRadius="{DynamicResource PanelCornerRadius}" Margin="{DynamicResource DialogHaloMargin}"
                 Padding="{DynamicResource DialogWindowFramePadding}">
@@ -96,18 +144,15 @@
             <Border Grid.RowSpan="6" IsHitTestVisible="False"
                     Background="{DynamicResource GrainTileBrush}" Opacity="{DynamicResource GrainOpacity}"/>
 
-            <!-- Title bar. TitleBarBrush, not Transparent: the row already spans the card, so this
-                 gives it a real caption band - a gradient on the themes that define one, and
-                 identical to BackgroundBrush on the themes that do not, which is why the other
-                 palettes look unchanged. -->
+            <!-- Title bar: transparent by default so it shows the card and its grain, one surface
+                 with the body, or the theme's own caption band where one is asked for (98SE). -->
             <Border Grid.Row="0" Height="{DynamicResource DialogTitleBarHeight}"
                     Background="{DynamicResource DialogTitleBarBrush}" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
-                <!-- The caption band paints OVER the dialog-wide grain (declared before this row),
-                     so it carries its own tile - same as the main window's chrome. -->
-                <Border IsHitTestVisible="False"
-                        Background="{DynamicResource GrainTileBrush}" Opacity="{DynamicResource GrainOpacity}"/>
                 <Grid Margin="{DynamicResource TitleBarPadding}">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <kui:AppIcon x:Name="TitleIcon" Width="{DynamicResource TitleIconSize}" Height="{DynamicResource TitleIconSize}"
+                                 Margin="{DynamicResource TitleIconMargin}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                     <!-- A file picker caption names the operation. It is window chrome, not a
                          branding surface; the caller's Title belongs here and nowhere else. -->
                     <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
@@ -115,6 +160,7 @@
                                FontSize="{DynamicResource MenuFontSize}" FontWeight="Bold"
                                Foreground="{DynamicResource ChromeTextBrush}"
                                VerticalAlignment="Center" IsHitTestVisible="False"/>
+                    </StackPanel>
                     <!-- The family overlay and dialog close (App.xaml, OverlayCloseButton): the glyph
                          reddens on hover without a fill, and 98SE gets the caption button face. -->
                     <Button x:Name="CaptionCloseButton" Content="{DynamicResource AboutCloseGlyph}" Click="Cancel_Click"
@@ -141,7 +187,7 @@
                      focus border. The chevron overlays the box's right edge (the box pads 28 to
                      clear it) and drops the recent-locations list, like Explorer's address bar. -->
                 <Grid Grid.Column="1">
-                    <TextBox x:Name="PathBox" Height="28" Style="{StaticResource DarkTextBox}"
+                    <TextBox x:Name="PathBox" Style="{StaticResource DialogPickerTextBox}"
                              AutomationProperties.Name="{Binding Text, RelativeSource={RelativeSource Self}}"
                              FontFamily="{DynamicResource UiFont}" FontSize="12" Padding="8,0,28,0"
                              VerticalContentAlignment="Center" KeyDown="PathBox_KeyDown"/>
@@ -165,7 +211,7 @@
                                 <Grid>
                                     <Border IsHitTestVisible="False" CornerRadius="{DynamicResource ControlCornerRadius}"
                                             Background="{DynamicResource GrainTileBrush}" Opacity="{DynamicResource GrainOpacity}"/>
-                                    <ListBox x:Name="RecentsList" Background="Transparent" BorderThickness="0" Padding="2,4"
+                                    <ListBox x:Name="RecentsList" Background="Transparent" BorderThickness="0" Padding="2,4" AutomationProperties.Name="{DynamicResource Str_TT_RecentLocations}"
                                              Width="{Binding ActualWidth, ElementName=PathBox}" MaxHeight="260"
                                              ItemContainerStyle="{StaticResource PickerRow}"
                                              SelectionChanged="RecentsList_SelectionChanged"
@@ -196,8 +242,7 @@
                             </StackPanel>
                         </Button.ToolTip>
                         <Button.ContextMenu>
-                            <ContextMenu x:Name="SortMenu" Style="{StaticResource PickerContextMenu}"
-                                         ItemContainerStyle="{StaticResource PickerMenuItem}">
+                            <ContextMenu x:Name="SortMenu">
                                 <MenuItem x:Name="SortNameItem" Header="{DynamicResource Str_Col_Name}"
                                           IsCheckable="True" Click="SortName_Click">
                                     <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
@@ -256,7 +301,7 @@
                         <RowDefinition x:Name="PlacesRow" Height="*" MinHeight="56"/>
                     </Grid.RowDefinitions>
                     <Control Grid.RowSpan="3" Panel.ZIndex="20" Style="{StaticResource PaneBevelOverlay}"/>
-                    <ListBox x:Name="PlacesList" Grid.Row="2" Background="Transparent" BorderThickness="0" Padding="2,4"
+                    <ListBox x:Name="PlacesList" Grid.Row="2" Background="Transparent" BorderThickness="0" Padding="2,4" AutomationProperties.Name="{DynamicResource Str_Dlg_Places}"
                              ItemContainerStyle="{StaticResource PickerPlaceRow}" SelectionChanged="Places_SelectionChanged"
                              ContextMenuOpening="Places_ContextMenuOpening"
                              PreviewMouseLeftButtonDown="Places_PreviewMouseLeftButtonDown" PreviewMouseMove="Places_PreviewMouseMove"
@@ -386,7 +431,7 @@
                             </LinearGradientBrush>
                         </Border.OpacityMask>
                         <Grid>
-                            <Border Background="{DynamicResource BackgroundBrush}"/>
+                            <Border Background="{DynamicResource FileDialogPaneBrush}"/>
                             <Border Background="{DynamicResource GrainTileBrush}" Opacity="{DynamicResource GrainOpacity}"/>
                         </Grid>
                     </Border>
@@ -399,7 +444,7 @@
                             </LinearGradientBrush>
                         </Border.OpacityMask>
                         <Grid>
-                            <Border Background="{DynamicResource BackgroundBrush}"/>
+                            <Border Background="{DynamicResource FileDialogPaneBrush}"/>
                             <Border Background="{DynamicResource GrainTileBrush}" Opacity="{DynamicResource GrainOpacity}"/>
                         </Grid>
                     </Border>
@@ -516,7 +561,7 @@
 
             <!-- File name + filter. Labels are DimTextBrush on the dark card: 3.15:1, the tier
                  these brushes are calibrated for. -->
-            <Grid Grid.Row="4" Margin="16,12,16,0">
+            <Grid x:Name="FileFields" Grid.Row="4" Margin="16,12,16,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -532,9 +577,9 @@
                      (WPF's TextBoxView), so at 8 the name started visibly right of the filter
                      combo's text directly below it (combo padding is 7 with no inherent inset).
                      5 + 2 lines the two up. (2026-07-31) -->
-                <TextBox x:Name="FileNameBox" Grid.Row="0" Grid.Column="1" Height="28"
+                <TextBox x:Name="FileNameBox" Grid.Row="0" Grid.Column="1"
                          AutomationProperties.Name="{DynamicResource Str_Dlg_FileName}"
-                         Style="{StaticResource DarkTextBox}"
+                         Style="{StaticResource DialogPickerTextBox}"
                          FontFamily="{DynamicResource UiFont}" FontSize="12" Padding="5,0,8,0"
                          VerticalContentAlignment="Center" KeyDown="FileNameBox_KeyDown"/>
 

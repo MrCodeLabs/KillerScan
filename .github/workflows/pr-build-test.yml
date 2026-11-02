@@ -26,26 +26,33 @@ jobs:
             project: KillerScan.csproj
             mode: build
             framework: ''
+            suite: ''
           - name: engine-net48
             project: tests/KillerScan.Engine.Tests/KillerScan.Engine.Tests.csproj
             mode: console
             framework: 'net48'
+            suite: engine
           - name: engine-net10
             project: tests/KillerScan.Engine.Tests/KillerScan.Engine.Tests.csproj
             mode: console
             framework: 'net10.0'
+            suite: engine
           - name: speed-test-fixtures
             project: tests/SpeedTest.Tests/SpeedTest.Tests.csproj
             mode: console
             framework: 'net48'
+            suite: app
     name: ${{ matrix.name }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: '10.0.x'
+      - name: Isolate fork test data
+        run: |
+          "KILLERSCAN_DATA_ROOT=$env:RUNNER_TEMP\KillerScan-ci-data" >> $env:GITHUB_ENV
       - name: Restore and build
         env:
           PROJECT: ${{ matrix.project }}
@@ -59,15 +66,6 @@ jobs:
           if ($env:FRAMEWORK) { $buildArgs += @('--framework', $env:FRAMEWORK) }
           & dotnet @buildArgs 2>&1 | Tee-Object ci-results/build.log
           if ($LASTEXITCODE -ne 0) { throw 'Build failed. See build.log.' }
-      - name: Run tests
-        if: matrix.mode == 'test'
-        env:
-          PROJECT: ${{ matrix.project }}
-        run: |
-          # WPF FontCache requires WINDIR even for isolated resource tests.
-          if (!$env:WINDIR) { $env:WINDIR = $env:SYSTEMROOT }
-          dotnet test $env:PROJECT --no-build --no-restore --configuration Release --logger 'trx;LogFileName=tests.trx' --results-directory ci-results --verbosity normal 2>&1 | Tee-Object ci-results/test.log
-          if ($LASTEXITCODE -ne 0) { throw 'Tests failed. See test.log and tests.trx.' }
       - name: Run console regression checks
         if: matrix.mode == 'console'
         env:
@@ -75,12 +73,36 @@ jobs:
           FRAMEWORK: ${{ matrix.framework }}
         run: |
           if (!$env:WINDIR) { $env:WINDIR = $env:SYSTEMROOT }
+          Get-Service W3SVC, WAS -ErrorAction SilentlyContinue | Stop-Service -Force -ErrorAction Stop
           # No --worker or --internet: SpeedTest uses local fixtures only.
           dotnet run --project $env:PROJECT --framework $env:FRAMEWORK --configuration Release --no-build --no-restore 2>&1 | Tee-Object ci-results/console.log
           if ($LASTEXITCODE -ne 0) { throw 'Regression checks failed. See console.log.' }
+      # The runners' flag-only groups. tests/suites.json lists every flag, and the script fails
+      # when a runner gains one that is not listed, so a new suite cannot go unrun.
+      - name: Run focused regression suites
+        if: matrix.suite != ''
+        env:
+          SUITE: ${{ matrix.suite }}
+          FRAMEWORK: ${{ matrix.framework }}
+        run: |
+          if (!$env:WINDIR) { $env:WINDIR = $env:SYSTEMROOT }
+          pwsh -NoProfile -NonInteractive -File ./tests/Run-FocusedSuites.ps1 -Suite $env:SUITE -Framework $env:FRAMEWORK -Configuration Release 2>&1 | Tee-Object ci-results/focused.log
+          if ($LASTEXITCODE -ne 0) { throw 'Focused suites failed. See focused.log.' }
+      - name: Check the suite inventory and the PowerShell module contract
+        if: matrix.name == 'application'
+        run: |
+          pwsh -NoProfile -NonInteractive -File ./tests/Release.Tests/PackageChecksum.Tests.ps1
+          if ($LASTEXITCODE -ne 0) { throw 'Package checksum response contract failed.' }
+          pwsh -NoProfile -NonInteractive -File ./tests/Run-FocusedSuites.ps1 -CheckOnly
+          if ($LASTEXITCODE -ne 0) { throw 'tests/suites.json does not match the test runners.' }
+          $exe = 'bin/Release/net48/KillerScan.exe'
+          pwsh -NoProfile -File tests/Module/ModuleContract.ps1 -Exe $exe 2>&1 | Tee-Object ci-results/module-pwsh.log
+          if ($LASTEXITCODE -ne 0) { throw 'Module contract failed on PowerShell 7. See module-pwsh.log.' }
+          powershell -NoProfile -ExecutionPolicy Bypass -File tests/Module/ModuleContract.ps1 -Exe $exe 2>&1 | Tee-Object ci-results/module-desktop.log
+          if ($LASTEXITCODE -ne 0) { throw 'Module contract failed on Windows PowerShell 5.1. See module-desktop.log.' }
       - name: Retain failure diagnostics and test results
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ci-${{ matrix.name }}
           path: ci-results/

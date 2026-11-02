@@ -25,6 +25,8 @@ namespace KillerScan.Features.Cli
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetStdHandle(int nStdHandle);
         [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetStdHandle(int nStdHandle, IntPtr hHandle);
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint GetFileType(IntPtr hFile);
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
@@ -88,7 +90,7 @@ namespace KillerScan.Features.Cli
             catch { return false; }
         }
 
-        private static string PaintErr(string text, string code) => _errAnsi ? code + text + AnsiReset : text;
+        private static string PaintErr(string text, string code) => _errAnsi ? code + TerminalText.Escape(text) + AnsiReset : TerminalText.Escape(text);
 
         /// <summary>Little stderr spinner shown while a scan or probe runs on an interactive
         /// console. Skipped when stderr is redirected (a \r animation would be garbage in a log),
@@ -138,9 +140,113 @@ namespace KillerScan.Features.Cli
             "/sort", "--sort", "/filter", "--filter", "/type", "--type",
             "/vendor-filter", "--vendor-filter", "/ports", "--ports", "/limit", "--limit",
             "/timeout", "--timeout", "/theme", "--theme", "/count", "--count",
-            "/interval", "--interval", "/max-hops", "--max-hops", "/skip", "--skip",
-            "/interface", "--interface", "/source-ip", "--source-ip", "/location", "--location"
+            "/interval", "--interval", "/max-hops", "--max-hops", "/location", "--location", "/skip", "--skip",
+            "/adapter", "--adapter"
         ];
+
+        /// <summary>
+        /// Finds the Location a command line names, by ID or by name in any letter case. Returns
+        /// null with a usage message when nothing matches or more than one Location shares the name.
+        /// </summary>
+        internal static LocationInfo? ResolveLocation(string text, IReadOnlyList<LocationInfo> items, out string? error)
+        {
+            error = null;
+            string wanted = text.Trim();
+            if (wanted.Length == 0) { error = "/location needs a Location name."; return null; }
+            if (items.FirstOrDefault(item => string.Equals(item.Id, wanted, StringComparison.OrdinalIgnoreCase)) is { } byId) return byId;
+            var named = items.Where(item => string.Equals(item.Name, wanted, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (named.Count == 1) return named[0];
+            error = named.Count == 0
+                ? $"no Location is named \"{wanted}\"."
+                : $"more than one Location is named \"{wanted}\". Use its ID instead: {string.Join(", ", named.Select(item => item.Id))}.";
+            return null;
+        }
+
+        /// <summary>The connected adapter /adapter names, by Windows name or address, or null with a message.</summary>
+        internal static ScanBinding? ResolveAdapter(string text, IReadOnlyList<ScanBinding> available, out string? error)
+        {
+            error = null;
+            string wanted = text.Trim();
+            var found = System.Net.IPAddress.TryParse(wanted, out var address)
+                ? available.FirstOrDefault(b => b.LocalAddress.Equals(address))
+                : available.FirstOrDefault(b => string.Equals(b.InterfaceName, wanted, StringComparison.OrdinalIgnoreCase));
+            if (found != null) return found;
+            error = $"no connected adapter is named \"{wanted}\"." + (available.Count == 0 ? " No adapters are connected."
+                : " Connected: " + string.Join(", ", available.Select(b => $"{b.InterfaceName} ({b.LocalAddress}/{b.PrefixLength})")) + ".");
+            return null;
+        }
+
+        /// <summary>
+        /// True, with a message, when a target is neither on the bound adapter's network nor
+        /// routed through it by Windows.
+        /// </summary>
+        internal static bool OffLinkTarget(ScanBinding binding, IEnumerable<System.Net.IPAddress> targets, out string? error)
+        {
+            foreach (var address in targets)
+            {
+                if (binding.Reaches(address, out string route)) continue;
+                error = binding.Unreachable(address, route) + " Leave out /adapter to scan it.";
+                return true;
+            }
+            error = null;
+            return false;
+        }
+
+        /// <summary>
+        /// The checks /skip turns off, by the same names Scan settings saves (dns, http, ...).
+        /// No /skip means every check; an empty or unknown name is a usage error.
+        /// </summary>
+        internal static bool ParseSkip(string? value, out ScanOptions options, out string? error)
+        {
+            options = new ScanOptions();
+            error = null;
+            if (value == null) return true;
+            try
+            {
+                options = options.Without(value);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                var unknown = value.Split(',').Select(name => name.Trim()).FirstOrDefault(name =>
+                    name.Length == 0 || !ScanOptions.Features.Contains(name.ToLowerInvariant()));
+                error = (unknown is { Length: > 0 } ? $"\"{unknown}\" is not a check name." : "/skip needs check names.") +
+                    " Use any of: " + string.Join(", ", ScanOptions.Features) + ".";
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Records a finished command-line scan in its Location: one history entry, then the
+        /// Known list. Status lines go to stderr; the in-app terminal reads the keyed form.
+        /// </summary>
+        internal static void RecordToLocation(LocationData location, string caption, string targets,
+            IReadOnlyList<NetworkDevice> devices, bool quick, TextWriter err, bool quiet, bool keyed, ScanOptions? scanOptions = null,
+            string adapter = "", ScanNetwork? network = null)
+        {
+            // A quick scan checks no ports, so it never becomes the baseline for a full one.
+            var options = scanOptions ?? new ScanOptions();
+            if (quick) options = options.Without("ports,http,tls,ssh");
+            var history = location.History;
+            if (!history.Record(caption, targets, devices, ScanCompletion.Complete, options, deep: false, adapter, network).Saved)
+                err.WriteLine(PaintErr("Warning: the scan could not be saved to history - " + Flatten(history.SaveError), AnsiBad));
+            if (devices.Count == 0) return;
+            var seen = location.Devices.Observe(devices);
+            if (!seen.Saved)
+                err.WriteLine(PaintErr("Warning: known devices could not be saved - " + Flatten(location.Devices.SaveError), AnsiBad));
+            if (keyed)
+            {
+                if (seen.BaselineCreated) err.WriteLine(ScanStatusText.Counted("Str_St_KnownBaseline", devices.Count) + "|" + devices.Count);
+                else if (seen.NewDevices.Count > 0) err.WriteLine(ScanStatusText.Counted("Str_St_UnknownDevices", seen.NewDevices.Count) + "|" + seen.NewDevices.Count);
+            }
+            else if (!quiet)
+            {
+                if (seen.BaselineCreated) err.WriteLine(devices.Count == 1 ? "Baseline set: 1 device is now known. It is not approved yet."
+                    : $"Baseline set: {devices.Count} devices are now known. None are approved yet.");
+                else if (seen.NewDevices.Count > 0) err.WriteLine(seen.NewDevices.Count == 1 ? "Alert: 1 device is new since the baseline."
+                    : $"Alert: {seen.NewDevices.Count} devices are new since the baseline.");
+            }
+        }
 
         private static readonly string[] FlagOptions =
         [
@@ -157,17 +263,27 @@ namespace KillerScan.Features.Cli
             "decay", "malaise", "sepulchre", "delirium", "mourning"
         ];
 
+        /// <summary>
+        /// Where the uiscan command is, or -1. It has to come first, after any demo switch, because
+        /// a later word can be a value: /location uiscan names a Location and must not open the app.
+        /// </summary>
+        internal static int UiScanIndex(string[] args)
+        {
+            int index = 0;
+            while (index < args.Length && (Eq(args[index], "/demo") || Eq(args[index], "--demo"))) index++;
+            return index < args.Length && (Eq(args[index], "/uiscan") || Eq(args[index], "--uiscan") || Eq(args[index], "uiscan")) ? index : -1;
+        }
+
         internal static bool TryRunCli(string[] args, out int exitCode)
         {
             exitCode = 0;
             if (args is null || args.Length == 0) return false;
             args = KillerFamily.CommandLine.CommandLineEntry.GetArguments(args,
-                ["scan", "probe", "network", "interfaces", "locations", "vendor", "ping", "trace", "diagnose", "watch", "speedtest", "version"], "--") ?? args;
+                ["scan", "probe", "network", "locations", "vendor", "ping", "trace", "diagnose", "watch", "speedtest", "version"], "--") ?? args;
             string? command = args.FirstOrDefault(a => IsHelp(a) || IsVersion(a) ||
                 Eq(a, "/scan") || Eq(a, "--scan") || Eq(a, "/probe") || Eq(a, "--probe") ||
-                Eq(a, "/network") || Eq(a, "--network") || Eq(a, "/vendor") || Eq(a, "--vendor") ||
-                Eq(a, "/interfaces") || Eq(a, "--interfaces") ||
-                Eq(a, "/locations") || Eq(a, "--locations") ||
+                Eq(a, "/network") || Eq(a, "--network") || Eq(a, "/locations") || Eq(a, "--locations") ||
+                Eq(a, "/vendor") || Eq(a, "--vendor") ||
                 Eq(a, "/ping") || Eq(a, "--ping") || Eq(a, "/trace") || Eq(a, "--trace") ||
                 Eq(a, "/diagnose") || Eq(a, "--diagnose") || Eq(a, "/watch") || Eq(a, "--watch") ||
                 Eq(a, "/speedtest") || Eq(a, "--speedtest"));
@@ -191,12 +307,10 @@ namespace KillerScan.Features.Cli
             {
                 var (positionals, options, parseError) = ParseArgs(args, command);
                 if (parseError != null) { err.WriteLine(PaintErr("Error: " + parseError, AnsiBad)); exitCode = 2; }
-                else if (Eq(command, "/locations") || Eq(command, "--locations"))
-                    exitCode = RunLocations(positionals, options, @out, err);
-                else if (Eq(command, "/interfaces") || Eq(command, "--interfaces"))
-                    exitCode = RunInterfaces(positionals, options, @out, err);
                 else if (Eq(command, "/network") || Eq(command, "--network"))
                     exitCode = RunNetwork(positionals, options, @out, err);
+                else if (Eq(command, "/locations") || Eq(command, "--locations"))
+                    exitCode = RunLocations(positionals, options, @out, err);
                 else if (Eq(command, "/vendor") || Eq(command, "--vendor"))
                     exitCode = RunVendor(positionals, options, @out, err);
                 else if (Eq(command, "/ping") || Eq(command, "--ping"))
@@ -223,7 +337,7 @@ namespace KillerScan.Features.Cli
             if (positionals.Count > 0 || options.Count > 0) return Usage(err, "/network takes no options or targets.");
             var net = LocalNetwork.Detect();
             if (net is null) return Usage(err, "no active IPv4 network was found.", 1);
-            @out.WriteLine("INTERFACE  " + net.InterfaceLabel);
+            @out.WriteLine("INTERFACE  " + TerminalText.Escape(net.InterfaceLabel));
             @out.WriteLine("LOCAL IP   " + net.LocalIp);
             @out.WriteLine("SUBNET     " + net.Subnet);
             @out.WriteLine("GATEWAY    " + (net.Gateway.Length == 0 ? "-" : net.Gateway));
@@ -231,22 +345,33 @@ namespace KillerScan.Features.Cli
             return 0;
         }
 
-        private static int RunLocations(List<string> positionals, Dictionary<string, string> options, TextWriter output, TextWriter error)
+        /// <summary>
+        /// Lists the saved Locations so a script or agent can find the name or ID /location takes.
+        /// Notes are left out: they are free text, and nothing here needs them.
+        /// </summary>
+        internal static int RunLocations(List<string> positionals, Dictionary<string, string> options,
+                                         TextWriter @out, TextWriter err)
         {
-            if (positionals.Count > 0 || !Only(options, "/json", "--json")) return Usage(error, "/locations accepts only /json.");
-            if (Has(options, "/json", "--json")) output.WriteLine(JsonSerializer.Serialize(Locations.Catalog.Items));
-            else foreach (var location in Locations.Catalog.Items) output.WriteLine(location.Id + "  " + location.Name);
-            return 0;
-        }
-
-        private static int RunInterfaces(List<string> positionals, Dictionary<string, string> options, TextWriter output, TextWriter error)
-        {
-            if (positionals.Count > 0 || !Only(options, "/json", "--json")) return Usage(error, "/interfaces accepts only /json.");
-            var interfaces = LocalNetwork.Enumerate().Where(n => n.InterfaceLabel is "Ethernet" or "Wi-Fi").Select(n => new
-            { Id = n.AdapterId, Name = n.AdapterName, Kind = n.InterfaceLabel, Address = n.LocalIp, n.Subnet, Index = n.InterfaceIndex,
-                CanBind = !n.Wireless || n.ConnectionIdentity.Length > 0 }).ToArray();
-            if (Has(options, "/json", "--json")) output.WriteLine(JsonSerializer.Serialize(interfaces));
-            else foreach (var net in interfaces) output.WriteLine(net.Id + "  " + net.Address + "  " + net.Kind + "  " + net.Name + (net.CanBind ? "" : "  [identity unavailable]"));
+            if (positionals.Count > 0 || !Only(options, "/json", "--json"))
+                return Usage(err, "/locations takes no targets and accepts /json.");
+            var found = LocationCatalog.ReadExisting(LocationService.Root, out string? error);
+            if (error != null) return Usage(err, "Locations are unavailable - " + Flatten(error), 1);
+            var items = found.OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToList();
+            if (Has(options, "/json", "--json"))
+            {
+                @out.WriteLine(JsonSerializer.Serialize(items.Select(item => new
+                {
+                    id = item.Id, name = item.Name, customer = item.Customer,
+                    lastTargets = item.LastTargets, lastAdapter = item.LastAdapter
+                })));
+                return 0;
+            }
+            if (items.Count == 0) { @out.WriteLine("No Locations yet."); return 0; }
+            string Row(string name, string id, string customer, string targets) =>
+                name.PadRight(items.Max(item => TerminalText.Escape(item.Name).Length) + 2) + id.PadRight(34) + customer.PadRight(items.Max(item => TerminalText.Escape(item.Customer).Length) + 2) + targets;
+            @out.WriteLine(Row("NAME", "ID", "CUSTOMER", "LAST TARGETS").TrimEnd());
+            foreach (var item in items)
+                @out.WriteLine(Row(TerminalText.Escape(item.Name), item.Id, TerminalText.Escape(item.Customer), TerminalText.Escape(item.LastTargets)).TrimEnd());
             return 0;
         }
 
@@ -258,7 +383,7 @@ namespace KillerScan.Features.Cli
             if (normalized.Length != 12) return Usage(err, "the MAC address must contain 12 hex digits.");
             OuiLookup.Load();
             string vendor = OuiLookup.GetVendor(positionals[0]);
-            @out.WriteLine(vendor.Length == 0 ? "Unknown" : vendor);
+            @out.WriteLine(vendor.Length == 0 ? "Unknown" : TerminalText.Escape(vendor));
             return vendor.Length == 0 ? 3 : 0;
         }
 
@@ -343,9 +468,9 @@ namespace KillerScan.Features.Cli
             else
             {
                 @out.WriteLine("ADDRESS     " + address);
-                @out.WriteLine("REVERSE DNS " + (reverse.Length == 0 ? "-" : reverse));
+                @out.WriteLine("REVERSE DNS " + (reverse.Length == 0 ? "-" : TerminalText.Escape(reverse)));
                 @out.WriteLine("PING        " + (ping.HasValue ? ping + " ms" : "no reply"));
-                @out.WriteLine("ROUTE       " + (route?.Interface ?? "-") + (string.IsNullOrEmpty(route?.NextHop) ? "" : " via " + route?.NextHop));
+                @out.WriteLine("ROUTE       " + TerminalText.Escape((route?.Interface ?? "-") + (string.IsNullOrEmpty(route?.NextHop) ? "" : " via " + route?.NextHop)));
                 foreach (var check in checks) @out.WriteLine($"TCP {check.port,-5} {(check.open ? "open" : "closed")}");
             }
             return ping.HasValue || checks.Any(check => check.open) ? 0 : 3;
@@ -423,23 +548,6 @@ namespace KillerScan.Features.Cli
             bool terminalProgress = Has(options, "/terminal-progress");
             bool noHeader = Has(options, "/no-header", "--no-header");
             bool failEmpty = Has(options, "/fail-empty", "--fail-empty");
-            ScanBinding? binding = null;
-            string? interfaceId = Value(options, "/interface", "--interface");
-            string? sourceIp = Value(options, "/source-ip", "--source-ip");
-            if ((interfaceId == null) != (sourceIp == null)) return Usage(err, "/interface and /source-ip must be supplied together.");
-            if (interfaceId != null)
-            {
-                if (Has(options, "/demo", "--demo")) return Usage(err, "Demo mode does not accept a real interface.");
-                try { binding = ScanBinding.Resolve(interfaceId, sourceIp!); }
-                catch (NetworkBindingException ex) { return Usage(err, ex.Message, 1); }
-            }
-            var scanOptions = new ScanOptions();
-            string? skip = Value(options, "/skip", "--skip");
-            if (skip != null)
-            {
-                try { scanOptions = scanOptions.Without(skip); }
-                catch (ArgumentException) { return Usage(err, "/skip needs comma-separated names: " + string.Join(", ", ScanOptions.Features) + "."); }
-            }
             string? exportPath = Value(options, "/export", "--export", "/output", "--output");
             var (format, formatFromExtension) = ResolveFormat(options, Value(options, "/format", "--format"), exportPath);
             if (format.Length == 0) return Usage(err, "format must be table, csv, json, or html, with only one format selected.");
@@ -461,15 +569,11 @@ namespace KillerScan.Features.Cli
             {
                 if (targetText.Length == 0)
                 {
-                    var local = binding == null ? LocalNetwork.Detect() : null;
-                    if (binding != null) targetText = binding.Subnet;
-                    else
-                    {
-                        if (local is null) return Usage(err, "no active IPv4 network was found. Give a target such as /scan 192.168.1.0/24.");
-                        targetText = local.Subnet;
-                    }
+                    var local = LocalNetwork.Detect();
+                    if (local is null) return Usage(err, "no active IPv4 network was found. Give a target such as /scan 192.168.1.0/24.");
+                    targetText = local.Subnet;
                 }
-                else if (binding == null) LocalNetwork.Detect();
+                else LocalNetwork.Detect();
                 parsed = ScanTargets.Parse(targetText);
                 if (!parsed.Ok) return Usage(err, parsed.Error == TargetError.TooLarge
                     ? $"that is {parsed.Detail} addresses; the ceiling is {ScanTargets.MaxAddresses:N0}."
@@ -486,22 +590,49 @@ namespace KillerScan.Features.Cli
             int[]? ports = ParsePorts(Value(options, "/ports", "--ports"));
             if (ports != null && ports.Length == 0) return Usage(err, "/ports must be comma-separated numbers from 1 to 65535.");
 
-            string? locationId = Value(options, "/location", "--location");
-            if (demo && locationId != null) return Usage(err, "Demo mode does not use saved locations.");
-            if (!demo)
+            if (!ParseSkip(Value(options, "/skip", "--skip"), out var scanOptions, out string? skipError))
+                return Usage(err, skipError!);
+
+            // With /adapter every probe leaves through that adapter, and only its own network can
+            // be scanned. Without it Windows picks the route, as before.
+            ScanBinding? binding = null;
+            if (Value(options, "/adapter", "--adapter") is { } adapterText)
             {
-                locationId ??= Environment.GetEnvironmentVariable("KS_LOCATION_ID") ?? LocationCatalog.LegacyId;
-                if (!LocationCatalog.ValidId(locationId) || !Locations.Catalog.Contains(locationId)) return Usage(err, "Unknown location. Use /locations to list existing IDs.");
-                if (!Locations.TrySelect(locationId, remember: false)) return Usage(err, "Stop the running scan before changing location.");
+                if (demo) return Usage(err, "/adapter does not work with /demo.");
+                binding = ResolveAdapter(adapterText, ScanBinding.Available(), out string? adapterError);
+                if (binding == null) return Usage(err, adapterError!);
+                var reach = probe ? [probeIp!] : parsed!.Addresses;
+                if (OffLinkTarget(binding, reach, out string? offLink)) return Usage(err, offLink!);
             }
-            using var locationRun = demo ? null : Locations.BeginRun();
+
+            // With /location both commands apply its names and types. Only a scan records
+            // history and updates Known; a probe changes no saved Location data.
+            // Without it, it is a Temporary scan: nothing saved is read and nothing is written.
+            string? locationText = Value(options, "/location", "--location");
+            LocationData? location = null;
+            if (locationText != null)
+            {
+                if (demo) return Usage(err, "/location does not work with /demo.");
+                if (!LocationService.Loaded) LocationService.Load("Unassigned");
+                if (LocationService.LoadError is { } locationError)
+                    return Usage(err, "Locations are unavailable - " + Flatten(locationError), 1);
+                var info = ResolveLocation(locationText, LocationService.Items, out string? resolveError);
+                if (info == null) return Usage(err, resolveError!);
+                location = LocationService.Get(info);
+            }
+
             OuiLookup.Load();
             using var cts = new CancellationTokenSource();
             if (timeout > 0) cts.CancelAfter(TimeSpan.FromSeconds(timeout));
             void OnCancel(object? sender, ConsoleCancelEventArgs e) { e.Cancel = true; cts.Cancel(); }
             try { Console.CancelKeyPress += OnCancel; } catch { }
 
-            var scanner = demo ? new NetworkScanner() : EngineHost.CreateScanner(binding);
+            var scanner = new NetworkScanner
+            {
+                ManualTypes = mac => location?.Overrides.Get(mac),
+                Completed = device => { location?.Devices.Apply(device); device.LocationId = location?.Info?.Id; device.LocationName = location?.Info?.Name; },
+                Binding = binding
+            };
             if (terminalProgress)
             {
                 int found = 0;
@@ -548,13 +679,12 @@ namespace KillerScan.Features.Cli
                 spinner?.Dispose(); spinner = null;
                 try { Console.CancelKeyPress -= OnCancel; } catch { }
                 devices = [.. demoScan!.Devices];
-                DemoData.AddIdentification(devices);
             }
             else
             try
             {
                 Task<List<NetworkDevice>> operation = probe
-                    ? ProbeAsListAsync(scanner, probeIp!.ToString(), cts.Token, scanOptions)
+                    ? ProbeAsListAsync(scanner, probeIp!.ToString(), scanOptions, cts.Token)
                     : scanner.ScanSubnetAsync(targetText, cts.Token, scanOptions, fullScan: !quick);
                 if (timeout > 0)
                 {
@@ -581,6 +711,21 @@ namespace KillerScan.Features.Cli
                 try { Console.CancelKeyPress -= OnCancel; } catch { }
             }
 
+            // History and the Known list get everything the scan found, before display filters.
+            if (location != null && !probe && !demo)
+            {
+                string adapter = binding?.InterfaceName ?? string.Empty;
+                ScanNetwork network;
+                try { network = ScanNetwork.Identify(targetText, adapter.Length > 0 ? adapter : ScanNetwork.RouteAdapter(targetText), ScanNetwork.Macs(devices)); }
+                catch (Exception ex) when (ex is not OutOfMemoryException) { network = ScanNetwork.Unknown; }
+                // The Location can be deleted in the app while this scan runs. Writing then would
+                // recreate its folder as an orphan nobody can open, so the run is not recorded.
+                if (location.Info is { } info && !LocationService.StillExists(info.Id))
+                    err.WriteLine(PaintErr("Warning: Location \"" + info.Name + "\" was deleted during the scan, so the run was not recorded.", AnsiBad));
+                else
+                    RecordToLocation(location, parsed!.Summary, targetText, devices, quick, err, quiet, terminalProgress, scanOptions, adapter, network);
+            }
+
             devices = ApplyFilters(devices, options, ports);
             var sorted = ApplySort(devices, Value(options, "/sort", "--sort"),
                 Has(options, "/descending", "--descending", "/desc", "--desc"), err);
@@ -594,10 +739,13 @@ namespace KillerScan.Features.Cli
             // only because the /export extension picked it - the FILE gets that format, but raw
             // CSV on a live console helps nobody. An EXPLICIT /csv, /json or /format choice is
             // honored on stdout as-is (that is the scripting contract), just without colors.
-            string body = Render(format, devices, label, theme, noHeader, demo ? null : Locations.Current);
+            string body = Render(format, devices, label, theme, noHeader);
             bool showTable = _outAnsi && (format == "table" || formatFromExtension);
+            // On a live console, device-chosen text (a hostname with ESC sequences) must not reach
+            // the terminal as control codes, so an explicit format is shown with them written as
+            // \xNN. Line breaks and tabs stay. Redirected output and exported files are untouched.
             if (!quiet)
-                @out.WriteLine(showTable ? Table(devices, !noHeader, ansi: true) : body);
+                @out.WriteLine(showTable ? Table(devices, !noHeader, ansi: true) : _outAnsi ? ConsoleSafe(body) : body);
             if (exportPath != null)
             {
                 try
@@ -605,7 +753,7 @@ namespace KillerScan.Features.Cli
                     string full = Path.GetFullPath(exportPath);
                     string? dir = Path.GetDirectoryName(full);
                     if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-                    File.WriteAllText(full, body, new UTF8Encoding(false));
+                    ExportFile.WriteText(full, body, new UTF8Encoding(false));
                     if (!quiet) err.WriteLine(PaintErr("Wrote " + full, AnsiGood));
                 }
                 catch (Exception ex) { err.WriteLine(PaintErr("Error: could not write the export - " + Flatten(ex.Message), AnsiBad)); return 1; }
@@ -621,7 +769,7 @@ namespace KillerScan.Features.Cli
         }
 
         private static async Task<List<NetworkDevice>> ProbeAsListAsync(
-            NetworkScanner scanner, string ip, CancellationToken cancellationToken, ScanOptions options)
+            NetworkScanner scanner, string ip, ScanOptions options, CancellationToken cancellationToken)
         {
             return [await scanner.DeepProbeHostAsync(ip, cancellationToken, options)];
         }
@@ -654,19 +802,31 @@ namespace KillerScan.Features.Cli
             return descending ? [.. devices.OrderByDescending(key)] : [.. devices.OrderBy(key)];
         }
 
-        private static string Render(string format, List<NetworkDevice> devices, string label,
-                                     string theme, bool noHeader, ScanLocation? location = null) => format switch
+        private static string ConsoleSafe(string text)
         {
-            "csv" => ReportExport.BuildLocationCsv(devices, location, !noHeader),
+            var result = new StringBuilder(text.Length);
+            foreach (char character in text)
+                if ((character < 0x20 && character is not ('\r' or '\n' or '\t')) || character is >= (char)0x7f and <= (char)0x9f)
+                    result.Append("\\x").Append(((int)character).ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+                else result.Append(character);
+            return result.ToString();
+        }
+
+        internal static string Render(string format, List<NetworkDevice> devices, string label,
+                                     string theme, bool noHeader) => format switch
+        {
+            "csv" => Csv(devices, !noHeader),
             "json" => JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true }),
-            "html" => ReportExport.BuildLocationHtml(devices, label, theme.ToLowerInvariant(), location),
+            "html" => ReportExport.BuildHtml(devices, label, theme.Equals("98se", StringComparison.OrdinalIgnoreCase) ? "se98" : theme.ToLowerInvariant()),
             _ => Table(devices, !noHeader),
         };
 
-        private static string Table(List<NetworkDevice> devices, bool header, bool ansi = false)
+        internal static string Table(List<NetworkDevice> devices, bool header, bool ansi = false)
         {
             string[] headers = ["IP ADDRESS", "HOSTNAME", "MAC ADDRESS", "VENDOR", "TYPE", "OPEN PORTS"];
-            var rows = devices.Select(d => new[] { d.IpAddress, d.Hostname, d.MacAddress, Clip(d.Vendor, 32), d.DeviceType, d.OpenPortsDisplay }).ToList();
+            var rows = devices.Select(d => new[] { d.IpAddress, d.Hostname, d.MacAddress, d.Vendor, d.DeviceType, d.OpenPortsDisplay }
+                .Select(TerminalText.Escape).ToArray()).ToList();
+            foreach (var row in rows) row[3] = Clip(row[3], 32);
             var width = new int[headers.Length];
             for (int c = 0; c < headers.Length; c++)
             { width[c] = header ? headers[c].Length : 0; foreach (var row in rows) width[c] = Math.Max(width[c], (row[c] ?? "").Length); }
@@ -698,9 +858,8 @@ namespace KillerScan.Features.Cli
         internal static string Csv(List<NetworkDevice> devices, bool header)
         {
             var sb = new StringBuilder();
-            if (header) sb.AppendLine("IP Address,Hostname,MAC Address,Vendor,Type,Open Ports,Home Assistant JSON");
-            foreach (var d in devices) sb.AppendLine(string.Join(",", new[]
-                { d.IpAddress, d.Hostname, d.MacAddress, d.Vendor, d.DeviceType, d.OpenPortsDisplay, JsonSerializer.Serialize(HomeAssistantAdvisor.ForDevice(d)) }.Select(CsvCell)));
+            if (header) sb.AppendLine(ReportExport.CsvHeader);
+            foreach (var d in devices) sb.AppendLine(string.Join(",", ReportExport.CsvValues(d).Select(CsvCell)));
             return sb.ToString().TrimEnd();
         }
 
@@ -749,8 +908,7 @@ namespace KillerScan.Features.Cli
             "  killerscan uiscan [targets]      open the interface and begin scanning",
             "  killerscan probe <IPv4>          deep-probe one host, including ports 1-1024",
             "  killerscan network               show the detected interface, subnet, gateway, and DNS",
-            "  killerscan interfaces [/json]    list IPv4 interface IDs and source addresses",
-            "  killerscan locations [/json]     list explicit location IDs and names",
+            "  killerscan locations             list saved Locations and their IDs; changes nothing",
             "  killerscan vendor <MAC>          look up a MAC address in the offline OUI database",
             "  killerscan ping <target>         send a bounded set of ICMP checks",
             "  killerscan trace <target>        trace the network path to an IPv4 target",
@@ -760,11 +918,6 @@ namespace KillerScan.Features.Cli
             "  killerscan version               print the version             /help  show this text", "",
             "SCAN AND PROBE OPTIONS",
             "  /quick                 discovery only; skip fingerprinting and the full port pass",
-            "  /skip <name,name,...>  disable scan/probe operations (also accepts --skip)",
-            "  /interface <id> /source-ip <IPv4>  pin scan/probe to an explicit Windows interface",
-            "  /location <id>         use saved data for that explicit location",
-            "                         GUI terminals inherit it; external CLI defaults to legacy",
-            "                         " + string.Join(", ", ScanOptions.Features),
             "  /progress              write status and progress every 5% to stderr",
             "  /timeout <seconds>     cancel the operation after a deadline",
             "  /filter <text>         keep rows matching any displayed or fingerprint field",
@@ -775,7 +928,13 @@ namespace KillerScan.Features.Cli
             "  /descending            reverse the selected sort",
             "  /limit <count>         keep the first N rows after filtering and sorting",
             "  /fail-empty            return exit code 3 when no rows remain",
-            "  /demo                  fabricated network for screenshots; scans nothing (with /scan)", "", "OUTPUT OPTIONS",
+            "  /demo                  fabricated network for screenshots; scans nothing (with /scan)",
+            "  /location <name|id>    apply a saved Location's device names and types",
+            "                        scan: records history and updates its Known list",
+            "                        probe: changes neither history nor the Known list",
+            "                        without /location, nothing saved is read or written",
+            "  /skip <check,...>      turn checks off: " + string.Join(", ", ScanOptions.Features),
+            "  /adapter <name|ip>     send every probe from one adapter; only its own network is reachable", "", "OUTPUT OPTIONS",
             "  /format <kind>         table, csv, json, or html",
             "  /table | /csv | /json | /html   shorthand for /format",
             "  /export <path>         write output; extension selects format unless overridden",
@@ -809,13 +968,7 @@ namespace KillerScan.Features.Cli
                 if (a.StartsWith("/", StringComparison.Ordinal) || a.StartsWith("-", StringComparison.Ordinal))
                 {
                     if (ValueOptions.Any(o => Eq(o, a)))
-                    {
-                        if (i + 1 >= args.Length) return (positionals, options, a + " needs a value.");
-                        string value = args[++i];
-                        if (Eq(a, "/skip") || Eq(a, "--skip"))
-                            options["/skip"] = options.TryGetValue("/skip", out var skipped) ? skipped + "," + value : value;
-                        else options[a] = value;
-                    }
+                    { if (i + 1 >= args.Length) return (positionals, options, a + " needs a value."); options[a] = args[++i]; }
                     else if (FlagOptions.Any(o => Eq(o, a))) options[a] = "";
                     else return (positionals, options, "unknown option " + a + ".");
                 }
@@ -832,16 +985,32 @@ namespace KillerScan.Features.Cli
         private static bool IsHelp(string a) => Eq(a, "/help") || Eq(a, "--help") || Eq(a, "-h") || Eq(a, "/?") || Eq(a, "-?");
         private static bool IsVersion(string a) => Eq(a, "/version") || Eq(a, "--version") || Eq(a, "-v");
         private static string Clip(string? value, int max) => (value ?? "").Length <= max ? value ?? "" : value![..(max - 3)] + "...";
-        private static string Flatten(string? value) => (value ?? "").Replace("\r", " ").Replace("\n", " ").Trim();
+        private static string Flatten(string? value) => TerminalText.Escape(value).Trim();
+
+        /// <summary>
+        /// Attaches the parent console whenever stdout or stderr still needs it, so
+        /// <c>killerscan /scan /json &gt; devices.json</c> keeps its errors on screen. Inherited pipe
+        /// and file handles are preserved: attaching can replace them with console handles, which
+        /// would leave a downstream process with no scan data, so each redirected handle is put back.
+        /// </summary>
+        internal static void AttachKeepingRedirects(Func<int, bool> isRedirected, Func<int, IntPtr> get,
+            Action<int, IntPtr> set, Func<bool> attach)
+        {
+            bool outRedirected = isRedirected(StdOutputHandle), errRedirected = isRedirected(StdErrorHandle);
+            if (outRedirected && errRedirected) return;
+            IntPtr savedOut = outRedirected ? get(StdOutputHandle) : IntPtr.Zero;
+            IntPtr savedErr = errRedirected ? get(StdErrorHandle) : IntPtr.Zero;
+            if (!attach()) return;
+            if (outRedirected) set(StdOutputHandle, savedOut);
+            if (errRedirected) set(StdErrorHandle, savedErr);
+        }
 
         private static (TextWriter, TextWriter) OpenConsole()
         {
             try
             {
-                // Preserve inherited pipe or file handles. Attaching first can replace them with
-                // console handles, which leaves a downstream process with no scan data.
-                if (!IsRedirected(StdOutputHandle) && !IsRedirected(StdErrorHandle))
-                    AttachConsole(AttachParentProcess);
+                AttachKeepingRedirects(IsRedirected, GetStdHandle, (id, handle) => SetStdHandle(id, handle),
+                    () => AttachConsole(AttachParentProcess));
                 _outAnsi = TryEnableVt(StdOutputHandle);
                 _errAnsi = TryEnableVt(StdErrorHandle);
                 var @out = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };

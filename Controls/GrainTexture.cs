@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -11,8 +12,8 @@ namespace KillerScan.Controls
     /// brush, so the pattern lines up across the title bar, the panes and the menus instead of each
     /// surface getting its own noise.
     ///
-    /// Every pixel is a speck of a continuous gray shade, softened into its neighbours, so the grain
-    /// reads as soft film grain on every theme instead of hard dots on Black. A share of the specks
+    /// Every pixel is a speck of a continuous gray shade with distinct dark and bright highlights,
+    /// lightly blended with its neighbours for a fine sandpaper texture. A share of the specks
     /// leans toward the theme's secondary color: the complement of the accent hue (a green accent
     /// leans purple, a blue one leans orange-brown, and reds lean orange-brown too instead of
     /// blue), or of the background hue when the accent has no hue of its own. The tile is
@@ -25,15 +26,18 @@ namespace KillerScan.Controls
         private const int Seed = 1337;
         private const byte Alpha = 70;
         private const double ShadeSpread = 150;  // standard deviation of a speck's gray around 128
-        private const double Soften = 0.25;      // share of each speck taken from its four neighbours
-        private const double Contrast = 1.2;     // restores the contrast the soften step removes
+        private const double Soften = 0.10;      // share of each speck taken from its four neighbours
+        private const double Contrast = 1.35;    // keeps dark and bright specks distinct after blending
         private const double LeanShare = 0.40;   // share of specks that lean toward the secondary color
         private const double LeanMix = 0.80;     // how far a leaning speck moves toward it
 
         private static readonly byte[] Shades = new byte[Size * Size];
         private static readonly bool[] Leaning = new bool[Size * Size];
         private static readonly Dictionary<int, BitmapSource> Cache = new();
-        private static readonly List<WeakReference<ImageBrush>> Layers = new();
+        // Every tracked brush binds its ImageSource to this one. A bound brush cannot be frozen, so a
+        // style or template that seals it (a StaticResource grain layer, KillerPDF) leaves it live, and
+        // a theme change repaints it instead of throwing on a frozen brush.
+        private static readonly ImageBrush TileSource = new();
         private static BitmapSource? _current;
         private static int _currentKey = int.MinValue;
         private static bool _hooked;
@@ -64,7 +68,7 @@ namespace KillerScan.Controls
         }
 
         /// <summary>Generates the tile, leaning toward <paramref name="lean"/> when given. Frozen.</summary>
-        internal static BitmapSource Generate(Color? lean)
+        internal static BitmapSource Generate(Color? lean, bool highlightsOnly = false)
         {
             var pixels = new byte[Size * Size * 4];
             for (int i = 0; i < Shades.Length; i++)
@@ -82,7 +86,8 @@ namespace KillerScan.Controls
                 pixels[p] = (byte)Math.Round(b);
                 pixels[p + 1] = (byte)Math.Round(g);
                 pixels[p + 2] = (byte)Math.Round(r);
-                pixels[p + 3] = Alpha;
+                // Fade midtones on near-black surfaces without dimming the brightest specks.
+                pixels[p + 3] = highlightsOnly ? (byte)Math.Round(Alpha * Math.Pow(shade / 255.0, 6)) : Alpha;
             }
 
             var bmp = new WriteableBitmap(Size, Size, 96, 96, PixelFormats.Bgra32, null);
@@ -120,15 +125,15 @@ namespace KillerScan.Controls
         /// <summary>Paints the tile into a brush and repaints it whenever the tile changes.</summary>
         internal static void Track(ImageBrush brush)
         {
-            brush.ImageSource = Publish();
-            foreach (var layer in Layers)
-                if (layer.TryGetTarget(out var known) && ReferenceEquals(known, brush)) return;
-            Layers.Add(new WeakReference<ImageBrush>(brush));
+            Publish();
+            if (BindingOperations.IsDataBound(brush, ImageBrush.ImageSourceProperty)) return;
+            BindingOperations.SetBinding(brush, ImageBrush.ImageSourceProperty,
+                new Binding(nameof(ImageBrush.ImageSource)) { Source = TileSource, Mode = BindingMode.OneWay });
         }
 
         /// <summary>
         /// Generates the tile for the current theme and publishes it as the app-level GrainTileBrush.
-        /// App startup calls this too, so dialogs shown before any main window exists (install,
+        /// Call this from App.OnStartup too, so dialogs shown before any main window exists (install,
         /// uninstall, install repair) are textured like the rest of the app. Theme and accent changes
         /// republish it on their own.
         /// </summary>
@@ -141,12 +146,16 @@ namespace KillerScan.Controls
             }
 
             var lean = CurrentLean();
+            // Only a theme that asks (Black) gets bright specks alone. Defaulting to true gave every
+            // theme light-only grain: Light turned white and the dark themes' surfaces ran together.
+            bool highlightsOnly = Application.Current?.TryFindResource("GrainHighlightsOnly") is bool enabled && enabled;
             int key = lean is Color c ? (c.R << 16) | (c.G << 8) | c.B : -1;
+            key = (key + 1) * 2 + (highlightsOnly ? 1 : 0);
             if (_current != null && key == _currentKey) return _current;
 
             if (!Cache.TryGetValue(key, out var bmp))
             {
-                bmp = Generate(lean);
+                bmp = Generate(lean, highlightsOnly);
                 Cache[key] = bmp;
             }
             _current = bmp;
@@ -164,11 +173,7 @@ namespace KillerScan.Controls
             tile.Freeze();
             if (Application.Current != null) Application.Current.Resources["GrainTileBrush"] = tile;
 
-            for (int i = Layers.Count - 1; i >= 0; i--)
-            {
-                if (Layers[i].TryGetTarget(out var layer)) layer.ImageSource = bmp;
-                else Layers.RemoveAt(i);
-            }
+            TileSource.ImageSource = bmp;
             return bmp;
         }
 

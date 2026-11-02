@@ -35,6 +35,9 @@ namespace KillerFamily.Deployment
                 int code = current is Win32Exception native ? native.NativeErrorCode :
                     current is IOException ? current.HResult & 0xffff : 0;
                 if (code == 39 || code == DiskFull) return DiskFull;
+                // Sharing or lock violation: the copy being replaced is running. Report it as busy
+                // so Intune, Configuration Manager and RMM tools retry instead of failing.
+                if (code == 32 || code == 33) return Busy;
                 if (code == AccessDenied || code == Cancelled || code == Busy || code == SecurityRejected)
                     return code;
             }
@@ -58,6 +61,23 @@ namespace KillerFamily.Deployment
 #else
             value.IndexOfAny(PathSeparators) >= 0;
 #endif
+
+        /// <summary>The install lock scoped to one target folder, so a per-user and an all-users
+        /// install serialize per directory instead of blocking each other. The folder is hashed to
+        /// keep the mutex name short and free of path characters.</summary>
+        internal static IDisposable Acquire(string product, string directory)
+        {
+            string scope = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).ToUpperInvariant();
+            byte[] scopeBytes = System.Text.Encoding.UTF8.GetBytes(scope);
+#if NET8_0_OR_GREATER
+            string token = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(scopeBytes));
+#else
+            string token;
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+                token = BitConverter.ToString(sha.ComputeHash(scopeBytes)).Replace("-", "");
+#endif
+            return Acquire(product + "-" + token);
+        }
 
         internal static IDisposable Acquire(string product)
         {

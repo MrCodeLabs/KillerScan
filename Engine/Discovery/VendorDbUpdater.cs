@@ -88,10 +88,14 @@ namespace KillerScan.Engine
 
             try
             {
-                var dir = Path.GetDirectoryName(path);
-                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(path, newContent, new UTF8Encoding(false));
-                OuiLookup.Reload();
+                lock (OuiLookup.PublicationGate)
+                {
+                    current = OuiLookup.Count;
+                    if (bestCount < current)
+                        return (false, current, new Status("Str_Db_Smaller", bestCount, current));
+                    PublishDatabase(path, newContent);
+                    if (!OuiLookup.ReloadFrom(path)) throw new IOException("The saved vendor database could not be loaded. The prior lookup table is still active.");
+                }
             }
             catch (Exception ex)
             {
@@ -101,24 +105,80 @@ namespace KillerScan.Engine
             return (true, OuiLookup.Count, new Status("Str_Db_Updated", OuiLookup.Count));
         }
 
+        internal static void PublishDatabase(string path, string content, Action<Stream, byte[]>? write = null)
+        {
+            path = Path.GetFullPath(path);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            byte[] bytes = new UTF8Encoding(false).GetBytes(content);
+            string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            string backup = temporary + ".original";
+            try
+            {
+                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough))
+                {
+                    if (write == null) stream.Write(bytes, 0, bytes.Length);
+                    else write(stream, bytes);
+                    stream.Flush(true);
+                }
+                if (!File.ReadAllBytes(temporary).SequenceEqual(bytes))
+                    throw new IOException("The staged vendor database did not match the complete download.");
+                if (File.Exists(path))
+                {
+                    try { File.Replace(temporary, path, backup); }
+                    catch
+                    {
+                        if (!File.Exists(path) && File.Exists(backup)) File.Move(backup, path);
+                        throw;
+                    }
+                    TryDelete(backup);
+                }
+                else File.Move(temporary, path);
+            }
+            finally { TryDelete(temporary); }
+        }
+
+        private static void TryDelete(string path)
+        {
+            try { File.Delete(path); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+        }
+
+        // The full manuf list is a few megabytes; these leave ample room while keeping a hostile or
+        // broken source from filling memory with an endless body or a small, highly compressed one.
+        internal const int MaxDownloadBytes = 32 * 1024 * 1024;
+        internal const int MaxTextBytes = 64 * 1024 * 1024;
+
         private static async Task<string> DownloadTextAsync(string url)
         {
-            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60), MaxResponseContentBufferSize = MaxDownloadBytes };
             http.DefaultRequestHeaders.UserAgent.TryParseAdd(Ua);
-            var bytes = await http.GetByteArrayAsync(url).ConfigureAwait(false);
-            // manuf is served gzip-compressed; decompress when the gzip magic (1F 8B) is present.
-            if (bytes.Length >= 2 && bytes[0] == 0x1f && bytes[1] == 0x8b)
+            using var response = await http.GetAsync(url).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            // .NET Framework follows a redirect from HTTPS to plain HTTP; the list must not come over one.
+            if (response.RequestMessage?.RequestUri?.Scheme != Uri.UriSchemeHttps)
+                throw new HttpRequestException("The vendor database was redirected away from HTTPS.");
+            return Decode(await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false));
+        }
+
+        /// <summary>Text of a downloaded list. manuf is served gzip-compressed, so it is decompressed
+        /// when the gzip magic (1F 8B) is present, never past <see cref="MaxTextBytes"/>.</summary>
+        internal static string Decode(byte[] bytes)
+        {
+            if (bytes.Length > MaxDownloadBytes) throw new InvalidDataException("The vendor database download is too large.");
+            if (bytes.Length < 2 || bytes[0] != 0x1f || bytes[1] != 0x8b) return Encoding.UTF8.GetString(bytes);
+            using var gz = new GZipStream(new MemoryStream(bytes), CompressionMode.Decompress);
+            using var text = new MemoryStream();
+            var buffer = new byte[81920];
+            int read;
+            while ((read = gz.Read(buffer, 0, buffer.Length)) > 0)
             {
-                using var ms = new MemoryStream(bytes);
-                using var gz = new GZipStream(ms, CompressionMode.Decompress);
-                using var sr = new StreamReader(gz, Encoding.UTF8);
-                return sr.ReadToEnd();
+                if (text.Length + read > MaxTextBytes) throw new InvalidDataException("The vendor database expands beyond its size limit.");
+                text.Write(buffer, 0, read);
             }
-            return Encoding.UTF8.GetString(bytes);
+            return Encoding.UTF8.GetString(text.GetBuffer(), 0, (int)text.Length);
         }
 
         // Wireshark manuf: "<prefix[/mask]>\t<short>\t<long>"  (/28 = MA-M, /36 = MA-S, none = MA-L).
-        private static (int, StringBuilder) ParseManuf(string content)
+        internal static (int, StringBuilder) ParseManuf(string content)
         {
             var sb = new StringBuilder(); int n = 0;
             foreach (var raw in content.Split('\n'))
@@ -136,10 +196,12 @@ namespace KillerScan.Engine
                 int slash = prefix.IndexOf('/');
                 if (slash >= 0)
                 {
-                    int.TryParse(prefix[(slash + 1)..], out bits);
+                    if (!int.TryParse(prefix[(slash + 1)..], out bits)) continue;
                     prefix = prefix[..slash];
                 }
-                if (bits <= 0) bits = 24;
+                // The lookup keys MA-L, MA-M and MA-S blocks only; any other mask would be truncated
+                // into a shorter key that overwrites the real owner of the wider block.
+                if (bits != 24 && bits != 28 && bits != 36) continue;
                 int nib = bits / 4;
                 var hex = new string([.. prefix.Where(Uri.IsHexDigit)]).ToUpperInvariant();
                 if (hex.Length < nib) continue;
