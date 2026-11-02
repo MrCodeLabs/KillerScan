@@ -75,6 +75,10 @@ or privately modified data folder can be upgraded.
   unchanged survey files. The first read preserves their original file bytes.
 - Workflow mappings are checked for duplicate keys; every package/monitor job has
   the fork guard. The test suite inventory includes the new compatibility tests.
+- Hosted CI runs fixture-based update publication checks. The actual elevated
+  relaunch with a signed-in desktop token remains the separate SN02 desktop
+  check: hosted runners can expose Explorer without such a usable token, so that
+  single interactive case is explicitly skipped there and is not certified here.
 
 These checks use fabricated devices, scratch data and controlled listeners.
 No customer-network scan, production HA connection or installed update/uninstall

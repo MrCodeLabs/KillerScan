@@ -82,7 +82,10 @@ internal static class UpdateHelperLaunchTests
     private static void ElevatedRelaunch(string root, byte[] standIn)
     {
         using var self = Process.GetCurrentProcess();
-        if (!KillerFamily.Deployment.InstallerExitCodes.IsElevated()
+        // Hosted runners may expose Explorer without a usable signed-in desktop token.
+        // This remains an SN02 desktop check; the fixture-based publication cases above run in CI.
+        if (string.Equals(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"), "true", StringComparison.OrdinalIgnoreCase)
+            || !KillerFamily.Deployment.InstallerExitCodes.IsElevated()
             || !Process.GetProcessesByName("explorer").Any(shell => shell.SessionId == self.SessionId))
         {
             Console.WriteLine("SKIP the real elevated relaunch needs an elevated process on the signed-in desktop.");

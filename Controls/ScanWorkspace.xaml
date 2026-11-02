@@ -425,7 +425,9 @@
 
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="{DynamicResource Str_HA_Title}" Click="HomeAssistant_Click"/>
+                            <MenuItem Header="{DynamicResource Str_HA_Title}" Click="HomeAssistant_Click">
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE80F;"/></MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem x:Name="RescanMenuItem" Header="{DynamicResource Str_Ctx_RescanOne}" InputGestureText="Ctrl+R" Click="RescanSelected_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE72C;"/></MenuItem.Icon>
                             </MenuItem>
@@ -751,8 +753,10 @@
                             <MenuItem Header="{DynamicResource Str_Services_CopyPort}" InputGestureText="Ctrl+Alt+P" Tag="CopyPort" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="{DynamicResource Str_HA_Title}" Tag="HomeAssistant" Click="ServiceMenu_Click"/>
-<MenuItem Header="{DynamicResource Str_Ctx_CopyIp}" Tag="CopyIp" InputGestureText="Ctrl+C" Click="ServiceMenu_Click">
+                            <MenuItem Header="{DynamicResource Str_HA_Title}" Tag="HomeAssistant" Click="ServiceMenu_Click">
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE80F;"/></MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="{DynamicResource Str_Ctx_CopyIp}" Tag="CopyIp" InputGestureText="Ctrl+C" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyHost}" Tag="CopyHost" InputGestureText="Ctrl+Alt+C" Click="ServiceMenu_Click">
