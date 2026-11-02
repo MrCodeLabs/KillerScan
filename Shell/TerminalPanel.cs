@@ -48,9 +48,15 @@ namespace KillerScan.Shell
                 _terminalIsPing = shellCommand?.StartsWith("ping.exe ", StringComparison.OrdinalIgnoreCase) == true;
                 _terminalStatusKey = null;
                 _terminalStatusArgument = null;
-                _terminalScanHasStatus = false;
                 terminal.GotKeyboardFocus += (_, _) => UpdateTerminalPanelStatus();
                 terminal.PromptReady += () => TerminalPromptReady(terminal);
+                terminal.InputRefused += () =>
+                {
+                    if (_terminalControl != terminal) return;
+                    _terminalStatusKey = "Str_Term_InputRefused";
+                    _terminalStatusArgument = null;
+                    UpdateTerminalPanelStatus();
+                };
                 terminal.SpeedTestRequested += () =>
                 {
                     if (_terminalControl == terminal) StartSpeedTest();
@@ -90,14 +96,13 @@ namespace KillerScan.Shell
                     return;
                 }
                 EnsureBundledModules();
-                Environment.SetEnvironmentVariable("KS_LOCATION_ID", Services.Locations.Current.Id);
                 string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 if (command != null) terminal.Start(command, home);
                 else
                 {
                     string shell = ResolveTerminalShell();
                     terminal.Start(QuoteArgument(shell) + " -NoLogo" + PromptArgs(terminal.ManagedShellSetup +
-                        (string.IsNullOrEmpty(shellCommand) ? "" : "; " + shellCommand)), home);
+                        (string.IsNullOrEmpty(shellCommand) ? "" : "; " + shellCommand), terminal.PromptToken), home);
                 }
             }
             else ShowWorkspaceContent(_terminalControl, "terminal");
@@ -157,7 +162,7 @@ namespace KillerScan.Shell
             await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(10));
             if (generation != _terminalPromptGeneration || _terminalControl != terminal ||
                 _terminalPanelDisposed || _terminalExited || terminal.HasRunningCommand ||
-                _speedTestRun != null || _terminalScanHasStatus || _terminalStatusKey != statusKey) return;
+                _speedTestRun != null || _terminalStatusKey != statusKey) return;
             _terminalTitle = null;
             _terminalStatusKey = "Str_St_Ready";
             _terminalStatusArgument = null;

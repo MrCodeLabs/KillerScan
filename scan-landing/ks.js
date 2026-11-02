@@ -110,7 +110,8 @@
   function applyAccent(name) {
     var theme = root.getAttribute('data-theme');
     var fam = famFor(theme);
-    if (!ACCENTS[fam][name]) name = 'green';
+    // Own keys only: 'constructor' or 'toString' from a stored value must not pass as an accent.
+    if (!Object.prototype.hasOwnProperty.call(ACCENTS[fam], name)) name = 'green';
     ['dark', 'light', 'hc'].forEach(function (neutralTheme) {
       var preview = ACCENTS[neutralTheme][name];
       if (preview) document.querySelectorAll('.sw-' + neutralTheme).forEach(function (dot) {
@@ -176,7 +177,11 @@
   var topbarEl = document.querySelector('.topbar');
   if (topbarEl && accDots.length) {
     accentBar = document.createElement('div');
+    accentBar.id = 'accentBar';
     accentBar.className = 'accent-bar';
+    accentBar.inert = true;
+    accentBar.setAttribute('aria-hidden', 'true');
+    if (accToggle) accToggle.setAttribute('aria-controls', accentBar.id);
     var pill = document.createElement('div'); pill.className = 'pill';
     var grip = document.createElement('span'); grip.className = 'grip'; grip.setAttribute('aria-hidden', 'true');
     pill.appendChild(grip);
@@ -221,13 +226,14 @@
     // Default position: top-right corner, nearest the theme picker (still draggable from there).
     requestAnimationFrame(function () { dragDx = dragClamp(1e6); pill.style.transform = 'translateX(' + dragDx + 'px)'; });
   }
-  function showAccentBar() { if (accentBar && NEUTRAL.indexOf(root.getAttribute('data-theme')) >= 0) { var contentPane = document.querySelector('.content'); if (contentPane) accentBar.style.top = Math.round(contentPane.getBoundingClientRect().top) + 'px'; accentBar.classList.add('show'); if (accToggle) accToggle.setAttribute('aria-expanded', 'true'); } }
-  function hideAccentBar() { if (accentBar) { accentBar.classList.remove('show'); if (accToggle) accToggle.setAttribute('aria-expanded', 'false'); } }
+  function showAccentBar() { if (accentBar && NEUTRAL.indexOf(root.getAttribute('data-theme')) >= 0) { var contentPane = document.querySelector('.content'); if (contentPane) accentBar.style.top = Math.round(contentPane.getBoundingClientRect().top) + 'px'; accentBar.inert = false; accentBar.setAttribute('aria-hidden', 'false'); accentBar.classList.add('show'); if (accToggle) accToggle.setAttribute('aria-expanded', 'true'); } }
+  function hideAccentBar() { if (accentBar) { if (accentBar.contains(document.activeElement) && accToggle) accToggle.focus(); accentBar.inert = true; accentBar.setAttribute('aria-hidden', 'true'); accentBar.classList.remove('show'); if (accToggle) accToggle.setAttribute('aria-expanded', 'false'); } }
   accDots.forEach(function (d) { d.addEventListener('click', function () { applyAccent(d.dataset.accent); }); });
   if (accToggle) {
     accToggle.addEventListener('click', function (e) { e.stopPropagation(); if (accentBar && accentBar.classList.contains('show')) hideAccentBar(); else showAccentBar(); });
   }
   document.addEventListener('click', function (e) { if (accentBar && accentBar.classList.contains('show') && !e.target.closest('.accent-bar') && !e.target.closest('#accentToggle')) hideAccentBar(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && accentBar && accentBar.classList.contains('show')) { hideAccentBar(); e.preventDefault(); } });
 
   // Localized visible text, accessible names, metadata, and generated controls.
   var I18N = (typeof window !== 'undefined' && window.I18N) ? window.I18N : {};
@@ -283,6 +289,7 @@
     "ui_accent_yellow": "Yellow",
     "ui_accent_magenta": "Magenta"
   };
+  EN.ui_store = 'Get KillerScan from the Microsoft Store';
   var currentLang = 'en';
   var translatedAttributes = ['title', 'aria-label', 'aria-roledescription', 'content'];
   function bindLabel(selector, attribute, key) {
@@ -290,6 +297,7 @@
       node.setAttribute('data-i18n-' + attribute, key);
     });
   }
+  bindLabel('.tb-store', 'title', 'ui_store');
   bindLabel('.tb-home', 'title', 'ui_home');
   bindLabel('.tgrp, .theme-toggle', 'aria-label', 'ui_choose_theme');
   bindLabel('.theme-toggle', 'title', 'ui_theme');
@@ -366,9 +374,9 @@
   if (features) new MutationObserver(translateCarousel).observe(features, { childList: true, subtree: true });
   window.addEventListener('resize', fitDiagramLabels);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitDiagramLabels);
-  var LANGS = ['en','cs','es','de','fr','ja','kk','pl','ru','uk','nb','pt','tr','vi','zh','zh-cn','bn','hu','it','sl'];
+  var LANGS = ['en','cs','es','de','fr','ja','kk','pl','ru','uk','nb','pt','tr','vi','zh','zh-cn','bn','hu','it', 'sl'];
   var FLAGS = {
-    sl: '<svg viewBox="0 0 24 24"><rect width="24" height="8" fill="#fff"/><rect y="8" width="24" height="8" fill="#003da5"/><rect y="16" width="24" height="8" fill="#ed1c24"/><path d="M5 5h7v6c0 3-3.5 5-3.5 5S5 14 5 11z" fill="#003da5" stroke="#ed1c24" stroke-width=".6"/><path d="m5.7 10.5 1.4-2 1.4 1.2 1.4-1.2 1.4 2-2.8 2z" fill="#fff"/></svg>',
+    sl: '<svg viewBox="0 0 24 24"><rect width="24" height="8" fill="#fff"/><rect y="8" width="24" height="8" fill="#005da4"/><rect y="16" width="24" height="8" fill="#ed1c24"/><path d="M4 4h7v6c0 3-3.5 5-3.5 5S4 13 4 10Z" fill="#005da4" stroke="#ed1c24" stroke-width=".5"/><path d="m5 10 1.5-2 1 1 1-1 1.5 2v1H5Z" fill="#fff"/></svg>',
     en: '<svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#fff"/><g fill="#b22234"><rect width="24" height="1.85"/><rect y="3.7" width="24" height="1.85"/><rect y="7.4" width="24" height="1.85"/><rect y="11.1" width="24" height="1.85"/><rect y="14.8" width="24" height="1.85"/><rect y="18.5" width="24" height="1.85"/><rect y="22.2" width="24" height="1.8"/></g><rect width="11" height="12.95" fill="#3c3b6e"/></svg>',
     cs: '<svg viewBox="0 0 24 24"><rect width="24" height="12" fill="#fff"/><rect y="12" width="24" height="12" fill="#d7141a"/><polygon points="0,0 12,12 0,24" fill="#11457e"/></svg>',
     es: '<svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#c60b1e"/><rect y="6" width="24" height="12" fill="#ffc400"/></svg>',
@@ -412,7 +420,15 @@
     // in a script array and are used as alt/title/aria-label - so those follow the language too.
     document.dispatchEvent(new CustomEvent('kscan-languagechange', { detail: { lang: lang } }));
   }
-  function closeLangMenu() { if (langMenu) { langMenu.hidden = true; langToggle.setAttribute('aria-expanded', 'false'); } }
+  // Like the theme flyout and the More menu: Escape closes it, and closing from the keyboard or
+  // by choosing a language puts focus back on the toggle instead of on a now-hidden button.
+  function closeLangMenu(refocus) {
+    if (!langMenu) return;
+    var hadFocus = langMenu.contains(document.activeElement);
+    langMenu.hidden = true;
+    langToggle.setAttribute('aria-expanded', 'false');
+    if (refocus || hadFocus) langToggle.focus();
+  }
   if (langToggle && langMenu) {
     langToggle.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -420,8 +436,11 @@
       langMenu.hidden = !willOpen;
       langToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
-    langItems.forEach(function (b) { b.addEventListener('click', function () { applyLang(b.dataset.lang); closeLangMenu(); }); });
-    document.addEventListener('click', function (e) { if (!langMenu.hidden && !e.target.closest('.lang-switch')) closeLangMenu(); });
+    langItems.forEach(function (b) { b.addEventListener('click', function () { applyLang(b.dataset.lang); closeLangMenu(true); }); });
+    document.addEventListener('click', function (e) { if (!langMenu.hidden && !e.target.closest('.lang-switch')) closeLangMenu(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !langMenu.hidden) closeLangMenu(true);
+    });
   }
 
   // ---- Easter egg: click the version number ----
@@ -551,4 +570,67 @@
   document.addEventListener('click', function (e) { if (!menu.hidden && !more.contains(e.target)) close(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { close(); btn.focus(); } });
   fit();
+})();
+/* Film Grain: the same switch as the app's theme menu and KillerTools, on the family Alt+Shift+G chord.
+   On by default; off sets data-grain="off", which empties --grain on every grained surface. */
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var KEY = 'film-grain';
+  var LABELS = {
+    en: 'Film Grain', bn: 'ফিল্ম গ্রেইন', cs: 'Filmové zrno', de: 'Filmkorn', es: 'Grano de película',
+    fr: 'Grain de film', hu: 'Filmszemcse', it: 'Grana pellicola', ja: 'フィルムグレイン',
+    kk: 'Пленка түйіршігі', nb: 'Filmkorn', no: 'Filmkorn', pl: 'Ziarno filmowe', pt: 'Granulação de filme',
+    ru: 'Зернистость плёнки', sl: 'Filmska zrnatost', tr: 'Film greni', uk: 'Зернистість плівки',
+    vi: 'Hạt phim', 'zh-hant': '底片顆粒', 'zh-hans': '胶片颗粒'
+  };
+  var box = null, text = null;
+  function apply(on) {
+    root.setAttribute('data-grain', on ? 'on' : 'off');
+    if (box) box.checked = on;
+  }
+  function set(on) {
+    apply(on);
+    try { localStorage.setItem(KEY, on ? 'on' : 'off'); } catch (e) {}
+  }
+  function label() {
+    var lang = (root.getAttribute('lang') || 'en').toLowerCase();
+    if (lang.indexOf('zh') === 0) lang = /hant|tw|hk/.test(lang) ? 'zh-hant' : 'zh-hans';
+    else lang = lang.split('-')[0];
+    return LABELS[lang] || LABELS.en;
+  }
+  function localize() {
+    if (!text) return;
+    text.textContent = label();
+    text.parentNode.title = label() + ' (Alt+Shift+G)';
+  }
+  var saved = 'on';
+  try { saved = localStorage.getItem(KEY) || 'on'; } catch (e) {}
+  apply(saved !== 'off');
+
+  var group = document.querySelector('.topbar .tgrp');
+  if (group) {
+    var sep = document.createElement('div');
+    sep.className = 'tgrp-sep';
+    sep.setAttribute('aria-hidden', 'true');
+    var row = document.createElement('label');
+    row.className = 'tgrp-grain';
+    box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = saved !== 'off';
+    box.addEventListener('change', function () { set(box.checked); });
+    text = document.createElement('span');
+    row.appendChild(box);
+    row.appendChild(text);
+    group.appendChild(sep);
+    group.appendChild(row);
+    localize();
+    new MutationObserver(localize).observe(root, { attributes: true, attributeFilter: ['lang'] });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyG') {
+      e.preventDefault();
+      if (!e.repeat) set(root.getAttribute('data-grain') === 'off');
+    }
+  });
 })();

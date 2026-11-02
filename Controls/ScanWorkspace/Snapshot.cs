@@ -21,9 +21,9 @@ namespace KillerScan.Controls
     {
         private enum SnapshotFormat { PngTransparent, Jpeg, Svg }
 
-        private void ExportSnapshotPngAlpha_Click(object sender, RoutedEventArgs e) => ExportSnapshot(SnapshotFormat.PngTransparent);
-        private void ExportSnapshotJpeg_Click(object sender, RoutedEventArgs e) => ExportSnapshot(SnapshotFormat.Jpeg);
-        private void ExportSnapshotSvg_Click(object sender, RoutedEventArgs e) => ExportSnapshot(SnapshotFormat.Svg);
+        private void ExportSnapshotPngAlpha_Click(object sender, RoutedEventArgs e) => Export("png");
+        private void ExportSnapshotJpeg_Click(object sender, RoutedEventArgs e) => Export("jpg");
+        private void ExportSnapshotSvg_Click(object sender, RoutedEventArgs e) => Export("svg");
 
         private void ExportSnapshot(SnapshotFormat format)
         {
@@ -39,7 +39,7 @@ namespace KillerScan.Controls
             var dlg = new FileDialog(FileDialogMode.Save)
             {
                 Filter = filter,
-                FileName = $"KillerScan_Topology_{Locations.Current.Id}_{DateTime.Now:yyyyMMdd_HHmmss}{extension}",
+                FileName = $"KillerScan_Topology_{DateTime.Now:yyyyMMdd_HHmmss}{extension}",
                 DefaultExt = extension,
                 AddExtension = true
             };
@@ -47,7 +47,7 @@ namespace KillerScan.Controls
 
             try
             {
-                if (format == SnapshotFormat.Svg) File.WriteAllText(dlg.FileName, BuildTopologySvg(), new UTF8Encoding(false));
+                if (format == SnapshotFormat.Svg) ExportFile.WriteText(dlg.FileName, BuildTopologySvg(), new UTF8Encoding(false));
                 else WriteTopologyRaster(dlg.FileName, format);
                 // System.IO.Path spelled out: System.Windows.Shapes.Path is in scope here too,
                 // because this file draws the connectors.
@@ -110,8 +110,7 @@ namespace KillerScan.Controls
                 ? new JpegBitmapEncoder { QualityLevel = 92 }
                 : new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bitmap));
-            using var stream = File.Create(path);
-            encoder.Save(stream);
+            ExportFile.Write(path, encoder.Save);
         }
 
         /// <summary>
@@ -131,8 +130,6 @@ namespace KillerScan.Controls
                .Append("\" width=\"").Append(width.ToString("0.##", ci))
                .Append("\" height=\"").Append(height.ToString("0.##", ci)).Append("\">\n");
 
-            svg.Append("<title>").Append(System.Security.SecurityElement.Escape(Locations.Current.Name)).Append("</title><metadata>")
-                .Append(System.Security.SecurityElement.Escape(Locations.Current.Id)).Append("</metadata>\n");
             // Connectors first so the boxes sit on top of them, matching the canvas.
             foreach (var line in TopologyCanvas.Children.OfType<Line>())
             {
@@ -176,7 +173,7 @@ namespace KillerScan.Controls
                     foreach (var text in stack.Children.OfType<TextBlock>())
                     {
                         textY += text.Margin.Top + text.FontSize;
-                        svg.Append("    <text x=\"").Append((x + 6).ToString("0.##", ci))
+                        svg.Append("    <text text-anchor=\"middle\" x=\"").Append((x + w / 2).ToString("0.##", ci))
                            .Append("\" y=\"").Append(textY.ToString("0.##", ci))
                            .Append("\" font-family=\"").Append(Escape(text.FontFamily?.Source ?? "Segoe UI"))
                            .Append("\" font-size=\"").Append(text.FontSize.ToString("0.##", ci))

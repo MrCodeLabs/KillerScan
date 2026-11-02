@@ -21,7 +21,7 @@ const physicalKeys = new Set(context.KBROWS.flat().map(key => key[0]));
 const bindings = Object.values(context.KBL).flatMap(layer => Object.entries(layer));
 assert.equal(bindings.reduce((count, entry) => count + entry[1][1].length, 0), context.KS_SHORTCUTS.length);
 for (const [key] of bindings) assert(physicalKeys.has(key), `Website map is missing ${key}`);
-for (const [site, app] of Object.entries({en:'en-US',es:'es',pt:'pt-BR',fr:'fr-FR',de:'de-DE',sl:'sl-SI',nb:'nb-NO',uk:'uk-UA',ru:'ru-RU',it:'it-IT',cs:'cs-CZ',pl:'pl-PL',hu:'hu-HU',tr:'tr-TR',kk:'kk-KZ',bn:'bn',ja:'ja-JP','zh-Hans':'zh-CN','zh-Hant':'zh-TW',vi:'vi-VN'})) {
+for (const [site, app] of Object.entries({en:'en-US',es:'es',pt:'pt-BR',sl:'sl-SI',fr:'fr-FR',de:'de-DE',nb:'nb-NO',uk:'uk-UA',ru:'ru-RU',it:'it-IT',cs:'cs-CZ',pl:'pl-PL',hu:'hu-HU',tr:'tr-TR',kk:'kk-KZ',bn:'bn',ja:'ja-JP','zh-Hans':'zh-CN','zh-Hant':'zh-TW',vi:'vi-VN'})) {
   context.language = site;
   context.paintCatalog();
   assert.equal(context.shortcutLocale(), app);

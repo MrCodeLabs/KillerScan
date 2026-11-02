@@ -10,13 +10,12 @@ using KillerScan.Services;
 
 namespace KillerScan.Controls
 {
-    public sealed class ScanDeviceActionEventArgs(NetworkDevice device, string action, bool beside, int? servicePort = null, AccessEndpoint? access = null) : EventArgs
+    public sealed class ScanDeviceActionEventArgs(NetworkDevice device, string action, bool beside, int? servicePort = null) : EventArgs
     {
         public NetworkDevice Device { get; } = device;
         public string Action { get; } = action;
         public bool Beside { get; } = beside;
         public int? ServicePort { get; } = servicePort;
-        public AccessEndpoint? Access { get; } = access;
     }
 
     public partial class ScanWorkspace : UserControl, IDisposable
@@ -60,26 +59,40 @@ namespace KillerScan.Controls
         public double Progress => ScanProgress.Value;
         public bool IsProgressVisible => ScanProgress.Visibility == Visibility.Visible;
         public ScanWorkspace(string initialTarget = "", bool demo = false)
+            : this(initialTarget, demo, new NetworkScanner()) { }
+
+        internal ScanWorkspace(string initialTarget, bool demo, NetworkScanner scanner)
         {
             DemoMode = demo;
+            InitializeLocation();
             InitializeComponent();
             StatusDescriptor.AddValueChanged(StatusText, NotifyFooterChanged);
             ProgressDescriptor.AddValueChanged(ScanProgress, NotifyFooterChanged);
             ProgressVisibilityDescriptor.AddValueChanged(ScanProgress, NotifyFooterChanged);
             PopulateNetworkInfo();
             if (!string.IsNullOrWhiteSpace(initialTarget)) SubnetInput.Text = initialTarget;
-            _active = new ScanSession(SubnetInput.Text)
+            _active = new ScanSession(SubnetInput.Text, scanner)
             { Status = string.Format(Loc("Str_Status_Ready"), OuiLookup.Count.ToString("N0")) };
             WireSession(_active);
+            ApplyLocationHooks();
+            InitializeLocationSuggestions();
             ScanOptionsMenu.Attach(ScanOptionsButton, () => _active.Options,
-                value => { if (!IsScanning) _active.Options = value; });
-            NetworkInterfaceMenu.Attach(InterfaceSelectionButton, () => SelectedAdapterId,
-                () => SelectedSourceAddress, (id, address) => SelectInterface(id, address));
+                value => { if (!_disposed && !IsScanning) _active.Options = value; },
+                new ScanOptionsMenu.AdapterHooks(() => AdapterChoice,
+                    value => { if (!_disposed && !IsScanning) AdapterChoice = value; },
+                    () => DemoMode ? [] : AvailableAdapters()));
             ActivateSession();
             StartVendorNoticeTimer();
             RestoreColumnLayout();
+            FitMacColumn();
+            // Themes and the interface font change the grid's font; the MAC column follows.
+            // A named handler, so Dispose can remove it: the descriptor table would otherwise keep
+            // every closed workspace alive.
+            _fitMac = (_, _) => FitMacColumn();
+            GridFontFamily.AddValueChanged(ResultsGrid, _fitMac);
+            GridFontSize.AddValueChanged(ResultsGrid, _fitMac);
+            Loaded += (_, _) => FitMacColumn();
             AddWorkspaceDeviceMenus();
-            RefreshColumnHeaders();
             ServicesGrid.SelectionChanged += (_, _) =>
             {
                 if (ServicesGrid.SelectedItem is ServiceRow row)
@@ -90,12 +103,16 @@ namespace KillerScan.Controls
             DeepScanAllButton.IsVisibleChanged += (_, _) => FitToolbarInputs();
             // A language switch changes these buttons' widths without resizing the bar.
             ScanBtn.SizeChanged += (_, _) => FitToolbarInputs();
+            ScanOptionsButton.SizeChanged += (_, _) => FitToolbarInputs();
+            LocationButton.SizeChanged += (_, _) => FitToolbarInputs();
             DeepScanAllButton.SizeChanged += (_, _) => FitToolbarInputs();
             TopologyOrderButton.IsVisibleChanged += (_, _) => FitToolbarInputs();
             SubnetInput.TextChanged += (_, _) => { _active.SubnetText = Targets; StateChanged?.Invoke(this, EventArgs.Empty); };
             SubnetInput.KeyDown += (_, e) => { if (e.Key == Key.Enter) { Scan(); e.Handled = true; } };
             ResultsGrid.PreviewKeyDown += TabOutOfGrid;
             ServicesGrid.PreviewKeyDown += TabOutOfGrid;
+            ResultsGrid.GotKeyboardFocus += EnterGridCell;
+            ServicesGrid.GotKeyboardFocus += EnterGridCell;
             Loaded += (_, _) => GrainTexture.Track(GrainBrush);
             if (demo) GenerateDemoScan();
         }
@@ -173,10 +190,13 @@ namespace KillerScan.Controls
             PaneTitle.Text = Loc(_showTopology ? "Str_Topology_Title" : _showServices ? "Str_Services_Title" : "Str_DiscoveredDevices");
             if (_showTopology) RefreshTopology();
             if (_showServices) RefreshServices();
+            UpdateLocationLabel();
+            if (LocationSuggestion.Visibility == Visibility.Visible) RefreshLocationSuggestion();
         }
+        // Grid columns sit outside the visual tree, so their DynamicResource headers keep the
+        // language they were created in. They are restated on every language change.
         private void RefreshColumnHeaders()
         {
-            // DataGrid columns are outside the visual tree, so refresh their resources explicitly.
             ColIp.Header = Loc("Str_Col_Ip");
             ColHost.Header = Loc("Str_Col_Host");
             ColMac.Header = Loc("Str_Col_Mac");
@@ -184,23 +204,35 @@ namespace KillerScan.Controls
             ColType.Header = Loc("Str_Col_Type");
             ColPorts.Header = Loc("Str_Col_Ports");
             string[] services = ["Str_Services_Service", "Str_Col_Ports", "Str_Col_DeviceName", "Str_Col_Ip", "Str_Col_Type"];
-            for (int i = 0; i < services.Length; i++) ServicesGrid.Columns[i].Header = Loc(services[i]);
+            for (int i = 0; i < services.Length && i < ServicesGrid.Columns.Count; i++) ServicesGrid.Columns[i].Header = Loc(services[i]);
         }
+
         public void ApplyScale(double scale) => LayoutTransform = new ScaleTransform(scale, scale);
+        private static readonly DependencyPropertyDescriptor GridFontFamily = DependencyPropertyDescriptor.FromProperty(Control.FontFamilyProperty, typeof(DataGrid));
+        private static readonly DependencyPropertyDescriptor GridFontSize = DependencyPropertyDescriptor.FromProperty(Control.FontSizeProperty, typeof(DataGrid));
+        private EventHandler? _fitMac;
+
         public void Dispose()
         {
             if (_disposed) return;
             _disposed = true;
+            _viewRefreshTimer?.Stop();
+            _vendorNoticeTimer?.Stop();
             StatusDescriptor.RemoveValueChanged(StatusText, NotifyFooterChanged);
+            if (_fitMac != null)
+            {
+                GridFontFamily.RemoveValueChanged(ResultsGrid, _fitMac);
+                GridFontSize.RemoveValueChanged(ResultsGrid, _fitMac);
+            }
             ProgressDescriptor.RemoveValueChanged(ScanProgress, NotifyFooterChanged);
             ProgressVisibilityDescriptor.RemoveValueChanged(ScanProgress, NotifyFooterChanged);
+            DisposeLocationSuggestions();
             Stop();
             SaveColumnLayout();
         }
         internal void RunProfile(ScanProfile profile)
         {
             if (_disposed || IsScanning) return;
-            if (profile.LocationId != LocationId) return;
             LoadProfile(profile);
             _runDeepAfterScan = profile.DeepScanAfter;
             Scan();
@@ -208,22 +240,50 @@ namespace KillerScan.Controls
         internal void LoadProfile(ScanProfile profile)
         {
             if (_disposed || IsScanning) return;
-            if (profile.LocationId != LocationId) return;
-            SelectInterface(profile.InterfaceId, profile.SourceAddress, updateTarget: false);
             Targets = profile.Target;
             _active.Options = profile.Options ?? new ScanOptions();
         }
-        internal void LoadSnapshot(string target, IEnumerable<NetworkDevice> devices)
+        internal void LoadSnapshot(string target, IEnumerable<NetworkDevice> devices, DateTimeOffset? scannedAt = null)
         {
             if (_disposed || IsScanning) return;
             Targets = target;
             _active.ScannedSubnet = target;
+            _active.ScannedTargets = target;
+            _active.ScannedAt = scannedAt ?? DateTimeOffset.Now;
+            _active.Completion = ScanCompletion.Complete;
+            _active.Refresh = null;
+            _active.Adapter = string.Empty;
+            _active.Network = ScanNetwork.Unknown;
             _active.Devices.Clear();
             foreach (var device in devices) _active.Devices.Add(device);
             RefreshDeviceCount();
             UpdateDeepScanButton();
             UpdateExportButtonAvailability();
         }
+        private static void EnterGridCell(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (sender is not DataGrid grid || !ReferenceEquals(e.NewFocus, grid) || grid.Items.Count == 0) return;
+            if (Mouse.LeftButton == MouseButtonState.Pressed || Mouse.RightButton == MouseButtonState.Pressed ||
+                Mouse.MiddleButton == MouseButtonState.Pressed) return;
+            grid.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, new Action(() =>
+            {
+                if (!grid.IsKeyboardFocused || grid.Items.Count == 0) return;
+                var item = grid.CurrentCell.IsValid && grid.Items.Contains(grid.CurrentCell.Item)
+                    ? grid.CurrentCell.Item : grid.SelectedItem ?? grid.Items[0];
+                var column = grid.CurrentCell.IsValid && grid.CurrentCell.Column.Visibility == Visibility.Visible
+                    ? grid.CurrentCell.Column
+                    : grid.Columns.Where(c => c.Visibility == Visibility.Visible).OrderBy(c => c.DisplayIndex).FirstOrDefault();
+                if (column == null) return;
+                grid.CurrentCell = new DataGridCellInfo(item, column);
+                if (grid.SelectedItems.Count == 0) grid.SelectedItem = item;
+                grid.ScrollIntoView(item, column);
+                grid.UpdateLayout();
+                DependencyObject? content = column.GetCellContent(item);
+                while (content != null && content is not DataGridCell) content = VisualTreeHelper.GetParent(content);
+                if (content is DataGridCell cell) cell.Focus();
+            }));
+        }
+
         /// <summary>
         /// Tab leaves a results grid in one step, as it leaves a list box, and the arrow keys
         /// still move between cells. The grid's own Tab handling visits every cell in the row first.

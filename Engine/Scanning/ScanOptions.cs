@@ -1,9 +1,8 @@
 namespace KillerScan.Engine
 {
     /// <summary>
-    /// Immutable choices for one scan. Defaults preserve the existing scan behavior. Turning off
-    /// a probe prevents that application-level operation; other enabled traffic can still cause
-    /// the operating system to resolve neighbors. This is not an interface or routing policy.
+    /// Immutable choices for one scan. Defaults preserve the existing behavior. Disabled checks
+    /// prevent application probes; enabled traffic can still trigger operating system discovery.
     /// </summary>
     public sealed record ScanOptions
     {
@@ -21,7 +20,13 @@ namespace KillerScan.Engine
         public bool Snmp { get; init; } = true;
         public bool Netbios { get; init; } = true;
 
-        /// <summary>Stable, language-independent names shared by the GUI and command line.</summary>
+        /// <summary>
+        /// Deep scans send HTTP and TLS payloads to open ports with no known web service only
+        /// when this is set. Raw services such as JetDirect printing are never sent payloads.
+        /// </summary>
+        public bool ProbeUnknownPorts { get; init; }
+
+        /// <summary>Stable, language-independent names shared by hosts.</summary>
         public static IReadOnlyList<string> Features { get; } = Array.AsReadOnly(new[]
         {
             "neighbor-cache", "arp", "icmp", "tcp-liveness", "dns", "mdns", "ssdp",
@@ -50,7 +55,7 @@ namespace KillerScan.Engine
             _ => throw new ArgumentException("Unknown scan feature: " + feature, nameof(feature))
         };
 
-        /// <summary>Apply a CLI-style list. Unknown or empty names fail before starting a scan.</summary>
+        /// <summary>Disable a comma-separated list. Unknown and empty names are refused.</summary>
         public ScanOptions Without(string features)
         {
             if (features == null) throw new ArgumentNullException(nameof(features));
@@ -60,7 +65,7 @@ namespace KillerScan.Engine
             return result;
         }
 
-        /// <summary>Disabled features, suitable for the CLI /skip value; empty means defaults.</summary>
+        /// <summary>The disabled features in a stable order; empty means defaults.</summary>
         [System.Text.Json.Serialization.JsonIgnore]
         public string DisabledFeatures => string.Join(",", Features.Where(feature => !IsEnabled(feature)));
     }

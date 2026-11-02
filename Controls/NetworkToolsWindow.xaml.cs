@@ -57,10 +57,22 @@ namespace KillerScan.Controls
 
         internal void IncludeTarget(string address)
         {
-            if (_run != null) return;
+            if (_closed) return;
+            if (!IPAddress.TryParse(address, out var added)) { Status.Text = L("Str_Watch_Invalid"); return; }
             var targets = Targets.Text.Split([',', ';', ' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
-            if (!targets.Contains(address))
-                Targets.Text = string.Join(", ", targets.Concat([address]));
+            IPAddress[] existing = [];
+            if (targets.Length > 0 && !ConnectionChecks.TryTargets(string.Join(", ", targets), out existing))
+            { Status.Text = L("Str_Watch_Invalid"); return; }
+            if (existing.Contains(added)) return;
+            if (existing.Length >= 16) { Status.Text = L("Str_Watch_Invalid"); return; }
+            Targets.Text = string.Join(", ", existing.Concat([added]));
+            if (_run is { IsCancellationRequested: false })
+            {
+                var card = new WatchCard(added.ToString(), L("Str_Watch_Waiting"));
+                _cards.Add(card);
+                _targets.Add(new WatchTarget(added, card));
+                RunChecks(card, _checks?.Token ?? _run.Token);
+            }
         }
 
         /// <summary>
@@ -249,15 +261,30 @@ namespace KillerScan.Controls
 
         private SemaphoreSlim? _checkSlots;
 
-        /// <summary>Expands a target's card, adding it to the run if it is not already watched.</summary>
+        /// <summary>Expands a target's card, adding it to the run if it is not already watched. With
+        /// no run going, as on a freshly opened window, it starts one: a card only exists while
+        /// targets are being watched, and Diagnose has to land on one.</summary>
         internal void ShowDetails(string address, IEnumerable<int> ports)
         {
             RememberPorts(address, ports);
             var card = _cards.FirstOrDefault(c => c.Address == address);
-            if (card == null) { IncludeTarget(address); return; }
+            if (card == null)
+            {
+                IncludeTarget(address);
+                // Start_Click lays out every card before its first await, so they exist on return.
+                if (_run == null && !_closed && IPAddress.TryParse(address, out var wanted)
+                    && ConnectionChecks.TryTargets(Targets.Text, out var listed) && listed.Contains(wanted))
+                    Start_Click(StartButton, new RoutedEventArgs());
+                card = _cards.FirstOrDefault(c => c.Address == address);
+                if (card == null) return;
+            }
+            if (_portsOnly) return;
             Cards.SelectedItem = card;
             Cards.ScrollIntoView(card);
         }
+
+        /// <summary>True while a check asks the shell for a target's ports (RunChecksAsync).</summary>
+        private bool _portsOnly;
 
         private void CardDiagnose_Click(object sender, RoutedEventArgs e)
         {
@@ -291,7 +318,14 @@ namespace KillerScan.Controls
             // Ask the shell for this target's scan record before probing, so the checks cover
             // its discovered ports. Guarded on the cache, so the shell calling back into
             // ShowDetails cannot bounce between the two.
-            if (!_knownPorts.ContainsKey(card.Address)) DiagnoseRequested?.Invoke(card.Address);
+            // Only the ports are wanted back: the shell answers through ShowDetails, which must not
+            // select and scroll to each card a sweep checks, moving the user's own selection.
+            if (!_knownPorts.ContainsKey(card.Address))
+            {
+                _portsOnly = true;
+                try { DiagnoseRequested?.Invoke(card.Address); }
+                finally { _portsOnly = false; }
+            }
             card.Checks.Clear();
             var slots = _checkSlots;
             if (slots != null) await slots.WaitAsync(token);
@@ -480,15 +514,15 @@ namespace KillerScan.Controls
 
             var csv = new System.Text.StringBuilder();
             csv.AppendLine(string.Join(",", Cell(L("Str_Watch_Targets")), Cell(L("Str_Diag_Result")),
-                Cell(L("Str_Watch_Latency")), Cell(L("Str_Watch_Loss")), Cell(L("Str_Watch_Sent")), "Location ID", "Location"));
+                Cell(L("Str_Watch_Latency")), Cell(L("Str_Watch_Loss")), Cell(L("Str_Watch_Sent"))));
             foreach (var card in _cards)
             {
                 csv.AppendLine(string.Join(",", Cell(card.Address), Cell(card.State),
-                    Cell(card.Latest + " / " + card.Average), Cell(card.Loss), Cell(card.Sent), Cell(Locations.Current.Id), Cell(Locations.Current.Name)));
+                    Cell(card.Latest + " / " + card.Average), Cell(card.Loss), Cell(card.Sent)));
                 foreach (var check in card.Checks)
-                    csv.AppendLine(string.Join(",", Cell(card.Address), Cell(check.Check), Cell(check.Result), "", "", Cell(Locations.Current.Id), Cell(Locations.Current.Name)));
+                    csv.AppendLine(string.Join(",", Cell(card.Address), Cell(check.Check), Cell(check.Result), "", ""));
                 foreach (var entry in card.Events)
-                    csv.AppendLine(string.Join(",", Cell(card.Address), Cell(entry.Time), Cell(entry.State), "", "", Cell(Locations.Current.Id), Cell(Locations.Current.Name)));
+                    csv.AppendLine(string.Join(",", Cell(card.Address), Cell(entry.Time), Cell(entry.State), "", ""));
             }
             return csv.ToString();
         }

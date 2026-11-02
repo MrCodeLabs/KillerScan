@@ -14,6 +14,11 @@ namespace KillerScan.Controls
         private readonly ObservableCollection<HistoryChangeRow> _changes = [];
         private readonly ObservableCollection<HistoryDeviceRow> _devices = [];
         private ScanHistoryEntry? _entry;
+
+        /// <summary>The history the shown entry belongs to, which picks its baseline. Set by the shell.</summary>
+        internal Func<HistoryStore> HistorySource { get; set; } = () => ScanHistory.Store;
+
+        private HistoryStore StoreFor(ScanHistoryEntry? entry) => entry?.Owner ?? HistorySource();
         private string Loc(string key) => TryFindResource(key) as string ?? key;
 
         /// <summary>
@@ -89,18 +94,27 @@ namespace KillerScan.Controls
             for (int i = 0; i < devices.Length; i++) HistoryAllGrid.Columns[i].Header = Loc(devices[i]);
             // Match the sidebar's saved timestamp, including archives recorded in another zone.
             HistoryEntryContext.Text = _entry == null ? string.Empty : $"{_entry.Target} · {_entry.ScannedAt:g}";
-            var comparison = _entry == null ? null : ScanHistory.Compare(_entry);
+            var history = StoreFor(_entry);
+            var comparison = _entry == null ? null : history.Compare(_entry);
             HistoryComparisonContext.Text = comparison?.Previous == null ? string.Empty :
                 string.Format(Loc("Str_History_ComparedWith"), comparison.Previous.ScannedAt.ToString("g"));
             bool comparing = !_showAll && comparison?.Previous != null;
-            HistoryTarget.Text = _entry?.Target ?? Loc("Str_History_Empty");
+            // An unreadable file is not an empty archive; say which one this is.
+            string empty = Loc(history.LoadError != null ? "Str_History_Unreadable" : "Str_History_Empty");
+            HistoryTarget.Text = _entry?.Target ?? empty;
+            if (_entry?.Completion is ScanCompletion.Partial or ScanCompletion.Canceled)
+            {
+                string state = Loc(_entry.Completion == ScanCompletion.Canceled ? "Str_St_ScanCanceled" : "Str_History_Partial");
+                HistoryTarget.Text += " · " + state;
+                HistoryEntryContext.Text += " · " + state;
+            }
             HistoryDateSeparator.Text = _entry == null ? string.Empty : " · ";
             HistoryPreviousTimestamp.Text = comparing ? comparison!.Previous!.ScannedAt.ToString("g") : string.Empty;
             HistoryComparisonSeparator.Text = comparing ? " / " : string.Empty;
             HistoryCurrentTimestamp.Text = _entry?.ScannedAt.ToString("g") ?? string.Empty;
             if (_entry == null)
             {
-                HistorySummary.Text = Loc("Str_History_Empty");
+                HistorySummary.Text = empty;
                 return;
             }
             if (_showAll)

@@ -23,9 +23,10 @@ namespace KillerScan.Shell
         {
             _startupScanTarget = startupScanTarget;
             _startScanOnLoad = startScanOnLoad;
-            _ = Locations.Current;
             InitializeComponent();
             new KillerFamily.Accessibility.OverlayFocus(this).Track(ShortcutsOverlay, AboutOverlay);
+            InitRailOrder();
+            InitHistoryDelete();
             var titleFrames = System.Windows.Media.Imaging.BitmapDecoder.Create(
                 new System.Uri("pack://application:,,,/Resources/ks-icon.ico"),
                 System.Windows.Media.Imaging.BitmapCreateOptions.None,
@@ -38,14 +39,23 @@ namespace KillerScan.Shell
             _grainBrush    = (ImageBrush)FindName("GrainBrush")!;
 
             OuiLookup.Load();
-            Locations.LoadData();
+            // Demo mode keeps everything in the app-wide stores, in memory. Otherwise each
+            // Location owns its own, and the first start moves existing data into Unassigned.
+            if (DemoData.Enabled)
+            {
+                DeviceOverrides.Load();
+                DeviceLogins.Load();
+                DevicePreferences.Load();
+                ScanHistory.Load();
+                ScanProfiles.Load();
+            }
+            LocationService.Load(Loc("Str_Loc_Unassigned"));
 
             _about = new AboutController(this);
 
             VersionLabel.Text = $"v{AppInfo.Version}";
 
             InitializeWorkspace();
-            InitializeLocations();
             InitSidebar();
             InitSidebarFades();
 
@@ -63,6 +73,12 @@ namespace KillerScan.Shell
                 UpdateAccentStrip(animate: false);                  // Theme.cs
                 ApplyFlatChrome();                                  // Theme.cs (98SE drops the shadow)
                 FadeInContent();                                    // WindowChrome.cs
+                if (LocationService.LoadError != null)
+                    Dispatcher.BeginInvoke(new Action(OfferLocationRecovery),  // History.cs
+                        System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                if (ShellLocation.History.LoadError != null)
+                    Dispatcher.BeginInvoke(new Action(OfferHistoryRecovery),   // History.cs
+                        System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 if (_startScanOnLoad && !DemoMode)
                     Dispatcher.BeginInvoke(new Action(() => ActiveScan?.Scan()),
                         System.Windows.Threading.DispatcherPriority.ApplicationIdle);
@@ -98,8 +114,17 @@ namespace KillerScan.Shell
         // Portable-mode install button
         private void Install_Click(object sender, RoutedEventArgs e)
         {
-            if (IsolatedSettings.Enabled) return;
-            var dlg = new ConfirmDialog { Owner = this };
+            var dlg = new ConfirmDialog(Loc("Str_Install_HeadUser"),
+                Loc("Str_Install_BulletShortcut") + "\n" + Loc("Str_Install_BulletArp"),
+                Loc("Str_Btn_Install"), Loc("Str_Btn_Cancel"),
+                check2Label: Loc("Str_Install_AllUsers"), check2Note: Loc("Str_Install_AllUsersNote")) { Owner = this };
+            // Already installed machine-wide (by an admin, winget, choco or an RMM)? Then the only
+            // sane move is to update that copy in place, so the all-users box is ticked and locked.
+            if (App.MachineInstallExists())
+                dlg.LockCheck2(Loc("Str_Install_AlreadyAllUsers"));
+            dlg.Check2.Checked += (_, _) => dlg.HeadingText.Text = Loc("Str_Install_HeadAll");
+            dlg.Check2.Unchecked += (_, _) => dlg.HeadingText.Text = Loc("Str_Install_HeadUser");
+            if (dlg.Check2Checked) dlg.HeadingText.Text = Loc("Str_Install_HeadAll");
             dlg.ShowDialog();
             if (!dlg.Confirmed) return;
 
@@ -107,7 +132,7 @@ namespace KillerScan.Shell
             // once the install actually happened, otherwise the app keeps running as portable.
             try
             {
-                if (!App.InstallAndRelaunch(wantDesktop: true, allUsers: dlg.AllUsers))
+                if (!App.InstallAndRelaunch(wantDesktop: true, allUsers: dlg.Check2Checked))
                 {
                     StatusText.Text = Loc("Str_St_InstallCanceled");
                     return;
@@ -118,12 +143,6 @@ namespace KillerScan.Shell
             {
                 ConfirmDialog.ShowNotice(string.Format(Loc("Str_Install_Failed"), ex.Message), this);
             }
-        }
-
-        // Footer version number -> About overlay (About.cs).
-        private void VersionLabel_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            ShowAboutOverlay();
         }
 
         // ============================================================
@@ -187,7 +206,6 @@ namespace KillerScan.Shell
         {
             SaveWindowPlacement();
             DisposeWorkspace();
-            LocaleManager.LocaleChanged -= RefreshLocationLabel;
             base.OnClosed(e);
         }
 

@@ -32,18 +32,33 @@ internal static partial class HistoryUiTests
     private static object? Field(object target, string name) => target.GetType().GetField(name, Instance)!.GetValue(target);
     private static void Require(bool condition, string message) { _checks++; if (!condition) throw new InvalidOperationException(message); }
 
-    public static Task Run(bool settingsOnly = false, bool tableOnly = false, bool profilesOnly = false, bool menusOnly = false)
+    private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            yield return child;
+            foreach (var nested in Descendants(child)) yield return nested;
+        }
+    }
+
+    /// <summary>Runs one other check inside this suite's app host instead of the history checks.</summary>
+    internal static Action? Isolated;
+
+    public static Task Run(bool settingsOnly = false, bool tableOnly = false, bool menusOnly = false, bool lifecycleOnly = false)
     {
         Exception? failure = null;
         var thread = new Thread(() =>
         {
-            try { CheckUi(settingsOnly, tableOnly, profilesOnly, menusOnly); } catch (Exception ex) { failure = ex; }
+            try { CheckUi(settingsOnly, tableOnly, menusOnly, lifecycleOnly); } catch (Exception ex) { failure = ex; }
             finally { Dispatcher.CurrentDispatcher.InvokeShutdown(); }
         });
         thread.SetApartmentState(ApartmentState.STA); thread.Start();
         Require(thread.Join(TimeSpan.FromSeconds(120)), "History checks finish within two minutes.");
         if (failure != null) throw new InvalidOperationException("History UI regression failed.", failure);
-        Console.WriteLine("PASS: " + _checks + " history, context-menu, shortcut and rendering assertions.");
+        if (Isolated == null)
+            Console.WriteLine(lifecycleOnly ? "PASS: controlled workspace lifecycle setup."
+                : "PASS: " + _checks + " history, context-menu, shortcut and rendering assertions.");
         return Task.CompletedTask;
     }
 
@@ -56,14 +71,14 @@ internal static partial class HistoryUiTests
         Console.Write(await output); Require(process.ExitCode == 0, "Isolated history suite: " + await error);
     }
 
-    private static void CheckUi(bool settingsOnly, bool tableOnly, bool profilesOnly, bool menusOnly)
+    private static void CheckUi(bool settingsOnly, bool tableOnly, bool menusOnly, bool lifecycleOnly)
     {
         // Settings writes are redirected for this isolated test process, never to the user's app key.
         string scratch = "Software\\KillerScan-HistoryTests-" + Guid.NewGuid().ToString("N");
         using var registry = Registry.CurrentUser.CreateSubKey(scratch);
         var currentUser = new IntPtr(unchecked((int)0x80000001));
         Require(RegOverridePredefKey(currentUser, registry.Handle.DangerousGetHandle()) == 0, "Isolate registry settings.");
-        try { Capture(settingsOnly, tableOnly, profilesOnly, menusOnly); }
+        try { Capture(settingsOnly, tableOnly, menusOnly, lifecycleOnly); }
         finally
         {
             RegOverridePredefKey(currentUser, IntPtr.Zero);
@@ -71,19 +86,18 @@ internal static partial class HistoryUiTests
         }
     }
 
-    private static void Capture(bool settingsOnly, bool tableOnly, bool profilesOnly, bool menusOnly)
+    private static void Capture(bool settingsOnly, bool tableOnly, bool menusOnly, bool lifecycleOnly)
     {
         var assembly = typeof(KillerScan.App).Assembly;
         typeof(Application).GetField("_resourceAssembly", Static)!.SetValue(null, assembly);
         var app = new TestApplication();
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "KillerScan.csproj"))) directory = directory.Parent;
-        if (directory == null && Environment.GetEnvironmentVariable("KILLERSCAN_TEST_ROOT") is string sourceRoot)
-            directory = new DirectoryInfo(sourceRoot);
+        KillerScan.Services.AppTheme.Configure();
+        var directory = TestRepository.Find();
         Require(directory != null, "Application resource source exists.");
         var xml = new XmlDocument(); xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
         var dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml.Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
-            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"")
+            .Replace("clr-namespace:KillerFamily.Controls\"", "clr-namespace:KillerFamily.Controls;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
@@ -109,6 +123,10 @@ internal static partial class HistoryUiTests
             ((Action?)localeManager.GetField("LocaleChanged", Static)!.GetValue(null))?.Invoke();
         }
         Theme("Black"); Locale("EnUS");
+        // The main window loads Locations at startup; keep that away from the real app data.
+        KillerScan.Services.LocationService.Root = Path.Combine(Path.GetTempPath(), "KillerScan-ui-locations-" + Guid.NewGuid().ToString("N"));
+        if (Isolated != null) { Isolated(); return; }
+        if (lifecycleOnly) { ScanLifecycleTests.Run(); return; }
         if (settingsOnly)
         {
             typeof(MainWindow).GetMethod("PublishGrainTile", Static)!.Invoke(null, null);
@@ -121,8 +139,8 @@ internal static partial class HistoryUiTests
         }
         var window = new MainWindow();
         if (menusOnly) { CheckMenuIcons(window, assembly, directory.FullName, Theme); return; }
-        if (profilesOnly) { CheckProfiles(window, assembly, Theme, Locale); return; }
-        var historyType = assembly.GetType("KillerScan.Services.ScanHistory", true)!;
+        var location = (KillerScan.Services.LocationData)window.GetType().GetProperty("ShellLocation", Instance)!.GetValue(window)!;
+        void SeedHistory(IList values) => location.History.SeedDemo(values.Cast<KillerScan.Services.ScanHistoryEntry>());
         var entryType = assembly.GetType("KillerScan.Services.ScanHistoryEntry", true)!;
         var deviceType = assembly.GetType("KillerScan.Services.HistoricalDevice", true)!;
         object Device(string identity, string ip, string name)
@@ -147,7 +165,7 @@ internal static partial class HistoryUiTests
         var before = Entry(time, missing, Device("common", "192.0.2.41", "server-old"));
         var after = Entry(time.AddHours(1), Device("common", "192.0.2.41", "server-new"), Device("added", "192.0.2.42", "new-device"));
         var entries = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
-        entries.Add(before); entries.Add(after); historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { entries });
+        entries.Add(before); entries.Add(after); SeedHistory(entries);
         Call(window, "RefreshHistoryList"); Call(window, "ShowHistoryEntry");
         var history = (HistoryWorkspace)Field(window, "_historyWorkspace")!;
         Call(history, "SetView", false);
@@ -155,6 +173,46 @@ internal static partial class HistoryUiTests
         var all = (DataGrid)history.FindName("HistoryAllGrid");
         var title = (TextBlock)history.FindName("HistoryIdentity");
         var sidebarTitle = (TextBlock)window.FindName("SidebarHeading");
+
+        // A status the footer trims can still be read in full, and a screen reader hears it.
+        var footer = (TextBlock)window.FindName("StatusText");
+        Require(System.Windows.Automation.AutomationProperties.GetLiveSetting(footer) == System.Windows.Automation.AutomationLiveSetting.Polite,
+            "The footer status is a live region.");
+        string shownStatus = footer.Text;
+        double shownWidth = footer.MaxWidth;
+        var viewField = window.GetType().GetField("_workspaceView", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        object shownView = viewField.GetValue(window)!;
+        viewField.SetValue(window, "scan");
+        footer.MaxWidth = 60;
+        footer.Text = "A status far too long for the footer, with what to do next at the end.";
+        Require(((string)Call(window, "BuildStatusTooltip")!).StartsWith(footer.Text, StringComparison.Ordinal), "The tooltip carries the whole of a trimmed status.");
+        footer.MaxWidth = 2000;
+        Require(!((string)Call(window, "BuildStatusTooltip")!).StartsWith(footer.Text, StringComparison.Ordinal), "A status that fits is not repeated in the tooltip.");
+        footer.MaxWidth = shownWidth;
+        footer.Text = shownStatus;
+
+        // The final status is written while the progress bar is still up, and is heard when it goes.
+        var scanPane = (FrameworkElement)Field(window, "_scanWorkspace")!;
+        var selectedField = window.GetType().GetField("_selectedWorkspace", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        object? shownPane = selectedField.GetValue(window);
+        selectedField.SetValue(window, scanPane);
+        var bar = (FrameworkElement)Field(scanPane, "ScanProgress")!;
+        var paneStatus = (TextBlock)Field(scanPane, "StatusText")!;
+        var heard = window.GetType().GetField("_announcedStatus", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var shownBar = bar.Visibility;
+        string shownPaneStatus = paneStatus.Text;
+        bar.Visibility = Visibility.Visible;
+        paneStatus.Text = "Final status of a run";
+        Call(window, "UpdateWorkspaceStatus");
+        Require((string?)heard.GetValue(window) != "Final status of a run" && footer.Text == "Final status of a run", "Nothing is announced while a run shows progress.");
+        bar.Visibility = Visibility.Collapsed;
+        Call(window, "UpdateWorkspaceStatus");
+        Require((string?)heard.GetValue(window) == "Final status of a run", "The status is announced once the progress bar goes.");
+        bar.Visibility = shownBar;
+        paneStatus.Text = shownPaneStatus;
+        selectedField.SetValue(window, shownPane);
+        viewField.SetValue(window, shownView);
+
         Require(title.FontSize == sidebarTitle.FontSize && Equals(title.FontFamily, sidebarTitle.FontFamily),
             "The history table header is the same size and face as the Scan History heading.");
         string Identity() => string.Concat(title.Inlines.OfType<Run>().Select(run => run.Text));
@@ -192,7 +250,7 @@ internal static partial class HistoryUiTests
         var menu = grid.ContextMenu;
         menu.RaiseEvent(new RoutedEventArgs(ContextMenu.OpenedEvent));
         Require(menu.Items.OfType<MenuItem>().Where(item => item.Tag is string action && new[] { "ip", "mac", "host", "details" }.Contains(action)).All(item => item.IsEnabled), "Saved row copy actions are available.");
-        Require(menu.Items.OfType<MenuItem>().Where(item => item.Tag as string != "ha").All(item => !string.IsNullOrWhiteSpace(item.InputGestureText)), "Existing history actions retain their shortcuts; the HA guide is available through its menu/button.");
+        Require(menu.Items.OfType<MenuItem>().Where(item => item.Tag as string != "ha").All(item => !string.IsNullOrWhiteSpace(item.InputGestureText)), "Every history menu action shows its shortcut.");
         Require(menu.Items.OfType<MenuItem>().All(item => !new[] { "Ping", "Ssh", "Rdp", "Rescan", "Trust" }.Contains(item.Tag as string)), "Historical menus contain no live commands.");
         Save(RenderWindow(1200, 780), Path.Combine(output, "History-Black-sidebar-closed.png"));
         SaveMenu(menu, app, Path.Combine(output, "History-menu.png"));
@@ -283,7 +341,7 @@ internal static partial class HistoryUiTests
         Call(window, "OpenSidebar"); Call(window, "ApplySidebarState", false);
         var dense = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
         for (int i = 0; i < 30; i++) dense.Add(Entry(time.AddHours(i)));
-        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { dense });
+        SeedHistory(dense);
         Call(window, "RefreshHistoryList"); Call(window, "ShowHistoryEntry");
         Save(RenderWindow(1200, 780), Path.Combine(output, "History-compact-sidebar.png"));
         var heading = (TextBlock)window.FindName("SidebarHeading");
@@ -311,7 +369,8 @@ internal static partial class HistoryUiTests
         var texts = new List<TextBlock>();
         void Collect(DependencyObject parent)
         {
-            if (parent is TextBlock text) texts.Add(text);
+            // The Location label is collapsed unless History lists every Location.
+            if (parent is TextBlock text && text.Visibility == Visibility.Visible) texts.Add(text);
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++) Collect(VisualTreeHelper.GetChild(parent, i));
         }
         var secondRow = (ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(1);
@@ -328,7 +387,7 @@ internal static partial class HistoryUiTests
         // so the theme's "pack://application:,,,/" font would otherwise fall back to Segoe UI.
         var widest = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
         widest.Add(Entry(new DateTimeOffset(2026, 12, 28, 22, 58, 0, TimeSpan.Zero)));
-        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { widest });
+        SeedHistory(widest);
         Call(window, "RefreshHistoryList");
         var widthSaved = window.GetType().GetField("_sidebarWidthSaved", BindingFlags.Instance | BindingFlags.NonPublic)!;
         var baseWidth = window.GetType().GetField("_sidebarBaseWidth", BindingFlags.Instance | BindingFlags.NonPublic)!;
@@ -385,146 +444,11 @@ internal static partial class HistoryUiTests
         widthSaved.SetValue(window, false);
         baseWidth.SetValue(window, defaultWidth);
         Call(window, "ApplySidebarState", false);
-        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { entries });
+        SeedHistory(entries);
         Call(window, "RefreshHistoryList"); Call(window, "ShowHistoryEntry");
         Console.WriteLine("RENDERED: " + output);
     }
 
-    private static void CheckProfiles(MainWindow window, Assembly assembly, Action<string> theme, Action<string> locale)
-    {
-        var store = assembly.GetType("KillerScan.Services.ScanProfiles", true)!;
-        var profileType = assembly.GetType("KillerScan.Services.ScanProfile", true)!;
-        var profiles = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(profileType))!;
-        object Profile(string name, string target, bool deep)
-        {
-            var profile = Activator.CreateInstance(profileType)!;
-            profileType.GetProperty("Name")!.SetValue(profile, name);
-            profileType.GetProperty("Target")!.SetValue(profile, target);
-            profileType.GetProperty("DeepScanAfter")!.SetValue(profile, deep);
-            profiles.Add(profile); return profile;
-        }
-        var home = Profile("Home", "192.0.2.0/24", false);
-        var work = Profile("Work", "198.51.100.0/25", true);
-        store.GetField("_items", Static)!.SetValue(null, profiles);
-        var scan = (ScanWorkspace)Field(window, "_scanWorkspace")!;
-        Require((bool)Field(scan, "DemoMode")!, "Profile tests cannot launch real network scans.");
-        var root = (FrameworkElement)window.Content;
-        root.Opacity = 1; ((UIElement)window.FindName("RootGrid")).Opacity = 1;
-        var list = (ListBox)window.FindName("ProfilesList");
-        var historyList = (ListBox)window.FindName("HistoryList");
-        var heading = (TextBlock)window.FindName("SidebarHeading");
-        var icon = (TextBlock)window.FindName("SidebarSectionIcon");
-        var group = (Panel)window.FindName("HistorySidebarHeader");
-        var button = (Button)window.FindName("ProfilesButton");
-        string output = Path.Combine(Path.GetTempPath(), "KillerScan-profiles-ui-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(output);
-        BitmapSource Draw(int width = 1200)
-        {
-            Render(root, width, 780); Call(window, "FitToolbarViews");
-            return Render(root, width, 780);
-        }
-        var historyType = assembly.GetType("KillerScan.Services.ScanHistory", true)!;
-        var entryType = assembly.GetType("KillerScan.Services.ScanHistoryEntry", true)!;
-        var reference = Activator.CreateInstance(entryType)!;
-        entryType.GetProperty("ScannedAt")!.SetValue(reference, new DateTimeOffset(2026, 10, 8, 12, 0, 0, TimeSpan.Zero));
-        entryType.GetProperty("Target")!.SetValue(reference, "192.0.2.0/24");
-        var seeded = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
-        seeded.Add(reference);
-        historyType.GetMethod("SeedDemo", Static)!.Invoke(null, new object[] { seeded });
-        Call(window, "RefreshHistoryList");
-        double HistoryRowHeight()
-        {
-            Call(window, "SetSidebarSection", "history", false); Draw();
-            double height = ((ListBoxItem)historyList.ItemContainerGenerator.ContainerFromIndex(0)).ActualHeight;
-            Call(window, "SetSidebarSection", "profiles", false); Draw();
-            return height;
-        }
-        Call(window, "SetSidebarSection", "profiles", false);
-        Call(window, "OpenSidebar"); Call(window, "ApplySidebarState", false); Draw();
-        ListBoxItem Row(object item) => (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(item);
-        void Click(object item)
-        {
-            var text = VisualChildren<TextBlock>(Row(item)).First();
-            text.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Left)
-                { RoutedEvent = Mouse.PreviewMouseUpEvent });
-            Draw();
-        }
-        var results = (DataGrid)scan.FindName("ResultsGrid");
-        int count = results.Items.Count;
-        Call(window, "ShowHistoryEntry"); Draw();
-        Click(home);
-        Require(scan.Targets == "192.0.2.0/24" && ReferenceEquals(list.SelectedItem, home) &&
-            (string)Field(window, "_workspaceView")! == "scan", "A real routed entry click loads its target and reveals Devices from History.");
-        Require(!scan.IsScanning && results.Items.Count == count && !(bool)Field(scan, "_runDeepAfterScan")!,
-            "A click keeps existing results and does not start or arm scanning.");
-        scan.Targets = "203.0.113.0/24";
-        Click(home);
-        Require(scan.Targets == "192.0.2.0/24", "Clicking the already-selected row reloads a changed target.");
-        Click(work);
-        Require(scan.Targets == "198.51.100.0/25" && ReferenceEquals(list.SelectedItem, work) &&
-            (bool)profileType.GetProperty("DeepScanAfter")!.GetValue(work)! && !(bool)Field(scan, "_runDeepAfterScan")!,
-            "A different row loads its target while preserving its saved deep-run option for explicit Run.");
-        scan.Targets = "203.0.113.0/24";
-        var row = Row(home);
-        row.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Right)
-            { RoutedEvent = Mouse.PreviewMouseDownEvent });
-        Require(scan.Targets == "203.0.113.0/24" && ReferenceEquals(list.SelectedItem, home), "Right-click selects its own menu target without loading or scanning.");
-        Require((bool)Call(window, "ExecuteProfileShortcut", Key.L, ModifierKeys.Control, list.SelectedItem)! && scan.Targets == "192.0.2.0/24" && !scan.IsScanning,
-            "The keyboard Load target dispatch applies the selected profile without scanning.");
-        var selected = list.SelectedItem;
-        Call(window, "ToggleSidebar"); Call(window, "ApplySidebarState", false);
-        Call(window, "OpenSidebar"); Call(window, "ApplySidebarState", false); Draw();
-        Require(ReferenceEquals(selected, list.SelectedItem) && scan.Targets == "192.0.2.0/24", "Closing and reopening preserves selection and target without activation.");
-        Call(window, "ShowScanView", "services"); Draw(); Click(home);
-        Require((string)Field(window, "_workspaceView")! == "scan" && scan.View == "devices", "Loading from Services restores normal Devices navigation.");
-        foreach (string name in Enum.GetNames(assembly.GetType("KillerScan.Services.Theme", true)!))
-        {
-            theme(name); Call(window, "ApplyFlatChrome"); Draw();
-            Require(heading.FontSize == 20 && heading.FontFamily.Equals((FontFamily)Application.Current.FindResource("HeadingFont")) &&
-                group.HorizontalAlignment == HorizontalAlignment.Center && icon.Text == "\uE728" &&
-                Equals(button.Content, icon.Text) && icon.FontFamily.Source == "Segoe MDL2 Assets" && icon.FontSize == 16,
-                name + ": Profiles uses the centered History heading format and the same saved-list glyph as its rail.");
-            Require(ReferenceEquals(list.ItemContainerStyle, historyList.ItemContainerStyle) && list.Margin == historyList.Margin,
-                name + ": profile rows use the actual History container style and insets.");
-            double historyRow = HistoryRowHeight();
-            var texts = VisualChildren<TextBlock>(Row(work)).ToArray();
-            Require(texts[0].Text == "Work" && texts[0].FontSize == 13 && texts[0].FontWeight == FontWeights.SemiBold &&
-                Equals(texts[0].Foreground, Application.Current.FindResource("PrimaryBrush")) && texts[1].FontSize == 11 && texts[1].Margin == new Thickness() &&
-                Equals(texts[1].Foreground, Application.Current.FindResource("MutedTextBrush")),
-                name + ": the unselected name and target match History primary and secondary formatting.");
-            Require(historyRow > 0 && Math.Abs(Row(work).ActualHeight - historyRow) < 0.5,
-                name + ": a profile row is exactly as tall as a History row (" + Row(work).ActualHeight + " and " + historyRow + ").");
-            var selectedTexts = VisualChildren<TextBlock>(Row(home)).ToArray();
-            Require(Equals(selectedTexts[0].Foreground, Application.Current.FindResource("SelectionFg")) &&
-                Equals(selectedTexts[1].Foreground, Application.Current.FindResource("SelectionFg")) && selectedTexts[1].Opacity == 0.78,
-                name + ": selection provides the existing readable row feedback.");
-            Save(Draw(), Path.Combine(output, "Profiles-" + name + ".png"));
-        }
-        theme("Black"); Call(window, "ApplyFlatChrome");
-        foreach (string name in Enum.GetNames(assembly.GetType("KillerScan.Services.Locale", true)!))
-        {
-            locale(name); Draw();
-            Require(heading.Text == (string)Application.Current.FindResource("Str_Profiles_Title") && icon.Text == "\uE728" &&
-                Row(home).ActualHeight > 0, name + ": the shared heading and profile rows remain localized.");
-        }
-        locale("EnUS"); Require(heading.Text == "Scan Profiles", "English profile heading uses the approved capitalization.");
-        foreach (double scale in new[] { 1.0, 1.5, 2.5 })
-        {
-            Call(window, "ApplyAppScale", scale, false);
-            Save(Draw(640), Path.Combine(output, "Profiles-narrow-scale-" + scale + ".png"));
-            Require(list.ActualWidth > 0 && heading.ActualHeight > 0 && Row(home).ActualHeight > 0, "Profiles remains usable at narrow width and zoom " + scale);
-        }
-        Call(window, "ApplyAppScale", 1.0, false);
-        list.SelectedItem = work;
-        Require(scan.Targets == "192.0.2.0/24", "Keyboard selection alone does not change the target or run a scan.");
-        Require((bool)Call(window, "ExecuteProfileShortcut", Key.Enter, ModifierKeys.None, list.SelectedItem)! &&
-            (bool)Field(scan, "_runDeepAfterScan")!, "Enter retains the explicit Run action and its saved deep-scan setting in demo mode.");
-        Require(profiles.Count == 2 && profileType.GetProperty("Name")!.GetValue(home)!.Equals("Home") &&
-            profileType.GetProperty("Target")!.GetValue(work)!.Equals("198.51.100.0/25"), "Loading and navigation preserve saved profile data.");
-        Call(window, "SetSidebarSection", "history", false); Draw();
-        Require(icon.Text == "\uE81C" && heading.Text == (string)Application.Current.FindResource("Str_History_Title"), "Returning to History restores its approved heading and clock glyph.");
-        Console.WriteLine("RENDERED: " + output);
-    }
 
     private static IEnumerable<T> VisualChildren<T>(DependencyObject parent) where T : DependencyObject
     {
@@ -588,9 +512,17 @@ internal static partial class HistoryUiTests
                 Require(ReferenceEquals(heading.Template, headerTemplate) && Equals(heading.Background, headerBackground) &&
                     Equals(heading.Foreground, headerForeground) && heading.Padding == standardHeader.Padding,
                     context + ": actual rendered column headers use the standard Devices style.");
-                Require(frame.CornerRadius == radius && surface.Clip.FillContains(new Point(0, 0)) == clipAtCorner &&
-                    ReferenceEquals(surface, frame.Child) && ReferenceEquals(history.Parent, Field(window, "_workspaceBody")),
-                    context + ": history uses the same rounded table frame and clipping as Devices.");
+                // The tab-side corners follow the active tab (ApplyPaneCorners squares the end tab's
+                // corner), so only the corners away from the tabs must match Devices.
+                var now = frame.CornerRadius;
+                bool sameRadius = (bool)Field(window, "_tabsAtBottom")!
+                        ? now.TopLeft == radius.TopLeft && now.TopRight == radius.TopRight
+                        : now.BottomLeft == radius.BottomLeft && now.BottomRight == radius.BottomRight,
+                    sameClip = surface.Clip.FillContains(new Point(0, 0)) == clipAtCorner,
+                    framed = ReferenceEquals(surface, frame.Child), hosted = ReferenceEquals(history.Parent, Field(window, "_workspaceBody"));
+                Require(sameRadius && sameClip && framed && hosted,
+                    context + ": history uses the same rounded table frame and clipping as Devices (radius " + sameRadius +
+                    ", clip " + sameClip + ", frame child " + framed + ", host " + hosted + ": " + history.Parent?.GetType().Name + ").");
                 Require(supplemental.Visibility == Visibility.Visible && Bounds(summary).Bottom <= Bounds(frame).Top &&
                     Bounds(toggle).Bottom <= Bounds(frame).Top && Bounds(identity).Bottom <= Bounds(summary).Top &&
                     Bounds(summary).Right <= Bounds(toggle).Left && !frame.IsAncestorOf(summary) && !frame.IsAncestorOf(toggle),
@@ -659,8 +591,9 @@ internal static partial class HistoryUiTests
                 context + ": content stays within the compact card without overlapping buttons.");
             foreach (var selection in new[] { timeOption, countOption, (RadioButton)dialog.FindName("AllMode") })
             {
+                // The label is the template's ContentPresenter; it must carry no bitmap effect.
                 Require(ReferenceEquals(selection.Style, dialog.FindResource("ThemeRadio")) &&
-                    selection.Template.FindName("label", selection) is ContentPresenter label && label.Effect == null,
+                    Descendants(selection).OfType<ContentPresenter>().FirstOrDefault() is ContentPresenter label && label.Effect == null,
                     context + ": selection uses the existing family template without a label bitmap effect.");
             }
             Require(dialog.UseLayoutRounding && dialog.SnapsToDevicePixels &&
@@ -668,7 +601,7 @@ internal static partial class HistoryUiTests
                 TextOptions.GetTextRenderingMode(dialog) == TextRenderingMode.ClearType &&
                 ((UIElement)dialog.FindName("DialogCard")).Effect == null,
                 context + ": sharp family text configuration is local to the dialog and the shadow is a sibling.");
-            if (Equals(dialog.FindResource("InputDialogWordmarkVisibility"), Visibility.Visible))
+            if (Equals(dialog.FindResource("DialogWordmarkVisibility"), Visibility.Visible))
                 Require(Bounds(caption).Bottom <= Bounds(rows).Top && Bounds(caption).Right <= Bounds((Button)dialog.FindName("CaptionCloseButton")).Left,
                     context + ": the localized inline caption clears the close control and body.");
         }
@@ -715,6 +648,16 @@ internal static partial class HistoryUiTests
         calls = _settingsApplyCalls;
         Call(input, "Cancel_Click", input, new RoutedEventArgs());
         Require(_settingsApplyCalls == calls, "Cancel invokes no settings or history mutation.");
+        // A refused value is announced and the field that needs fixing gets focus, so pressing
+        // Enter on OK is not met with silence by a screen reader.
+        count.IsChecked = true;
+        countBox.Text = "0";
+        save.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        var validation = (TextBlock)input.FindName("ValidationText");
+        Require(_settingsApplyCalls == calls && validation.Visibility == Visibility.Visible
+                && System.Windows.Automation.AutomationProperties.GetLiveSetting(validation) == System.Windows.Automation.AutomationLiveSetting.Assertive
+                && ReferenceEquals(FocusManager.GetFocusedElement(input), countBox),
+            "An invalid retention value is announced and focuses its field.");
         var entryType = assembly.GetType("KillerScan.Services.ScanHistoryEntry", true)!;
         var fixture = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(entryType))!;
         var now = new DateTimeOffset(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
@@ -788,7 +731,9 @@ internal static partial class HistoryUiTests
             Require(app.FindResource(key) is string text && text.Length > 0, "Shortcut description resolves: " + key);
         }
         Call(window, "BuildShortcutRows"); Call(window, "BuildKeyboardMap");
-        Require(rows.Length >= 70, "The list and map include the added contextual shortcuts.");
+        // A floor against an accidentally truncated catalog. The Profiles and toolbar-style rows left
+        // with those features on 2026-10-26, so it sits below the count from before then.
+        Require(rows.Length >= 60, "The list and map include the added contextual shortcuts: " + rows.Length + ".");
     }
 
     private static void CheckHistorySettingsMenu(MainWindow window, Application app, string output)
@@ -796,31 +741,30 @@ internal static partial class HistoryUiTests
         var icon = (Button)window.FindName("HistoryButton");
         var menu = icon.ContextMenu;
         Call(window, "HistorySettingsMenu_Opening", icon, null);
-        Require(ReferenceEquals(menu.PlacementTarget, icon) && menu.CustomPopupPlacementCallback != null && menu.HorizontalOffset == 0 && menu.VerticalOffset == 0,
+        // FlyoutPlacement.Attach (KillerUI) targets the unscaled root and places the menu from the
+        // button through its callback, so the anchor is the button whatever opened the menu.
+        Require(menu.Placement == System.Windows.Controls.Primitives.PlacementMode.Custom && menu.PlacementTarget != null
+                && menu.CustomPopupPlacementCallback != null && menu.HorizontalOffset == 0 && menu.VerticalOffset == 0,
             "Mouse and native keyboard menu opening use the history button anchor, never the pointer.");
-        // Every rail flyout opens beside the button that opened it, never at a fixed point.
+        // Rail flyouts are placed by the kit's FlyoutPlacement: against the window's unscaled root
+        // (so app size cannot shift them), beside the rail, at their button's height but never
+        // below the pane's corner.
+        var root = (FrameworkElement)window.FindName("RootGrid");
         var themeButton = (Button)window.FindName("ThemeButton");
         Call(window, "ThemeButton_Click", themeButton, new RoutedEventArgs());
         var themeMenu = (ContextMenu)typeof(MainWindow).GetField("_themeContextMenu", Instance)!.GetValue(window)!;
-        Require(ReferenceEquals(themeMenu.PlacementTarget, themeButton), "The theme flyout is anchored to the theme button.");
+        Require(ReferenceEquals(themeMenu.PlacementTarget, root) && themeMenu.Placement == System.Windows.Controls.Primitives.PlacementMode.Custom
+            && themeMenu.CustomPopupPlacementCallback != null, "The theme flyout uses the family placement against the unscaled root.");
         themeMenu.IsOpen = false;
         var langButton = (Button)window.FindName("LangButton");
         Call(window, "LangButton_Click", langButton, new RoutedEventArgs());
-        Require(ReferenceEquals(langButton.ContextMenu.PlacementTarget, langButton), "The language flyout is anchored to the language button.");
+        Require(ReferenceEquals(langButton.ContextMenu.PlacementTarget, root) && langButton.ContextMenu.CustomPopupPlacementCallback != null,
+            "The language flyout uses the family placement against the unscaled root.");
         langButton.ContextMenu.IsOpen = false;
-        var placement = typeof(MainWindow).Assembly.GetType("KillerScan.Shell.FlyoutPlacement", true)!.GetMethod("PlaceBesideButton", Static)!;
-        foreach (double dpi in new[] { 1.0, 1.5, 2.0 })
-        foreach (double zoom in new[] { 1.0, 1.5, 2.5 })
-        {
-            double scale = dpi * zoom;
-            var candidates = (System.Windows.Controls.Primitives.CustomPopupPlacement[])placement.Invoke(null,
-                new object[] { new Size(320 * scale, 80 * scale), new Size(24 * scale, 24 * scale), new Thickness(22, 18, 22, 26), scale, scale, dpi })!;
-            Require(candidates.Length == 2 && candidates.All(candidate => Math.Abs(candidate.Point.X + 22 * scale - 24 * scale - 8 * dpi) < 0.01),
-                "Visible menu card stays eight logical pixels right of the rail button at DPI=" + dpi + " zoom=" + zoom);
-            Require(Math.Abs(candidates[0].Point.Y + 18 * scale) < 0.01 && Math.Abs(candidates[1].Point.Y + 80 * scale - 26 * scale - 24 * scale) < 0.01,
-                "Top and bottom candidates let WPF fit screen edges without covering the rail.");
-        }
-        var item = menu.Items.OfType<MenuItem>().Single();
+        Require(menu.Items.OfType<MenuItem>().Count() == 2 &&
+            menu.Items.OfType<MenuItem>().Last() is { IsCheckable: true } all && Equals(all.Header, app.FindResource("Str_History_AllLocations")),
+            "The history icon also offers the all-Locations switch.");
+        var item = menu.Items.OfType<MenuItem>().First();
         Require(Equals(item.Header, app.FindResource("Str_History_Settings")) && item.InputGestureText == "Ctrl+Alt+R",
             "The history icon offers localized settings with its visible shortcut.");
         Require(item.Icon is TextBlock clock && clock.Text == (string)icon.Content,
@@ -858,7 +802,7 @@ internal static partial class HistoryUiTests
     {
         var workspace = new ScanWorkspace("192.0.2.0/24", true);
         var host = new KillerScan.Engine.NetworkDevice { IpAddress = "192.0.2.40", Hostname = "service-fixture", DeviceType = "Server", OpenPorts = new List<int> { 22, 53, 3389, 8443 } };
-        Call(workspace, "LoadSnapshot", "192.0.2.0/24", new[] { host });
+        workspace.LoadSnapshot("192.0.2.0/24", new[] { host });
         Call(workspace, "RefreshServices");
         var grid = (DataGrid)workspace.FindName("ServicesGrid");
         var rows = grid.Items.Cast<object>().ToArray();

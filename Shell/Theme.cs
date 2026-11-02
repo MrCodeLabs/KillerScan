@@ -68,7 +68,7 @@ namespace KillerScan.Shell
         ///     wordmark and subtitle collapse and PlainTitle takes over. This is not cosmetic
         ///     preference: the wordmark's two runs are TextBrush and PrimaryBrush, which on 98SE
         ///     are black and navy - both invisible on the navy caption.
-        ///   - A Win98 caption is 22px, not 32. The row height and WindowChrome.CaptionHeight have
+        ///   - A Win98 caption is 18px, not 32. The row height and WindowChrome.CaptionHeight have
         ///     to move together or the draggable strip stops matching the bar you can see.
         /// </summary>
         private void ApplyFlatChrome()
@@ -90,26 +90,68 @@ namespace KillerScan.Shell
             var wordmark = flat ? Visibility.Collapsed : Visibility.Visible;
             var plain    = flat ? Visibility.Visible   : Visibility.Collapsed;
             if (FindName("LogoBar")      is UIElement lb) lb.Visibility = wordmark;
-            if (FindName("SubtitleText") is UIElement st) st.Visibility = wordmark;
             if (FindName("PlainTitle")   is UIElement pt) pt.Visibility = plain;
 
-            // The icon shrinks with the bar; 27px does not fit a 22px caption.
+            // The classic caption carries the original 16-pixel small icon.
             if (FindName("TitleIcon") is FrameworkElement icon)
             {
                 icon.Width = icon.Height = flat ? 16 : 27;
                 icon.Margin = new Thickness(0, 0, flat ? 5 : 7, 0);
             }
 
-            double h = flat ? 22 : 32;
+            double h = flat ? 18 : 32;
             if (FindName("RootGrid") is System.Windows.Controls.Grid root && root.RowDefinitions.Count > 0)
                 root.RowDefinitions[0].Height = new GridLength(h);
             var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(this);
             chrome?.CaptionHeight = h;
+            PlaceClassicToolbar(flat);
+            UpdateCaptionGlyphs();
         }
 
-        private void AccentSwatch_Click(object sender, RoutedEventArgs e)
+        private Panel? _toolbarCaptionParent, _filterCaptionParent;
+
+        private void PlaceClassicToolbar(bool classic)
         {
-            if (sender is Button b && b.Tag is string name && Enum.TryParse<Accent>(name, out var accent))
+            if (classic) ScaleHost.SetResourceReference(Panel.BackgroundProperty, "BackgroundBrush");
+            else ScaleHost.ClearValue(Panel.BackgroundProperty);
+            _toolbarCaptionParent ??= TitleToolbarHost.Parent as Panel;
+            _filterCaptionParent ??= TitleTools.Parent as Panel;
+            Move(TitleToolbarHost, _toolbarCaptionParent, first: false);
+            Move(TitleTools, _filterCaptionParent, first: true);
+
+            void Move(FrameworkElement control, Panel? captionParent, bool first)
+            {
+                Panel? destination = classic ? ScaleHost : captionParent;
+                if (destination == null || ReferenceEquals(control.Parent, destination)) return;
+                (control.Parent as Panel)?.Children.Remove(control);
+                if (!classic && first) destination.Children.Insert(0, control);
+                else destination.Children.Add(control);
+                Grid.SetRow(control, 0);
+                Grid.SetColumn(control, 0);
+                Grid.SetColumnSpan(control, 2);
+                control.HorizontalAlignment = classic && first ? HorizontalAlignment.Right : HorizontalAlignment.Stretch;
+            }
+        }
+
+        private void UpdateCaptionGlyphs()
+        {
+            if (MaximizeGlyph == null) return;
+            bool classic = ThemeManager.Current == Theme.SE98;
+            bool restored = WindowState == WindowState.Maximized;
+            MaximizeGlyph.Text = ((char)(restored ? 0xE923 : 0xE922)).ToString();
+            foreach (var glyph in new UIElement[] { MinimizeGlyph, MaximizeGlyph, CloseGlyph })
+                glyph.Visibility = classic ? Visibility.Collapsed : Visibility.Visible;
+            ClassicMinimizeGlyph.Visibility = ClassicCloseGlyph.Visibility = classic ? Visibility.Visible : Visibility.Collapsed;
+            ClassicMaximizeGlyph.Visibility = classic && !restored ? Visibility.Visible : Visibility.Collapsed;
+            ClassicRestoreGlyph.Visibility = classic && restored ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // KillerShell's accent pills: AccentDot borders (AccentSwatchCornerRadius) stretched down
+        // the strip. They were ThemeSwatch buttons, whose template is an Ellipse, so stretching
+        // them drew tall ovals instead of the family's pills.
+        private void AccentStripDot_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is Border b && b.Tag is string name && Enum.TryParse<Accent>(name, out var accent))
             {
                 ThemeManager.ApplyAccent(ThemeManager.Current, accent);
                 UpdateThemeSwatchSelection();   // ring colors follow the accent
@@ -150,7 +192,9 @@ namespace KillerScan.Shell
             {
                 if (content.Parent is Panel parent) parent.Children.Remove(content);
                 oldPopup.IsOpen = false;
-                content.Margin = new Thickness(12, 10, 3, 10);
+                // Hover rows sit 4px in from both menu edges: 12 left less the row's -8, and
+                // 2 right plus the row's own 2.
+                content.Margin = new Thickness(12, 10, 2, 10);
 
                 var itemStyle = new Style(typeof(MenuItem));
                 var itemTemplate = new ControlTemplate(typeof(MenuItem));
@@ -166,7 +210,7 @@ namespace KillerScan.Shell
             }
 
             if (_themeContextMenu == null) return;
-            FlyoutPlacement.Attach(_themeContextMenu, ThemeButton);
+            FlyoutPlacement.Attach(_themeContextMenu, null);   // large: always the corner
             _themeContextMenu.IsOpen = true;
 
             // Sync on OPEN: the theme can have changed since the menu was last visited.
@@ -200,7 +244,7 @@ namespace KillerScan.Shell
         private bool _stripOpen;
         private const double AccentStripWidth = 39;
         private const double AccentStripSlideMs = 180;
-        private Button[] StripDots =>
+        private Border[] StripDots =>
             [AccentStripDot0, AccentStripDot1, AccentStripDot2, AccentStripDot3, AccentStripDot4, AccentStripDot5, AccentStripDot6, AccentStripDot7];
 
         // Each pill shows its accent the way a selection does: the palette's own SelectionBg
@@ -345,7 +389,7 @@ namespace KillerScan.Shell
             if (sender is Button b && b.ContextMenu != null)
             {
                 BuildLanguageMenu(b.ContextMenu);
-                FlyoutPlacement.Attach(b.ContextMenu, b);
+                FlyoutPlacement.Attach(b.ContextMenu, null);   // large: always the corner
                 b.ContextMenu.IsOpen = true;
                 Anim.FadeIn(b.ContextMenu);
             }
@@ -363,7 +407,7 @@ namespace KillerScan.Shell
             (Services.Locale.Fr,   "Français",   "fr-FR"),
             (Services.Locale.HuHU, "Magyar",      "hu-HU"),
             (Services.Locale.ItIT, "Italiano",    "it-IT"),
-            (Services.Locale.Ja,   "日本語",      "ja-JP"),
+            (Services.Locale.JaJP, "日本語",      "ja-JP"),
             (Services.Locale.KkKZ, "Қазақша",    "kk-KZ"),
             (Services.Locale.NbNO, "Norsk bokmål",      "nb-NO"),
             (Services.Locale.PlPL, "Polski",      "pl-PL"),

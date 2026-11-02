@@ -1,18 +1,12 @@
-<UserControl x:Class="KillerScan.Controls.ScanWorkspace" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:a11y="clr-namespace:KillerFamily.Accessibility" xmlns:cm="clr-namespace:System.ComponentModel;assembly=System" xmlns:controls="clr-namespace:KillerScan.Controls" Background="{DynamicResource BackgroundBrush}" UseLayoutRounding="True">
+<UserControl x:Class="KillerScan.Controls.ScanWorkspace" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ha="clr-namespace:KillerScan.Controls" xmlns:a11y="clr-namespace:KillerFamily.Accessibility" xmlns:cm="clr-namespace:System.ComponentModel;assembly=System" Background="{DynamicResource BackgroundBrush}" UseLayoutRounding="True">
 <Grid>
 <Grid.Resources>
-    <controls:HomeAssistantChoiceConverter x:Key="HaChoice"/>
-    <DataTemplate x:Key="HaChoiceCell">
-        <Button Click="HomeAssistantRow_Click" AutomationProperties.Name="{Binding HomeAssistant, Converter={StaticResource HaChoice}}"
-                ToolTip="{Binding HomeAssistant, Converter={StaticResource HaChoice}}" Style="{StaticResource OutlineButton}" Padding="5,2" Margin="1">
-            <TextBlock Text="{Binding HomeAssistant, Converter={StaticResource HaChoice}}" MaxWidth="185" TextTrimming="CharacterEllipsis"/>
-        </Button>
-    </DataTemplate>
+    <ha:HomeAssistantChoiceConverter x:Key="HomeAssistantChoiceConverter"/>
     <!-- The type cell, shared by the Devices grid and the Services grid so one list of
          colors serves both. The triggers match the raw English type, which is why
          ServiceRow carries the raw value and localizes separately for its CSV. -->
     <DataTemplate x:Key="DeviceTypeCell">
-        <StackPanel Orientation="Horizontal">
+
             <TextBlock Text="{Binding DeviceType, Converter={StaticResource DeviceTypeLoc}}" FontWeight="Medium">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -83,16 +77,18 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
-            <TextBlock Text="{Binding Identification, Converter={StaticResource IdentificationConfidence}}" FontSize="10" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
         </DataTemplate>
     <!-- Template cells have no text of their own for UI Automation, which otherwise reads them
          out as the row's type name and a column number. -->
     <Style x:Key="IpCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
         <Setter Property="AutomationProperties.Name" Value="{Binding IpAddress}"/>
     </Style>
+    <!-- The tooltip text is built when it opens, so it always shows the device's current evidence. -->
     <Style x:Key="DeviceTypeCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DarkDataGridCell}">
         <Setter Property="AutomationProperties.Name" Value="{Binding DeviceTypeDisplay}"/>
+        <Setter Property="ToolTip" Value=" "/>
+        <Setter Property="ToolTipService.ShowDuration" Value="60000"/>
+        <EventSetter Event="ToolTipOpening" Handler="TypeCell_ToolTipOpening"/>
     </Style>
     <!-- A blank cell would read out as the row's type name, so an empty host name, MAC address
          or vendor is read as unknown. -->
@@ -115,23 +111,44 @@
         </Style.Triggers>
     </Style>
 </Grid.Resources>
-<Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+<Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 <Grid x:Name="ScanToolbar">
 <StackPanel Orientation="Horizontal" Margin="0,2">
+<!-- The Location picker: the site this scan belongs to, and a click lists the Locations, this
+     Location's saved scans and the Location actions (ScanWorkspace/Location.cs). -->
+<Button x:Name="LocationButton" ToolTip="{DynamicResource Str_Loc_Title}" Style="{StaticResource OutlineButton}"
+        Click="LocationButton_Click" ContextMenuOpening="LocationButton_ContextMenuOpening"
+        FontSize="12" Padding="8,3" Margin="0,2,6,2">
+    <StackPanel Orientation="Horizontal">
+        <a11y:Glyph x:Name="LocationGlyph" Text="&#xE707;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
+        <TextBlock x:Name="LocationLabel" MaxWidth="140" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+    </StackPanel>
+</Button>
 <TextBox x:Name="SubnetInput" AutomationProperties.Name="{DynamicResource Str_Lbl_Subnet}" Style="{StaticResource DarkTextBox}" Padding="5,3,9,3" FontSize="12" Width="220" MaxWidth="220" VerticalAlignment="Center" Margin="0,2,8,2"/>
-<Button x:Name="ScanBtn" Content="{DynamicResource Str_Btn_Scan}" Style="{StaticResource OutlineButton}" Click="ScanBtn_Click" FontSize="12" Padding="10,3" Margin="0,2,6,2">
+<!-- The app's main action, so its largest button: the family's filled accent PrimaryButton with
+     the label in the wordmark's Lacquer, like KillerNotes' + New. -->
+<Button x:Name="ScanBtn" Content="{DynamicResource Str_Btn_Scan}" Style="{StaticResource PrimaryButton}" Click="ScanBtn_Click"
+        FontFamily="{DynamicResource WordmarkAccentFont}" FontSize="19" FontWeight="Normal"
+        Height="26" Padding="10,0" Margin="0,0,8,0" VerticalContentAlignment="Center">
+<Button.ContentTemplate>
+    <DataTemplate>
+        <TextBlock Text="{Binding}"><TextBlock.RenderTransform><TranslateTransform Y="-1"/></TextBlock.RenderTransform></TextBlock>
+    </DataTemplate>
+</Button.ContentTemplate>
 <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_Btn_Scan}"/><Run Text=" (F5)"/></TextBlock></Button.ToolTip>
 </Button>
-<Button x:Name="DeepScanAllButton" Content="{DynamicResource Str_Btn_DeepScanAll}" Style="{StaticResource OutlineButton}" Click="DeepScanAll_Click" Visibility="Collapsed" FontSize="12" Padding="8,3" Margin="0,2,10,2"/>
-<Button x:Name="ScanOptionsButton" Content="&#xE713;" FontFamily="Segoe MDL2 Assets"
-        AutomationProperties.Name="{DynamicResource Str_Options_Title}" ToolTip="{DynamicResource Str_Options_Title}"
-        Style="{StaticResource OutlineButton}" Padding="6,3" Margin="0,2,6,2"/>
-<Button x:Name="InterfaceSelectionButton" Content="&#xE774;" FontFamily="Segoe MDL2 Assets"
-        AutomationProperties.Name="{DynamicResource Str_Interface_Title}" ToolTip="{DynamicResource Str_Interface_Title}"
-        Style="{StaticResource OutlineButton}" Padding="6,3" Margin="0,2,6,2"/>
+
+<Button x:Name="ScanOptionsButton" AutomationProperties.Name="{DynamicResource Str_Options_Title}"
+        ToolTip="{DynamicResource Str_Options_Title}" Style="{StaticResource BareButton}"
+        FontSize="12" Padding="8,3" Margin="0,2,6,2">
+    <StackPanel Orientation="Horizontal">
+        <a11y:Glyph Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center"/>
+    </StackPanel>
+</Button>
 <Button x:Name="HomeAssistantButton" Content="HA" Click="HomeAssistantAll_Click"
-        AutomationProperties.Name="{DynamicResource Str_HA_AllTitle}" ToolTip="{DynamicResource Str_HA_AllTitle}"
-        Style="{StaticResource OutlineButton}" FontSize="12" Padding="6,3" Margin="0,2,6,2"/>
+        Style="{StaticResource OutlineButton}" ToolTip="{DynamicResource Str_HA_AllTitle}"
+        AutomationProperties.Name="{DynamicResource Str_HA_AllTitle}" Padding="8,3" Margin="0,2,6,2"/>
+<Button x:Name="DeepScanAllButton" Content="{DynamicResource Str_Btn_DeepScanAll}" Style="{StaticResource BareButton}" Click="DeepScanAll_Click" Visibility="Collapsed" FontSize="12" Padding="8,3" Margin="0,2,10,2"/>
 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,8,2">
 <TextBlock Text="{DynamicResource Str_Lbl_Local}" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" Margin="0,0,5,0"/>
 <TextBlock x:Name="LocalIpLabel" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="11"/>
@@ -154,7 +171,7 @@
 <TextBlock x:Name="FooterNetLabel" Visibility="Collapsed"/>
 <TextBlock x:Name="FooterNetAdapter" Visibility="Collapsed"/>
 <TextBlock x:Name="FooterNetSpeed" Visibility="Collapsed"/>
-<Button x:Name="FilterToggleButton" Style="{StaticResource OutlineButton}" FontFamily="Segoe MDL2 Assets" Content="&#xE71C;" Width="26" Height="26" Padding="0" Margin="0,2,6,2" Click="FilterToggle_Click">
+<Button x:Name="FilterToggleButton" Style="{StaticResource BareButton}" FontFamily="Segoe MDL2 Assets" Content="&#xE71C;" Width="26" Height="26" Padding="0" Margin="0,2,6,2" Click="FilterToggle_Click">
 <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_FilterPlaceholder}"/><Run Text=" (Ctrl+Shift+F)"/></TextBlock></Button.ToolTip>
 </Button>
                     <Border x:Name="FilterBox" Margin="0,2,6,2" Width="150" MaxWidth="150" Visibility="Collapsed" Height="26" VerticalAlignment="Center" HorizontalAlignment="Stretch"
@@ -206,34 +223,6 @@
                             </Grid>
                         </Grid>
                     </Border>
-                    <Button x:Name="TopologyOrderButton" Visibility="Collapsed" Style="{StaticResource OutlineButton}"
-                            FontFamily="Segoe MDL2 Assets" Content="&#xE713;" Width="26" Height="26" Padding="0"
-                            Margin="0,2,6,2" Click="TopologyOrderButton_Click">
-                        <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_Topology_Settings}"/><Run Text=" (Shift+F10)"/></TextBlock></Button.ToolTip>
-                        <Button.ContextMenu>
-                            <ContextMenu PreviewMouseWheel="Menu_ForwardWheelToGrid">
-                                <MenuItem Header="{DynamicResource Str_TT_TopologyOrder}">
-                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
-                                    <MenuItem x:Name="TopologyRoleItem" Header="{DynamicResource Str_Topology_Role}"
-                                              Tag="Role" InputGestureText="Ctrl+1" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE902;"/></MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem x:Name="TopologyTypeItem" Header="{DynamicResource Str_Col_Type}"
-                                              Tag="Type" InputGestureText="Ctrl+2" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem x:Name="TopologyIpItem" Header="{DynamicResource Str_Col_Ip}"
-                                              Tag="Ip" InputGestureText="Ctrl+3" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE774;"/></MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem x:Name="TopologyVendorItem" Header="{DynamicResource Str_Col_Vendor}"
-                                              Tag="Vendor" InputGestureText="Ctrl+4" IsCheckable="True" Click="TopologyOrderItem_Click">
-                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
-                                    </MenuItem>
-                                </MenuItem>
-                            </ContextMenu>
-                        </Button.ContextMenu>
-                    </Button>
                     <TextBlock x:Name="DeviceCount"
                                Text="" TextTrimming="CharacterEllipsis" MaxWidth="180"
                                Foreground="{DynamicResource MutedTextBrush}"
@@ -348,8 +337,28 @@
 
 </StackPanel>
 </Grid>
+<!-- Offers the Location this network belongs to. A popup floating over the foot of the table,
+     not a row of its own: as a row it pushed the whole table down while it showed. -->
+<Border x:Name="LocationSuggestion" Grid.Row="2" Visibility="Collapsed" Margin="16,0,16,16" Padding="10,6"
+        VerticalAlignment="Bottom" HorizontalAlignment="Center" MaxWidth="720" Panel.ZIndex="50"
+        Effect="{DynamicResource BarShadowEffect}"
+        Background="{DynamicResource ScanContentPaneBrush}" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1"
+        CornerRadius="{DynamicResource ControlCornerRadius}">
+    <!-- Docked right, Dismiss is declared first so it sits at the far right; the tab order still
+         reaches Switch, the main choice, first. -->
+    <DockPanel KeyboardNavigation.TabNavigation="Local">
+        <Button x:Name="LocationSuggestionDismiss" DockPanel.Dock="Right" Content="{DynamicResource Str_Loc_Dismiss}"
+                Style="{StaticResource OutlineButton}" FontSize="12" Padding="10,3" Margin="6,0,0,0" Click="LocationSuggestionDismiss_Click" KeyboardNavigation.TabIndex="1"/>
+        <Button x:Name="LocationSuggestionSwitch" DockPanel.Dock="Right" Content="{DynamicResource Str_Loc_Switch}"
+                Style="{StaticResource OutlineButton}" FontSize="12" Padding="10,3" Margin="16,0,0,0" Click="LocationSuggestionSwitch_Click" KeyboardNavigation.TabIndex="0"/>
+        <a11y:Glyph DockPanel.Dock="Left" Text="&#xE707;" FontFamily="Segoe MDL2 Assets" FontSize="13" Margin="0,0,8,0"
+                    Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+        <TextBlock x:Name="LocationSuggestionText" Foreground="{DynamicResource TextBrush}" FontSize="12" AutomationProperties.LiveSetting="Polite"
+                   TextWrapping="Wrap" VerticalAlignment="Center"/>
+    </DockPanel>
+</Border>
 <Border x:Name="DevicesPane"
-                Grid.Row="1" Background="{DynamicResource ScanContentPaneBrush}" BorderBrush="{DynamicResource PaneBorderBrush}"
+                Grid.Row="2" Background="{DynamicResource ScanContentPaneBrush}" BorderBrush="{DynamicResource PaneBorderBrush}"
                 BorderThickness="0" CornerRadius="{DynamicResource PanelCornerRadius}" Margin="0" Panel.ZIndex="10"
                 >
             <Grid>
@@ -375,6 +384,7 @@
                 </Border>
 
                 <DataGrid Grid.Row="0" x:Name="ResultsGrid" AutomationProperties.Name="{DynamicResource Str_View_Devices}"
+                          AutomationProperties.HelpText="{DynamicResource Str_Table_KeyboardHelp}"
                           Margin="0"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
@@ -415,11 +425,7 @@
 
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="{DynamicResource Str_Access_Title}" Click="Access_Click"/>
                             <MenuItem Header="{DynamicResource Str_HA_Title}" Click="HomeAssistant_Click"/>
-                            <MenuItem Header="{DynamicResource Str_Evidence_Title}" InputGestureText="Ctrl+I" Click="Evidence_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
-                            </MenuItem>
                             <MenuItem x:Name="RescanMenuItem" Header="{DynamicResource Str_Ctx_RescanOne}" InputGestureText="Ctrl+R" Click="RescanSelected_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE72C;"/></MenuItem.Icon>
                             </MenuItem>
@@ -457,6 +463,13 @@
 
                             <MenuItem Header="{DynamicResource Str_Ctx_SshAs}" InputGestureText="Ctrl+Shift+S" Click="SshAsDevice_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE756;"/></MenuItem.Icon>
+                            </MenuItem>
+                            <!-- Filled when it opens, from what the scan recorded. Opening it sends nothing. -->
+                            <MenuItem x:Name="AccessMenuItem" Header="{DynamicResource Str_Access_Menu}" SubmenuOpened="AccessMenu_Opened">
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE71B;"/></MenuItem.Icon>
+                                <MenuItem Header="{DynamicResource Str_Access_None}" IsEnabled="False">
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
+                                </MenuItem>
                             </MenuItem>
                             <Separator Style="{x:Null}" Background="#3a3a3a" Height="1" Margin="8,4"/>
                             <MenuItem Header="{DynamicResource Str_Rename_Title}" InputGestureText="F2" Click="RenameDevice_Click">
@@ -540,6 +553,9 @@
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_ClearOverride}" InputGestureText="Ctrl+Alt+T" Click="ClearOverride_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE894;"/></MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem x:Name="WhyTypeMenuItem" Header="{DynamicResource Str_Rec_Menu}" InputGestureText="Ctrl+I" Click="WhyType_Click">
+                                <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
                             </MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
@@ -640,8 +656,16 @@
                                         </Grid.ColumnDefinitions>
                                         <Ellipse Width="4" Height="4" HorizontalAlignment="Left" VerticalAlignment="Center"
                                                    Margin="0,0,6,0"
-                                                   Fill="{Binding Converter={StaticResource TrustMark}}"
-                                                   ToolTip="{DynamicResource Str_TT_TrustMark}"/>
+                                                   ToolTip="{DynamicResource Str_TT_TrustMark}">
+                                            <!-- The row's selection rides along so an unapproved device can switch
+                                                 to a stronger orange on a cream selected row (TrustMarkConverter). -->
+                                            <Ellipse.Fill>
+                                                <MultiBinding Converter="{StaticResource TrustMark}">
+                                                    <Binding/>
+                                                    <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType=DataGridRow}"/>
+                                                </MultiBinding>
+                                            </Ellipse.Fill>
+                                        </Ellipse>
                                         <TextBlock Grid.Column="1" Text="{Binding IpAddress}" VerticalAlignment="Center"/>
                                     </Grid>
                                 </DataTemplate>
@@ -672,7 +696,6 @@
                         </DataGridTextColumn>
                         <DataGridTemplateColumn x:Name="ColType" Header="{DynamicResource Str_Col_Type}" Width="Auto" MinWidth="95" SortMemberPath="DeviceTypeDisplay"
                                                 CellTemplate="{StaticResource DeviceTypeCell}" CellStyle="{StaticResource DeviceTypeCellStyle}"/>
-                        <DataGridTemplateColumn x:Name="ColHa" Header="Home Assistant" Width="205" MinWidth="110" CellTemplate="{StaticResource HaChoiceCell}"/>
                         <DataGridTextColumn x:Name="ColPorts" Header="{DynamicResource Str_Col_Ports}" Binding="{Binding OpenPortsDisplay}" Width="*" MinWidth="130">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
@@ -694,10 +717,18 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
+                        <DataGridTemplateColumn x:Name="ColHa" Header="{DynamicResource Str_HA_BestChoice}" Width="180" MinWidth="110">
+                            <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                                <Button Content="{Binding Converter={StaticResource HomeAssistantChoiceConverter}}"
+                                    Style="{StaticResource OutlineButton}" Click="HomeAssistantRow_Click" Padding="5,2"/>
+                            </DataTemplate></DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <DataGrid Grid.Row="0" x:Name="ServicesGrid" Visibility="Collapsed"
+                          AutomationProperties.Name="{DynamicResource Str_Services_Title}"
+                          AutomationProperties.HelpText="{DynamicResource Str_Table_KeyboardHelp}"
                           ContextMenuOpening="ServicesGrid_ContextMenuOpening"
                           PreviewMouseRightButtonDown="ServicesGrid_RightClick"
                           AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent"
@@ -711,11 +742,6 @@
                           CellStyle="{StaticResource DarkDataGridCell}">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="{DynamicResource Str_Access_Title}" Tag="Access" Click="ServiceMenu_Click"/>
-                            <MenuItem Header="{DynamicResource Str_HA_Title}" Tag="HomeAssistant" Click="ServiceMenu_Click"/>
-                            <MenuItem Header="{DynamicResource Str_Evidence_Title}" InputGestureText="Ctrl+I" Tag="Evidence" Click="ServiceMenu_Click">
-                                <MenuItem.Icon><TextBlock Style="{StaticResource MenuIcon}" Text="&#xE946;"/></MenuItem.Icon>
-                            </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Services_CopyEndpoint}" InputGestureText="Ctrl+Shift+C" Tag="CopyEndpoint" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
@@ -725,7 +751,8 @@
                             <MenuItem Header="{DynamicResource Str_Services_CopyPort}" InputGestureText="Ctrl+Alt+P" Tag="CopyPort" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="{DynamicResource Str_Ctx_CopyIp}" Tag="CopyIp" InputGestureText="Ctrl+C" Click="ServiceMenu_Click">
+                            <MenuItem Header="{DynamicResource Str_HA_Title}" Tag="HomeAssistant" Click="ServiceMenu_Click"/>
+<MenuItem Header="{DynamicResource Str_Ctx_CopyIp}" Tag="CopyIp" InputGestureText="Ctrl+C" Click="ServiceMenu_Click">
                                 <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8C8;"/></MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="{DynamicResource Str_Ctx_CopyHost}" Tag="CopyHost" InputGestureText="Ctrl+Alt+C" Click="ServiceMenu_Click">
@@ -759,7 +786,6 @@
                         <DataGridTextColumn Header="{DynamicResource Str_Col_DeviceName}" Binding="{Binding DeviceName}" Width="*"/>
                         <DataGridTextColumn Header="{DynamicResource Str_Col_Ip}" Binding="{Binding IpAddress}" Width="130"/>
                         <DataGridTemplateColumn Header="{DynamicResource Str_Col_Type}" Width="150" SortMemberPath="DeviceTypeDisplay" CellTemplate="{StaticResource DeviceTypeCell}" CellStyle="{StaticResource DeviceTypeCellStyle}"/>
-                        <DataGridTemplateColumn Header="Home Assistant" Width="205" CellTemplate="{StaticResource HaChoiceCell}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -773,6 +799,37 @@
                                     MouseRightButtonDown="TopologyBackground_RightClick"/>
                         </Grid>
                     </ScrollViewer>
+                    <!-- The topology's own settings, in the pane's bottom-right corner rather than in
+                         the title bar beside Scan settings, where two gears read as one. -->
+                    <Button x:Name="TopologyOrderButton" Visibility="Collapsed" Style="{StaticResource BareButton}"
+                            FontFamily="Segoe MDL2 Assets" Content="&#xE713;" Width="26" Height="26" Padding="0"
+                            Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Panel.ZIndex="5" Click="TopologyOrderButton_Click">
+                        <Button.ToolTip><TextBlock><Run Text="{DynamicResource Str_Topology_Settings}"/><Run Text=" (Shift+F10)"/></TextBlock></Button.ToolTip>
+                        <Button.ContextMenu>
+                            <ContextMenu PreviewMouseWheel="Menu_ForwardWheelToGrid">
+                                <MenuItem Header="{DynamicResource Str_TT_TopologyOrder}">
+                                    <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8CB;"/></MenuItem.Icon>
+                                    <MenuItem x:Name="TopologyRoleItem" Header="{DynamicResource Str_Topology_Role}"
+                                              Tag="Role" InputGestureText="Ctrl+1" IsCheckable="True" Click="TopologyOrderItem_Click">
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE902;"/></MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem x:Name="TopologyTypeItem" Header="{DynamicResource Str_Col_Type}"
+                                              Tag="Type" InputGestureText="Ctrl+2" IsCheckable="True" Click="TopologyOrderItem_Click">
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem x:Name="TopologyIpItem" Header="{DynamicResource Str_Col_Ip}"
+                                              Tag="Ip" InputGestureText="Ctrl+3" IsCheckable="True" Click="TopologyOrderItem_Click">
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE774;"/></MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem x:Name="TopologyVendorItem" Header="{DynamicResource Str_Col_Vendor}"
+                                              Tag="Vendor" InputGestureText="Ctrl+4" IsCheckable="True" Click="TopologyOrderItem_Click">
+                                        <MenuItem.Icon><a11y:Glyph Style="{StaticResource MenuIcon}" Text="&#xE8EC;"/></MenuItem.Icon>
+                                    </MenuItem>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
                 </Grid>
             </Grid>
         </Border>

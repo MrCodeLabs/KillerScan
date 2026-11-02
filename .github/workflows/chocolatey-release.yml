@@ -9,26 +9,55 @@ on:
         description: 'Release tag (e.g. v1.0.0)'
         required: true
 
+# Nothing here writes to the repository; the token is read-only and not left in the checkout.
+permissions:
+  contents: read
+
 jobs:
   push:
+    # A prerelease is not published to Chocolatey. The manual retry path still runs.
+    if: >-
+      github.repository == 'SteveTheKiller/KillerScan' &&
+      (github.event_name == 'workflow_dispatch' || !github.event.release.prerelease)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      # The released tag's nuspec and install script, also for a manual retry of an older tag.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+          persist-credentials: false
 
       - name: Build and push Chocolatey package
         shell: pwsh
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+          # Event values reach the script as data, never as script text.
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          $releaseTag = if ("${{ github.event_name }}" -eq "workflow_dispatch") { "${{ github.event.inputs.tag }}" } else { "${{ github.event.release.tag_name }}" }
+          $releaseTag = if ($env:EVENT_NAME -eq 'workflow_dispatch') { $env:INPUT_TAG } else { $env:RELEASE_TAG }
+          if ($releaseTag -notmatch '^v\d+\.\d+\.\d+$') { throw "Release tag '$releaseTag' is not vMAJOR.MINOR.PATCH." }
           $version = $releaseTag.TrimStart('v')
-          $exeUrl  = "https://github.com/SteveTheKiller/KillerScan/releases/download/$releaseTag/KillerScan.exe"
+          $base    = "https://github.com/SteveTheKiller/KillerScan/releases/download/$releaseTag"
+          $exeUrl  = "$base/KillerScan.exe"
 
           # Download release EXE and compute hash
           Write-Host "Downloading $exeUrl..."
           Invoke-WebRequest -Uri $exeUrl -OutFile "$env:RUNNER_TEMP\KillerScan.exe"
           $hash = (Get-FileHash "$env:RUNNER_TEMP\KillerScan.exe" -Algorithm SHA256).Hash
           Write-Host "SHA256: $hash"
+
+          # The package pins whatever was downloaded, so check it is the release release.ps1 built:
+          # the published checksum and a valid signature from the release certificate.
+          $sums = (Invoke-WebRequest -Uri "$base/SHA256SUMS.txt" -UseBasicParsing).Content
+          if ($sums -is [byte[]]) { $sums = [Text.Encoding]::UTF8.GetString($sums) }
+          $listed = [regex]::Match($sums, '(?m)^KillerScan\.exe\s+([0-9A-Fa-f]{64})\s*$').Groups[1].Value
+          if ($listed -ne $hash) { throw "KillerScan.exe does not match SHA256SUMS.txt (listed '$listed', downloaded $hash)." }
+          $signature = Get-AuthenticodeSignature "$env:RUNNER_TEMP\KillerScan.exe"
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.GetNameInfo([Security.Cryptography.X509Certificates.X509NameType]::SimpleName, $false) -ne 'Open Source Developer Stephen Riley') {
+              throw "KillerScan.exe is not validly signed by the release certificate ($($signature.Status), $($signature.SignerCertificate.Subject))."
+          }
 
           # Stamp version and hash into package files
           $nuspec  = "choco\killerscan.nuspec"
@@ -99,6 +128,7 @@ jobs:
           $feed = "https://community.chocolatey.org/api/v2/Packages(Id='killerscan',Version='$env:CHOCO_VERSION')"
           $repushed = $false
           $pendingSinceRepush = $false
+          $lastKnownState = ''
           $deadline = (Get-Date).AddMinutes(160)
           while ((Get-Date) -lt $deadline) {
               Start-Sleep -Seconds 300
@@ -109,6 +139,7 @@ jobs:
                   continue
               }
               $state = [regex]::Match($entry, '<d:PackageValidationResultStatus>(\w+)</d:PackageValidationResultStatus>').Groups[1].Value
+              if ($state) { $lastKnownState = $state }
               Write-Host "$(Get-Date -Format HH:mm:ss) validation: $(if ($state) { $state } else { 'not shown' })"
               if ($state -like 'Pass*') { exit 0 }
               if ($repushed -and $state -and $state -notlike 'Fail*') { $pendingSinceRepush = $true }
@@ -121,6 +152,9 @@ jobs:
               } elseif ($pendingSinceRepush) {
                   throw "Chocolatey validation failed twice. See $page"
               }
+          }
+          if ($lastKnownState -like 'Fail*') {
+              throw "Chocolatey validation remained failed after re-push. See $page"
           }
           # Chocolatey's queue often takes longer than this. The package is already pushed, so a
           # validation that is still pending is a warning, not a failed release.

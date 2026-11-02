@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -21,10 +22,55 @@ namespace KillerScan.Controls
         /// <param name="initial">Pre-filled value, selected so typing replaces it.</param>
         /// <param name="confirmText">Confirm button caption.</param>
         /// <param name="cancelText">Cancel button caption.</param>
+        private (string Key, string Glyph, string NameKey)[] _icons = [];
+
+        /// <summary>The icon picked, when <see cref="UseIcons"/> showed the icon button.</summary>
+        public string SelectedIcon { get; private set; } = string.Empty;
+
+        /// <summary>Shows the icon button after the field, starting on <paramref name="selected"/>.</summary>
+        public void UseIcons((string Key, string Glyph, string NameKey)[] icons, string selected)
+        {
+            _icons = icons;
+            IconButton.Visibility = Visibility.Visible;
+            SetIcon(Array.Exists(icons, icon => icon.Key == selected) ? selected : icons[0].Key);
+        }
+
+        private void SetIcon(string key)
+        {
+            SelectedIcon = key;
+            var icon = Array.Find(_icons, item => item.Key == key);
+            IconButton.Content = icon.Glyph;
+            string name = TryFindResource(icon.NameKey) as string ?? key;
+            IconButton.ToolTip = name;
+            System.Windows.Automation.AutomationProperties.SetName(IconButton, name);
+        }
+
+        private void IconButton_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = new System.Windows.Controls.ContextMenu
+            {
+                PlacementTarget = IconButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom
+            };
+            foreach (var icon in _icons)
+            {
+                var captured = icon.Key;
+                var item = new System.Windows.Controls.MenuItem
+                {
+                    IsCheckable = true, IsChecked = icon.Key == SelectedIcon,
+                    Icon = MenuGlyph.Create(char.ConvertToUtf32(icon.Glyph, 0))
+                };
+                item.SetResourceReference(System.Windows.Controls.HeaderedItemsControl.HeaderProperty, icon.NameKey);
+                item.Click += (_, _) => SetIcon(captured);
+                menu.Items.Add(item);
+            }
+            menu.IsOpen = true;
+        }
+
         public InputDialog(string heading, string detail, string fieldLabel,
                            string initial, string confirmText, string cancelText)
         {
             InitializeComponent();
+            if (!DialogChrome.SetTitleIcon(TitleIcon)) TitleIcon.Visibility = Visibility.Collapsed;
 
             HeadingText.Text = heading;
             DetailText.Text = detail;
@@ -48,8 +94,56 @@ namespace KillerScan.Controls
         // this the dialog would need a mouse for its only field.
         private void ValueBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)       { OK_Click(this, new RoutedEventArgs()); e.Handled = true; }
+            if (e.Key == Key.Enter && !ValueBox.AcceptsReturn) { OK_Click(this, new RoutedEventArgs()); e.Handled = true; }
             else if (e.Key == Key.Escape) { Cancel_Click(this, new RoutedEventArgs()); e.Handled = true; }
+        }
+
+        /// <summary>A taller box that keeps line breaks, for free text such as Location notes.</summary>
+        /// <summary>Shows a read-only labelled line under the fields.</summary>
+        public void UseInfo(string label, string text)
+        {
+            InfoLabel.Text = label;
+            InfoText.Text = text;
+            InfoLabel.Visibility = InfoText.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>The notes box's text, when <see cref="UseNotes"/> showed it.</summary>
+        public string Notes => NotesBox.Text;
+
+        /// <summary>Shows the notes box under the field. Enter in it is a new line; Ctrl+Enter saves.</summary>
+        public void UseNotes(string label, string notes)
+        {
+            Width = 380;   // room for notes; a lone name field stays at 300
+            NotesLabel.Text = label;
+            NotesLabel.Visibility = Visibility.Visible;
+            NotesBox.Text = notes ?? string.Empty;
+            NotesBox.Visibility = Visibility.Visible;
+            NotesBox.PreviewKeyDown += (_, e) =>
+            {
+                if (e.Key != Key.Enter || Keyboard.Modifiers != ModifierKeys.Control) return;
+                OK_Click(this, new RoutedEventArgs());
+                e.Handled = true;
+            };
+        }
+
+        internal void UseMultipleLines()
+        {
+            ValueBox.AcceptsReturn = true;
+            ValueBox.TextWrapping = TextWrapping.Wrap;
+            ValueBox.MinHeight = 140;
+            ValueBox.MaxHeight = 320;
+            ValueBox.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Auto;
+            ValueBox.VerticalContentAlignment = VerticalAlignment.Top;
+            Width = 440;
+            // Enter is a new line here, so Ctrl+Enter confirms. The box would take Enter first.
+            ValueBox.PreviewKeyDown += (_, e) =>
+            {
+                if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
+                {
+                    OK_Click(this, new RoutedEventArgs());
+                    e.Handled = true;
+                }
+            };
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)

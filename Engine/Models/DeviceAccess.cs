@@ -1,58 +1,118 @@
+using System.Globalization;
 using System.Net;
+using System.Text.Json.Serialization;
 
-namespace KillerScan.Engine;
-
-/// <summary>One observed or suggested endpoint. Authentication applies only to the requested resource.</summary>
-public sealed record AccessEndpoint
+namespace KillerScan.Engine
 {
-    public string Protocol { get; init; } = "tcp";
-    public int Port { get; init; }
-    public string Verification { get; init; } = "PortHint";
-    public string Authentication { get; init; } = "Unknown";
-    public int? HttpStatus { get; init; }
-    public string? Challenge { get; init; }
-    public bool Redirect { get; init; }
-    public DateTimeOffset? ObservedAtUtc { get; init; }
-}
-
-public static class DeviceAccess
-{
-    public static string? SuggestedWebProtocol(int port) => port switch
+    /// <summary>What a scan actually saw at an endpoint. None of these means a login would work.</summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum AccessEvidence
     {
-        443 or 5001 or 8006 or 8443 => "https",
-        80 or 5000 or 5357 or 8080 or 8123 or 32400 => "http",
-        _ => null
-    };
+        /// <summary>The port accepted a connection. The protocol is a guess from the port number.</summary>
+        PortOpen,
+        /// <summary>A web server answered at the endpoint's root address.</summary>
+        HttpResponse,
+        /// <summary>An SSH server sent its banner. No login was attempted.</summary>
+        SshBanner,
+    }
 
-    /// <summary>No I/O. Old records have suggestions, never retroactively verified observations.</summary>
-    public static IReadOnlyList<AccessEndpoint> ForDevice(NetworkDevice device)
+    /// <summary>What the endpoint said about signing in, for the root address only.</summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum AccessLogin
     {
-        if (!IPAddress.TryParse(device.IpAddress, out _)) return [];
-        var result = (device.Access ?? []).Where(item => Address(device.IpAddress, item) != null)
-            .GroupBy(item => (item.Protocol, item.Port)).Select(group => group.Last()).ToList();
-        foreach (int port in device.OpenPorts.Distinct().OrderBy(port => port))
+        /// <summary>Nothing either way. A 200 page or an open port does not mean no login is needed.</summary>
+        Unknown,
+        /// <summary>The server answered 401 and asked for credentials.</summary>
+        Requested,
+        /// <summary>The page has a form with a password field.</summary>
+        LoginForm,
+    }
+
+    /// <summary>One way into a device: a protocol and port, and the evidence for it.</summary>
+    public sealed record AccessEndpoint
+    {
+        /// <summary>http, https, ssh, rdp or tcp.</summary>
+        public string Protocol { get; set; } = "tcp";
+        public int Port { get; set; }
+        public AccessEvidence Evidence { get; set; }
+        public int? HttpStatus { get; set; }
+        public AccessLogin Login { get; set; }
+        /// <summary>The scheme a 401 asked for, such as Basic or NTLM. Realms and other values are not kept.</summary>
+        public string AuthScheme { get; set; } = string.Empty;
+        /// <summary>When the response was seen, in UTC. Null for endpoints known only from an open port.</summary>
+        public DateTimeOffset? ObservedAt { get; set; }
+        public string Verification
         {
-            if (port is < 1 or > 65535 || result.Any(item => item.Port == port)) continue;
-            string protocol = SuggestedWebProtocol(port) ?? (port == 22 ? "ssh" : port == 3389 ? "rdp" : "tcp");
-            bool ssh = port == 22 && device.SshBanner.StartsWith("SSH-", StringComparison.Ordinal);
-            result.Add(new AccessEndpoint { Protocol = protocol, Port = port,
-                Verification = ssh ? "SshBanner" : device.ObservationCompletedAtUtc != null ? "TcpOpen" : "PortHint",
-                ObservedAtUtc = device.ObservationCompletedAtUtc });
+            get => Evidence == AccessEvidence.HttpResponse ? "HttpResponse" : Evidence == AccessEvidence.SshBanner ? "SshBanner" : "PortHint";
+            set { Evidence = value == "HttpResponse" ? AccessEvidence.HttpResponse : value == "SshBanner" ? AccessEvidence.SshBanner : AccessEvidence.PortOpen; }
         }
-        return result.OrderBy(item => item.Port).ThenBy(item => item.Protocol, StringComparer.Ordinal).ToArray();
+        public string Authentication
+        {
+            get => Login == AccessLogin.Requested ? "Challenge" : Login == AccessLogin.LoginForm ? "LoginForm" : "Unknown";
+            set { Login = value is "Challenge" or "Required" ? AccessLogin.Requested : value == "LoginForm" ? AccessLogin.LoginForm : AccessLogin.Unknown; }
+        }
+        public string? Challenge { get => AuthScheme; set => AuthScheme = value ?? string.Empty; }
+        public bool Redirect { get; set; }
+        public DateTimeOffset? ObservedAtUtc { get => ObservedAt; set => ObservedAt = value; }
+
     }
 
-    public static string? Address(string ip, AccessEndpoint endpoint)
+    /// <summary>
+    /// Builds a device's access list from what a scan recorded. Reading it sends nothing: the
+    /// list is the recorded web responses plus every other open port, labeled by what is known.
+    /// </summary>
+    public static class DeviceAccess
     {
-        if (!IPAddress.TryParse(ip, out var address) || endpoint.Port is < 1 or > 65535 ||
-            endpoint.Protocol is not ("http" or "https" or "ssh" or "rdp" or "tcp")) return null;
-        string host = address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6
-            ? "[" + address + "]" : address.ToString();
-        return endpoint.Protocol + "://" + host + ":" + endpoint.Port.ToString(System.Globalization.CultureInfo.InvariantCulture)
-            + (endpoint.Protocol is "http" or "https" ? "/" : "");
-    }
+        /// <summary>The web protocol usually served on a port, or null when there is none.</summary>
+        public static string? SuggestedWebProtocol(int port) => port switch
+        {
+            443 or 5001 or 8006 or 8443 => "https",
+            80 or 5000 or 5357 or 8080 or 8123 or 32400 => "http",
+            _ => null,
+        };
 
-    public static AccessEndpoint? Web(NetworkDevice device, int? port = null) => ForDevice(device)
-        .Where(item => item.Protocol is "http" or "https" && (!port.HasValue || item.Port == port.Value))
-        .OrderByDescending(item => item.Verification == "HttpResponse").ThenByDescending(item => item.Protocol == "https").FirstOrDefault();
+        private static readonly string[] Protocols = ["http", "https", "ssh", "rdp", "tcp"];
+
+        /// <summary>Every endpoint for the device, ordered by port. Empty when its address is not numeric.</summary>
+        public static IReadOnlyList<AccessEndpoint> ForDevice(NetworkDevice device)
+        {
+            if (!IPAddress.TryParse(device.IpAddress, out _)) return [];
+            var list = (device.Access ?? [])
+                .Where(e => e.Port is >= 1 and <= 65535 && Protocols.Contains(e.Protocol))
+                .GroupBy(e => (e.Protocol, e.Port)).Select(g => g.Last()).ToList();
+            foreach (int port in device.OpenPorts.Distinct())
+            {
+                if (port is < 1 or > 65535 || list.Any(e => e.Port == port)) continue;
+                string protocol = SuggestedWebProtocol(port) ?? (port == 22 ? "ssh" : port == 3389 ? "rdp" : "tcp");
+                bool banner = port == 22 && device.SshBanner.StartsWith("SSH-", StringComparison.Ordinal);
+                list.Add(new AccessEndpoint { Protocol = protocol, Port = port, Evidence = banner ? AccessEvidence.SshBanner : AccessEvidence.PortOpen });
+            }
+            return [.. list.OrderBy(e => e.Port).ThenBy(e => e.Protocol, StringComparer.Ordinal)];
+        }
+
+        /// <summary>
+        /// The address to open or copy, such as https://192.0.2.10:8443/. Built only from the
+        /// device's numeric address and the endpoint, never from anything the device sent.
+        /// </summary>
+        public static string? Address(string ip, AccessEndpoint endpoint)
+        {
+            if (!IPAddress.TryParse(ip, out var address) || endpoint.Port is < 1 or > 65535 || !Protocols.Contains(endpoint.Protocol))
+                return null;
+            string host = address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6 ? "[" + address + "]" : address.ToString();
+            string port = endpoint.Port.ToString(CultureInfo.InvariantCulture);
+            return endpoint.Protocol is "http" or "https" ? endpoint.Protocol + "://" + host + ":" + port + "/" : host + ":" + port;
+        }
+
+        /// <summary>
+        /// The web endpoint to open by default: one that answered, HTTPS first, then a web port
+        /// guessed from its number. Null when the device has no web port at all.
+        /// </summary>
+        public static AccessEndpoint? Web(NetworkDevice device, int? port = null) => BestWeb(device, port);
+        public static AccessEndpoint? BestWeb(NetworkDevice device, int? port = null) => ForDevice(device)
+            .Where(e => e.Protocol is "http" or "https" && (port == null || e.Port == port))
+            .OrderByDescending(e => e.Evidence == AccessEvidence.HttpResponse)
+            .ThenByDescending(e => e.Protocol == "https")
+            .ThenBy(e => e.Port)
+            .FirstOrDefault();
+    }
 }

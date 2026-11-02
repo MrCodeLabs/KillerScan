@@ -51,8 +51,11 @@ namespace KillerScan.Controls
         /// that reached topology without an odd number of trips through that handler left the
         /// button hidden while the graph was on screen.
         /// </summary>
-        private void UpdateViewChrome() =>
+        private void UpdateViewChrome()
+        {
             TopologyOrderButton.Visibility = _showTopology ? Visibility.Visible : Visibility.Collapsed;
+            UpdateExportButtonAvailability();
+        }
 
         private void LoadTopologyOrder()
         {
@@ -69,8 +72,9 @@ namespace KillerScan.Controls
             if (TopologyOrderButton.ContextMenu == null) return;
             UpdateTopologyOrderUi();
             TopologyOrderButton.ContextMenu.PlacementTarget = TopologyOrderButton;
+            TopologyOrderButton.ContextMenu.ClearValue(ContextMenu.PlacementRectangleProperty);
             TopologyOrderButton.ContextMenu.Placement =
-                System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                System.Windows.Controls.Primitives.PlacementMode.Top;
             TopologyOrderButton.ContextMenu.IsOpen = true;
         }
 
@@ -99,14 +103,43 @@ namespace KillerScan.Controls
             UpdateTopologySettingsUi();
         }
 
+        // A drag-resize or the sidebar slide fires this per frame. The rebuild goes through the
+        // same coalescing timer as streamed results, so it runs at most once per interval and
+        // always once more after the last change.
         private void TopologyPane_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_showTopology) RefreshTopology();
+            if (_showTopology) ScheduleViewRefresh();
         }
+
+        /// <summary>How many times the diagram has been rebuilt, for the streaming budget check.</summary>
+        internal int TopologyRefreshes { get; private set; }
 
         private void RefreshTopology()
         {
             if (TopologyCanvas == null || TopologyPane == null || !_showTopology) return;
+            TopologyRefreshes++;
+            // Rebuilding replaces every node, so a focused node's device gets focus back after.
+            bool hadFocus = TopologyCanvas.IsKeyboardFocusWithin;
+            // Lay out with the slot the last build measured. Cards size to their text, so the slot
+            // is the largest device card (never the network card in the middle, whose whole target
+            // text has a place of its own). Only when that changed is the diagram built again, so a
+            // streaming scan with the same names builds once per refresh.
+            BuildTopology();
+            var cards = TopologyCanvas.Children.OfType<TopologyNode>().Where(card => card.Tag is NetworkDevice).ToList();
+            var largest = new Size(cards.Count == 0 ? 0 : cards.Max(card => card.Width),
+                cards.Count == 0 ? 0 : cards.Max(card => card.Height));
+            var slot = largest.Width > DefaultTopologyNodeWidth + 0.5 || largest.Height > DefaultTopologyNodeHeight + 0.5
+                ? largest : default;
+            if (Math.Abs(slot.Width - _topologyCardSize.Width) > 0.5 || Math.Abs(slot.Height - _topologyCardSize.Height) > 0.5)
+            {
+                _topologyCardSize = slot;
+                BuildTopology();
+            }
+            RestoreTopologyFocus(hadFocus);
+        }
+
+        private void BuildTopology()
+        {
 
             double scale = TopologyScale;
             double viewportWidth = Math.Max(1, TopologyPane.ActualWidth - SystemParameters.VerticalScrollBarWidth);
@@ -322,7 +355,7 @@ namespace KillerScan.Controls
         private void AddNetworkNode(double x, double y)
         {
             string subnet = string.IsNullOrWhiteSpace(ActiveSubnet) ? SubnetInput.Text : ActiveSubnet;
-            AddNode(x, y, Services.Locations.Current.Name, subnet, "PrimaryBrush", null);
+            AddNode(x, y, Loc("Str_Topology_Network"), subnet, "PrimaryBrush", null);
         }
 
         private void AddRoleNode(double x, double y, string role, string value, string brushKey,
@@ -349,7 +382,9 @@ namespace KillerScan.Controls
 
         private Border AddNode(double x, double y, string title, string detail, string brushKey, NetworkDevice? device)
         {
-            var accent = new Border { Height = 2 };
+            // Kept for the SVG export (Snapshot.cs), which draws the type colour from it; on screen
+            // the card's own ring carries that colour now (TopologyNode).
+            var accent = new Border { Height = 2, Visibility = Visibility.Collapsed };
             accent.SetResourceReference(Border.BackgroundProperty, brushKey);
 
             var titleBlock = new TextBlock
@@ -358,8 +393,8 @@ namespace KillerScan.Controls
                 FontSize = TopologyFontSize,
                 FontFamily = _topologyOptions["Font"] == "Default" ? FontFamily : new FontFamily(_topologyOptions["Font"]),
                 FontWeight = FontWeights.SemiBold,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                Margin = new Thickness(6, 2, 6, 0)
+                Margin = new Thickness(6, 1, 6, 0),
+                HorizontalAlignment = HorizontalAlignment.Center
             };
             titleBlock.SetResourceReference(TextBlock.ForegroundProperty, "TopologyNodeTextBrush");
 
@@ -367,9 +402,9 @@ namespace KillerScan.Controls
             {
                 Text = detail,
                 FontFamily = new FontFamily(_topologyOptions["Font"] == "Default" ? "Consolas" : _topologyOptions["Font"]),
-                FontSize = TopologyFontSize - 1,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                Margin = new Thickness(6, 0, 6, 2)
+                FontSize = TopologyFontSize,
+                Margin = new Thickness(6, 0, 6, 0),
+                HorizontalAlignment = HorizontalAlignment.Center
             };
             detailBlock.SetResourceReference(TextBlock.ForegroundProperty, "TopologyNodeTextBrush");
             detailBlock.Opacity = 0.78;
@@ -379,21 +414,17 @@ namespace KillerScan.Controls
             stack.Children.Add(titleBlock);
             stack.Children.Add(detailBlock);
 
-            var border = new Border
+            var border = new TopologyNode(this)
             {
-                Width = TopologyNodeWidth,
-                Height = TopologyNodeHeight,
-                CornerRadius = new CornerRadius(3),
-                BorderThickness = new Thickness(1),
                 Child = stack,
-                Tag = device
+                Tag = device,
+                RingKey = brushKey
             };
             // Topology nodes have their own two keys rather than borrowing the menu surface. A
             // node has to separate from the pane behind it, which a menu never has to do, and on
             // the near-black themes those two needs pull in opposite directions. Themes that do
             // not set them fall back to the menu brushes, so nothing else moves.
             border.SetResourceReference(Border.BackgroundProperty, "TopologyNodeBrush");
-            border.SetResourceReference(Border.BorderBrushProperty, "TopologyNodeBorderBrush");
             if (device != null)
             {
                 border.Cursor = DragCursors.Open;   // a node is picked up and carried
@@ -406,11 +437,21 @@ namespace KillerScan.Controls
                 border.MouseLeave += TopologyNode_MouseLeave;
             }
 
-            Canvas.SetLeft(border, x - TopologyNodeWidth / 2);
-            Canvas.SetTop(border, y - TopologyNodeHeight / 2);
             Panel.SetZIndex(border, 2);
             TopologyCanvas.Children.Add(border);
+            // Each card is exactly as wide as its longer line, name or IP, with the same 6px on
+            // both sides, and as tall as its two lines: nothing trims and nothing pads. Measured
+            // AFTER it joins the canvas, because the app's text styles only reach it there and a
+            // card measured before that came out narrower than it draws. The size is then pinned
+            // so placement, dragging, keyboard focus and the SVG export read the real box.
+            border.RefreshRing();
+            border.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            border.Width = Math.Ceiling(border.DesiredSize.Width);
+            border.Height = Math.Ceiling(border.DesiredSize.Height);
+            Canvas.SetLeft(border, x - border.Width / 2);
+            Canvas.SetTop(border, y - border.Height / 2);
             UpdateTopologyNodeSelection(border);
+            MakeTopologyNodeKeyboardReady(border, title, detail);
             return border;
         }
 
@@ -459,15 +500,15 @@ namespace KillerScan.Controls
         {
             foreach (var item in _topologyDragStarts)
             {
-                double left = Math.Max(0, Math.Min(TopologyCanvas.Width - TopologyNodeWidth,
+                double left = Math.Max(0, Math.Min(TopologyCanvas.Width - item.Key.Width,
                     item.Value.X + delta.X));
-                double top = Math.Max(0, Math.Min(TopologyCanvas.Height - TopologyNodeHeight,
+                double top = Math.Max(0, Math.Min(TopologyCanvas.Height - item.Key.Height,
                     item.Value.Y + delta.Y));
                 Canvas.SetLeft(item.Key, left);
                 Canvas.SetTop(item.Key, top);
 
                 if (item.Key.Tag is not NetworkDevice device) continue;
-                var center = new Point(left + TopologyNodeWidth / 2, top + TopologyNodeHeight / 2);
+                var center = new Point(left + item.Key.Width / 2, top + item.Key.Height / 2);
                 _topologyPositions[device.IpAddress] = center;
                 if (_topologyLinks.TryGetValue(device.IpAddress, out var link))
                 {
@@ -517,9 +558,7 @@ namespace KillerScan.Controls
         private void UpdateTopologyNodeSelection(Border border)
         {
             bool selected = border.Tag is NetworkDevice device && ResultsGrid.SelectedItems.Contains(device);
-            border.BorderThickness = new Thickness(selected ? 2 : 1);
-            border.SetResourceReference(Border.BorderBrushProperty,
-                selected ? "PrimaryBrush" : "TopologyNodeBorderBrush");
+            if (border is TopologyNode node) node.Selected = selected;
         }
 
         private static void TopologyNode_MouseEnter(object sender, MouseEventArgs e)

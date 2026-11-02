@@ -9,79 +9,138 @@ namespace KillerScan.Services
         public string Target { get; set; } = string.Empty;
         public bool DeepScanAfter { get; set; }
         public ScanOptions Options { get; set; } = new();
-        public string InterfaceId { get; set; } = "";
-        public string SourceAddress { get; set; } = "";
-        public string LocationId { get; set; } = LocationCatalog.LegacyId;
+
+        /// <summary>
+        /// The adapter this scan was set up on, by its Windows name. A preference only: it is
+        /// checked against the route again on every run, and a mismatch asks before scanning.
+        /// </summary>
+        public string Adapter { get; set; } = string.Empty;
+        public string? InterfaceId { get; set; }
+        public string? SourceAddress { get; set; }
+        public string? LocationId { get; set; }
 
         /// <summary>What a screen reader announces for the profile's row in the profiles list.</summary>
         public override string ToString() => Name + ", " + Target;
     }
 
-    internal static class ScanProfiles
+    /// <summary>The saved scans of one Location (profiles.json).</summary>
+    internal sealed class SavedScanStore
     {
-        private static string FilePath => Locations.DataFile("profiles.json");
-        private static bool _readable = true;
-        internal static bool IsReadable => _readable;
-        private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-        private static List<ScanProfile> _items = [];
+        private readonly JsonPreferenceFile<List<ScanProfile>> _store;
+        private readonly bool _memoryOnly;
+        private List<ScanProfile> _items => _store.Value;
+        public string? SaveError => _store.Error;
 
-        public static IReadOnlyList<ScanProfile> Items => _items;
+        // Demo mode keeps its profiles in memory: a screenshot build must not add fabricated
+        // profiles to whatever the person running it has saved.
+        private bool MemoryOnly => _memoryOnly || DemoData.Enabled;
 
-        public static void Load()
+        internal SavedScanStore(string path, bool memoryOnly = false)
         {
-            _items = []; _readable = true;
-            // Demo mode keeps its profiles in memory: a screenshot build must not add fabricated
-            // profiles to whatever the person running it has saved.
-            if (DemoData.Enabled)
+            _memoryOnly = memoryOnly;
+            _store = new(path, () => [], items =>
             {
-                _items = [.. DemoData.Profiles()];
-                foreach (var item in _items) item.LocationId = Locations.Current.Id;
-                return;
-            }
-            try
-            {
-                if (!File.Exists(FilePath)) return;
-                _items = JsonSerializer.Deserialize<List<ScanProfile>>(File.ReadAllText(FilePath)) ?? [];
-                _items.RemoveAll(item => item == null);
-                if (_items.Any(item => item.LocationId != Locations.Current.Id)) throw new InvalidDataException("Profiles belong to a different location.");
-                foreach (var item in _items)
+                items.RemoveAll(item => item == null);
+                foreach (var item in items)
                 {
                     item.Name ??= string.Empty;
                     item.Target ??= string.Empty;
                     item.Options ??= new ScanOptions();
-                    item.InterfaceId ??= "";
-                    item.SourceAddress ??= "";
+                    item.Adapter ??= string.Empty;
+                    if (item.Adapter.Length == 0 && !string.IsNullOrWhiteSpace(item.InterfaceId))
+                        item.Adapter = ForkCompatibility.AdapterName(item.InterfaceId!);
                 }
-            }
-            catch { _items = []; _readable = false; }
+                return items;
+            });
         }
 
-        public static void Save(ScanProfile profile)
+        public IReadOnlyList<ScanProfile> Items => _items;
+
+        public void Load()
         {
-            if (profile.LocationId != Locations.Current.Id) throw new InvalidOperationException("A profile belongs to a different location.");
-            _items.RemoveAll(item => string.Equals(item.Name, profile.Name, StringComparison.OrdinalIgnoreCase));
-            _items.Add(profile);
-            Persist();
+            if (DemoData.Enabled) { _items.AddRange(DemoData.Profiles()); return; }
+            if (!MemoryOnly) _store.Load();
         }
 
-        public static void Delete(ScanProfile profile)
+        public bool Save(ScanProfile profile)
         {
-            if (profile.LocationId != Locations.Current.Id) return;
-            _items.Remove(profile);
-            Persist();
-        }
-
-        public static void Update() => Persist();
-
-        private static void Persist()
-        {
-            if (DemoData.Enabled || !_readable) return;
-            try
+            var saved = new ScanProfile
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-                LocationCatalog.WriteAtomic(FilePath, JsonSerializer.Serialize(_items.Where(item => item.LocationId == Locations.Current.Id), JsonOptions));
-            }
-            catch { }
+                Name = profile.Name, Target = profile.Target, DeepScanAfter = profile.DeepScanAfter,
+                Options = profile.Options ?? new ScanOptions(), Adapter = profile.Adapter ?? string.Empty, InterfaceId = profile.InterfaceId, SourceAddress = profile.SourceAddress, LocationId = profile.LocationId
+            };
+            return _store.Change(items =>
+            {
+                items.RemoveAll(item => string.Equals(item.Name, saved.Name, StringComparison.OrdinalIgnoreCase));
+                items.Add(saved);
+            }, MemoryOnly);
         }
+
+        /// <summary>
+        /// The Save profile dialog edits the target and options, and the adapter comes from the
+        /// tab's current choice (empty is Automatic), so it is required. Saving over an existing
+        /// name (any case) keeps only what the dialog does not show, such as Deep Scan.
+        /// </summary>
+        public bool SaveEdited(string name, string target, ScanOptions options, string adapter) =>
+            _store.Change(items =>
+            {
+                var existing = items.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
+                items.RemoveAll(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
+                items.Add(new ScanProfile
+                {
+                    Name = name, Target = target, Options = options ?? new ScanOptions(),
+                    DeepScanAfter = existing?.DeepScanAfter ?? false,
+                    Adapter = adapter ?? string.Empty
+                });
+            }, MemoryOnly);
+
+        /// <summary>
+        /// Renames one saved scan in place, keeping everything else it holds (Deep Scan included).
+        /// A name only differing in case is a plain rename. A name another saved scan already uses
+        /// is refused rather than replacing that scan; <paramref name="taken"/> says so. Worked out
+        /// over the latest file, so a name another window just took counts, and a failed save
+        /// changes nothing here: repeat the call to retry. False with no error and not taken means
+        /// the scan is gone from the file.
+        /// </summary>
+        public bool Rename(ScanProfile profile, string name, out bool taken)
+        {
+            // Read once, because the change runs over more than one copy of the list and the
+            // object passed in may be among them.
+            string original = profile.Name;
+            bool collision = false, found = false;
+            static bool Named(ScanProfile item, string text) => string.Equals(item.Name, text, StringComparison.OrdinalIgnoreCase);
+            void Apply(List<ScanProfile> items)
+            {
+                var match = items.FirstOrDefault(item => Named(item, original));
+                found = match != null;
+                collision = items.Any(item => !Named(item, original) && Named(item, name));
+                if (match != null && !collision) match.Name = name;
+            }
+            bool saved = MemoryOnly ? _store.Change(Apply, memoryOnly: true) : _store.Commit(Apply);
+            taken = collision;
+            return saved && found && !collision;
+        }
+
+        public bool Delete(ScanProfile profile) => _store.Change(items =>
+            items.RemoveAll(item => string.Equals(item.Name, profile.Name, StringComparison.OrdinalIgnoreCase)), MemoryOnly);
+
+        public bool Update(ScanProfile profile) => Save(profile);
+        public bool Retry() => MemoryOnly || _store.Save();
+    }
+
+    /// <summary>The app-wide saved scans, until every caller works through a Location.</summary>
+    internal static class ScanProfiles
+    {
+        private static readonly string FilePath = Path.Combine(DevelopmentData.Root, "profiles.json");
+        internal static SavedScanStore Store { get; private set; } = new(FilePath);
+
+        public static string? SaveError => Store.SaveError;
+        public static IReadOnlyList<ScanProfile> Items => Store.Items;
+        public static void Load() { Store = new(FilePath); Store.Load(); }
+        public static bool Save(ScanProfile profile) => Store.Save(profile);
+        public static bool SaveEdited(string name, string target, ScanOptions options, string adapter = "") => Store.SaveEdited(name, target, options, adapter);
+        public static bool Delete(ScanProfile profile) => Store.Delete(profile);
+        public static bool Update(ScanProfile profile) => Store.Update(profile);
+        public static bool Retry() => Store.Retry();
     }
 }

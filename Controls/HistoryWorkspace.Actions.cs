@@ -48,9 +48,8 @@ namespace KillerScan.Controls
             Add("Str_Ctx_CopyIp", "Ctrl+C", "ip", 0xE8C8);
             Add("Str_Ctx_CopyMac", "Ctrl+Shift+C", "mac", 0xE8C8);
             Add("Str_Ctx_CopyHost", "Ctrl+Alt+C", "host", 0xE8C8);
+            Add("Str_HA_Title", "", "ha", 0xE80F);
             Add("Str_History_CopyDetails", "Ctrl+Shift+Y", "details", 0xE8C8);
-            Add("Str_Evidence_Title", "Ctrl+I", "evidence", 0xE946);
-            Add("Str_HA_Title", "", "ha", 0xE946);
             menu.Items.Add(new Separator());
             Add("Str_Export_Csv", "Ctrl+E", "export", 0xE896);
             Add("Str_History_ViewChanges", "Ctrl+Shift+H", "changes", 0xE8FD);
@@ -65,8 +64,8 @@ namespace KillerScan.Controls
                     string action = (string)item.Tag;
                     item.IsEnabled = action switch
                     {
+                        "ha" => grid != null && SelectedHistoryDevice != null,
                         "ip" or "mac" or "host" or "details" => grid != null && CopyValue(action).Length > 0,
-                        "evidence" or "ha" => grid != null && SelectedHistoryDevice != null,
                         "export" => _entry != null && VisibleGrid.Items.Count > 0,
                         "changes" => _entry != null && _showAll,
                         "all" => _entry != null && !_showAll,
@@ -88,7 +87,7 @@ namespace KillerScan.Controls
         {
             var device = SelectedHistoryDevice;
             if (device == null) return string.Empty;
-            return action switch
+            return (action switch
             {
                 "ip" => device.IpAddress,
                 "mac" => device.MacAddress,
@@ -96,27 +95,21 @@ namespace KillerScan.Controls
                 "details" => string.Join("\t", device.IpAddress, device.Hostname, device.MacAddress,
                     device.Vendor, DeviceTypeConverter.Display(device.DeviceType), string.Join(", ", device.OpenPorts)),
                 _ => string.Empty
-            };
+            }) ?? string.Empty;
         }
 
         private async void ExecuteAction(string action)
         {
-            if (action == "ha" && SelectedHistoryDevice is { } historical)
-            {
-                new HomeAssistantAdviceWindow(HomeAssistantText.FromHistory(historical), WebLink.Open, text =>
-                {
-                    try { Clipboard.SetText(text); }
-                    catch (COMException) { HistorySummary.Text = Loc("Str_Clipboard_Failed"); }
-                }) { Owner = Window.GetWindow(this) }.ShowDialog();
-                return;
-            }
-            if (action == "evidence" && SelectedHistoryDevice is { } selected)
-            {
-                new DeviceEvidenceWindow(new NetworkDevice { IpAddress = selected.IpAddress, Hostname = selected.Hostname,
-                    DeviceType = selected.DeviceType, Identification = selected.Identification }) { Owner = Window.GetWindow(this) }.ShowDialog();
-                return;
-            }
             if (action == "changes" || action == "all") { SetView(action == "all"); VisibleGrid.Focus(); return; }
+            if (action == "ha")
+            {
+                if (SelectedHistoryDevice is { } saved)
+                {
+                    var dialog = new HomeAssistantAdviceWindow(HomeAssistantText.FromHistory(saved), WebLink.Open, value => Clipboard.SetText(value));
+                    dialog.Owner = Window.GetWindow(this); dialog.ShowDialog();
+                }
+                return;
+            }
             if (action == "current") { CurrentScanRequested?.Invoke(); return; }
             if (action == "sidebar") { SidebarRequested?.Invoke(); return; }
             if (action == "export") { ExportCsv(); return; }
@@ -137,15 +130,13 @@ namespace KillerScan.Controls
         {
             static string Cell(string value) => ReportExport.CsvField(value);
             var lines = new List<string> { string.Join(",", new[] { "Str_History_Change", "Str_Col_Ip", "Str_Col_DeviceName",
-                "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }.Select(key => Cell(Loc(key)))) + ",Location ID,Location,Identification JSON,Access JSON,Home Assistant JSON" };
+                "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Str_Col_Ports" }.Select(key => Cell(Loc(key)))) };
             foreach (object row in VisibleGrid.Items)
             {
                 var device = row is HistoryChangeRow change ? change.Device : ((HistoryDeviceRow)row).Device;
                 lines.Add(string.Join(",", new[] { row is HistoryChangeRow changed ? changed.Change : "",
                     device.IpAddress, device.Hostname, device.MacAddress, device.Vendor,
-                    DeviceTypeConverter.Display(device.DeviceType), string.Join(", ", device.OpenPorts),
-                    _entry?.LocationId ?? "", _entry?.LocationName ?? "",
-                    device.Identification == null ? "" : System.Text.Json.JsonSerializer.Serialize(device.Identification), System.Text.Json.JsonSerializer.Serialize(device.Access), System.Text.Json.JsonSerializer.Serialize(HomeAssistantAdvisor.ForDevice(HomeAssistantText.FromHistory(device))) }.Select(Cell)));
+                    DeviceTypeConverter.Display(device.DeviceType), string.Join(", ", device.OpenPorts) }.Select(Cell)));
             }
             return string.Join(Environment.NewLine, lines) + Environment.NewLine;
         }
@@ -169,7 +160,7 @@ namespace KillerScan.Controls
             var dialog = new FileDialog(FileDialogMode.Save) { Filter = Loc("Str_Filter_Csv") + "|*.csv",
                 DefaultExt = ".csv", AddExtension = true, FileName = "KillerScan_History_" + _entry.ScannedAt.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".csv" };
             if (dialog.ShowDialog(Window.GetWindow(this)) != true) return;
-            try { File.WriteAllText(dialog.FileName, BuildCsv(), new UTF8Encoding(true)); }
+            try { ExportFile.WriteText(dialog.FileName, BuildCsv(), new UTF8Encoding(true)); }
             catch (Exception ex) when (ex is not OutOfMemoryException)
             { HistorySummary.Text = string.Format(Loc("Str_Err_Export"), ex.Message); }
         }
@@ -183,7 +174,6 @@ namespace KillerScan.Controls
                 (Key.C, ModifierKeys.Control | ModifierKeys.Shift) => "mac",
                 (Key.C, ModifierKeys.Control | ModifierKeys.Alt) => "host",
                 (Key.Y, ModifierKeys.Control | ModifierKeys.Shift) => "details",
-                (Key.I, ModifierKeys.Control) => "evidence",
                 (Key.E, ModifierKeys.Control) => "export",
                 (Key.H, ModifierKeys.Control | ModifierKeys.Shift) => _showAll ? "changes" : "all",
                 (Key.F6, ModifierKeys.None) => "current",

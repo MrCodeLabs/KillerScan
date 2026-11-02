@@ -30,8 +30,6 @@ internal static partial class HistoryUiTests
         // and targets. Constructing a terminal or an empty Keep Alive view starts no process or scan.
         var app = Application.Current;
         var menus = new Dictionary<string, ContextMenu>();
-        var profiles = (ListBox)window.FindName("ProfilesList");
-        menus.Add("Profiles", ((FrameworkElement)profiles.ItemTemplate.LoadContent()).ContextMenu);
         var history = new HistoryWorkspace();
         menus.Add("History", ((DataGrid)history.FindName("HistoryChangesGrid")).ContextMenu);
         var terminal = (FrameworkElement)Activator.CreateInstance(assembly.GetType("KillerScan.Terminal.TerminalControl", true)!)!;
@@ -47,11 +45,8 @@ internal static partial class HistoryUiTests
         menus.Add("Devices", ((DataGrid)scan.FindName("ResultsGrid")).ContextMenu);
         menus.Add("Services", ((DataGrid)scan.FindName("ServicesGrid")).ContextMenu);
         menus.Add("Export", ((Button)scan.FindName("ExportButton")).ContextMenu);
-        menus.Add("Toolbar", (ContextMenu)Field(window, "_toolbarMenu")!);
 
-        // Load the actual Sort menu with its picker template without navigating user directories.
-        app.Resources.MergedDictionaries.Add((ResourceDictionary)Application.LoadComponent(
-            new Uri("/KillerScan;component/Controls/PickerStyles.xaml", UriKind.Relative)));
+        // Load the actual Sort menu without navigating user directories; its styles are the family Controls.xaml.
         var xml = new XmlDocument(); xml.Load(Path.Combine(source, "Controls", "FileDialog.xaml"));
         var ns = new XmlNamespaceManager(xml.NameTable);
         ns.AddNamespace("p", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
@@ -65,14 +60,15 @@ internal static partial class HistoryUiTests
         var parser = new ParserContext();
         parser.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         parser.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
-        menus.Add("Sort", (ContextMenu)XamlReader.Parse(PreserveMenuGlyphReferences(sort.OuterXml), parser));
+        // FileDialog.xaml maps its glyph namespace without an assembly; the parser needs it named.
+        string sortXaml = sort.OuterXml
+            .Replace("clr-namespace:KillerFamily.Accessibility\"", "clr-namespace:KillerFamily.Accessibility;assembly=KillerScan\"")
+            .Replace("clr-namespace:KillerScan.Controls\"", "clr-namespace:KillerScan.Controls;assembly=KillerScan\"");
+        menus.Add("Sort", (ContextMenu)XamlReader.Parse(PreserveMenuGlyphReferences(sortXaml), parser));
 
         // Build the actual dynamic menus without needing a visible desktop popup or any action.
         menus.Add("HistoryExport", (ContextMenu)Call(history, "CreateExportMenu", (FrameworkElement)scan.FindName("ExportButton"))!);
         var root = (FrameworkElement)window.Content; Render(root, 640, 780); Call(window, "FitToolbarViews");
-        var overflow = (ContextMenu)Call(window, "CreateToolbarOverflowMenu")!;
-        Require(overflow.Items.Count > 0, "A narrow toolbar creates its actual overflow menu.");
-        menus.Add("Overflow", overflow);
         foreach (var shortcut in new[] { (Key.Apps, ModifierKeys.None), (Key.F10, ModifierKeys.Shift) })
         {
             Require(history.HandleShortcut(shortcut.Item1, shortcut.Item2), "History supports keyboard menu opening.");
@@ -126,14 +122,15 @@ internal static partial class HistoryUiTests
                     int codepoint = char.ConvertToUtf32(glyph.Text, 0);
                     Require(font.CharacterToGlyphMap.ContainsKey(codepoint), label + " exists in the installed font: U+" + codepoint.ToString("X4"));
                 }
-                bool picker = item.Template.FindName("IconPresenter", item) is ContentPresenter;
-                var presenter = (ContentPresenter)item.Template.FindName(picker ? "IconPresenter" : "ico", item);
+                // Every menu, the file picker's sort menu included since the KillerUI sync, uses the
+                // family MenuItem, whose icon presenter is IconPresenter (KillerScan's old one was "ico").
+                var presenter = (ContentPresenter)(item.Template.FindName("IconPresenter", item) ?? item.Template.FindName("ico", item));
                 Require(presenter.Visibility == Visibility.Visible && icon.ActualWidth > 0 && icon.ActualHeight > 0, label + " renders its icon.");
                 var grid = (Grid)presenter.Parent;
-                Require(grid.ColumnDefinitions[0].ActualWidth == (picker ? 18 : 16), label + " keeps a fixed icon gutter.");
+                Require(grid.ColumnDefinitions[0].ActualWidth == 16, label + " keeps a fixed icon gutter.");
                 if (item.HasItems)
                 {
-                    var arrow = (TextBlock)item.Template.FindName("arrow", item);
+                    var arrow = (TextBlock)(item.Template.FindName("SubArrow", item) ?? item.Template.FindName("arrow", item));
                     Require(arrow.Text == "\uE76C" && arrow.Visibility == Visibility.Visible, label + " renders the submenu chevron.");
                 }
                 string gesture = item.InputGestureText;
@@ -141,22 +138,26 @@ internal static partial class HistoryUiTests
                 if (item.IsCheckable)
                 {
                     item.SetCurrentValue(MenuItem.IsCheckedProperty, true); surface.UpdateLayout();
-                    var check = (TextBlock)item.Template.FindName(picker ? "CheckGlyph" : "check", item);
+                    // Family MenuItem: "Check". The picker's own items: "CheckGlyph".
+                    var check = (TextBlock)(item.Template.FindName("Check", item) ?? item.Template.FindName("CheckGlyph", item));
                     Require(check.Text == "\uE73E" && check.Visibility == Visibility.Visible && presenter.Visibility == Visibility.Collapsed,
                         label + " replaces the icon with a checkmark.");
-                    Require(item.ActualHeight == rowHeight && grid.ColumnDefinitions[0].ActualWidth == (picker ? 18 : 16),
+                    Require(item.ActualHeight == rowHeight && grid.ColumnDefinitions[0].ActualWidth == 16,
                         label + " preserves spacing when checked.");
                     item.SetCurrentValue(MenuItem.IsCheckedProperty, false);
                 }
                 item.SetCurrentValue(UIElement.IsEnabledProperty, true);
                 typeof(MenuItem).GetProperty("IsHighlighted")!.SetValue(item, true);
                 surface.UpdateLayout();
-                var expected = (Brush)app.FindResource(picker ? "TextBrush" : "ComboHighlightTextBrush");
+                var expected = (Brush)app.FindResource("MenuHoverTextBrush");
                 if (icon is TextBlock highlighted)
                     Require(highlighted.Foreground.ToString() == expected.ToString(), label + " follows the highlighted foreground.");
                 typeof(MenuItem).GetProperty("IsHighlighted")!.SetValue(item, false);
                 item.SetCurrentValue(UIElement.IsEnabledProperty, false); surface.UpdateLayout();
-                Require(Math.Abs(item.Opacity - (picker ? 0.45 : 0.4)) < 0.001, label + " dims disabled glyphs with its row.");
+                // The family MenuItem dims its row border (MenuBd, which holds the icon); the picker
+                // dims the whole item. Either way the glyph dims with its row.
+                double dimmed = item.Opacity * ((item.Template.FindName("MenuBd", item) as UIElement)?.Opacity ?? 1);
+                Require(Math.Abs(dimmed - 0.4) < 0.001, label + " dims disabled glyphs with its row.");
                 Require(item.InputGestureText == gesture, label + " retains its shortcut text.");
                 item.SetCurrentValue(UIElement.IsEnabledProperty, enabled[item]);
                 item.SetCurrentValue(MenuItem.IsCheckedProperty, checks[item]);

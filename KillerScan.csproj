@@ -11,15 +11,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\ks-icon.ico</ApplicationIcon>
-    <Version>1.8.4</Version>
-    <FileVersion>1.8.4.0</FileVersion>
-    <AssemblyVersion>1.8.4.0</AssemblyVersion>
+    <!-- Per-monitor DPI awareness (PerMonitorV2) and the Windows 10/11 compatibility block, as in the family. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.9.0</Version>
+    <FileVersion>1.9.0.0</FileVersion>
+    <AssemblyVersion>1.9.0.0</AssemblyVersion>
     <Authors>Steve the Killer</Authors>
     <Copyright>Copyright (c) 2026 Steve the Killer</Copyright>
     <!-- Shown in the About card beside the version so a user can tell how old their build
          is. Keep the prior release date while development is Unreleased. Set the new date
          immediately before release so it matches the dated CHANGELOG section. -->
-    <ReleaseDate>2026-10-19</ReleaseDate>
+    <ReleaseDate>2026-11-01</ReleaseDate>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
@@ -56,7 +58,7 @@
          and output entirely. Same fix as KillerNotes. -->
     <PackageReference Include="System.Net.Http" Version="4.3.4" ExcludeAssets="all" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" ExcludeAssets="all" />
-    <PackageReference Include="System.Text.Json" Version="10.0.11" />
+    <PackageReference Include="System.Text.Json" Version="10.0.14" />
     <PackageReference Include="PolySharp" Version="1.16.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -80,7 +82,9 @@
        run off a USB stick on a customer's machine has to bring these with it. -->
   <ItemGroup>
     <EmbeddedResource Include="Modules\**\*" />
+    <EmbeddedResource Include="Terminal\Unicode-LICENSE.txt" />
     <EmbeddedResource Include="Terminal\KillerPrompt.ps1" />
+    <EmbeddedResource Include="Resources\report-logo.svg" LogicalName="KillerScan.ReportLogo.svg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ks-icon.ico" />
@@ -98,7 +102,7 @@
 
   <!-- GPL3 source bundle: produces <AppName>-<Version>-src.zip in the publish folder every time you Publish. -->
   <Target Name="BundleSource" AfterTargets="Publish">
-    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(ProjectDir)build\bundle-source.ps1&quot; -ProjectDir &quot;$(ProjectDir.TrimEnd('\'))&quot; -Version &quot;$(Version)&quot; -AppName &quot;$(AssemblyName)&quot; -PublishDir &quot;$(PublishDir.TrimEnd('\'))&quot;" IgnoreExitCode="true" />
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(ProjectDir)build\bundle-source.ps1&quot; -ProjectDir &quot;$(ProjectDir.TrimEnd('\'))&quot; -Version &quot;$(Version)&quot; -AppName &quot;$(AssemblyName)&quot; -PublishDir &quot;$(PublishDir.TrimEnd('\'))&quot;" />
   </Target>
 
   <ItemGroup>

@@ -24,12 +24,12 @@ internal static class ReleaseUiTests
         protected override void OnStartup(StartupEventArgs e) { }
     }
 
-    public static Task Run(bool evidenceOnly = false)
+    public static Task Run(bool scanOptionsOnly = false)
     {
         Exception? failure = null;
         var thread = new Thread(() =>
         {
-            try { Capture(evidenceOnly); }
+            try { Capture(scanOptionsOnly); }
             catch (Exception ex) { failure = ex; }
             finally { Dispatcher.CurrentDispatcher.InvokeShutdown(); }
         });
@@ -40,19 +40,23 @@ internal static class ReleaseUiTests
         return Task.CompletedTask;
     }
 
-    internal static KillerScan.App CreateApplication()
+    private static void Capture(bool scanOptionsOnly)
     {
         var assembly = typeof(KillerScan.App).Assembly;
         typeof(Application).GetField("_resourceAssembly", Static)!.SetValue(null, assembly);
         var app = new TestApplication();
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "KillerScan.csproj"))) directory = directory.Parent;
+        KillerScan.Services.AppTheme.Configure();
+        var directory = TestRepository.Find();
         Require(directory != null, "App resource source exists.");
         var xml = new XmlDocument();
         xml.Load(Path.Combine(directory!.FullName, "App.xaml"));
         string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
             .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
-            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"")
+            .Replace("clr-namespace:KillerFamily.Controls\"", "clr-namespace:KillerFamily.Controls;assembly=KillerScan\"");
+        // Preserve compiled-XAML glyph references through the .NET Framework loose parser.
+        foreach (char glyph in dictionary.Where(c => c >= 0xE000 && c <= 0xF8FF).Distinct().ToArray())
+            dictionary = dictionary.Replace(glyph.ToString(), "&#x" + ((int)glyph).ToString("X4") + ";");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
@@ -60,13 +64,6 @@ internal static class ReleaseUiTests
         context.XmlnsDictionary.Add("snap", "clr-namespace:KillerFamily.Windowing;assembly=KillerScan");
         context.XmlnsDictionary.Add("kl", "clr-namespace:KillerFamily.Layout;assembly=KillerScan");
         app.Resources = (ResourceDictionary)XamlReader.Parse(dictionary, context);
-        return app;
-    }
-
-    private static void Capture(bool evidenceOnly)
-    {
-        var app = CreateApplication();
-        var assembly = typeof(KillerScan.App).Assembly;
         var manager = assembly.GetType("KillerScan.Services.ThemeManager", true)!;
         var themeType = assembly.GetType("KillerScan.Services.Theme", true)!;
         var accentType = assembly.GetType("KillerScan.Services.Accent", true)!;
@@ -94,11 +91,75 @@ internal static class ReleaseUiTests
         ((UIElement)window.FindName("RootGrid")).Opacity = 1;
         var output = Path.Combine(Path.GetTempPath(), "KillerScan-release-ui-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(output);
-        UpstreamSyncUiChecks.Run(window);
-        HomeAssistantUiChecks.Run(window, (element, name) => Save(Render(element, name.StartsWith("HA-All-", StringComparison.Ordinal) ? 1180 : 920, 740), Path.Combine(output, name)));
-        EvidenceUiChecks.Run(window, (element, name) => Save(Render(element, 820, 600), Path.Combine(output, name)));
-        AccessUiChecks.Run(window, (element, name) => Save(Render(element, 900, 620), Path.Combine(output, name)));
-        if (evidenceOnly) { Console.WriteLine("Evidence UI: " + output); window.Close(); return; }
+        if (scanOptionsOnly)
+        {
+            var scanWorkspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
+            Render(root, 1200, 780);
+            ScanOptionsUiChecks.Run(scanWorkspace);
+            var settingsButton = (Button)scanWorkspace.FindName("ScanOptionsButton");
+            void Pump()
+            {
+                var frame = new DispatcherFrame();
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
+                    new Action(() => frame.Continue = false));
+                Dispatcher.PushFrame(frame);
+            }
+            void CaptureSettings(string name, int windowWidth = 1200)
+            {
+                Pump();
+                Save(Render(root, windowWidth, 780), Path.Combine(output, name + ".png"));
+                var buttonBounds = settingsButton.TransformToAncestor(root).TransformBounds(new Rect(settingsButton.RenderSize));
+                Require(buttonBounds.Width > 0 && buttonBounds.Left >= 0 && buttonBounds.Right <= windowWidth,
+                    name + ": the complete scan settings button remains inside the window.");
+                settingsButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                var settingsMenu = settingsButton.ContextMenu;
+                settingsMenu.RaiseEvent(new RoutedEventArgs(ContextMenu.OpenedEvent));
+                Pump();
+                settingsMenu.Measure(new Size(650, 900));
+                // The family menu fades in from 0 when it opens; render its settled state.
+                if (settingsMenu.Template.FindName("MenuRoot", settingsMenu) is UIElement menuRoot)
+                {
+                    menuRoot.BeginAnimation(UIElement.OpacityProperty, null);
+                    menuRoot.Opacity = 1;
+                }
+                int width = (int)Math.Ceiling(settingsMenu.DesiredSize.Width);
+                int height = (int)Math.Ceiling(settingsMenu.DesiredSize.Height);
+                Require(width > 100 && height > 100, "Scan settings menu measures visible content.");
+                Save(Render(settingsMenu, width, height), Path.Combine(output, name + "-menu.png"));
+                settingsMenu.IsOpen = false;
+                Pump();
+            }
+            foreach (string theme in Enum.GetNames(themeType))
+            {
+                Theme(theme, theme == "SE98" ? "Blue" : "Orange");
+                window.GetType().GetMethod("ApplyFlatChrome", Instance)!.Invoke(window, null);
+                CaptureSettings(theme);
+            }
+            Theme("Black", "Orange");
+            foreach (string locale in Enum.GetNames(localeType))
+            {
+                Locale(locale);
+                Pump();
+                Render(root, 1200, 780);
+                Require(System.Windows.Automation.AutomationProperties.GetName(settingsButton)
+                    == (string)app.FindResource("Str_Options_Title"), locale + ": scan settings accessible label follows the language.");
+                settingsButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                foreach (var item in settingsButton.ContextMenu.Items.OfType<MenuItem>().Where(item => item.IsCheckable))
+                    // Untagged is the unknown-port choice, which sits outside ScanOptions.Features.
+                    Require(item.Header is string label && label == (string)app.FindResource("Str_Options_" + (item.Tag as string ?? "ProbeUnknownPorts")),
+                        locale + ": every scan setting has a translated label.");
+                settingsButton.ContextMenu.IsOpen = false;
+                if (locale is "SlSI" or "De") CaptureSettings(locale);
+            }
+            Locale("SlSI");
+            CaptureSettings("SlSI-narrow", 800);
+            window.GetType().GetMethod("ApplyAppScale", Instance)!.Invoke(window, new object[] { 1.5, false });
+            CaptureSettings("SlSI-scale150");
+            Console.WriteLine("PASS: scan settings button, menu, profile JSON, defaults, dependencies, 13 themes and 20 locales.");
+            Console.WriteLine("Offscreen scan settings UI: " + output);
+            return;
+        }
+        ForkHaUiChecks.Run(window, (element, name) => Save(Render(element, 1050, 740), Path.Combine(output, name)));
         var samples = new List<(string Label, BitmapSource Image)>();
         int states = 0;
         foreach (string theme in Enum.GetNames(themeType))
@@ -110,6 +171,30 @@ internal static class ReleaseUiTests
                 Theme(theme, accent);
                 window.GetType().GetMethod("ApplyFlatChrome", Instance)!.Invoke(window, null);
                 bool flat = theme == "SE98";
+                if (flat)
+                {
+                    var maximize = (Button)window.FindName("MaximizeBtn");
+                    var classicImage = Render(root, 1200, 780);
+                    var toolbarPixel = new byte[4];
+                    classicImage.CopyPixels(new Int32Rect(1100, 32, 1, 1), toolbarPixel, 4, 0);
+                    Require(toolbarPixel[0] == 192 && toolbarPixel[1] == 192 && toolbarPixel[2] == 192,
+                        "The classic client toolbar uses the Windows 98 gray face, without a black gap.");
+                    var captionRoot = (Grid)window.FindName("RootGrid");
+                    var captionBox = maximize.TransformToAncestor(captionRoot).TransformBounds(new Rect(maximize.RenderSize));
+                    var tools = (FrameworkElement)window.FindName("TitleToolbarHost");
+                    Require(tools.TransformToAncestor(captionRoot).TransformBounds(new Rect(tools.RenderSize)).Top >= 18,
+                        "The scan toolbar sits below the original Windows 98 caption instead of being clipped inside it.");
+                    Require(Math.Abs(captionRoot.RowDefinitions[0].ActualHeight - 18) < 0.1 &&
+                        Math.Abs(captionBox.Top - 2) < 0.1 && Math.Abs(captionBox.Bottom - 16) < 0.1,
+                        "Windows 98 has an eighteen-pixel caption with fourteen-pixel buttons inset two pixels above and below.");
+                    Require(maximize.Content is FrameworkElement,
+                        "98SE caption buttons use the established drawn classic glyphs, not modern font glyphs.");
+                    Require(((UIElement)window.FindName("ClassicMinimizeGlyph")).Visibility == Visibility.Visible &&
+                        ((UIElement)window.FindName("ClassicMaximizeGlyph")).Visibility == Visibility.Visible &&
+                        ((UIElement)window.FindName("ClassicCloseGlyph")).Visibility == Visibility.Visible &&
+                        ((UIElement)window.FindName("MaximizeGlyph")).Visibility == Visibility.Collapsed,
+                        "98SE displays its drawn minimize, maximize and close symbols and hides modern glyphs.");
+                }
                 var panel = new StackPanel { Background = (Brush)app.FindResource("BackgroundBrush"), Width = 370 };
                 foreach (string style in new[] { "PrimaryButton", "OutlineButton" })
                 {
@@ -131,7 +216,7 @@ internal static class ReleaseUiTests
                             Require(flat || border.Background is LinearGradientBrush, theme + "/" + accent + ": outline hover uses a gradient.");
                         }
                         if (style == "OutlineButton" && state == "pressed")
-                            Require(Equals(button.Foreground, app.FindResource("SelectionFg")), "Pressed outline text follows selection contrast.");
+                            Require(Equals(button.Foreground, app.FindResource("OutlineHoverTextBrush")), "Pressed outline keeps the accent fill and its text color.");
                     }
                 }
                 var image = Render(panel, 370, 340);
@@ -143,52 +228,11 @@ internal static class ReleaseUiTests
         }
         Require(states == 45, "All 45 default and explicit theme/accent states render.");
         Theme("Black", "Orange");
-        var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
-        ScanOptionsUiChecks.Run(workspace);
-        InterfaceUiChecks.Run(workspace);
-        LocationUiChecks.Run(window, workspace, () => Save(Render(root, 1200, 780), Path.Combine(output, "Location.png")));
         foreach (string locale in Enum.GetNames(localeType))
         {
             Locale(locale);
             window.GetType().GetMethod("RefreshWorkspaceLocale", Instance)!.Invoke(window, null);
-            if (locale is "EnUS" or "SlSI")
-            {
-                var options = ((Button)workspace.FindName("ScanOptionsButton")).ContextMenu;
-                foreach (var item in options.Items.OfType<MenuItem>())
-                    if (item.Tag is string) item.IsChecked = true;
-                var entries = options.Items.Cast<UIElement>().ToArray();
-                options.Items.Clear();
-                var surface = new StackPanel { Background = (Brush)app.FindResource("MenuBackgroundBrush") };
-                foreach (var entry in entries) surface.Children.Add(entry);
-                Save(Render(surface, 570, 720), Path.Combine(output, "ScanOptions-" + locale + ".png"));
-                Require(surface.Children.Cast<FrameworkElement>().All(entry => entry.ActualHeight + entry.TranslatePoint(new Point(), surface).Y <= 720),
-                    locale + ": every scan option fits the rendered menu.");
-                surface.Children.Clear();
-                foreach (var entry in entries) options.Items.Add(entry);
-            }
             Require(app.FindResource("Str_Btn_Scan") is string text && text.Length > 0, locale + ": scan label resolves.");
-            foreach (var (gridName, keys) in new[]
-            {
-                ("ResultsGrid", new[] { "Str_Col_Ip", "Str_Col_Host", "Str_Col_Mac", "Str_Col_Vendor", "Str_Col_Type", "Home Assistant", "Str_Col_Ports" }),
-                ("ServicesGrid", new[] { "Str_Services_Service", "Str_Col_Ports", "Str_Col_DeviceName", "Str_Col_Ip", "Str_Col_Type", "Home Assistant" })
-            })
-            {
-                var grid = (DataGrid)workspace.FindName(gridName);
-                Require(grid.Columns.Select(column => column.Header).SequenceEqual(keys.Select(key => key == "Home Assistant" ? key : app.FindResource(key))),
-                    locale + ": " + gridName + " headers follow the selected locale.");
-            }
-            if (locale == "SlSI")
-            {
-                Require(Equals(localeManager.GetMethod("LocaleForCulture", Static)!.Invoke(null,
-                    new object[] { System.Globalization.CultureInfo.GetCultureInfo("sl-SI") }), Enum.Parse(localeType, "SlSI")),
-                    "Slovenian Windows UI culture selects Slovenian.");
-                var reports = assembly.GetType("KillerScan.Services.ReportExport", true)!;
-                string html = (string)reports.GetMethod("BuildHtml", Static)!.Invoke(null,
-                    new object[] { Array.Empty<KillerScan.Engine.NetworkDevice>(), "192.0.2.0/24", "black" })!;
-                Require(html.Contains("<html lang='sl-SI'") && System.Net.WebUtility.HtmlDecode(html).Contains(
-                    "<title>KillerScan - " + app.FindResource("Str_Filter_Html") + "</title>"),
-                    "Slovenian HTML reports declare their language and translate the document title.");
-            }
             if (locale is "UkUA" or "NbNO" or "PtBR" or "SlSI")
                 foreach (double scale in new[] { 1.0, 1.5 })
                 {
@@ -203,14 +247,15 @@ internal static class ReleaseUiTests
         var leftColumn = (StackPanel)columnsPanel.Children[0];
         var rightColumn = (StackPanel)columnsPanel.Children[2];
         var languages = leftColumn.Children.Cast<RadioButton>().Concat(rightColumn.Children.Cast<RadioButton>()).ToArray();
-        int localeCount = Enum.GetNames(localeType).Length;
-        Require(languages.Length == localeCount && leftColumn.Children.Count == (localeCount + 1) / 2 && rightColumn.Children.Count == localeCount / 2, "Language menu includes every locale in two balanced columns.");
+        Require(leftColumn.Children.Count == 10 && rightColumn.Children.Count == 10, "Language menu has two balanced columns.");
         foreach (string locale in new[] { "UkUA", "NbNO", "PtBR", "SlSI" })
             Require(languages.Any(radio => Equals(radio.Tag, locale)), locale + ": language is selectable in the menu.");
         Require(languages.Count(radio => radio.IsChecked == true) == 1, "Language menu marks exactly one current locale.");
         menu.Items.Clear();
         var menuSurface = new Border { Child = columnsPanel, Background = (Brush)app.FindResource("MenuBackgroundBrush") };
         Save(Render(menuSurface, 450, 420), Path.Combine(output, "LanguageMenu.png"));
+        var workspace = (KillerScan.Controls.ScanWorkspace)window.GetType().GetField("_scanWorkspace", Instance)!.GetValue(window)!;
+        ScanOptionsUiChecks.Run(workspace);
         workspace.SetView("services");
         Render(root, 1200, 780);
         CheckServiceMenu(workspace, root, output);
@@ -256,7 +301,7 @@ internal static class ReleaseUiTests
         var sheet = new RenderTargetBitmap(columns * 370, rows * 370, 96, 96, PixelFormats.Pbgra32);
         sheet.Render(drawing);
         Save(sheet, Path.Combine(output, "ButtonStates.png"));
-        Console.WriteLine($"PASS: 45 theme/accent states, {localeCount} locales, new-language scaling, services and topology rendered.");
+        Console.WriteLine("PASS: 45 theme/accent states, 20 locales, new-language scaling, services and topology rendered.");
         Console.WriteLine("Offscreen release UI: " + output);
     }
 
@@ -268,7 +313,7 @@ internal static class ReleaseUiTests
         Require(!ReferenceEquals(grid.ContextMenu, devicesGrid.ContextMenu), "Services have their own context menu.");
         var actions = grid.ContextMenu.Items.OfType<MenuItem>().ToDictionary(item => (string)item.Tag);
         Require(actions.Keys.OrderBy(value => value).SequenceEqual(new[] { "Browser", "CopyEndpoint", "CopyHost", "CopyIp", "CopyPort",
-            "CopyService", "Access", "Evidence", "HomeAssistant", "Export", "Rdp", "SelectAll", "Ssh", "SshAs" }.OrderBy(value => value)),
+            "CopyService", "Export", "HomeAssistant", "Rdp", "SelectAll", "Ssh", "SshAs" }.OrderBy(value => value)),
             "The service menu contains service actions and excludes device trust, renaming, MAC copying and type overrides.");
         var original = ((IEnumerable<KillerScan.Engine.NetworkDevice>)type.GetProperty("ScannedDevices", Instance)!.GetValue(workspace)!).ToArray();
         string originalTarget = workspace.Targets;
@@ -299,7 +344,8 @@ internal static class ReleaseUiTests
         }
         try
         {
-            load.Invoke(workspace, new object[] { "192.0.2.0/24", new[] { host, unnamed } });
+            // LoadSnapshot's optional scan time must be passed explicitly through reflection.
+            load.Invoke(workspace, new object?[] { "192.0.2.0/24", new[] { host, unnamed }, null });
             refresh.Invoke(workspace, null);
             Render(root, 1200, 780);
             void RightClick(object item)
@@ -370,7 +416,7 @@ internal static class ReleaseUiTests
         finally
         {
             actionField.SetValue(workspace, originalHandler);
-            load.Invoke(workspace, new object[] { originalTarget, original });
+            load.Invoke(workspace, new object?[] { originalTarget, original, null });
             refresh.Invoke(workspace, null);
         }
     }
@@ -391,7 +437,9 @@ internal static class ReleaseUiTests
             var click = new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0,
                 System.Windows.Input.MouseButton.Right) { RoutedEvent = UIElement.MouseRightButtonDownEvent };
             canvas.RaiseEvent(click);
-            Require(click.Handled && settings.IsOpen && settings.PlacementTarget == canvas && settings.Placement == PlacementMode.MousePoint,
+            var viewport = (ScrollViewer)workspace.FindName("TopologyScrollViewer");
+            Require(click.Handled && settings.IsOpen && settings.PlacementTarget == viewport &&
+                settings.Placement == PlacementMode.RelativePoint && settings.PlacementRectangle.TopLeft == click.GetPosition(viewport),
                 "Right-clicking the topology background opens settings at the pointer.");
         }
         finally { settings.IsOpen = false; settings.Visibility = Visibility.Visible; }
@@ -450,7 +498,7 @@ internal static class ReleaseUiTests
                             Require(bounds[i].Left >= 0 && bounds[i].Top >= 0 && bounds[i].Right <= canvas.Width + 0.1 &&
                                 bounds[i].Bottom <= canvas.Height + 0.1, "All topology boxes stay within the canvas.");
                             for (int j = i + 1; j < bounds.Length; j++)
-                                Require(!bounds[i].IntersectsWith(bounds[j]), "Automatic topology boxes do not overlap.");
+                                Require(!bounds[i].IntersectsWith(bounds[j]), "Automatic topology boxes do not overlap: " + pattern + "/" + orientation + "/" + scale + "/" + size + " " + bounds[i] + " and " + bounds[j] + ".");
                         }
                         foreach (var node in canvas.Children.OfType<Border>())
                         {

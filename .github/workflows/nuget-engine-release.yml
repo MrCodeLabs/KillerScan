@@ -24,8 +24,8 @@ concurrency:
 jobs:
   publish:
     if: >-
-      (github.event_name == 'release' && !github.event.release.prerelease) ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      github.repository == 'SteveTheKiller/KillerScan' &&
+      ((github.event_name == 'release' && !github.event.release.prerelease) || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
     # Windows, so the net48 build and its regression run sit beside net10.0.
     runs-on: windows-latest
     permissions:
@@ -41,7 +41,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -62,6 +62,22 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw 'Repair commit must be on main.' }
             git diff --exit-code $tag $source -- Engine Resources/oui.txt ':!Engine/KillerScan.Engine.csproj' ':!Engine/README.md' ':!Engine/icon.png'
             if ($LASTEXITCODE -ne 0) { throw 'Engine code differs from the released source.' }
+            # The project file decides what is compiled and which dependency versions ship, so only
+            # its package metadata may change in a repair. Everything else must match the tag.
+            $metadata = 'Title', 'Authors', 'Copyright', 'Description', 'PackageTags', 'PackageProjectUrl',
+              'RepositoryUrl', 'RepositoryType', 'PackageReleaseNotes'
+            function Get-BuildShape([string]$ref) {
+              [xml]$project = (git show "$($ref):Engine/KillerScan.Engine.csproj") -join "`n"
+              if ($LASTEXITCODE -ne 0) { throw "The engine project is missing at $ref." }
+              foreach ($name in $metadata) {
+                foreach ($node in @($project.SelectNodes("/Project/PropertyGroup/$name"))) { [void]$node.ParentNode.RemoveChild($node) }
+              }
+              foreach ($node in @($project.SelectNodes('//comment()'))) { [void]$node.ParentNode.RemoveChild($node) }
+              $project.OuterXml
+            }
+            if ((Get-BuildShape $tag) -ne (Get-BuildShape $source)) {
+              throw 'The engine project differs from the released source beyond package metadata.'
+            }
           }
           git checkout --detach $source
           if ($LASTEXITCODE -ne 0) { throw 'Release source checkout failed.' }
@@ -73,7 +89,7 @@ jobs:
           }
           "version=$version" >> $env:GITHUB_OUTPUT
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: '10.0.x'
 
@@ -82,6 +98,8 @@ jobs:
 
       - name: Test
         run: |
+          # The hosted image includes IIS, which can reserve the loopback HTTP fixture's port.
+          Get-Service W3SVC, WAS -ErrorAction SilentlyContinue | Stop-Service -Force -ErrorAction Stop
           dotnet build tests/KillerScan.Engine.Tests/KillerScan.Engine.Tests.csproj -c Release --no-restore
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           foreach ($tfm in 'net48', 'net10.0') {
@@ -93,7 +111,7 @@ jobs:
         run: dotnet pack Engine/KillerScan.Engine.csproj -c Release -o artifacts/nuget
 
       - name: Preserve packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: engine-${{ steps.release.outputs.version }}
           path: artifacts/nuget/*
@@ -101,7 +119,7 @@ jobs:
 
       - name: Sign in to NuGet
         id: nuget-login
-        uses: NuGet/login@v1
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         with:
           user: StevetheKiller
 

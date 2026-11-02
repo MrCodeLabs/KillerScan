@@ -12,61 +12,6 @@ namespace KillerScan.Controls
     {
         private NetworkDevice? GetSelectedDevice() => ResultsGrid.SelectedItem as NetworkDevice;
 
-        internal NetworkDevice? EvidenceDevice => _showServices
-            ? (ServicesGrid.CurrentItem as ServiceRow ?? ServicesGrid.SelectedItem as ServiceRow) is { } row && ServicesGrid.SelectedItems.Contains(row)
-                ? ActiveDevices.FirstOrDefault(item => item.IpAddress == row.IpAddress) : null
-            : ResultsGrid.CurrentItem is NetworkDevice current && ResultsGrid.SelectedItems.Contains(current) ? current : GetSelectedDevice();
-
-        private void Evidence_Click(object sender, RoutedEventArgs e)
-        {
-            if (EvidenceDevice is { } device)
-                new DeviceEvidenceWindow(device) { Owner = Window.GetWindow(this) }.ShowDialog();
-        }
-
-        private void Access_Click(object sender, RoutedEventArgs e)
-        {
-            if (EvidenceDevice is not { } device) return;
-            new DeviceAccessWindow(device, endpoint => OpenAccess(device, endpoint), CopyDeviceText)
-                { Owner = Window.GetWindow(this) }.ShowDialog();
-        }
-
-        private void HomeAssistant_Click(object sender, RoutedEventArgs e)
-        {
-            CreateHomeAssistantAdvice().ShowDialog();
-        }
-
-        private void HomeAssistantAll_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = CreateHomeAssistantOverview();
-            if (Window.GetWindow(this) is { } owner && PresentationSource.FromVisual(owner) != null) dialog.Owner = owner;
-            dialog.ShowDialog();
-        }
-        internal HomeAssistantOverviewWindow CreateHomeAssistantOverview() => new(ActiveDevices, WebLink.Open, CopyDeviceText);
-
-        private void HomeAssistantRow_Click(object sender, RoutedEventArgs e)
-        {
-            var value = (sender as FrameworkElement)?.DataContext;
-            var device = value as NetworkDevice ?? (value is ServiceRow row ? ActiveDevices.FirstOrDefault(item => item.IpAddress == row.IpAddress) : null);
-            if (device == null) return;
-            var dialog = new HomeAssistantAdviceWindow(device, WebLink.Open, CopyDeviceText);
-            if (Window.GetWindow(this) is { } owner && PresentationSource.FromVisual(owner) != null) dialog.Owner = owner;
-            dialog.ShowDialog();
-        }
-
-        internal HomeAssistantAdviceWindow CreateHomeAssistantAdvice()
-        {
-            var dialog = new HomeAssistantAdviceWindow(EvidenceDevice ?? new NetworkDevice(), WebLink.Open, CopyDeviceText);
-            if (Window.GetWindow(this) is { } owner && PresentationSource.FromVisual(owner) != null) dialog.Owner = owner;
-            return dialog;
-        }
-
-        internal void OpenAccess(NetworkDevice device, AccessEndpoint endpoint)
-        {
-            if (DeviceAccess.Address(device.IpAddress, endpoint) == null) return;
-            string? action = endpoint.Protocol switch { "http" or "https" => "Browser", "ssh" => "Ssh", "rdp" => "Rdp", _ => null };
-            if (action != null) DeviceAction?.Invoke(this, new ScanDeviceActionEventArgs(device, action, false, endpoint.Port, endpoint));
-        }
-
         private void ResultsGrid_RightClick(object sender, MouseButtonEventArgs e)
         {
             var row = ItemsControl.ContainerFromElement(ResultsGrid, e.OriginalSource as DependencyObject) as DataGridRow;
@@ -141,8 +86,11 @@ namespace KillerScan.Controls
             var d = GetSelectedDevice(); if (d == null || string.IsNullOrEmpty(d.MacAddress)) return;
             if (sender is MenuItem mi && mi.Tag is string type)
             {
-                DeviceOverrides.Set(d.MacAddress, type);
-                DeviceIdentification.ApplyManualType(d, type);
+                PersistenceFeedback.Check(_location.Overrides.Set(d.MacAddress, type), _location.Overrides.Save, () => _location.Overrides.SaveError);
+                // The automatic result stays on record next to the manual type.
+                d.Recognition = NetworkScanner.AssessDevice(d, mac => _location.Overrides.Get(mac));
+                d.DeviceType = type;
+                if (d.Identification != null) DeviceIdentification.ApplyManualType(d, type);
                 _filteredView?.Refresh();
                 if (_showTopology) RefreshTopology();
                 StatusText.Text = string.Format(Loc("Str_St_OverrideSet"), d.MacAddress, type);
@@ -152,12 +100,95 @@ namespace KillerScan.Controls
         private void ClearOverride_Click(object sender, RoutedEventArgs e)
         {
             var d = GetSelectedDevice(); if (d == null || string.IsNullOrEmpty(d.MacAddress)) return;
-            DeviceOverrides.Set(d.MacAddress, null);
-            DeviceIdentification.ApplyManualType(d, null);
+            PersistenceFeedback.Check(_location.Overrides.Set(d.MacAddress, null), _location.Overrides.Save, () => _location.Overrides.SaveError);
+            d.Recognition = NetworkScanner.AssessDevice(d, mac => _location.Overrides.Get(mac));
+            d.DeviceType = d.Recognition.Type;
+            if (d.Identification != null) DeviceIdentification.ApplyManualType(d, null);
             _filteredView?.Refresh();
             if (_showTopology) RefreshTopology();
             StatusText.Text = string.Format(Loc("Str_St_OverrideCleared"), d.MacAddress);
         }
+
+        private void TypeCell_ToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            if (sender is not DataGridCell { DataContext: NetworkDevice device } cell) { e.Handled = true; return; }
+            cell.ToolTip = RecognitionText.Tooltip(device.Recognition);
+        }
+
+        /// <summary>
+        /// Shows why the selected device has its type. It only reads what the scan already
+        /// recorded: opening it sends nothing to the device.
+        /// </summary>
+        internal void WhyType_Click(object sender, RoutedEventArgs e)
+        {
+            var d = GetSelectedDevice(); if (d == null) return;
+            var show = ShowRecognition ?? ((heading, detail) =>
+                new ConfirmDialog(heading, detail, Loc("Str_Sys_Close"), string.Empty) { Owner = Window.GetWindow(this) }.ShowDialog());
+            show(RecognitionText.Heading(d), RecognitionText.Detail(d));
+        }
+
+        /// <summary>
+        /// Lists the selected device's endpoints from what the scan recorded. Opening the menu
+        /// sends nothing; clicking an endpoint opens it with the existing browser, SSH or Remote
+        /// Desktop action, or copies the address when no app handles the protocol.
+        /// </summary>
+        private void AccessMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            if (!ReferenceEquals(e.OriginalSource, AccessMenuItem)) return;
+            AccessMenuItem.Items.Clear();
+            var d = GetSelectedDevice();
+            var endpoints = d == null ? [] : DeviceAccess.ForDevice(d);
+            if (d == null || endpoints.Count == 0)
+            {
+                AccessMenuItem.Items.Add(new MenuItem { Header = Loc("Str_Access_None"), IsEnabled = false, Icon = MenuGlyph.Create(0xE946) });
+                return;
+            }
+            foreach (var endpoint in endpoints)
+            {
+                string? action = AccessAction(endpoint);
+                var item = new MenuItem { Header = AccessWording.Item(endpoint), ToolTip = AccessWording.Tooltip(endpoint, action != null), Icon = MenuGlyph.Create(AccessGlyph(endpoint)) };
+                item.Click += (_, _) => OpenAccess(d, endpoint);
+                AccessMenuItem.Items.Add(item);
+            }
+            var copy = new MenuItem { Header = Loc("Str_Access_CopyMenu"), Icon = MenuGlyph.Create(0xE8C8) };
+            foreach (var endpoint in endpoints)
+            {
+                string? address = DeviceAccess.Address(d.IpAddress, endpoint);
+                if (address == null) continue;
+                var item = new MenuItem { Header = address, Icon = MenuGlyph.Create(0xE8C8) };
+                item.Click += (_, _) => CopyDeviceText(address);
+                copy.Items.Add(item);
+            }
+            AccessMenuItem.Items.Add(copy);
+        }
+
+        // The same glyphs the device menu uses for Open in Browser, SSH and Remote Desktop.
+        private static int AccessGlyph(AccessEndpoint endpoint) => endpoint.Protocol switch
+        {
+            "http" or "https" => 0xE8A7,
+            "ssh" => 0xE756,
+            "rdp" => 0xE7F4,
+            _ => 0xE8C8,
+        };
+
+        private static string? AccessAction(AccessEndpoint endpoint) => endpoint.Protocol switch
+        {
+            "http" or "https" => "Browser",
+            "ssh" => "Ssh",
+            "rdp" => "Rdp",
+            _ => null,
+        };
+
+        internal void OpenAccess(NetworkDevice device, AccessEndpoint endpoint)
+        {
+            if (AccessAction(endpoint) is { } action)
+                DeviceAction?.Invoke(this, new ScanDeviceActionEventArgs(device, action, false, endpoint.Port));
+            else if (DeviceAccess.Address(device.IpAddress, endpoint) is { } address)
+                CopyDeviceText(address);
+        }
+
+        /// <summary>Test hook: replaces the window that shows a device's evidence.</summary>
+        internal Action<string, string>? ShowRecognition { get; set; }
 
         private void RenameDevice_Click(object sender, RoutedEventArgs e)
         {
@@ -166,13 +197,14 @@ namespace KillerScan.Controls
                 Loc("Str_Rename_Title"),
                 d.IpAddress,
                 Loc("Str_Rename_Label"),
-                DevicePreferences.GetName(d) ?? d.Hostname,
+                _location.Devices.GetName(d) ?? d.Hostname,
                 Loc("Str_Rename_Save"),
                 Loc("Str_Btn_Cancel")) { Owner = Window.GetWindow(this) };
             dlg.ShowDialog();
             if (!dlg.Confirmed) return;
-            DevicePreferences.SetName(d, dlg.Value);
-            if (!string.IsNullOrWhiteSpace(dlg.Value)) d.Hostname = dlg.Value.Trim();
+            PersistenceFeedback.Check(_location.Devices.SetName(d, dlg.Value), _location.Devices.Retry, () => _location.Devices.SaveError);
+            // A blank name clears the custom one, so the row shows the discovered name again.
+            if (string.IsNullOrWhiteSpace(dlg.Value)) DevicePreferenceStore.Restore(d); else DevicePreferenceStore.Rename(d, dlg.Value);
             _filteredView?.Refresh();
             if (_showTopology) RefreshTopology();
         }
@@ -180,8 +212,8 @@ namespace KillerScan.Controls
         private void ClearDeviceName_Click(object sender, RoutedEventArgs e)
         {
             var d = GetSelectedDevice(); if (d == null) return;
-            DevicePreferences.SetName(d, null);
-            d.Hostname = string.IsNullOrWhiteSpace(d.NetbiosName) ? string.Empty : d.NetbiosName;
+            PersistenceFeedback.Check(_location.Devices.SetName(d, null), _location.Devices.Retry, () => _location.Devices.SaveError);
+            DevicePreferenceStore.Restore(d);
             _filteredView?.Refresh();
             if (_showTopology) RefreshTopology();
         }
@@ -189,8 +221,8 @@ namespace KillerScan.Controls
         private void TrustDevice_Click(object sender, RoutedEventArgs e)
         {
             var d = GetSelectedDevice(); if (d == null) return;
-            DevicePreferences.SetTrusted(d, !DevicePreferences.IsTrusted(d));
-            ((System.Windows.Shapes.Ellipse)TrustDeviceMenuItem.Icon).Fill = (System.Windows.Media.Brush)new TrustMarkConverter().Convert(
+            PersistenceFeedback.Check(_location.Devices.SetTrusted(d, !_location.Devices.IsTrusted(d)), _location.Devices.Retry, () => _location.Devices.SaveError);
+            ((System.Windows.Shapes.Ellipse)TrustDeviceMenuItem.Icon).Fill = (System.Windows.Media.Brush)_trustMark.Convert(
                 d, typeof(System.Windows.Media.Brush), null!, System.Globalization.CultureInfo.CurrentCulture);
             // Trust is not a property of the device, so nothing notifies the row that its gutter
             // marker has changed color. Re-reading the items is what re-runs the converter; the

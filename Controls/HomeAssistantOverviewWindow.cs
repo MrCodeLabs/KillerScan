@@ -10,7 +10,7 @@ namespace KillerScan.Controls;
 
 public sealed class HomeAssistantChoiceConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is HomeAssistantAdvice advice
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => (value is NetworkDevice device ? HomeAssistantAdvisor.ForDevice(device) : value) is HomeAssistantAdvice advice
         ? HomeAssistantText.Choice(advice) : HomeAssistantText.L("NoChoice");
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Binding.DoNothing;
 }

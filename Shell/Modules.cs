@@ -69,7 +69,8 @@ namespace KillerScan.Shell
         /// the check below is "does the folder exist".
         /// </summary>
         private static string ModulesRoot() => Path.Combine(
-            Services.Locations.DataRoot, "Modules", AppVersion());
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "KillerScan", "Modules", AppVersion());
 
         private static string AppVersion() =>
             Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0";

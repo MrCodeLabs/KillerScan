@@ -14,8 +14,10 @@ using KillerScan.Services;
 
 namespace KillerScan.Controls
 {
-    /// <summary>Open or Save. Picked at construction; changes the accept button and the rules.</summary>
-    public enum FileDialogMode { Open, Save }
+    /// <summary>Open, Save or Folder. Picked at construction; changes the accept button and the
+    /// rules. Folder hides the name and type fields, labels the button Select, and returns a
+    /// folder as FileName.</summary>
+    public enum FileDialogMode { Open, Save, Folder }
 
     /// <summary>
     /// Themed stand-in for Microsoft.Win32.OpenFileDialog / SaveFileDialog. Same chrome, places
@@ -29,8 +31,7 @@ namespace KillerScan.Controls
     ///     var dlg = new FileDialog(FileDialogMode.Save) { Title = ..., Filter = ..., FileName = ... };
     ///     if (dlg.ShowDialog(owner) == true) Use(dlg.FileName);
     ///
-    /// Multiselect is deliberately NOT implemented yet - nothing in the app needs it, and
-    /// a half-working Multiselect is worse than an absent one. Add it when something wants it.
+    /// Multiselect matches Explorer's Ctrl and Shift selection behavior in Open mode.
     /// </summary>
     public partial class FileDialog : Window
     {
@@ -51,6 +52,11 @@ namespace KillerScan.Controls
         public string DefaultExt { get; set; } = "";
 
         public bool AddExtension { get; set; } = true;
+
+        /// <summary>Keeps the seeded name fixed while the user picks only the folder: the name box
+        /// is read only, picking a file does not replace it, and a type switch leaves it alone.
+        /// Off by default.</summary>
+        public bool IsFileNameReadOnly { get; set; }
         /// <summary>
         /// Append the active filter's extension even when the typed name contains another dot.
         /// Use this for format-locked exports such as flattened PDF output.
@@ -73,9 +79,22 @@ namespace KillerScan.Controls
         /// Set it BEFORE ShowDialog - the list's selection mode is applied there.</summary>
         public bool Multiselect { get; set; }
 
+        /// <summary>Folder mode only: list folders alone instead of folders and the files that
+        /// pass the filter. Off by default.</summary>
+        public bool HideFilesInFolderMode { get; set; }
+
+        /// <summary>Folder mode only: Explorer-style picking. A highlighted subfolder is the answer
+        /// (otherwise the folder being shown), Enter anywhere accepts, and the chosen folder is
+        /// remembered as the next starting point. Off by default: the folder being shown is the
+        /// answer and nothing is remembered.</summary>
+        public bool AcceptHighlightedFolder { get; set; }
+
         /// <summary>Show a live preview pane for image-selection workflows. The pane is opt-in so
         /// ordinary Open and Save dialogs keep their compact layout.</summary>
         public bool ShowImagePreview { get; set; }
+
+        /// <summary>The kit's older name for <see cref="ShowImagePreview"/>, kept for its callers.</summary>
+        public bool ShowPreview { get => ShowImagePreview; set => ShowImagePreview = value; }
 
         /// <summary>Every path chosen. Always populated on success, so a caller can read this
         /// whether or not it asked for Multiselect - single selection yields one entry, matching
@@ -91,6 +110,31 @@ namespace KillerScan.Controls
 
         private readonly List<PickerEntry> _raw = [];
         private string _currentDir = string.Empty;
+
+        /// <summary>A typed name or path, resolved against the folder shown. "C:shot.png" and
+        /// "\shot.png" are rooted but not fully qualified; they must not fall back on the
+        /// process's current directory.</summary>
+        private string ResolveTyped(string typed)
+        {
+            // Written by hand: .NET Framework apps share this file and lack the two-argument GetFullPath.
+            if (typed.Length == 0 || _currentDir.Length == 0) return typed;
+            if (typed.StartsWith(@"\\") || typed.StartsWith("//")) return typed;
+            string combined;
+            if (typed.Length >= 2 && char.IsLetter(typed[0]) && typed[1] == ':')
+            {
+                if (typed.Length >= 3 && (typed[2] == '\\' || typed[2] == '/')) return typed;
+                // "C:shot.png": the shown folder when it is on that drive, otherwise that drive's root.
+                bool sameDrive = _currentDir.Length >= 2 && _currentDir[1] == ':'
+                    && char.ToUpperInvariant(_currentDir[0]) == char.ToUpperInvariant(typed[0]);
+                combined = Path.Combine(sameDrive ? _currentDir : typed.Substring(0, 2) + @"\", typed.Substring(2));
+            }
+            else if (typed[0] == '\\' || typed[0] == '/')
+                combined = Path.Combine(Path.GetPathRoot(_currentDir) ?? _currentDir, typed.TrimStart('\\', '/'));
+            else combined = Path.Combine(_currentDir, typed);
+            try { return Path.GetFullPath(combined); }
+            catch (Exception error) when (error is ArgumentException or NotSupportedException or PathTooLongException)
+            { return combined; }
+        }
         private bool _navigating;
         private bool _built;                 // suppresses filter events during construction
         private int  _viewMode;              // 0 list, 1 icons, 2 details
@@ -152,6 +196,8 @@ namespace KillerScan.Controls
             {
                 _fadingOut = true;
                 e.Cancel = true;
+                // Stop folder listing now, not after the fade, so a slow listing cannot land on a closing dialog.
+                CloseDirectoryListing();
                 Anim.FadeOut(RootFade, () =>
                 {
                     if (_pendingResult.HasValue) DialogResult = _pendingResult;   // this closes it
@@ -166,6 +212,8 @@ namespace KillerScan.Controls
         {
             _mode = mode;
             InitializeComponent();
+            Closed += (_, _) => CloseDirectoryListing();
+            if (!DialogChrome.SetTitleIcon(TitleIcon)) TitleIcon.Visibility = Visibility.Collapsed;
             Loaded += (_, _) => Anim.FadeIn(RootFade);
 
             // Size and placement remembered separately from the folder picker: this dialog is a
@@ -173,17 +221,17 @@ namespace KillerScan.Controls
             try
             {
                 var ci = System.Globalization.CultureInfo.InvariantCulture;
-                if (double.TryParse(App.GetSetting("FileDlgW"),
+                if (double.TryParse(Services.ThemeManager.GetSetting("FileDlgW"),
                         System.Globalization.NumberStyles.Float, ci, out double w) &&
-                    double.TryParse(App.GetSetting("FileDlgH"),
+                    double.TryParse(Services.ThemeManager.GetSetting("FileDlgH"),
                         System.Globalization.NumberStyles.Float, ci, out double h))
                 {
                     Width  = Math.Max(MinWidth,  Math.Min(w, SystemParameters.WorkArea.Width));
                     Height = Math.Max(MinHeight, Math.Min(h, SystemParameters.WorkArea.Height));
                 }
-                if (double.TryParse(App.GetSetting("FileDlgX"),
+                if (double.TryParse(Services.ThemeManager.GetSetting("FileDlgX"),
                         System.Globalization.NumberStyles.Float, ci, out double x) &&
-                    double.TryParse(App.GetSetting("FileDlgY"),
+                    double.TryParse(Services.ThemeManager.GetSetting("FileDlgY"),
                         System.Globalization.NumberStyles.Float, ci, out double y))
                 {
                     var wa = SystemParameters.WorkArea;
@@ -195,19 +243,19 @@ namespace KillerScan.Controls
                         Top  = y;
                     }
                 }
-                if (double.TryParse(App.GetSetting(PlacesHKey),
+                if (double.TryParse(Services.ThemeManager.GetSetting(PlacesHKey),
                         System.Globalization.NumberStyles.Float, ci, out double ph) && ph >= 56)
                     PlacesRow.Height = new GridLength(Math.Min(ph, 600));
             }
             catch { /* registry unavailable - defaults are fine */ }
 
-            _showHidden = App.GetSetting(ShowHiddenKey) == "1";
+            _showHidden = Services.ThemeManager.GetSetting(ShowHiddenKey) == "1";
             FolderNode.ShowHidden = _showHidden;
             ApplyShowHiddenButton();
-            if (int.TryParse(App.GetSetting(SortKeyKey), out int savedSortKey)
+            if (int.TryParse(Services.ThemeManager.GetSetting(SortKeyKey), out int savedSortKey)
                 && savedSortKey is >= 0 and <= 2)
                 _sortKey = savedSortKey;
-            _sortAsc = App.GetSetting(SortAscKey) is not string savedSortAsc
+            _sortAsc = Services.ThemeManager.GetSetting(SortAscKey) is not string savedSortAsc
                 || savedSortAsc != "0";
 
             Closing += (_, _) =>
@@ -215,11 +263,11 @@ namespace KillerScan.Controls
                 try
                 {
                     var ci = System.Globalization.CultureInfo.InvariantCulture;
-                    App.SetSetting("FileDlgW", ActualWidth.ToString(ci));
-                    App.SetSetting("FileDlgH", ActualHeight.ToString(ci));
-                    App.SetSetting("FileDlgX", Left.ToString(ci));
-                    App.SetSetting("FileDlgY", Top.ToString(ci));
-                    App.SetSetting(PlacesHKey, PlacesRow.ActualHeight.ToString(ci));
+                    Services.ThemeManager.SetSetting("FileDlgW", ActualWidth.ToString(ci));
+                    Services.ThemeManager.SetSetting("FileDlgH", ActualHeight.ToString(ci));
+                    Services.ThemeManager.SetSetting("FileDlgX", Left.ToString(ci));
+                    Services.ThemeManager.SetSetting("FileDlgY", Top.ToString(ci));
+                    Services.ThemeManager.SetSetting(PlacesHKey, PlacesRow.ActualHeight.ToString(ci));
                 }
                 catch { /* not worth failing the close */ }
             };
@@ -242,7 +290,17 @@ namespace KillerScan.Controls
         {
             if (owner != null && owner.IsVisible) Owner = owner;
 
-            AcceptButton.Content = Loc(_mode == FileDialogMode.Save ? "Str_Btn_Save" : "Str_Btn_Open");
+            AcceptButton.Content = Loc(_mode switch
+            {
+                FileDialogMode.Save   => "Str_Btn_Save",
+                FileDialogMode.Folder => "Str_Btn_Select",
+                _                     => "Str_Btn_Open",
+            });
+            if (_mode == FileDialogMode.Folder)
+            {
+                FileFields.Visibility = Visibility.Collapsed;
+                AcceptButton.IsDefault = AcceptHighlightedFolder;
+            }
             ConfigureImagePreview();
             // Extended, not Multiple: Extended is the Explorer behavior (plain click replaces the
             // selection, Ctrl adds, Shift ranges). Multiple toggles on every click, which feels
@@ -275,7 +333,7 @@ namespace KillerScan.Controls
             }
             if (string.IsNullOrWhiteSpace(startDir) || !Directory.Exists(startDir))
             {
-                string? remembered = App.GetSetting(LastDirKey);
+                string? remembered = Services.ThemeManager.GetSetting(LastDirKey);
                 startDir = !string.IsNullOrWhiteSpace(remembered) && Directory.Exists(remembered)
                     ? remembered!
                     : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -284,10 +342,12 @@ namespace KillerScan.Controls
             _built = true;
             NavigateTo(startDir);
             FileNameBox.Text = seedName;
+            FileNameBox.IsReadOnly = IsFileNameReadOnly;
 
             // Save: preselect the stem so typing replaces the name but keeps the extension
-            // visible. Open: caret at the end.
-            FileNameBox.Focus();
+            // visible. Open: caret at the end. Folder: there is no name box, so the button.
+            if (_mode == FileDialogMode.Folder) AcceptButton.Focus();
+            else FileNameBox.Focus();
             if (_mode == FileDialogMode.Save && seedName.Length > 0)
             {
                 int dot = seedName.LastIndexOf('.');
@@ -343,7 +403,7 @@ namespace KillerScan.Controls
             // Save mode follows the Win32 dialogs: switching the type swaps the typed name's
             // extension - but only when the current one belongs to another entry of THIS filter.
             // An extension the user typed by hand is theirs and is left alone.
-            if (_mode == FileDialogMode.Save)
+            if (_mode == FileDialogMode.Save && !IsFileNameReadOnly)
             {
                 string? newExt = ActiveFilterExt();
                 string  name   = FileNameBox.Text?.Trim() ?? "";
@@ -386,6 +446,7 @@ namespace KillerScan.Controls
         private bool PassesFilter(PickerEntry en)
         {
             if (en.IsFolder) return true;
+            if (_mode == FileDialogMode.Folder && HideFilesInFolderMode) return false;
             int i = FilterCombo.SelectedIndex;
             if (i < 0 || i >= _filterPatterns.Count) return true;
             var pats = _filterPatterns[i];
@@ -408,23 +469,77 @@ namespace KillerScan.Controls
         /// </summary>
         private void BuildPlaces()
         {
+            int build = ++_placesBuild;
+            _ = FillPlacesAsync(build, PinnedPaths());
+        }
+
+        private int _placesBuild;
+
+        /// <summary>
+        /// Drive readiness and folder existence are probed on a worker: a dropped mapped drive or an
+        /// unreachable pinned share blocks for the network timeout, and on the UI thread that would
+        /// keep the dialog from ever appearing. The list fills in when the probe is done, and a newer
+        /// build supersedes an older one.
+        /// </summary>
+        private async Task FillPlacesAsync(int build, List<string> pinnedPaths)
+        {
+            List<(string? Label, string Path, bool Pinned)> found;
+            try { found = await OnStaWorker(() => ProbePlaces(pinnedPaths)); }
+            catch { return; }
+            if (build != _placesBuild) return;
+
             Places.Clear();
+            foreach (var place in found)
+                Places.Add(new PickerPlace(place.Label ?? LabelFor(place.Path), place.Path, place.Pinned));
+            SyncPlacesSelection();
+        }
+
+        /// <summary>Runs on a worker, so it touches no WPF state; a null label means "name it from the path".</summary>
+        private static List<(string? Label, string Path, bool Pinned)> ProbePlaces(List<string> pinnedPaths)
+        {
+            var found = new List<(string? Label, string Path, bool Pinned)>();
             var added = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var p in PinnedPaths())
-                if (added.Add(p.TrimEnd('\\'))) AddPlace(LabelFor(p), p, pinned: true);
+            foreach (var p in pinnedPaths)
+                if (added.Add(p.TrimEnd('\\')) && PlaceExists(p)) found.Add((null, p, true));
 
             foreach (var place in ExplorerQuickAccessPlaces())
-                if (added.Add(place.Path.TrimEnd('\\'))) AddPlace(place.Label, place.Path);
+                if (added.Add(place.Path.TrimEnd('\\'))) found.Add((place.Label.Length > 0 ? place.Label : null, place.Path, false));
 
-            foreach (var d in DriveInfo.GetDrives().Where(d => d.IsReady))
+            try
             {
-                string label;
-                try { label = string.IsNullOrWhiteSpace(d.VolumeLabel) ? d.DriveType.ToString() : d.VolumeLabel.Trim(); }
-                catch { label = d.DriveType.ToString(); }
-                if (added.Add(d.RootDirectory.FullName.TrimEnd('\\')))
-                    AddPlace($"{d.Name.TrimEnd('\\')}  {label}", d.RootDirectory.FullName);
+                foreach (var d in DriveInfo.GetDrives().Where(d => d.IsReady))
+                {
+                    string label;
+                    try { label = string.IsNullOrWhiteSpace(d.VolumeLabel) ? d.DriveType.ToString() : d.VolumeLabel.Trim(); }
+                    catch { label = d.DriveType.ToString(); }
+                    if (added.Add(d.RootDirectory.FullName.TrimEnd('\\')) && PlaceExists(d.RootDirectory.FullName))
+                        found.Add(($"{d.Name.TrimEnd('\\')}  {label}", d.RootDirectory.FullName, false));
+                }
             }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+            return found;
+        }
+
+        private static bool PlaceExists(string path) => !string.IsNullOrEmpty(path) && Directory.Exists(path);
+
+        /// <summary>
+        /// Runs <paramref name="work"/> on its own background thread in a single-threaded apartment:
+        /// the Shell.Application COM object behind Quick Access is apartment-bound, and a pool
+        /// thread would marshal it back to the UI thread, which is the thread being kept free.
+        /// </summary>
+        private static Task<T> OnStaWorker<T>(Func<T> work)
+        {
+            var done = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var thread = new System.Threading.Thread(() =>
+            {
+                try { done.SetResult(work()); }
+                catch (Exception error) { done.SetException(error); }
+            }) { IsBackground = true };
+            thread.SetApartmentState(System.Threading.ApartmentState.STA);
+            thread.Start();
+            return done.Task;
         }
 
         /// <summary>
@@ -463,7 +578,7 @@ namespace KillerScan.Controls
                         if (!Convert.ToBoolean(quickItem.IsFolder)) continue;
                         string path = Convert.ToString(quickItem.Path) ?? "";
                         string name = Convert.ToString(quickItem.Name) ?? "";
-                        if (Directory.Exists(path)) places.Add((name.Length > 0 ? name : LabelFor(path), path));
+                        if (Directory.Exists(path)) places.Add((name, path));
                     }
                     catch { /* one unreadable entry must not lose the rest */ }
                     finally { if (item != null && Marshal.IsComObject(item)) Marshal.FinalReleaseComObject(item); }
@@ -485,7 +600,7 @@ namespace KillerScan.Controls
         /// </summary>
         private static List<string> PinnedPaths()
         {
-            string? saved = App.GetSetting(PinnedKey);
+            string? saved = Services.ThemeManager.GetSetting(PinnedKey);
             if (saved != null)
                 return [.. saved.Split('|').Where(s => s.Length > 0)];
 
@@ -517,19 +632,13 @@ namespace KillerScan.Controls
             return name.Length == 0 ? p : name;
         }
 
-        private void AddPlace(string label, string path, bool pinned = false)
-        {
-            if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
-                Places.Add(new PickerPlace(label, path, pinned));
-        }
-
         private void PinPlace(string path)
         {
             var list = PinnedPaths();
             if (list.Any(p => p.TrimEnd('\\').Equals(path.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)))
                 return;
             list.Add(path);
-            App.SetSetting(PinnedKey, string.Join("|", list));
+            Services.ThemeManager.SetSetting(PinnedKey, string.Join("|", list));
             BuildPlaces();
             SyncPlacesSelection();
         }
@@ -549,7 +658,7 @@ namespace KillerScan.Controls
             var list = PinnedPaths()
                 .Where(p => !p.TrimEnd('\\').Equals(pl.Path.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            App.SetSetting(PinnedKey, string.Join("|", list));
+            Services.ThemeManager.SetSetting(PinnedKey, string.Join("|", list));
             BuildPlaces();
             SyncPlacesSelection();
         }
@@ -595,55 +704,7 @@ namespace KillerScan.Controls
 
         // ── Navigation ───────────────────────────────────────────────────────────
 
-        private void NavigateTo(string dir)
-        {
-            if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir)) return;
-
-            _navigating = true;
-            UpdateImagePreview(null);
-            _currentDir  = dir;
-            PathBox.Text = dir;
-            _raw.Clear();
-
-            try
-            {
-                // The toggle gates two things together: attribute Hidden/System AND leading-dot
-                // names - the Unix convention is all over a Windows home folder (.gradle, .ssh)
-                // and those carry no Hidden attribute. Same gate in the folder tree (FolderTree.cs).
-                foreach (var sub in Directory.EnumerateDirectories(dir))
-                {
-                    DirectoryInfo info;
-                    try { info = new DirectoryInfo(sub); } catch { continue; }
-                    if (!_showHidden)
-                    {
-                        if ((info.Attributes & (FileAttributes.Hidden | FileAttributes.System)) != 0) continue;
-                        if (info.Name.StartsWith(".")) continue;
-                    }
-                    _raw.Add(new PickerEntry(info.Name, sub, true, 0, SafeTime(() => info.LastWriteTime)));
-                }
-                foreach (var file in Directory.EnumerateFiles(dir))
-                {
-                    FileInfo fi;
-                    try { fi = new FileInfo(file); } catch { continue; }
-                    if (!_showHidden)
-                    {
-                        if ((fi.Attributes & (FileAttributes.Hidden | FileAttributes.System)) != 0) continue;
-                        if (fi.Name.StartsWith(".")) continue;
-                    }
-                    _raw.Add(new PickerEntry(fi.Name, file, false, SafeLen(fi), SafeTime(() => fi.LastWriteTime)));
-                }
-            }
-            catch { /* unauthorized / unreadable - show what we have */ }
-
-            ApplySort();
-            UpButton.IsEnabled = Directory.GetParent(dir) != null;
-            UpdateInfoSummary();
-            SyncPlacesSelection();
-            _navigating = false;
-
-            RecordRecent(dir);
-            _ = RevealInTree(dir);
-        }
+        private void NavigateTo(string dir) => DirectoryListingTask = NavigateDirectoryAsync(dir);
 
         private static DateTime SafeTime(Func<DateTime> get)
         {
@@ -670,24 +731,15 @@ namespace KillerScan.Controls
         // ── Folder tree (ported from KillerShell, see Controls/FolderTree.cs) ────
 
         /// <summary>Ready drives only - an empty optical drive or a dropped mapping would sit
-        /// there as a node that throws the moment anyone touches it.</summary>
+        /// there as a node that throws the moment anyone touches it. The drives are probed on a
+        /// worker, because a dropped mapping can block for the network timeout, and the roots fill
+        /// in when it is done.</summary>
         private void InitTree()
         {
-            if (TreeRoots.Count > 0) return;
+            if (TreeRoots.Count > 0 || _treeStarted) return;
+            _treeStarted = true;
             FolderTreeCtl.ItemsSource = TreeRoots;
-
-            DriveInfo[] drives;
-            try { drives = DriveInfo.GetDrives(); }
-            catch (IOException) { return; }
-
-            foreach (var d in drives)
-            {
-                bool ready;
-                try { ready = d.IsReady; }
-                catch (IOException) { continue; }
-                catch (UnauthorizedAccessException) { continue; }
-                if (ready) TreeRoots.Add(new FolderNode(d));
-            }
+            _ = FillTreeRootsAsync();
 
             // Edge fades follow the scroll position (KillerShell TreePanel.cs). ScrollChanged is
             // handled at the TreeView rather than dug out of its template: it bubbles, so the
@@ -704,6 +756,37 @@ namespace KillerScan.Controls
                 new ScrollChangedEventHandler((_, _) => SyncPlacesEdgeFades()));
             PlacesList.SizeChanged += (_, _) => SyncPlacesEdgeFades();
             PlacesList.Loaded      += (_, _) => SyncPlacesEdgeFades();
+        }
+
+        private bool _treeStarted;
+
+        private async Task FillTreeRootsAsync()
+        {
+            List<FolderNode> roots;
+            try { roots = await OnStaWorker(ReadyDriveNodes); }
+            catch { return; }
+            foreach (var root in roots) TreeRoots.Add(root);
+            // The first listing may have finished before the roots existed, leaving nothing revealed.
+            if (_currentDir.Length > 0) _ = RevealInTree(_currentDir, _navigationVersion);
+        }
+
+        /// <summary>Runs on a worker; FolderNode is plain data, so the nodes can be built there.</summary>
+        private static List<FolderNode> ReadyDriveNodes()
+        {
+            var roots = new List<FolderNode>();
+            DriveInfo[] drives;
+            try { drives = DriveInfo.GetDrives(); }
+            catch (IOException) { return roots; }
+
+            foreach (var d in drives)
+            {
+                bool ready;
+                try { ready = d.IsReady; }
+                catch (IOException) { continue; }
+                catch (UnauthorizedAccessException) { continue; }
+                if (ready) roots.Add(new FolderNode(d));
+            }
+            return roots;
         }
 
         /// <summary>Places-list twin of SyncTreeEdgeFades: same ramp, same rules.</summary>
@@ -862,7 +945,7 @@ namespace KillerScan.Controls
         /// own expander is left exactly as the user had it (KillerShell's rule - forcing it
         /// collapsed the branch under the cursor and the whole tree jumped).
         /// </summary>
-        private async Task RevealInTree(string folder)
+        private async Task RevealInTree(string folder, long version)
         {
             if (string.IsNullOrEmpty(folder)) return;
 
@@ -880,6 +963,7 @@ namespace KillerScan.Controls
             if (segments.Count > 0)
             {
                 await current.LoadChildrenAsync();
+                if (version != _navigationVersion) return;   // a newer folder is being shown
                 current.IsExpanded = true;
             }
 
@@ -893,6 +977,7 @@ namespace KillerScan.Controls
                 if (i == segments.Count - 1) break;
 
                 await current.LoadChildrenAsync();   // needed to match the NEXT segment
+                if (version != _navigationVersion) return;
                 current.IsExpanded = true;
             }
 
@@ -911,7 +996,7 @@ namespace KillerScan.Controls
         // ── Recent locations ─────────────────────────────────────────────────────
 
         private static List<string> LoadRecents()
-            => [.. (App.GetSetting(RecentsKey) ?? "")
+            => [.. (Services.ThemeManager.GetSetting(RecentsKey) ?? "")
                .Split('|').Where(s => s.Length > 0)];
 
         private static void RecordRecent(string dir)
@@ -920,7 +1005,7 @@ namespace KillerScan.Controls
             list.RemoveAll(p => p.TrimEnd('\\').Equals(dir.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase));
             list.Insert(0, dir);
             if (list.Count > RecentsMax) list.RemoveRange(RecentsMax, list.Count - RecentsMax);
-            App.SetSetting(RecentsKey, string.Join("|", list));
+            Services.ThemeManager.SetSetting(RecentsKey, string.Join("|", list));
         }
 
         private void RecentsBtn_Click(object sender, RoutedEventArgs e)
@@ -950,7 +1035,7 @@ namespace KillerScan.Controls
         private void ShowHidden_Click(object sender, RoutedEventArgs e)
         {
             _showHidden = !_showHidden;
-            App.SetSetting(ShowHiddenKey, _showHidden ? "1" : "0");
+            Services.ThemeManager.SetSetting(ShowHiddenKey, _showHidden ? "1" : "0");
             FolderNode.ShowHidden = _showHidden;
             ApplyShowHiddenButton();
 
@@ -976,7 +1061,7 @@ namespace KillerScan.Controls
                 // Selecting a FILE fills the name box - that is the value being chosen. Selecting
                 // a folder does not: it is a navigation target, and overwriting the typed name
                 // with a folder name would lose what the user was in the middle of typing.
-                if (!en.IsFolder) FileNameBox.Text = en.Name;
+                if (!en.IsFolder && !IsFileNameReadOnly) FileNameBox.Text = en.Name;
                 SelName.Text = en.Name;
                 SelMeta.Text = en.IsFolder ? en.ModifiedLabel : $"{en.SizeLabel}  |  {en.ModifiedLabel}";
                 UpdateImagePreview(en);
@@ -1049,6 +1134,9 @@ namespace KillerScan.Controls
 
         private void Files_DoubleClick(object sender, MouseButtonEventArgs e)
         {
+            // A double-click on the scroll bars or the blank space under the last row is raised by
+            // the list too, and must not open whatever row is still highlighted.
+            if (ItemUnder<PickerEntry>(e.OriginalSource as DependencyObject) == null) return;
             if (FileList.SelectedItem is not PickerEntry en) return;
             if (en.IsFolder) NavigateTo(en.FullPath);
             else Accept();
@@ -1058,7 +1146,7 @@ namespace KillerScan.Controls
         {
             if (e.Key != Key.Enter) return;
             var typed = PathBox.Text?.Trim();
-            if (!string.IsNullOrEmpty(typed) && Directory.Exists(typed)) NavigateTo(typed!);
+            if (!string.IsNullOrEmpty(typed)) NavigateTo(typed!);
             e.Handled = true;
         }
 
@@ -1073,7 +1161,7 @@ namespace KillerScan.Controls
             // Win32 dialogs, and is how people paste a path in.
             if (typed.Length > 0)
             {
-                var asDir = Path.IsPathRooted(typed) ? typed : Path.Combine(_currentDir, typed);
+                var asDir = ResolveTyped(typed);
                 if (Directory.Exists(asDir)) { NavigateTo(asDir); FileNameBox.Clear(); return; }
             }
 
@@ -1097,6 +1185,7 @@ namespace KillerScan.Controls
             var leaf    = Path.GetFileName(_currentDir.TrimEnd('\\'));
             SelName.Text = leaf.Length == 0 ? _currentDir : leaf;
             SelMeta.Text = string.Format(Loc("Str_Sum_Counts"), folders, shown);
+            if (!IsDirectoryListingComplete && !string.IsNullOrWhiteSpace(_listingError)) SelMeta.Text += " | " + _listingError;
         }
 
         // ── View modes ───────────────────────────────────────────────────────────
@@ -1207,8 +1296,8 @@ namespace KillerScan.Controls
         {
             if (_sortKey == key) _sortAsc = !_sortAsc;
             else { _sortKey = key; _sortAsc = key == 0; }
-            App.SetSetting(SortKeyKey, _sortKey.ToString());
-            App.SetSetting(SortAscKey, _sortAsc ? "1" : "0");
+            Services.ThemeManager.SetSetting(SortKeyKey, _sortKey.ToString());
+            Services.ThemeManager.SetSetting(SortAscKey, _sortAsc ? "1" : "0");
             ApplySort();
         }
 
@@ -1216,7 +1305,9 @@ namespace KillerScan.Controls
         /// Rebuilds Entries from _raw: filter applied, folders always before files, then the
         /// active sort key. Folders-first is not a sort key - it is the frame the sort runs in.
         /// </summary>
-        private void ApplySort()
+        private void ApplySort() => _ = ApplySortAsync();
+
+        private async Task ApplySortAsync()
         {
             var visible = _raw.Where(PassesFilter);
 
@@ -1230,8 +1321,7 @@ namespace KillerScan.Controls
                               : visible.OrderBy(x => !x.IsFolder).ThenByDescending(x => x.Name, StringComparer.OrdinalIgnoreCase),
             };
 
-            Entries.Clear();
-            foreach (var e in ordered) Entries.Add(e);
+            if (!await PublishListingRowsAsync(ordered.ToArray())) return;
 
             NameArrow.Text = _sortKey == 0 ? (_sortAsc ? ArrowUp : ArrowDown) : "";
             SizeArrow.Text = _sortKey == 1 ? (_sortAsc ? ArrowUp : ArrowDown) : "";
@@ -1255,6 +1345,35 @@ namespace KillerScan.Controls
         /// </summary>
         private void Accept()
         {
+            // Accept stays off while a listing loads or an accept is already running, so a double
+            // press or an Enter during the overwrite prompt cannot run it twice.
+            if (IsDirectoryListingBusy || !IsDirectoryListingAvailable || _accepting) return;
+            _accepting = true;
+            AcceptButton.IsEnabled = false;
+            try { AcceptCore(); }
+            finally
+            {
+                _accepting = false;
+                if (_pendingResult != true) AcceptButton.IsEnabled = IsDirectoryListingAvailable && !IsDirectoryListingBusy;
+            }
+        }
+
+        private bool _accepting;
+
+        private void AcceptCore()
+        {
+            if (_mode == FileDialogMode.Folder)
+            {
+                string folder = AcceptHighlightedFolder && FileList.SelectedItem is PickerEntry { IsFolder: true } selected
+                    ? selected.FullPath : _currentDir;
+                if (!Directory.Exists(folder)) return;
+                FileName  = folder;
+                FileNames = [folder];
+                if (AcceptHighlightedFolder) RememberAcceptedDirectory();
+                _pendingResult = true;   // applied after the fade - see OnClosing
+                Close();
+                return;
+            }
             // Multiselect: several files highlighted wins outright. The name box shows a quoted
             // list in that state and is not worth re-parsing - the selection IS the answer. A
             // single highlighted file falls through to the normal path so every rule below
@@ -1284,7 +1403,7 @@ namespace KillerScan.Controls
                 else { FileNameBox.Focus(); return; }
             }
 
-            var full = Path.IsPathRooted(typed) ? typed : Path.Combine(_currentDir, typed);
+            var full = ResolveTyped(typed);
 
             if (_mode == FileDialogMode.Save)
             {
@@ -1317,6 +1436,8 @@ namespace KillerScan.Controls
                         "",
                         Loc("Str_Btn_Replace"),
                         Loc("Str_Btn_Cancel")) { Owner = this };
+                    // Enter keeps the existing file, as Windows' own replace prompt does.
+                    confirm.DefaultToCancel();
                     confirm.ShowDialog();
                     if (!confirm.Confirmed) { FileNameBox.Focus(); return; }
                 }
@@ -1342,7 +1463,7 @@ namespace KillerScan.Controls
         private void RememberAcceptedDirectory()
         {
             if (_currentDir.Length > 0 && Directory.Exists(_currentDir))
-                App.SetSetting(LastDirKey, _currentDir);
+                Services.ThemeManager.SetSetting(LastDirKey, _currentDir);
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
@@ -1354,7 +1475,9 @@ namespace KillerScan.Controls
             // Windows into its sticky keyboard-style size loop: the window chases the mouse,
             // resizing, until a click. (2026-07-30)
             e.Handled = true;
-            DragMove();
+            if (e.ButtonState != MouseButtonState.Pressed) return;
+            try { DragMove(); }
+            catch (InvalidOperationException) { }   // the button was already up
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

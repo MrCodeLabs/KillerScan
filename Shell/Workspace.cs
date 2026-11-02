@@ -12,41 +12,41 @@ namespace KillerScan.Shell
     public partial class MainWindow
     {
         private readonly Grid _workspaceBody = new();
-        private readonly StackPanel _workspaceNavigation = new() { Orientation = Orientation.Horizontal };
         private readonly Grid _workspaceToolbar = new();
+        private readonly Grid _toolbarSurface = new() { UseLayoutRounding = true, Background = Brushes.Transparent };
         private readonly Grid _workspaceSummary = new() { Visibility = Visibility.Collapsed, UseLayoutRounding = true };
-        private readonly Dictionary<string, Button> _viewButtons = [];
         private ScanWorkspace? _scanWorkspace;
         private FrameworkElement? _selectedWorkspace;
         private string _workspaceView = "scan";
+        private string? _announcedStatus;
         private ScanWorkspace? ActiveScan => _selectedWorkspace == _scanWorkspace ? _scanWorkspace : null;
 
         private void InitializeWorkspace()
         {
+            // Toolbar, summary, top tab slot, the pane, bottom tab slot (Shell/WorkspaceTabs.cs).
+            WorkspaceHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             WorkspaceHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             WorkspaceHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             WorkspaceHost.RowDefinitions.Add(new RowDefinition());
+            WorkspaceHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             // Supplemental view information sits above the existing table frame.
             foreach (UIElement child in WorkspaceHost.Children)
-                if (Grid.GetRow(child) == 1) Grid.SetRow(child, 2);
+                if (Grid.GetRow(child) == 1) Grid.SetRow(child, 3);
             Grid.SetRow(_workspaceSummary, 1);
             WorkspaceHost.Children.Add(_workspaceSummary);
             BuildWorkspaceNavigation();
             _workspaceToolbar.ColumnDefinitions.Add(new ColumnDefinition());
-            _workspaceToolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            Grid.SetColumn(_workspaceNavigation, 1);
-            _workspaceToolbar.Children.Add(_workspaceNavigation);
             // Transparent, not a colour of its own. The window paints the background across its
             // full width, so letting it through keeps one continuous gradient; painting the brush
             // here restarted the ramp inside the content column, and painting a flat tone instead
             // just moved the seam to where the bar met the margins beside the pane.
-            var toolbarSurface = new Grid { UseLayoutRounding = true, Background = Brushes.Transparent };
+            var toolbarSurface = _toolbarSurface;
             // No grain of its own either. The chrome strip behind this whole row already carries
             // one, and it shows through now that the bar is transparent; adding a second here
             // doubled the texture over the toolbar. The strip sits below the controls, so the
             // subnet box still reads as a field rather than as textured background.
             toolbarSurface.Children.Add(_workspaceToolbar);
-            WorkspaceHost.Children.Add(toolbarSurface);
+            TitleToolbarHost.Child = toolbarSurface;
             TerminalLayout.Children.Add(_workspaceBody);
             TerminalLayout.SizeChanged += (_, _) => ClipWorkspaceSurface();
             NewScan(_startupScanTarget ?? string.Empty);
@@ -63,8 +63,25 @@ namespace KillerScan.Shell
             toolbar.VerticalAlignment = VerticalAlignment.Center;
             Grid.SetColumn(toolbar, 0);
             _viewToolbars[view] = toolbar;
+            FitToTitleBar(toolbar);
             _workspaceToolbar.Children.Add(toolbar);
             UpdateViewToolbar();
+        }
+
+        /// <summary>
+        /// The bars were laid out for their own 34px row and now ride in the 32px title bar (22px
+        /// on 98SE), where their 2px margins and 3px padding clipped the address box's text top
+        /// and bottom. Vertical margins go and vertical padding drops to 1px, so every control
+        /// fits whatever height the caption has.
+        /// </summary>
+        private static void FitToTitleBar(FrameworkElement element)
+        {
+            element.Margin = new Thickness(element.Margin.Left, 0, element.Margin.Right, 0);
+            if (element is Control c)
+                c.Padding = new Thickness(c.Padding.Left, Math.Min(c.Padding.Top, 1), c.Padding.Right, Math.Min(c.Padding.Bottom, 1));
+            if (element is Panel panel)
+                foreach (var child in panel.Children.OfType<FrameworkElement>()) FitToTitleBar(child);
+            else if (element is Decorator { Child: FrameworkElement inner } && element is not Control) FitToTitleBar(inner);
         }
 
         private void UpdateViewToolbar()
@@ -73,6 +90,9 @@ namespace KillerScan.Shell
             string key = ActiveScan != null ? "scan" : _workspaceView;
             foreach (var pair in _viewToolbars)
                 pair.Value.Visibility = pair.Key == key ? Visibility.Visible : Visibility.Collapsed;
+            // A view with no bar of its own (the terminal) gets the row back.
+            _toolbarSurface.Visibility = _viewToolbars.ContainsKey(key) ? Visibility.Visible : Visibility.Collapsed;
+            TitleTools.Visibility = key == "scan" ? Visibility.Visible : Visibility.Collapsed;
             // The bars are different widths, so what fits beside them changes with the view.
             FitToolbarViews();
         }
@@ -103,7 +123,13 @@ namespace KillerScan.Shell
                 scanToolbar.Margin = new Thickness(8, 0, 0, 0);
                 _viewToolbarTargets["scan"] = (FrameworkElement)_scanWorkspace.FindName("SubnetInput");
                 RegisterViewToolbar("scan", scanToolbar);
-                InitializeTerminalScanToolbar((TextBox)_scanWorkspace.FindName("SubnetInput"));
+                // The filter lives in the title bar's right end, like KillerShell's search.
+                foreach (string name in new[] { "FilterToggleButton", "FilterBox" })
+                {
+                    var part = (FrameworkElement)_scanWorkspace.FindName(name);
+                    ((Panel)part.Parent).Children.Remove(part);
+                    TitleTools.Children.Add(part);
+                }
                 var networkDetails = new StackPanel();
                 foreach (string name in new[] { "LocalIpLabel", "GatewayLabel", "DnsLabel", "InterfaceLabel" })
                 {
@@ -155,17 +181,20 @@ namespace KillerScan.Shell
                 export.FontSize = 15;
                 export.Content = "\uE896";
                 export.SetResourceReference(StyleProperty, "RailButton");
-                var exportTip = new TextBlock();
-                var exportCaption = new System.Windows.Documents.Run();
-                exportCaption.SetResourceReference(System.Windows.Documents.Run.TextProperty, "Str_TT_Export");
-                exportTip.Inlines.Add(exportCaption);
-                exportTip.Inlines.Add(" (CSV Ctrl+E, HTML Ctrl+Shift+E, TXT Ctrl+Shift+X, PNG Ctrl+Shift+G, JPG Ctrl+Shift+J, map HTML Ctrl+Alt+H)");
-                export.ToolTip = exportTip;
                 export.SetResourceReference(System.Windows.Automation.AutomationProperties.NameProperty, "Str_TT_Export");
                 RailButtons.Children.Insert(0, export);
-                ApplyToolbarAppearance();
-                _scanWorkspace.DeviceAction += (_, e) => WorkspaceDeviceAction(e.Device, e.Action, e.ServicePort, e.Access);
+                _scanWorkspace.DeviceAction += (_, e) => WorkspaceDeviceAction(e.Device, e.Action, e.ServicePort);
                 _scanWorkspace.ShellExportRequested += ShellExport;
+                // The sidebar lists belong to the workspace's Location, so they follow it.
+                _scanWorkspace.LocationChanged += (_, _) =>
+                {
+                    RefreshHistoryList();
+                    RefreshLocationsList();
+                    if (_workspaceView == "history") ShowHistoryEntry();
+                    UpdateWorkspaceStatus();
+                };
+                _scanWorkspace.ManageLocationsRequested += (_, _) => ShowLocationsSection();
+                _scanWorkspace.SavedScansEmptied += (_, _) => RetireHoldingLocation();
                 // Everything bound with DynamicResource follows a language change on its own. The
                 // status line and the device count do not: they are composed in code and stored,
                 // so they are re-stated here from the state the workspace is in.
@@ -173,6 +202,7 @@ namespace KillerScan.Shell
                 _scanWorkspace.HistoryRecorded += (_, _) =>
                 {
                     if (!_sidebarCollapsed) RefreshHistoryList();
+                    if (!_sidebarCollapsed && _sidebarSection == "locations") RefreshLocationsList();
                     // A re-rolled demo network invalidates whatever Keep Alive was watching, so it
                     // follows the new addresses rather than sitting on a network that is gone.
                     if (DemoData.Enabled) _watchWorkspace?.RestartWith(DemoWatchTargets());
@@ -214,10 +244,7 @@ namespace KillerScan.Shell
         private void UpdateScanLight()
         {
             if (ScanLight == null) return;
-            var state = _workspaceView == "terminal" && _terminalScanHasStatus
-                ? (_terminalScanRunning ? Controls.ScanIndicator.Scanning : _terminalScanError == null && _terminalStatusKey != "Str_St_ScanCanceled"
-                    ? Controls.ScanIndicator.Complete : Controls.ScanIndicator.Idle)
-                : _scanWorkspace?.Indicator ?? Controls.ScanIndicator.Idle;
+            var state = _scanWorkspace?.Indicator ?? Controls.ScanIndicator.Idle;
             (string fill, string key) = state switch
             {
                 Controls.ScanIndicator.Scanning => ("#D0453A", "Str_Light_Scanning"),
@@ -341,9 +368,19 @@ namespace KillerScan.Shell
         {
             // Str_St_Ready rather than nothing: before the first scan the cell would otherwise be
             // empty in every language except English, where the XAML's design-time "Ready" showed.
-            StatusText.Text = ActiveScan?.Status ?? (_workspaceView == "watch" ? Loc("Str_View_KeepAlive")
+            string status = ActiveScan?.Status ?? (_workspaceView == "watch" ? Loc("Str_View_KeepAlive")
                 : _workspaceView == "history" ? Loc("Str_History_Title")
                 : _workspaceView == "services" ? Loc("Str_Services_Title") : Loc("Str_St_Ready"));
+            StatusText.Text = status;
+            // The text is a live region, so a screen reader hears where things stand. Not while a
+            // scan runs, when its progress lines would talk over each other. A run's final status
+            // is written before its bar goes, so this compares with what was last announced.
+            if (ActiveScan?.IsProgressVisible != true && status != _announcedStatus)
+            {
+                _announcedStatus = status;
+                System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(StatusText)?
+                    .RaiseAutomationEvent(System.Windows.Automation.Peers.AutomationEvents.LiveRegionChanged);
+            }
             ScanProgress.Value = ActiveScan?.Progress ?? 0;
             ScanProgress.Visibility = ActiveScan?.IsProgressVisible == true ? Visibility.Visible : Visibility.Collapsed;
             if (_workspaceView == "terminal") UpdateTerminalPanelStatus();
@@ -354,15 +391,6 @@ namespace KillerScan.Shell
                 bool hide = _workspaceView is "terminal" or "history" || string.IsNullOrEmpty(count.Text) || StatusText.Text.Contains(count.Text);
                 count.Visibility = hide ? Visibility.Collapsed : Visibility.Visible;
                 DeviceCountFooter.Visibility = hide ? Visibility.Collapsed : Visibility.Visible;
-            }
-            bool terminalCount = _workspaceView == "terminal" && _terminalScanHasStatus;
-            _terminalDeviceCount.Visibility = terminalCount ? Visibility.Visible : Visibility.Collapsed;
-            if (terminalCount)
-            {
-                _terminalDeviceCount.Text = string.Format(Loc("Str_Count_Found"), _terminalScanCount);
-                DeviceCountFooter.Visibility = Visibility.Visible;
-                ScanProgress.Value = _terminalScanProgress;
-                ScanProgress.Visibility = _terminalScanRunning ? Visibility.Visible : Visibility.Collapsed;
             }
             FitFooterStatus();
         }
@@ -383,6 +411,18 @@ namespace KillerScan.Shell
             StatusText.ToolTip = tip;
         }
 
+        // Measured on a copy: a trimmed TextBlock reports the width of what it drew, not of its text.
+        private bool StatusIsTrimmed()
+        {
+            var whole = new TextBlock
+            {
+                Text = StatusText.Text, FontFamily = StatusText.FontFamily, FontSize = StatusText.FontSize,
+                FontWeight = StatusText.FontWeight, FontStyle = StatusText.FontStyle
+            };
+            whole.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return whole.DesiredSize.Width > StatusText.MaxWidth;
+        }
+
         private string BuildStatusTooltip()
         {
             if (_workspaceView == "terminal") return StatusText.Text;
@@ -398,11 +438,14 @@ namespace KillerScan.Shell
                         entry.ScannedAt.ToLocalTime().ToString("g"), entry.Devices.Count)
                     : string.Empty;
 
+            // A status the footer trims is read here in full, ahead of the counts.
+            string whole = StatusIsTrimmed() ? StatusText.Text : string.Empty;
             var devices = _scanWorkspace?.ScannedDevices;
-            if (devices == null || devices.Count == 0) return string.Empty;
+            if (devices == null || devices.Count == 0) return whole;
+            if (whole.Length > 0) whole += "\n\n";
 
             // The alert the status bar raises is a count. This is the part that answers "which?".
-            var unknown = devices.Where(device => !DevicePreferences.IsTrusted(device)).ToList();
+            var unknown = _scanWorkspace!.NewDevices;
             if (unknown.Count > 0)
             {
                 const int Listed = 8;
@@ -413,10 +456,10 @@ namespace KillerScan.Shell
                 string body = string.Join("\n", lines);
                 if (unknown.Count > Listed)
                     body += "\n" + string.Format(Loc("Str_Tip_AndMore"), unknown.Count - Listed);
-                return Loc("Str_Tip_UnknownHead") + "\n" + body + "\n\n" + Loc("Str_Tip_TrustHint");
+                return whole + Loc("Str_Tip_UnknownHead") + "\n" + body + "\n\n" + Loc("Str_Tip_TrustHint");
             }
             int withPorts = devices.Count(device => device.OpenPorts.Count > 0);
-            return string.Format(Loc("Str_Tip_Scan"), devices.Count, withPorts);
+            return whole + string.Format(Loc("Str_Tip_Scan"), devices.Count, withPorts);
         }
 
         private void DisposeWorkspace()
@@ -426,10 +469,19 @@ namespace KillerScan.Shell
                 if (content != _terminalControl) (content as IDisposable)?.Dispose();
         }
 
+        // AppScale.cs hook: the scan bar rides in the title bar, so the workspace parts scale
+        // one by one instead of through ScaleHost.
+        partial void ApplyAppScaleTo(double scale, ref bool handled)
+        {
+            ApplyWorkspaceScale(scale);
+            handled = true;
+        }
+
         private void ApplyWorkspaceScale(double scale)
         {
             _workspaceToolbar.LayoutTransform = new ScaleTransform(scale, scale);
             _workspaceSummary.LayoutTransform = new ScaleTransform(scale, scale);
+            _viewTabBand.LayoutTransform = new ScaleTransform(scale, scale);
             foreach (var content in _workspaceBody.Children.OfType<FrameworkElement>())
                 if (content is ScanWorkspace scan) scan.ApplyScale(scale);
                 else if (content is NetworkToolsWindow tools) tools.ApplyScale(scale);
@@ -447,35 +499,42 @@ namespace KillerScan.Shell
             UpdateWorkspaceStatus();
         }
 
-        private void WorkspaceDeviceAction(NetworkDevice device, string action, int? servicePort = null, AccessEndpoint? access = null)
+        private void WorkspaceDeviceAction(NetworkDevice device, string action, int? servicePort = null)
         {
-            try { RunWorkspaceDeviceAction(device, action, servicePort, access); }
+            try { RunWorkspaceDeviceAction(device, action, servicePort); }
             catch (System.ComponentModel.Win32Exception ex) { StatusText.Text = ex.Message; }
             catch (InvalidOperationException ex) { StatusText.Text = ex.Message; }
         }
 
-        private void RunWorkspaceDeviceAction(NetworkDevice device, string action, int? servicePort = null, AccessEndpoint? access = null)
+        private void RunWorkspaceDeviceAction(NetworkDevice device, string action, int? servicePort = null)
         {
             if (!IPAddress.TryParse(device.IpAddress, out var address)) return;
             string ip = address.ToString();
             if (action == "Watch" || action == "Diagnose") { OpenNetworkTool(device, action == "Diagnose"); return; }
             if (action == "Browser")
             {
-                var endpoint = access ?? DeviceAccess.Web(device, servicePort);
-                string? url = endpoint != null && endpoint.Protocol is "http" or "https" ? DeviceAccess.Address(ip, endpoint) : null;
+                string? url = ScanWorkspace.BrowserAddress(device, servicePort);
                 if (url != null) Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                 return;
             }
-            if (action == "Rdp") { Process.Start(new ProcessStartInfo("mstsc.exe", "/v:" + (servicePort.HasValue ? ScanWorkspace.ServiceEndpoint(ip, servicePort.Value) : ip)) { UseShellExecute = true }); return; }
+            if (action == "Rdp")
+            {
+                Process.Start(new ProcessStartInfo(SystemTools.Path("mstsc.exe"), "/v:" + (servicePort.HasValue ? ScanWorkspace.ServiceEndpoint(ip, servicePort.Value) : ip))
+                { UseShellExecute = true, WorkingDirectory = SystemTools.WorkingDirectory });
+                return;
+            }
             string command;
             if (action.StartsWith("Ssh", StringComparison.Ordinal))
             {
-                string? user = DeviceLogins.Get(device.MacAddress, ip);
+                // Usernames belong to the Location, so another site's same IP never skips the prompt.
+                var logins = ShellLocation.Logins;
+                string? user = logins.Get(device.MacAddress, ip);
                 if (user == null || action.StartsWith("SshAs", StringComparison.Ordinal))
                 {
                     var dialog = new InputDialog(string.Format(Loc("Str_Ssh_Head"), ip), Loc("Str_Ssh_Detail"), Loc("Str_Ssh_User"), user ?? "", Loc("Str_Ssh_Connect"), Loc("Str_Btn_Cancel")) { Owner = this };
                     dialog.ShowDialog(); if (!dialog.Confirmed) return;
-                    user = dialog.Value; DeviceLogins.Set(device.MacAddress, ip, user);
+                    user = dialog.Value;
+                    PersistenceFeedback.Check(logins.Set(device.MacAddress, ip, user), logins.Save, () => logins.SaveError);
                 }
                 // Invoke the SSH client directly; user input never goes through a command shell.
                 command = "ssh.exe " + (servicePort.HasValue ? "-p " + servicePort.Value + " " : "")
@@ -486,20 +545,54 @@ namespace KillerScan.Shell
             if (action.EndsWith("External", StringComparison.Ordinal))
             {
                 int separator = command.IndexOf(' ');
-                Process.Start(new ProcessStartInfo(command[..separator], command[(separator + 1)..]) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(SystemTools.Path(command[..separator]), command[(separator + 1)..])
+                { UseShellExecute = true, WorkingDirectory = SystemTools.WorkingDirectory });
             }
             // Ping runs inside the styled shell, which is what tints the replies. SSH does not:
             // its command line carries a username the user typed, and that has to reach the
             // client as an argument rather than as text a shell gets to interpret.
-            else if (action.StartsWith("Ssh", StringComparison.Ordinal)) NewTerminal(command, "SSH " + ip);
-            else NewTerminal(title: "Ping " + ip, shellCommand: PingCommand(ip));
+            // The terminal starts it through CreateProcess, which also looks beside the exe first,
+            // so it gets the same full path as the external window.
+            else if (action.StartsWith("Ssh", StringComparison.Ordinal))
+            {
+                if (!ConfirmReplaceTerminal("SSH " + ip)) return;
+                int separator = command.IndexOf(' ');
+                NewTerminal(QuoteArgument(SystemTools.Path(command[..separator])) + command[separator..], "SSH " + ip);
+            }
+            else if (ConfirmReplaceTerminal("Ping " + ip)) NewTerminal(title: "Ping " + ip, shellCommand: PingCommand(ip));
+        }
+
+        /// <summary>A device's Ping or SSH takes over the terminal. A session or command still running
+        /// there (an open SSH login, a ping -t) is ended only after asking, as the speed test does.</summary>
+        private bool ConfirmReplaceTerminal(string what)
+        {
+            if (_terminalControl?.HasRunningCommand != true) return true;
+            var dialog = new Controls.ConfirmDialog(what, string.Format(Loc("Str_Term_ReplaceRunning"), what),
+                Loc("Str_Term_Replace"), Loc("Str_Btn_Cancel")) { Owner = this };
+            dialog.ShowDialog();
+            return dialog.Confirmed;
         }
 
         private void ClipWorkspaceSurface()
         {
-            double radius = DevicesPane.CornerRadius.BottomLeft;
-            if (TerminalLayout.ActualWidth > 0 && TerminalLayout.ActualHeight > 0)
-                TerminalLayout.Clip = new RectangleGeometry(new Rect(0, 0, TerminalLayout.ActualWidth, TerminalLayout.ActualHeight), radius, radius);
+            // Per corner: the pane squares the corners on the side its tabs join, and the content
+            // (the table header included) has to square with it.
+            double w = TerminalLayout.ActualWidth, h = TerminalLayout.ActualHeight;
+            if (w <= 0 || h <= 0) return;
+            var c = DevicesPane.CornerRadius;
+            var figure = new PathFigure { StartPoint = new Point(c.TopLeft, 0), IsClosed = true };
+            void Corner(Point line, Point end, double radius)
+            {
+                figure.Segments.Add(new LineSegment(line, false));
+                if (radius > 0) figure.Segments.Add(new ArcSegment(end, new Size(radius, radius), 0, false, SweepDirection.Clockwise, false));
+            }
+            Corner(new Point(w - c.TopRight, 0), new Point(w, c.TopRight), c.TopRight);
+            Corner(new Point(w, h - c.BottomRight), new Point(w - c.BottomRight, h), c.BottomRight);
+            Corner(new Point(c.BottomLeft, h), new Point(0, h - c.BottomLeft), c.BottomLeft);
+            Corner(new Point(0, c.TopLeft), new Point(c.TopLeft, 0), c.TopLeft);
+            var clip = new PathGeometry(new[] { figure });
+            clip.Freeze();
+            TerminalLayout.Clip = clip;
         }
 
         private static string QuoteArgument(string value)

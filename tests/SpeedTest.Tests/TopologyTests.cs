@@ -103,14 +103,15 @@ internal static class TopologyTests
         var assembly = typeof(KillerScan.App).Assembly;
         typeof(Application).GetField("_resourceAssembly", Static)!.SetValue(null, assembly);
         var app = new TestApplication();
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(System.IO.Path.Combine(directory.FullName, "KillerScan.csproj"))) directory = directory.Parent;
+        KillerScan.Services.AppTheme.Configure();
+        var directory = TestRepository.Find();
         Require(directory != null, "Resource source is available.");
         var xml = new XmlDocument();
         xml.Load(System.IO.Path.Combine(directory!.FullName, "App.xaml"));
         string dictionary = xml.DocumentElement!.FirstChild!.FirstChild!.OuterXml
             .Replace("clr-namespace:KillerScan.Controls", "clr-namespace:KillerScan.Controls;assembly=KillerScan")
-            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"");
+            .Replace("clr-namespace:KillerFamily.Layout\"", "clr-namespace:KillerFamily.Layout;assembly=KillerScan\"")
+            .Replace("clr-namespace:KillerFamily.Controls\"", "clr-namespace:KillerFamily.Controls;assembly=KillerScan\"");
         var context = new ParserContext { BaseUri = new Uri("pack://application:,,,/KillerScan;component/") };
         context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
         context.XmlnsDictionary.Add("x", "http://schemas.microsoft.com/winfx/2006/xaml");
@@ -132,7 +133,7 @@ internal static class TopologyTests
         locales.GetMethod("ApplyInternal", Static)!.Invoke(null, new[] { Enum.Parse(localeType, "EnUS") });
         Theme("Black", "Orange");
         using var workspace = new ScanWorkspace("192.0.2.0/24", demo: true);
-        Call(workspace, "LoadSnapshot", "192.0.2.0/24", Enumerable.Range(1, 31).Select(i => new NetworkDevice
+        workspace.LoadSnapshot("192.0.2.0/24", Enumerable.Range(1, 31).Select(i => new NetworkDevice
         {
             IpAddress = "192.0.2." + i, Hostname = i % 3 == 0 ? "synthetic-server-with-a-long-label-" + i : "device-" + i,
             DeviceType = i == 1 ? "Router" : i % 2 == 0 ? "Windows" : "Printer"
@@ -206,7 +207,9 @@ internal static class TopologyTests
         var deviceNode = canvas.Children.OfType<Border>().First(n => n.Tag is NetworkDevice);
         var click = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = UIElement.MouseLeftButtonDownEvent, Source = deviceNode };
         deviceNode.RaiseEvent(click);
-        Require(ReferenceEquals(grid.SelectedItem, deviceNode.Tag) && deviceNode.BorderThickness.Left == 2, "Selection works while zoomed.");
+        // A selected card wears the accent ring (TopologyNode.Selected); the stripe width never changes.
+        Require(ReferenceEquals(grid.SelectedItem, deviceNode.Tag) && deviceNode is KillerScan.Controls.TopologyNode { Selected: true },
+            "Selection works while zoomed.");
         deviceNode.ReleaseMouseCapture();
         var point = deviceNode.TranslatePoint(new Point(deviceNode.Width / 2, deviceNode.Height / 2), root);
         DependencyObject? hit = VisualTreeHelper.HitTest(root, point)?.VisualHit;
@@ -238,6 +241,19 @@ internal static class TopologyTests
         Require(grid.ContextMenu.PlacementTarget == deviceNode, "Device menu remains anchored to the selected box.");
         grid.ContextMenu.IsOpen = false;
         var settingsButton = (Button)workspace.FindName("TopologyOrderButton");
+        var rightClick = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right)
+            { RoutedEvent = UIElement.MouseRightButtonDownEvent, Source = canvas };
+        canvas.RaiseEvent(rightClick);
+        Require(settingsButton.ContextMenu.PlacementTarget == scroll &&
+            settingsButton.ContextMenu.Placement == PlacementMode.RelativePoint,
+            "Topology's background menu anchors the clicked point to the viewport, outside the zoomed canvas.");
+        Require(settingsButton.ContextMenu.PlacementRectangle.TopLeft == rightClick.GetPosition(scroll),
+            "The topology menu captures the right-click position in viewport coordinates.");
+        settingsButton.ContextMenu.IsOpen = false;
+        settingsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Require(settingsButton.ContextMenu.PlacementTarget == settingsButton && settingsButton.ContextMenu.PlacementRectangle.IsEmpty,
+            "Opening topology settings from its button clears the previous canvas click position.");
+        settingsButton.ContextMenu.IsOpen = false;
         var zoomMenu = settingsButton.ContextMenu.Items.OfType<MenuItem>().Single(item => item.InputGestureText == "Ctrl+Wheel");
         var normal = zoomMenu.Items.OfType<MenuItem>().Single(item => Equals(item.Tag, 1.0));
         normal.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
@@ -293,7 +309,7 @@ internal static class TopologyTests
         var boxes = canvas.Children.OfType<Border>().Select(Bounds).ToArray();
         foreach (var box in boxes)
             Require(box.Left >= 0 && box.Top >= 0 && box.Right <= canvas.Width + 0.01 && box.Bottom <= canvas.Height + 0.01,
-                "Node stays within the canvas.");
+                "Node stays within the canvas: box " + box + ", canvas " + canvas.Width + "x" + canvas.Height + ".");
         for (int i = 0; i < boxes.Length; i++)
             for (int j = i + 1; j < boxes.Length; j++) Require(!boxes[i].IntersectsWith(boxes[j]), "Automatic nodes do not overlap.");
     }

@@ -28,11 +28,12 @@ namespace KillerScan.Shell
         /// still fits at any zoom.
         /// </summary>
         private bool _sidebarWidthSaved;
+        private bool _sidebarRight;
 
-        private const double RailW = 24;
+        private double RailW => TryFindResource("RailColumnWidth") is GridLength width ? width.Value : 24;
         private const double PanelMinLogical = 140;
         private const double SidebarMinPx = 170;
-        private const double SidebarDefaultPx = 210;
+        private const double SidebarDefaultPx = 176;
         private const double SidebarMaxPx = 480;
 
         // The default fits the widest date at full size. A width the user drags to is kept as is:
@@ -92,13 +93,84 @@ namespace KillerScan.Shell
 
         private void InitSidebar()
         {
-            _sidebarCollapsed = App.GetSetting("HistorySidebarOpen") != "1";
+            var menu = new ContextMenu { Placement = PlacementMode.MousePoint };
+            if (TryFindResource(typeof(ContextMenu)) is Style style) menu.Style = style;
+            var heading = new MenuItem { IsEnabled = false };
+            heading.SetResourceReference(HeaderedItemsControl.HeaderProperty, "Str_Sidebar");
+            menu.Items.Add(heading);
+            foreach (var side in new[] { SidebarSide.Left, SidebarSide.Right })
+            {
+                var item = new MenuItem
+                {
+                    IsCheckable = true, Tag = side, Icon = side.MenuIcon(),
+                    InputGestureText = side == SidebarSide.Right ? "Alt+Shift+Right" : "Alt+Shift+Left"
+                };
+                item.SetResourceReference(HeaderedItemsControl.HeaderProperty, side.StringKey());
+                item.Click += (_, _) => SelectSidebarSide(side == SidebarSide.Right);
+                menu.Items.Add(item);
+            }
+            SidebarToggleStrip.ContextMenu = menu;
+            SidebarToggleBtn.ToolTipOpening += (_, _) =>
+                SidebarToggleBtn.ToolTip = Loc(_sidebarCollapsed ? "Str_TT_ExpandSidebar" : "Str_TT_CollapseSidebar")
+                    + (_sidebarRight ? " (Alt+Shift+Right)" : " (Alt+Shift+Left)");
+            menu.Opened += (_, _) => UpdateSidebarSideMenu();
+            SelectSidebarSide(string.Equals(App.GetSetting(SidebarSides.SettingName), "Right", StringComparison.OrdinalIgnoreCase), save: false);
+            KillerScan.Services.ThemeManager.ThemeChanged += RefreshSidebarTheme;
+            Closed += (_, _) => KillerScan.Services.ThemeManager.ThemeChanged -= RefreshSidebarTheme;
+            // Always starts closed; a rail button opens it. Restoring the last open state brought
+            // History back on every launch whatever was open before.
+            _sidebarCollapsed = true;
             if (double.TryParse(App.GetSetting("HistorySidebarWidth"), NumberStyles.Float,
                     CultureInfo.InvariantCulture, out double width))
             {
                 _sidebarBaseWidth = Math.Min(SidebarMaxPx, Math.Max(SidebarMinPx, width));
                 _sidebarWidthSaved = true;
             }
+            ApplySidebarState();
+        }
+
+        private void SelectSidebarSide(bool right, bool save = true)
+        {
+            if (_sidebarRight != right)
+            {
+                var first = ScaleHost.ColumnDefinitions[0];
+                ScaleHost.ColumnDefinitions.RemoveAt(0);
+                ScaleHost.ColumnDefinitions.Add(first);
+                foreach (UIElement child in ScaleHost.Children)
+                    Grid.SetColumn(child, 2 - Grid.GetColumn(child) - Grid.GetColumnSpan(child));
+            }
+            _sidebarRight = right;
+            if (save) App.SetSetting(SidebarSides.SettingName, right ? "Right" : "Left");
+            RailButtons.HorizontalAlignment = right ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+            SidebarToggleStrip.HorizontalAlignment = right ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+            RailButtons.Margin = right ? new Thickness(0, 0, 2, 6) : new Thickness(2, 0, 0, 6);
+            SidebarToggleBtn.HorizontalAlignment = right ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+            SidebarResizeGrip.HorizontalAlignment = right ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+            FlyoutPlacement.UsePane(DevicesPane, RootGrid, right ? SidebarSide.Right : SidebarSide.Left);
+            UpdateSidebarSideMenu();
+            RefreshSidebarTheme();
+        }
+
+        private void SidebarSideShortcut(bool right)
+        {
+            if (right == _sidebarRight) ToggleSidebar();
+            else SelectSidebarSide(right);
+        }
+
+        private void UpdateSidebarSideMenu()
+        {
+            foreach (MenuItem item in SidebarToggleStrip.ContextMenu.Items)
+                if (item.Tag is SidebarSide side)
+                    item.IsChecked = side == (_sidebarRight ? SidebarSide.Right : SidebarSide.Left);
+        }
+
+        private void RefreshSidebarTheme()
+        {
+            SidebarClip.Margin = _sidebarRight ? new Thickness(RailW, 0, 0, 0) : new Thickness(0, 0, RailW, 0);
+            SidebarResizeGrip.Margin = SidebarClip.Margin;
+            ScaleHost.Resources.Remove("DevicesPaneMargin");
+            if (_sidebarRight && Application.Current.TryFindResource("DevicesPaneMargin") is Thickness inset)
+                ScaleHost.Resources["DevicesPaneMargin"] = new Thickness(inset.Right, inset.Top, inset.Left, inset.Bottom);
             ApplySidebarState();
         }
 
@@ -123,13 +195,21 @@ namespace KillerScan.Shell
 
         private void SetSidebarSection(string section, bool fade)
         {
-            var incoming = section == "profiles" ? (FrameworkElement)ProfilesList : HistoryList;
-            var outgoing = section == "profiles" ? (FrameworkElement)HistoryList : ProfilesList;
+            FrameworkElement ListFor(string name) => name switch
+            {
+                "locations" => LocationsList,
+                _ => HistoryList
+            };
+            var incoming = ListFor(section);
+            var outgoing = ListFor(_sidebarSection);
             _sidebarSection = section;
-            SidebarSectionIcon.Text = ((char)(section == "profiles" ? 0xE728 : 0xE81C)).ToString();
+            SidebarSectionIcon.Text = ((char)(section switch { "locations" => 0xE707, _ => 0xE81C })).ToString();
             SidebarHeading.SetResourceReference(TextBlock.TextProperty,
-                section == "profiles" ? "Str_Profiles_Title" : "Str_History_Title");
-            SaveProfileButton.Visibility = section == "profiles" ? Visibility.Visible : Visibility.Collapsed;
+                section switch { "locations" => "Str_Loc_ManageTitle", _ => "Str_History_Title" });
+            LocationsFooter.Visibility = section == "locations" ? Visibility.Visible : Visibility.Collapsed;
+            // Every list but the incoming one is hidden, whichever was showing before.
+            foreach (var list in new FrameworkElement[] { HistoryList, LocationsList })
+                if (list != incoming && list != outgoing) list.Visibility = Visibility.Collapsed;
             RefreshSidebarSection();
             UpdateSidebarRailTags();
 
@@ -150,7 +230,7 @@ namespace KillerScan.Shell
 
         private void RefreshSidebarSection()
         {
-            if (_sidebarSection == "profiles") RefreshProfilesList();
+            if (_sidebarSection == "locations") RefreshLocationsList();
             else RefreshHistoryList();
         }
 
@@ -159,7 +239,7 @@ namespace KillerScan.Shell
         {
             bool open = !_sidebarCollapsed;
             HistoryButton.Tag = open && _sidebarSection == "history" ? "on" : null;
-            ProfilesButton.Tag = open && _sidebarSection == "profiles" ? "on" : null;
+            LocationsButton.Tag = open && _sidebarSection == "locations" ? "on" : null;
         }
 
         private void SidebarToggle_Click(object sender, RoutedEventArgs e) => ToggleSidebar();
@@ -185,7 +265,7 @@ namespace KillerScan.Shell
             // The chevron points where the panel is going, per the family standard. Set from a
             // char code, never a literal glyph: pasted PUA characters have been corrupted by
             // tooling in this family before.
-            SidebarToggleBtn.Content = ((char)(_sidebarCollapsed ? 0xE76C : 0xE76B)).ToString();
+            SidebarToggleBtn.Content = ((char)(_sidebarCollapsed != _sidebarRight ? 0xE76C : 0xE76B)).ToString();
             SidebarToggleBtn.SetResourceReference(ToolTipProperty,
                 _sidebarCollapsed ? "Str_TT_ExpandSidebar" : "Str_TT_CollapseSidebar");
             SidebarResizeGrip.Visibility = _sidebarCollapsed ? Visibility.Collapsed : Visibility.Visible;
@@ -207,15 +287,17 @@ namespace KillerScan.Shell
             {
                 SidebarCol.BeginAnimation(ColumnDefinition.WidthProperty, null);
                 SidebarCol.Width = new GridLength(target);
+                HistorySidebar.ClearValue(WidthProperty);
+                HistorySidebar.HorizontalAlignment = HorizontalAlignment.Stretch;
                 if (_sidebarCollapsed) HistorySidebar.Visibility = Visibility.Collapsed;
                 return;
             }
 
-            // Freeze the panel at its open width and left-align it, so the closing tween wipes
+            // Freeze the panel at its open width against the outside edge, so the closing tween wipes
             // it behind the clip instead of reflowing its contents into a sliver.
             double frozen = ExpandedLogicalWidth(scale);
             HistorySidebar.Width = frozen;
-            HistorySidebar.HorizontalAlignment = HorizontalAlignment.Left;
+            HistorySidebar.HorizontalAlignment = _sidebarRight ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 
             var anim = new GridLengthAnimation
             {
@@ -250,7 +332,7 @@ namespace KillerScan.Shell
             // Driven straight off the pointer with no tween; a tween here reads as lag.
             double scale = _appScale <= 0 ? 1 : _appScale;
             double next = Math.Min(SidebarMaxPx, Math.Max(SidebarMinPx,
-                (SidebarCol.ActualWidth - RailW + e.HorizontalChange) * scale));
+                (SidebarCol.ActualWidth - RailW + (_sidebarRight ? -e.HorizontalChange : e.HorizontalChange)) * scale));
             _sidebarBaseWidth = next;
             _sidebarWidthSaved = true;
             SidebarCol.BeginAnimation(ColumnDefinition.WidthProperty, null);

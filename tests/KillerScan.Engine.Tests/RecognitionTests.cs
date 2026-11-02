@@ -1,117 +1,133 @@
-using System.Net;
 using System.Text.Json;
 using KillerScan.Engine;
 
+// A labeled corpus of made-up devices: each row says what the device is and how sure the
+// classifier should be. The corpus includes weak, empty and contradictory devices on purpose,
+// so the checks cover Low and conflicting results, not only easy positives.
 internal static class RecognitionTests
 {
-    private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
-    private static DeviceIdentification Assess(NetworkDevice device, Func<string, string?>? manual = null)
+    private sealed class Case(string label, NetworkDevice device, string type, RecognitionConfidence confidence, bool Conflict = false)
     {
-        device.DeviceType = NetworkScanner.ClassifyDeviceForNetwork(device, "", "", manual);
-        return device.Identification!;
+        public string Label { get; } = label;
+        public NetworkDevice Device { get; } = device;
+        public string Type { get; } = type;
+        public RecognitionConfidence Confidence { get; } = confidence;
+        public bool Conflict { get; } = Conflict;
     }
-    internal static Task WeakSignals()
+
+    private static NetworkDevice Device(string ip, params int[] ports) => new() { IpAddress = ip, OpenPorts = [.. ports] };
+
+    internal static Task Run()
     {
-        foreach (var device in new[] { new NetworkDevice(), new NetworkDevice { MacAddress = "02:00:00:00:00:01" } })
+        string oldGateway = NetworkScanner.GatewayIp, oldDns = NetworkScanner.DnsIp;
+        try
         {
-            var result = Assess(device);
-            Require(result.AutomaticType == "Unknown" && result.Confidence == "None", "Silence/private MAC cannot prove IoT or a mobile device.");
+            NetworkScanner.GatewayIp = "192.0.2.1";
+            NetworkScanner.DnsIp = "192.0.2.53";
+            var corpus = new List<Case>
+            {
+                new("gateway", Device("192.0.2.1", 53, 80), "Router", RecognitionConfidence.High),
+                new("printer, mDNS and SNMP agree",
+                    new NetworkDevice { IpAddress = "192.0.2.10", Vendor = "Brother Industries", OpenPorts = [631, 9100],
+                        MdnsServices = ["_ipp._tcp"], SnmpDescr = "Brother NC-8300w printer" },
+                    "Printer", RecognitionConfidence.High),
+                new("printer by port only", Device("192.0.2.11", 9100), "Printer", RecognitionConfidence.Low),
+                new("domain controller by ports", Device("192.0.2.12", 53, 88, 135, 389, 445, 3389), "Windows Server", RecognitionConfidence.Medium),
+                new("Windows with OpenSSH and NetBIOS",
+                    new NetworkDevice { IpAddress = "192.0.2.13", OpenPorts = [22, 445], NetbiosName = "DESK-01", SshBanner = "SSH-2.0-OpenSSH_for_Windows_9.5" },
+                    "Windows", RecognitionConfidence.High),
+                new("Linux by SSH banner", new NetworkDevice { IpAddress = "192.0.2.14", OpenPorts = [22], SshBanner = "SSH-2.0-OpenSSH_9.6p1", Ttl = 64 },
+                    "Linux/SSH", RecognitionConfidence.Medium),
+                new("NAS by hostname alone", new NetworkDevice { IpAddress = "192.0.2.15", Hostname = "office-synology" }, "NAS", RecognitionConfidence.Medium),
+                new("hostname outvoted by protocols",
+                    new NetworkDevice { IpAddress = "192.0.2.16", Hostname = "old-pihole", OpenPorts = [631, 9100],
+                        MdnsServices = ["_ipp._tcp"], SnmpDescr = "HP LaserJet M404", HttpTitle = "Embedded Web Server" },
+                    "Printer", RecognitionConfidence.High),
+                new("close call between name and protocol",
+                    new NetworkDevice { IpAddress = "192.0.2.25", Hostname = "office-synology", OpenPorts = [9100], MdnsServices = ["_ipp._tcp"] },
+                    "Printer", RecognitionConfidence.Low, Conflict: true),
+                new("smart plug, no ports", new NetworkDevice { IpAddress = "192.0.2.17", MacAddress = "00:11:22:33:44:55" }, "IoT", RecognitionConfidence.Low),
+                new("private MAC phone", new NetworkDevice { IpAddress = "192.0.2.18", MacAddress = "DA:11:22:33:44:55" }, "Mobile", RecognitionConfidence.Low),
+                new("nothing at all", Device("192.0.2.19"), "Unknown", RecognitionConfidence.Low),
+                new("odd port only", Device("192.0.2.20", 5000), "Other", RecognitionConfidence.Low),
+                new("Chromecast", new NetworkDevice { IpAddress = "192.0.2.21", MdnsServices = ["_googlecast._tcp"], OpenPorts = [8008, 8009] },
+                    "Smart TV", RecognitionConfidence.Medium),
+                new("camera vendor and title",
+                    new NetworkDevice { IpAddress = "192.0.2.22", Vendor = "Hangzhou Hikvision", OpenPorts = [80, 554], HttpTitle = "Hikvision NVR" },
+                    "Camera", RecognitionConfidence.Medium),
+                new("Proxmox port and title", new NetworkDevice { IpAddress = "192.0.2.23", OpenPorts = [22, 8006], HttpTitle = "proxmox virtual environment" },
+                    "Hypervisor", RecognitionConfidence.Medium),
+                new("Cisco switch by vendor only", new NetworkDevice { IpAddress = "192.0.2.24", Vendor = "Cisco Systems" }, "Switch/AP", RecognitionConfidence.Low),
+            };
+
+            int unknown = 0;
+            foreach (var test in corpus)
+            {
+                var result = NetworkScanner.AssessDevice(test.Device, null);
+                Require(result.Type == test.Type, $"{test.Label}: expected {test.Type}, got {result.Type}.");
+                Require(result.Confidence == test.Confidence, $"{test.Label}: expected {test.Confidence} confidence, got {result.Confidence}.");
+                Require(result.Conflict == test.Conflict, $"{test.Label}: conflict should be {test.Conflict}.");
+                Require(result.Signals.Count > 0, $"{test.Label}: every result names at least one signal.");
+                Require(result.AutomaticType == result.Type && result.AutomaticConfidence == result.Confidence, $"{test.Label}: no manual type, so automatic and shown agree.");
+                Require(NetworkScanner.ClassifyDevice(test.Device, null) == result.Type, $"{test.Label}: ClassifyDevice and AssessDevice agree.");
+                if (result.Type is "Unknown" or "Other") unknown++;
+            }
+            Console.WriteLine($"Recognition corpus: {corpus.Count} devices, {unknown} left Unknown or Other.");
+
+            // The outvoted hostname is still on record, as the alternative it pointed to.
+            var outvoted = NetworkScanner.AssessDevice(corpus.Single(c => c.Label == "hostname outvoted by protocols").Device, null);
+            Require(outvoted.Alternatives.Any(a => a.Type == "DNS Server"), "An outvoted hostname keeps its type as an alternative.");
+            Require(outvoted.Signals.Select(s => s.Source).Distinct().Count() >= 3, "Signals record each source family that agreed.");
+
+            // Evidence for a refinement of the winner is listed with it.
+            var router = NetworkScanner.AssessDevice(new NetworkDevice { IpAddress = "192.0.2.40", Vendor = "MikroTik", OpenPorts = [53] }, null);
+            Require(router.Type == "Router" && router.Signals.Any(s => s.Source == RecognitionSources.Vendor && s.Detail == "MikroTik"),
+                "A router's network-vendor hint is part of its evidence.");
+
+            // A manual type wins and keeps the automatic result alongside.
+            var printer = corpus.Single(c => c.Label == "printer by port only").Device;
+            printer.MacAddress = "00:00:5E:00:53:10";
+            var manual = NetworkScanner.AssessDevice(printer, mac => mac == printer.MacAddress ? "NAS" : null);
+            Require(manual.Type == "NAS" && manual.Confidence == RecognitionConfidence.Manual &&
+                    manual.AutomaticType == "Printer" && manual.AutomaticConfidence == RecognitionConfidence.Low,
+                "A manual type is shown as Manual with the automatic result kept.");
+
+            // Fallback guesses say which rule produced them, with a stable key.
+            var plug = NetworkScanner.AssessDevice(corpus.Single(c => c.Label == "smart plug, no ports").Device, null);
+            Require(plug.Signals[0].Source == RecognitionSources.Fallback && plug.Signals[0].Detail == RecognitionRules.NoPortsWithMac,
+                "A fallback guess records its rule.");
+
+            // Observed values are kept short and on one line.
+            var hostile = NetworkScanner.AssessDevice(new NetworkDevice
+            {
+                IpAddress = "192.0.2.30", OpenPorts = [9100],
+                SnmpDescr = "printer\r\n" + new string('x', 500),
+            }, null);
+            Require(hostile.Signals.All(s => s.Detail.Length <= 80 && !s.Detail.Any(char.IsControl)), "Evidence values are bounded and single-line.");
+
+            // The assessment survives a JSON round trip with stable, readable enum names.
+            string json = JsonSerializer.Serialize(outvoted);
+            Require(json.Contains("\"High\"") && json.Contains("\"snmp\""), "JSON uses readable confidence and source names: " + json);
+            var back = JsonSerializer.Deserialize<DeviceRecognition>(json)!;
+            Require(back.Type == outvoted.Type && back.Confidence == outvoted.Confidence && back.Signals.Count == outvoted.Signals.Count,
+                "A saved assessment reads back unchanged.");
+
+            // Assessing reads the device only.
+            var before = JsonSerializer.Serialize(printer);
+            NetworkScanner.AssessDevice(printer, null);
+            Require(JsonSerializer.Serialize(printer) == before, "Assessing a device does not change it.");
         }
-        var vendor = Assess(new NetworkDevice { Vendor = "Synology" });
-        Require(vendor.AutomaticType == "NAS" && vendor.Confidence == "Low" && vendor.ReportedModel == null,
-            "OUI is a weak role hint, never a model declaration.");
-        var name = Assess(new NetworkDevice { Hostname = "office-synology" });
-        Require(name.AutomaticType == "NAS" && name.Confidence == "Low", "A name alone has low confidence.");
-        var contrary = Assess(new NetworkDevice { Hostname = "synology", HttpTitle = "VMware ESXi", TlsSubject = "CN=VMware ESXi" });
-        Require(contrary.AutomaticType == "Hypervisor" && contrary.Confidence == "High", "Protocol evidence can outweigh a weak name.");
-        var port = Assess(new NetworkDevice { OpenPorts = [8006] });
-        Require(port.AutomaticType == "Hypervisor" && port.Confidence == "Low", "A port alone cannot provide high confidence.");
+        finally
+        {
+            NetworkScanner.GatewayIp = oldGateway;
+            NetworkScanner.DnsIp = oldDns;
+        }
+        Console.WriteLine("PASS: recognition gives each type its evidence, alternatives and a confidence grade.");
         return Task.CompletedTask;
     }
-    internal static Task CorroborationAndConflict()
+
+    private static void Require(bool condition, string message)
     {
-        var one = Assess(new NetworkDevice { HttpTitle = "Proxmox VMware ESXi XenServer", HttpServer = "Proxmox" });
-        Require(one.AutomaticType == "Hypervisor" && one.Confidence == "Medium", "Repeated hints from HTTP are one source family.");
-        var unrelated = Assess(new NetworkDevice { HttpTitle = "VMware ESXi", TlsSubject = "CN=unrelated fixture" });
-        Require(unrelated.Confidence == "Medium" && unrelated.Candidates.Single().Sources.SequenceEqual(new[] { "HTTP" }),
-            "An unrelated TLS value does not corroborate a matched HTTP rule.");
-        var conflict = Assess(new NetworkDevice { HttpTitle = "VMware ESXi", TlsSubject = "CN=VMware", SnmpDescr = "Printer; model=Unit42" });
-        Require(conflict.ConflictingSignals && conflict.Confidence == "Low", "A strong contradictory source is visible even when its score is lower.");
-        Require(conflict.Rules.Any(rule => rule.Candidate == "Printer" && rule.Sources.Contains("SNMP")), "The alternative has its actual source recorded.");
-        var tie = Assess(new NetworkDevice { SnmpDescr = "Printer", HttpTitle = "Synology" });
-        Require(tie.ConflictingSignals && tie.Confidence == "Low", "Ties cannot silently produce high confidence.");
-        var independent = Assess(new NetworkDevice { SnmpDescr = "Windows Server", HttpTitle = "Unrelated site" });
-        Require(independent.Candidates.Single().Sources.SequenceEqual(new[] { "SNMP" }), "Protocol words in a payload do not create a second source.");
-        Require(Assess(new NetworkDevice { MdnsServices = { "_PRINTER._TCP.LOCAL" } }).AutomaticType == "Printer", "Service recognition is case-insensitive.");
-        return Task.CompletedTask;
-    }
-    internal static Task ModelsAndUntrustedValues()
-    {
-        var named = Assess(new NetworkDevice { Vendor = "Synology", Hostname = "DS999", HttpTitle = "DiskStation DS999" });
-        Require(named.ReportedModel == null, "Model-looking names/titles are not explicit model declarations.");
-        var explicitModel = Assess(new NetworkDevice { SnmpDescr = "Printer; model=Unit42", HttpTitle = "Embedded Web Server; model=Unit42" });
-        Require(explicitModel.ReportedModel == "Unit42" && !explicitModel.ModelConflict, "Matching explicit declarations remain labelled as reported, not verified.");
-        var different = Assess(new NetworkDevice { SnmpDescr = "model=Unit42", SsdpServer = "model=Other99" });
-        Require(different.ReportedModel == null && different.ModelConflict, "Conflicting model declarations do not silently pick one.");
-        var hostile = Assess(new NetworkDevice { HttpTitle = new string('a', 600) + "VMware ESXi", SnmpDescr = "model==HYPERLINK(bad)", SsdpServer = "x\r\n\0<script>" });
-        Require(hostile.AutomaticType == "Unknown" && hostile.ReportedModel == null, "Uncaptured suffixes and formula-like declarations are not used.");
-        Require(hostile.Evidence.All(fact => fact.Value.Length <= 512 && !fact.Value.Any(char.IsControl)), "Displayed/stored evidence is bounded and strips control characters.");
-        var longModel = Assess(new NetworkDevice { SnmpDescr = "model=" + new string('X', 70) });
-        Require(longModel.ReportedModel == null, "A long model is not truncated into a different model name.");
-        return Task.CompletedTask;
-    }
-    internal static Task ManualAndSnapshots()
-    {
-        var device = new NetworkDevice { Hostname = "fixture", HttpTitle = "VMware ESXi", TlsSubject = "CN=VMware" };
-        var auto = Assess(device, _ => "Printer");
-        Require(auto.AutomaticType == "Hypervisor" && auto.EffectiveConfidence == "Manual" && device.DeviceType == "Printer",
-            "Manual assignment is distinct from automatic inference and confidence.");
-        var stamp = auto.AssessedAtUtc;
-        device.Hostname = "synology-renamed-by-user";
-        DeviceIdentification.ApplyManualType(device, null);
-        Require(device.DeviceType == "Hypervisor" && device.Identification!.AssessedAtUtc == stamp,
-            "Clearing a manual assignment restores the frozen inference without treating a user name as new evidence.");
-        var copy = device.Identification!.Snapshot();
-        device.Identification.Candidates[0].Sources[0] = "changed";
-        Require(!copy.Candidates[0].Sources.Contains("changed"), "History snapshots have independent source arrays.");
-        var roundTrip = JsonSerializer.Deserialize<DeviceIdentification>(JsonSerializer.Serialize(copy))!;
-        Require(roundTrip.AutomaticType == copy.AutomaticType && roundTrip.Evidence.Length == copy.Evidence.Length, "JSON preserves the evidence contract.");
-        Require(copy.ObservationCompletedAtUtc == null && copy.Evidence.All(fact => fact.ObservedAtUtc == null), "External classification does not invent capture timestamps.");
-        Require(!JsonSerializer.Serialize(new NetworkDevice()).Contains("Identification"), "Unassessed/old devices keep the optional field absent.");
-        return Task.CompletedTask;
-    }
-    private sealed class Probes : NetworkScanner.ScanProbes
-    {
-        internal override IReadOnlyDictionary<string, string> ReadNeighbors() => new Dictionary<string, string> { ["192.0.2.10"] = "" };
-        internal override string ResolveMac(IPAddress address) => "";
-        internal override void FlushDns() { }
-        internal override Task<string> Hostname(IPAddress address) => Task.FromResult("fixture");
-        internal override Task<int?> Ping(IPAddress address, int timeout) => Task.FromResult<int?>(64);
-        internal override Task<bool> Connect(IPAddress address, int port, int timeout) => Task.FromResult(port == 80);
-        internal override Task<bool> TcpAlive(IPAddress address) => Task.FromResult(false);
-        internal override Task<Dictionary<string, MulticastDiscovery.MdnsInfo>> Mdns(CancellationToken token) => Task.FromResult(new Dictionary<string, MulticastDiscovery.MdnsInfo>
-        { ["192.0.2.10"] = new() { Services = { "_printer._tcp.local" } } });
-        internal override Task<Dictionary<string, string>> Ssdp(CancellationToken token) => Task.FromResult(new Dictionary<string, string> { ["192.0.2.10"] = "model=Unit42" });
-        internal override Task Http(NetworkDevice device, IPAddress address, bool deep, CancellationToken token = default) { device.HttpTitle = "Embedded Web Server; model=Unit42"; return Task.CompletedTask; }
-        internal override Task Tls(NetworkDevice device, IPAddress address, bool deep) => Task.CompletedTask;
-        internal override Task Ssh(NetworkDevice device, IPAddress address) => Task.CompletedTask;
-        internal override Task Snmp(NetworkDevice device, IPAddress address) { device.SnmpDescr = "Printer; model=Unit42"; return Task.CompletedTask; }
-        internal override Task Netbios(NetworkDevice device, IPAddress address) => Task.CompletedTask;
-    }
-    internal static async Task ScanProvenance()
-    {
-        var scanner = new NetworkScanner(new Probes());
-        var full = (await scanner.ScanSubnetAsync("192.0.2.10", CancellationToken.None)).Single();
-        Require(full.Identification is { Scope: "full", Confidence: "High" }, "A full scan records corroborated protocol evidence.");
-        var first = full.Identification!;
-        Require(first.ObservationStartedAtUtc <= first.ObservationCompletedAtUtc && first.Evidence.Any(fact => fact.Source == "HTTP" && fact.ObservedAtUtc != null), "Scan windows and protocol observation times are available.");
-        var deep = await scanner.DeepProbeHostAsync("192.0.2.10", CancellationToken.None, new ScanOptions().Without("http,snmp"));
-        Require(deep.Identification is { Scope: "deep" } && deep.Identification.DisabledFeatures.Contains("http"), "Deep scope records disabled probes.");
-        var cached = deep.Identification!.Evidence.Single(fact => fact.Source == "mDNS");
-        Require(cached.Reused && cached.ObservedAtUtc == first.Evidence.Single(fact => fact.Source == "mDNS").ObservedAtUtc,
-            "Cached multicast values keep their old timestamps.");
-        Require(deep.Identification.Confidence != "High" && !deep.Identification.Evidence.Any(fact => fact.Source is "HTTP" or "SNMP"), "Skipped or cached sources cannot masquerade as fresh corroboration.");
-        var quick = (await scanner.ScanSubnetAsync("192.0.2.10", CancellationToken.None, new ScanOptions(), false)).Single();
-        Require(quick.Identification is { Scope: "quick" } && !quick.Identification.Evidence.Any(fact => fact.Source is "TCP" or "HTTP" or "SNMP"), "Quick scans report their limited scope without inventing port/protocol observations.");
+        if (!condition) throw new InvalidOperationException(message);
     }
 }

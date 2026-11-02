@@ -35,6 +35,7 @@
     <sys:String x:Key="Str_Btn_Stop">Stop</sys:String>
     <sys:String x:Key="Str_Status_Ready">Ready - {0} OUI vendors loaded</sys:String>
     <sys:String x:Key="Str_Count_Found">{0} devices found</sys:String>
+    <sys:String x:Key="Str_Count_FoundOne">{0} device found</sys:String>
     <sys:String x:Key="Str_Count_Shown">{0} of {1} shown</sys:String>
 
     <!-- Results pane -->
@@ -45,6 +46,8 @@
     <sys:String x:Key="Str_Sc_CycleTopologyOrder">Cycle topology arrangement</sys:String>
     <sys:String x:Key="Str_History_Title">Scan History</sys:String>
     <sys:String x:Key="Str_History_Empty">No completed scans yet.</sys:String>
+    <sys:String x:Key="Str_History_Unreadable">Scan history could not be read. The file was left untouched.</sys:String>
+    <sys:String x:Key="Str_History_LoadFailed">Scan history could not be read, so it is not shown and new scans are not added to it.&#10;&#10;{0}&#10;&#10;The file was left untouched: {1}&#10;Close other KillerScan windows, or move the file aside to start a new history. Try again?</sys:String>
     <sys:String x:Key="Str_History_Change">Change</sys:String>
     <sys:String x:Key="Str_History_Added">Added</sys:String>
     <sys:String x:Key="Str_History_Removed">Missing</sys:String>
@@ -92,6 +95,61 @@
     <sys:String x:Key="Str_Ctx_SshAs">SSH as...</sys:String>
     <sys:String x:Key="Str_Ctx_SetType">Set Device Type</sys:String>
     <sys:String x:Key="Str_Ctx_ClearOverride">Clear Override</sys:String>
+    <!-- Access: each way into a device and what the scan actually saw there. -->
+    <sys:String x:Key="Str_Access_Menu">Access</sys:String>
+    <sys:String x:Key="Str_Access_None">No open ports recorded</sys:String>
+    <sys:String x:Key="Str_Access_CopyMenu">Copy Address</sys:String>
+    <sys:String x:Key="Str_Access_Item">{0} {1}: {2}</sys:String>
+    <sys:String x:Key="Str_Access_Answered">answered {0}</sys:String>
+    <sys:String x:Key="Str_Access_LoginRequested">asks for a login</sys:String>
+    <sys:String x:Key="Str_Access_LoginRequestedScheme">asks for a login ({0})</sys:String>
+    <sys:String x:Key="Str_Access_LoginForm">sign-in page</sys:String>
+    <sys:String x:Key="Str_Access_Banner">banner received</sys:String>
+    <sys:String x:Key="Str_Access_PortOpen">port open</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Http">The web server answered HTTP {0} at this address.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Requested">It asked for credentials. KillerScan sent none.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_LoginForm">The page has a password field, so it is a sign-in page. Whether a login would work is not known.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Unknown">Whether it needs a login is not known.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Banner">The SSH server sent its banner. No login was attempted.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_PortOpen">The port accepted a connection. The protocol is guessed from the port number.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Seen">Seen {0}</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Copy">No app opens this protocol, so clicking copies the address.</sys:String>
+    <!-- Recognition evidence: why a device has its type. -->
+    <sys:String x:Key="Str_Rec_Menu">Why This Type?</sys:String>
+    <sys:String x:Key="Str_Rec_Heading">{0} ({1})</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_Low">Low confidence</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_Medium">Medium confidence</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_High">High confidence</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_Manual">Set manually</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_None">no evidence recorded</sys:String>
+    <sys:String x:Key="Str_Rec_None">No evidence was recorded for this device.</sys:String>
+    <sys:String x:Key="Str_Rec_Evidence">Evidence</sys:String>
+    <sys:String x:Key="Str_Rec_Alternatives">Also possible</sys:String>
+    <sys:String x:Key="Str_Rec_More">and {0} more</sys:String>
+    <sys:String x:Key="Str_Rec_Conflict">Another type scored close to this one, so confidence was lowered.</sys:String>
+    <sys:String x:Key="Str_Rec_Automatic">Automatic result: {0} ({1})</sys:String>
+    <sys:String x:Key="Str_Rec_Caveat">Confidence says how well the evidence fits the type. It is not a probability, and a device can report anything about itself.</sys:String>
+    <sys:String x:Key="Str_RecSrc_hostname">Name</sys:String>
+    <sys:String x:Key="Str_RecSrc_vendor">MAC vendor</sys:String>
+    <sys:String x:Key="Str_RecSrc_ports">Open ports</sys:String>
+    <sys:String x:Key="Str_RecSrc_ttl">TTL</sys:String>
+    <sys:String x:Key="Str_RecSrc_http">Web page</sys:String>
+    <sys:String x:Key="Str_RecSrc_tls">TLS certificate</sys:String>
+    <sys:String x:Key="Str_RecSrc_ssh">SSH banner</sys:String>
+    <sys:String x:Key="Str_RecSrc_snmp">SNMP</sys:String>
+    <sys:String x:Key="Str_RecSrc_netbios">NetBIOS name</sys:String>
+    <sys:String x:Key="Str_RecSrc_mdns">mDNS service</sys:String>
+    <sys:String x:Key="Str_RecSrc_ssdp">UPnP server</sys:String>
+    <sys:String x:Key="Str_RecRule_gateway">Windows uses it as the default gateway</sys:String>
+    <sys:String x:Key="Str_RecRule_gateway-dns">Windows uses it as the default gateway and DNS server</sys:String>
+    <sys:String x:Key="Str_RecRule_private-mac-few-ports">A private (randomized) MAC address and few open ports, typical of phones and tablets</sys:String>
+    <sys:String x:Key="Str_RecRule_ssh-port">Port 22 (SSH) is open</sys:String>
+    <sys:String x:Key="Str_RecRule_windows-ports">Windows file sharing or Remote Desktop ports are open</sys:String>
+    <sys:String x:Key="Str_RecRule_web-port">A web port is open</sys:String>
+    <sys:String x:Key="Str_RecRule_pc-vendor-no-ports">A PC maker's MAC address and no open ports, typical of a sleeping computer</sys:String>
+    <sys:String x:Key="Str_RecRule_no-ports-with-mac">Answers on the network but has no open ports, typical of smart-home devices</sys:String>
+    <sys:String x:Key="Str_RecRule_no-evidence">Nothing identifying was found</sys:String>
+    <sys:String x:Key="Str_RecRule_open-ports-only">Has open ports, but none that match a known type</sys:String>
 
     <!-- SSH username prompt ({0} is the device, filled in by the app) -->
     <sys:String x:Key="Str_Ssh_Head">Connect to {0} over SSH</sys:String>
@@ -138,10 +196,12 @@
     <sys:String x:Key="Str_St_Probing">Probing {0} alive hosts...</sys:String>
     <sys:String x:Key="Str_St_ResolvingHosts">Resolving {0} hosts...</sys:String>
     <sys:String x:Key="Str_St_ScanComplete">Scan complete - {0} devices found</sys:String>
+    <sys:String x:Key="Str_St_ScanCompleteOne">Scan complete - {0} device found</sys:String>
     <sys:String x:Key="Str_St_Ready">Ready</sys:String>
     <sys:String x:Key="Str_St_ScanCanceled">Scan canceled</sys:String>
     <sys:String x:Key="Str_St_Rescanning">Deep scanning {0} ...</sys:String>
     <sys:String x:Key="Str_St_RescanDone">Rescan complete - {0} host(s) refreshed</sys:String>
+    <sys:String x:Key="Str_St_RescanPartial">Rescan finished - {0} of {1} host(s) refreshed, {2} did not respond</sys:String>
     <sys:String x:Key="Str_St_Exported">Exported to {0}</sys:String>
     <sys:String x:Key="Str_St_OverrideSet">Override set: {0} = {1}</sys:String>
     <sys:String x:Key="Str_St_OverrideCleared">Override cleared for {0}</sys:String>
@@ -241,6 +301,7 @@
     <sys:String x:Key="Str_About_UpdateHeading">Download and install {0} {1}?</sys:String>
     <sys:String x:Key="Str_About_UpdateDetail">The app will close and reopen automatically.</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateCheck">Check for updates on startup</sys:String>
+    <sys:String x:Key="Str_About_ShowShortcutsInMenus">Show Shortcuts in Menus</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateHeading">{0} {1} is available</sys:String>
     <sys:String x:Key="Str_About_StartupUpdateDetail">Would you like to download and install it now? The app will close and reopen automatically.</sys:String>
     <sys:String x:Key="Str_About_UpdateNow">Update</sys:String>
@@ -282,10 +343,13 @@ Your settings will not be removed.</sys:String>
          can never disagree with the app that produced it. Only these are its own. Accent names
          are new: the app's accent dots are swatches with no text, but the report's need titles. -->
     <sys:String x:Key="Str_Rep_Theme">Theme</sys:String>
+    <sys:String x:Key="Str_Rep_Title">KillerScan Report</sys:String>
     <sys:String x:Key="Str_Rep_Accent">Accent</sys:String>
     <sys:String x:Key="Str_Rep_Subnet">Subnet</sys:String>
     <sys:String x:Key="Str_Rep_Scanned">Scanned</sys:String>
     <sys:String x:Key="Str_Rep_Devices">devices</sys:String>
+    <sys:String x:Key="Str_Rep_Refreshed">Refreshed later</sys:String>
+    <sys:String x:Key="Str_Rep_RefreshPartial">Partial refresh</sys:String>
     <sys:String x:Key="Str_Rep_GeneratedBy">Generated by</sys:String>
     <sys:String x:Key="Str_Accent_Red">Red</sys:String>
     <sys:String x:Key="Str_Accent_Orange">Orange</sys:String>
@@ -336,6 +400,7 @@ Your settings will not be removed.</sys:String>
 
     <sys:String x:Key="Str_Btn_Open">Open</sys:String>
     <sys:String x:Key="Str_Btn_Save">Save</sys:String>
+    <sys:String x:Key="Str_Btn_Select">Select</sys:String>
     <sys:String x:Key="Str_Col_Modified">modified</sys:String>
     <sys:String x:Key="Str_Col_Name">name</sys:String>
     <sys:String x:Key="Str_Col_DeviceName">Name</sys:String>
@@ -343,6 +408,7 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Dlg_AllFiles">All files</sys:String>
     <sys:String x:Key="Str_Dlg_FileName">File name:</sys:String>
     <sys:String x:Key="Str_Dlg_FileType">File type:</sys:String>
+    <sys:String x:Key="Str_Dlg_Places">Places</sys:String>
     <sys:String x:Key="Str_Dlg_NoMatchingFiles">Nothing here matches the current file type.</sys:String>
     <sys:String x:Key="Str_Dlg_NoPreview">No preview available</sys:String>
     <sys:String x:Key="Str_Dlg_NoSuchFile">That file does not exist.</sys:String>
@@ -370,24 +436,80 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Rename_Label">Name:</sys:String>
     <sys:String x:Key="Str_Rename_Save">Save</sys:String>
     <sys:String x:Key="Str_Rename_Clear">Clear manual name</sys:String>
-    <sys:String x:Key="Str_Trust_Device">Trusted device</sys:String>
-    <sys:String x:Key="Str_TT_TrustMark">Green: trusted device. Amber: not in your trusted list.</sys:String>
+    <sys:String x:Key="Str_Trust_Device">Approved device</sys:String>
+    <sys:String x:Key="Str_TT_TrustMark">Green: approved. Amber: new since this Location's baseline. Gray: known, not approved.</sys:String>
     <sys:String x:Key="Str_St_TrustedBaseline">Trusted baseline created with {0} devices.</sys:String>
+    <sys:String x:Key="Str_St_KnownBaseline">Baseline set: {0} devices are now known. None are approved yet.</sys:String>
+    <sys:String x:Key="Str_St_KnownBaselineOne">Baseline set: {0} device is now known. It is not approved yet.</sys:String>
     <sys:String x:Key="Str_St_UnknownDevices">Alert: {0} unknown devices found.</sys:String>
-    <sys:String x:Key="Str_Tip_UnknownHead">Not in your trusted list:</sys:String>
+    <sys:String x:Key="Str_St_UnknownDevicesOne">Alert: {0} unknown device found.</sys:String>
+    <sys:String x:Key="Str_Tip_UnknownHead">New since this Location's baseline:</sys:String>
     <sys:String x:Key="Str_Tip_AndMore">and {0} more</sys:String>
-    <sys:String x:Key="Str_Tip_TrustHint">Right-click a device to set it trusted.</sys:String>
+    <sys:String x:Key="Str_Tip_TrustHint">Right-click a device to approve it.</sys:String>
+    <sys:String x:Key="Str_Loc_Title">Location</sys:String>
+    <sys:String x:Key="Str_Loc_Temporary">Temporary scan</sys:String>
+    <sys:String x:Key="Str_Loc_Unassigned">Unassigned</sys:String>
+    <sys:String x:Key="Str_Loc_New">New Location...</sys:String>
+    <sys:String x:Key="Str_Loc_NewTitle">New Location</sys:String>
+    <sys:String x:Key="Str_Loc_NewShort">+ New</sys:String>
+    <sys:String x:Key="Str_Loc_ImportedScans">Saved scans</sys:String>
+    <sys:String x:Key="Str_Loc_SaveScan">Save scan</sys:String>
+    <sys:String x:Key="Str_LocIcon_Pin">Pin</sys:String>
+    <sys:String x:Key="Str_LocIcon_Home">Home</sys:String>
+    <sys:String x:Key="Str_LocIcon_Office">Office</sys:String>
+    <sys:String x:Key="Str_LocIcon_Shop">Shop</sys:String>
+    <sys:String x:Key="Str_LocIcon_School">School</sys:String>
+    <sys:String x:Key="Str_LocIcon_Server">Server room</sys:String>
+    <sys:String x:Key="Str_LocIcon_Cloud">Cloud</sys:String>
+    <sys:String x:Key="Str_LocIcon_Wifi">Wi-Fi spot</sys:String>
+    <sys:String x:Key="Str_Loc_Edit">Edit Location...</sys:String>
+    <sys:String x:Key="Str_Loc_Manage">Manage Locations...</sys:String>
+    <sys:String x:Key="Str_Loc_ManageTitle">Locations</sys:String>
+    <sys:String x:Key="Str_Loc_Current">{0} (current)</sys:String>
+    <sys:String x:Key="Str_Loc_Open">Switch to this Location</sys:String>
+    <sys:String x:Key="Str_Loc_Delete">Delete Location...</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteTitle">Delete Location</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteDetail">Delete {0}? Its saved scans, device names, approvals and history leave KillerScan. The files are kept in the Locations "deleted" folder, so they can be recovered.</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteButton">Delete</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteScan">Delete scan</sys:String>
+    <sys:String x:Key="Str_Loc_ScanNameTaken">A saved scan named {0} already exists. Choose another name.</sys:String>
+    <sys:String x:Key="Str_Loc_Busy">Stop the scan before changing Location.</sys:String>
+    <sys:String x:Key="Str_Loc_DeletedElsewhere">{0} was deleted in another window. To keep these results, choose Save results to Location.</sys:String>
+    <sys:String x:Key="Str_Loc_ImportTooLarge">This Location file is larger than {0} MB, which is more than KillerScan imports.</sys:String>
+    <sys:String x:Key="Str_Loc_DiscardTitle">Discard these results?</sys:String>
+    <sys:String x:Key="Str_Loc_DiscardTemporary">These Temporary scan results are not saved anywhere. Changing Location clears them. To keep them, choose Save results to Location instead.</sys:String>
+    <sys:String x:Key="Str_Loc_DiscardConfirm">Discard</sys:String>
+    <sys:String x:Key="Str_Loc_LoadFailed">Locations could not be set up, so KillerScan is using your existing devices, saved scans and history as before.&#10;&#10;{0}&#10;&#10;Nothing was changed or removed. KillerScan will try again the next time it starts.</sys:String>
+    <sys:String x:Key="Str_Loc_NotesLabel">Notes (Ctrl+Enter saves)</sys:String>
+    <sys:String x:Key="Str_Loc_RouterLabel">Router (gateway MAC):</sys:String>
+    <sys:String x:Key="Str_Loc_RouterNone">None yet. Saving a scan here remembers its router.</sys:String>
+    <sys:String x:Key="Str_Loc_Export">Export Location...</sys:String>
+    <sys:String x:Key="Str_Loc_ExportDetail">Saves this Location's name, notes, saved scans, device names, approvals, known devices, device types and history to one file you can import on another PC.</sys:String>
+    <sys:String x:Key="Str_Loc_ExportButton">Export</sys:String>
+    <sys:String x:Key="Str_Loc_ExportUsernames">Include remembered SSH usernames (passwords are never stored)</sys:String>
+    <sys:String x:Key="Str_Loc_Import">Import Location...</sys:String>
+    <sys:String x:Key="Str_Loc_Imported">Imported Location {0}.</sys:String>
+    <sys:String x:Key="Str_Loc_ImportFailed">The Location could not be imported. Nothing was added.&#10;&#10;{0}</sys:String>
+    <sys:String x:Key="Str_Loc_FileFilter">KillerScan Location</sys:String>
+    <sys:String x:Key="Str_Loc_Suggest">This network's gateway was seen in {0}. Switch to that Location?</sys:String>
+    <sys:String x:Key="Str_Loc_SuggestMany">This network's gateway was seen in more than one Location: {0}. Pick one from the Location button.</sys:String>
+    <sys:String x:Key="Str_Loc_Switch">Switch</sys:String>
+    <sys:String x:Key="Str_Loc_Dismiss">Dismiss</sys:String>
+    <sys:String x:Key="Str_Loc_AdapterTitle">Network adapter not connected</sys:String>
+    <sys:String x:Key="Str_Loc_AdapterMissing">This scan is set to use {0}, which is not connected. Scan using the adapter Windows chooses instead?</sys:String>
+    <sys:String x:Key="Str_St_AdapterOffLink">{0} is not on {1}'s network ({2}), and Windows does not route it through {1}. Choose Automatic under Network adapter to scan it.</sys:String>
+    <sys:String x:Key="Str_Rep_Location">Location</sys:String>
+    <sys:String x:Key="Str_Rep_Adapter">Adapter</sys:String>
+    <sys:String x:Key="Str_Loc_SaveResults">Save results to Location</sys:String>
+    <sys:String x:Key="Str_Loc_TemporaryNotice">Temporary scan, not saved. Choose Save scan to keep it.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveGone">{0} was deleted in another window, so nothing was moved. Choose another Location.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveRetention">Nothing was moved, because the history limit of {0} would delete this scan right away. Raise that limit or save to another Location.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveIncomplete">Not everything could be saved to {0}, so the results stay here. Save them again to finish.</sys:String>
     <sys:String x:Key="Str_Tip_Scan">{0} devices, {1} with open ports</sys:String>
     <sys:String x:Key="Str_Tip_Watch">Watching {0} targets, {1} not replying</sys:String>
     <sys:String x:Key="Str_Tip_History">{0} at {1}, {2} devices recorded</sys:String>
     <sys:String x:Key="Str_Services_Title">Services</sys:String>
     <sys:String x:Key="Str_Services_Service">Service</sys:String>
-    <sys:String x:Key="Str_Profiles_Title">Scan Profiles</sys:String>
-    <sys:String x:Key="Str_Profiles_Save">Save current profile</sys:String>
-    <sys:String x:Key="Str_Profiles_Run">Run profile</sys:String>
-    <sys:String x:Key="Str_Profiles_Load">Load target</sys:String>
-    <sys:String x:Key="Str_Profiles_Deep">Deep Scan All afterward</sys:String>
-    <sys:String x:Key="Str_Profiles_Delete">Delete profile</sys:String>
     <sys:String x:Key="Str_Watch_Title">Connection watch</sys:String>
     <sys:String x:Key="Str_Watch_Targets">IP addresses (up to 16, separated by commas)</sys:String>
     <sys:String x:Key="Str_Watch_Start">Start</sys:String>
@@ -439,11 +561,18 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_View_Topology">Topology</sys:String>
     <sys:String x:Key="Str_View_KeepAlive">Keep Alive</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Terminal</sys:String>
+    <sys:String x:Key="Str_Layout_TabsTop">Tabs on top</sys:String>
+    <sys:String x:Key="Str_Layout_TabsBottom">Tabs on bottom</sys:String>
+    <sys:String x:Key="Str_Term_InputRefused">The terminal could not take that much input at once, so it was not sent.</sys:String>
     <sys:String x:Key="Str_Term_Copy">Copy</sys:String>
     <sys:String x:Key="Str_Term_Paste">Paste</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Select all</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Copy All</sys:String>
     <sys:String x:Key="Str_Term_Clear">Clear</sys:String>
+    <sys:String x:Key="Str_Term_ReplaceRunning">Something is running in the terminal. Stop it and start {0} instead?</sys:String>
+    <sys:String x:Key="Str_Term_Replace">Stop and start</sys:String>
+    <sys:String x:Key="Str_Term_PasteTitle">Paste several lines?</sys:String>
+    <sys:String x:Key="Str_Term_PasteDetail">This text has {0} lines. Pasted here, each line runs as soon as it arrives.</sys:String>
     <sys:String x:Key="Str_Workspace_EscStop">Esc to stop</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Split panes</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Move to other pane</sys:String>
@@ -454,13 +583,6 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Workspace_OpenExternal">Open in separate window</sys:String>
     <sys:String x:Key="Str_Workspace_Exited">Process exited ({0})</sys:String>
     <sys:String x:Key="Str_Workspace_StartFailed">Could not start the terminal: {0}</sys:String>
-    <sys:String x:Key="Str_Toolbar_Header">Toolbar</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextNone">No text</sys:String>
-    <sys:String x:Key="Str_Toolbar_SmallIcons">Small icons</sys:String>
-    <sys:String x:Key="Str_Toolbar_LargeIcons">Large icons</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextBeside">Text beside icons</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextUnder">Text under icons</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextOnly">Text only</sys:String>
     <sys:String x:Key="Str_Clipboard_Failed">Could not copy to the clipboard. Try again.</sys:String>
     <sys:String x:Key="Str_KS_Base">Base</sys:String>
     <sys:String x:Key="Str_Speed_Title">KillerSpeed</sys:String>
@@ -502,6 +624,8 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Speed_Tls">The test server could not establish a secure connection.</sys:String>
     <sys:String x:Key="Str_Speed_RateLimited">The test server is busy. Try again later.</sys:String>
     <sys:String x:Key="Str_Speed_BadResponse">The test server returned an invalid response.</sys:String>
+    <sys:String x:Key="Str_Speed_Challenged">Cloudflare blocked the test with a security challenge.</sys:String>
+    <sys:String x:Key="Str_Speed_Detail">Details: {0}</sys:String>
     <sys:String x:Key="Str_Speed_TransferFailed">The transfer failed. Check your connection and try again.</sys:String>
     <sys:String x:Key="Str_Speed_ClipboardFailed">Could not copy the results. Try again.</sys:String>
     <sys:String x:Key="Str_Speed_ReplaceRunning">Something is running in the terminal. Stop it and run the speed test instead?</sys:String>
@@ -527,6 +651,7 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_History_ToggleView">Switch history view</sys:String>
     <sys:String x:Key="Str_Sc_ContextMenu">Context menu</sys:String>
     <sys:String x:Key="Str_History_Settings">History settings</sys:String>
+    <sys:String x:Key="Str_History_AllLocations">Show all Locations</sys:String>
     <sys:String x:Key="Str_History_KeepFor">Keep scans for</sys:String>
     <sys:String x:Key="Str_History_Days">days</sys:String>
     <sys:String x:Key="Str_History_KeepLatest">Keep the latest</sys:String>
@@ -537,6 +662,7 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_History_SaveFailed">Could not save history settings: {0}</sys:String>
     <sys:String x:Key="Str_History_ComparisonIdentity">Scan comparison: {0} / {1}</sys:String>
     <sys:String x:Key="Str_History_Delete">Delete scans</sys:String>
+    <sys:String x:Key="Str_History_Rename">Rename scan...</sys:String>
     <sys:String x:Key="Str_Scroll_Up">Scroll up</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Scroll down</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Scroll left</sys:String>
@@ -545,10 +671,12 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Scroll_PageDown">Page down</sys:String>
     <sys:String x:Key="Str_Scroll_PageLeft">Page left</sys:String>
     <sys:String x:Key="Str_Scroll_PageRight">Page right</sys:String>
+    <sys:String x:Key="Str_SaveFailed">Could not save changes. They are still available for this session. Try saving again?&#10;&#10;{0}</sys:String>
+    <sys:String x:Key="Str_History_Partial">Partial scan</sys:String>
 
-    <!-- Per-scan probe choices; stable feature IDs also serve CLI /skip. -->
-    <sys:String x:Key="Str_Options_Title">Scan options</sys:String>
-    <sys:String x:Key="Str_Options_Detail">Per tab; saved with profiles. Fewer probes may reduce results. HTTP/TLS/SSH need port scanning; SNMP/NetBIOS are independent.</sys:String>
+    <!-- Scan settings -->
+    <sys:String x:Key="Str_Options_Title">Scan settings</sys:String>
+    <sys:String x:Key="Str_Options_Detail">Applies to this tab; saved with profiles. Fewer checks may reduce results. HTTP, TLS, and SSH require port scanning; SNMP and NetBIOS do not.</sys:String>
     <sys:String x:Key="Str_Options_Defaults">Restore defaults (all enabled)</sys:String>
     <sys:String x:Key="Str_Options_neighbor-cache">Read neighbor cache</sys:String>
     <sys:String x:Key="Str_Options_arp">Resolve MAC via ARP</sys:String>
@@ -563,22 +691,13 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Options_ssh">SSH banner</sys:String>
     <sys:String x:Key="Str_Options_snmp">SNMP description</sys:String>
     <sys:String x:Key="Str_Options_netbios">NetBIOS name</sys:String>
-    <sys:String x:Key="Str_Interface_Title">Network interface</sys:String>
-    <sys:String x:Key="Str_Interface_Auto">Automatic (system routing)</sys:String>
-    <sys:String x:Key="Str_Interface_Unavailable">Selected interface/address is unavailable. Choose an interface again.</sys:String>
-    <sys:String x:Key="Str_Interface_WifiIdentity">Wi-Fi network identity is unavailable. Windows must allow reading the connected Wi-Fi identity for explicit binding.</sys:String>
-    <sys:String x:Key="Str_Location_Title">Location</sys:String>
-    <sys:String x:Key="Str_Location_Busy">Stop the current scan or terminal command before changing location.</sys:String>
-    <sys:String x:Key="Str_Location_Legacy">Legacy data (unassigned)</sys:String>
-    <sys:String x:Key="Str_Location_New">New location...</sys:String>
-    <sys:String x:Key="Str_Location_Rename">Rename location...</sys:String>
-    <sys:String x:Key="Str_Location_Switch">Change location</sys:String>
-    <sys:String x:Key="Str_Location_Explicit">Choose a name yourself. Locations are never inferred from IP ranges or Wi-Fi names.</sys:String>
-    <sys:String x:Key="Str_Location_Clear">Changing location clears current results and closes the idle terminal and monitoring views. Saved data stays in its original location.</sys:String>
-    <sys:String x:Key="Str_Location_InvalidName">Use a location name of 1 to 80 characters without control characters.</sys:String>
-    <sys:String x:Key="Str_Location_DuplicateName">A location with this name already exists. Choose another name.</sys:String>
-    <sys:String x:Key="Str_Location_SelectionError">This location is unavailable or cannot be changed. Choose an existing location.</sys:String>
-    <sys:String x:Key="Str_Location_DataError">Location data could not be read or saved. Close other copies of KillerScan and check file permissions or restore a backup before continuing.</sys:String>
+    <sys:String x:Key="Str_Options_ProbeUnknownPorts">Deep scan: fingerprint unknown ports (never printer ports)</sys:String>
+    <sys:String x:Key="Str_Options_Adapter">Network adapter</sys:String>
+    <sys:String x:Key="Str_Options_AdapterAuto">Automatic (Windows chooses)</sys:String>
+    <sys:String x:Key="Str_Table_KeyboardHelp">Use the arrow keys to navigate the table.</sys:String>
+    <sys:String x:Key="Str_Sidebar_Left">Left</sys:String>
+    <sys:String x:Key="Str_Sidebar_Right">Right</sys:String>
+    <sys:String x:Key="Str_Sidebar">SIDEBAR</sys:String>
     <sys:String x:Key="Str_Evidence_Title">Recognition evidence</sys:String>
     <sys:String x:Key="Str_Evidence_Confidence">Confidence</sys:String>
     <sys:String x:Key="Str_Evidence_None">Not available</sys:String>
@@ -601,7 +720,6 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Evidence_External">Imported / unspecified scope</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Other candidates</sys:String>
     <sys:String x:Key="Str_Access_Title">Access</sys:String>
-    <sys:String x:Key="Str_Access_None">No access endpoints are available.</sys:String>
     <sys:String x:Key="Str_Access_Authentication">Authentication</sys:String>
     <sys:String x:Key="Str_Access_Unknown">Unknown</sys:String>
     <sys:String x:Key="Str_Access_Required">Server requested authentication</sys:String>
@@ -613,7 +731,6 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Access_Redirect">Redirect response; destination was not followed</sys:String>
     <sys:String x:Key="Str_Access_Note">Opening makes a new connection. HTTP 200 does not prove access without login. HTTPS certificates were not validated. Login evidence applies only to the requested address.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Observation time unavailable</sys:String>
-
     <sys:String x:Key="Str_HA_Title">Home Assistant integrations</sys:String>
     <sys:String x:Key="Str_HA_Note">Suggestions are not verified compatibility. No connection or setup is performed. Optional inputs stay in this window; documentation links never include device data.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">No specific match in this catalogue. This does not mean the device is unsupported.</sys:String>
@@ -655,7 +772,6 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_HA_Oids">Supported OIDs and read access; sysDescr alone does not define HA entities</sys:String>
     <sys:String x:Key="Str_HA_Radio">Compatible radio/adapter/hub and exact-device support</sys:String>
     <sys:String x:Key="Str_HA_Conflict">Conflicting evidence; no best integration has been selected.</sys:String>
-
     <sys:String x:Key="Str_HA_AllTitle">Best HA integrations for this scan</sys:String>
     <sys:String x:Key="Str_HA_BestChoice">Best integration choice</sys:String>
     <sys:String x:Key="Str_HA_NoChoice">Needs identification</sys:String>
@@ -667,7 +783,6 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_HA_Inputs">Refine device information</sys:String>
     <sys:String x:Key="Str_HA_Next">In HA, use Add integration and select this integration. Check its model support and prerequisites below.</sys:String>
     <sys:String x:Key="Str_HA_NoDevices">This scan has no devices yet. Run a scan first.</sys:String>
-
     <sys:String x:Key="Str_HA_CheckChoice">Check: {0}</sys:String>
     <sys:String x:Key="Str_HA_ResearchChoice">Start with this integration. The manufacturer or name is a lead; confirm the exact model, firmware and prerequisites below.</sys:String>
     <sys:String x:Key="Str_HA_FirmwareChoice">ESP: check firmware</sys:String>

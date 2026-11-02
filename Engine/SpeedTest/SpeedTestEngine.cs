@@ -15,8 +15,9 @@ using System.Threading.Tasks;
 namespace KillerScan.Engine.SpeedTest
 {
     /// <summary>A bounded HTTP throughput test against a compatible endpoint. Download counts
-    /// bytes read from the response stream; upload counts only bytes acknowledged by the server.
-    /// Neither number includes HTTP headers, TLS framing, or unfinished upload requests.</summary>
+    /// bytes read from the response stream. Upload counts payload written to the HTTP transport
+    /// during the timed phase, including in-flight requests, and requires a valid server acknowledgment.
+    /// These payload counts exclude HTTP headers and TLS framing. Written upload bytes may still be buffered.</summary>
     public sealed class SpeedTestEngine
     {
         private const int BufferSize = 64 * 1024;
@@ -300,15 +301,20 @@ namespace KillerScan.Engine.SpeedTest
                                 });
                             }
                         }
-                        catch (SpeedTestException ex) when (!stop.IsCancellationRequested)
+                        catch (SpeedTestException ex)
                         {
-                            if (ex.Kind == SpeedTestFailureKind.RateLimited)
+                            switch (LatencyFailure(ex, stop.IsCancellationRequested))
                             {
-                                Interlocked.CompareExchange(ref counters.Failure, ex, null);
-                                stop.Cancel();
-                                return;
+                                case LatencyFailureAction.FailPhase:
+                                    Interlocked.CompareExchange(ref counters.Failure, ex, null);
+                                    stop.Cancel();
+                                    return;
+                                case LatencyFailureAction.CountSample:
+                                    failedSamples++;
+                                    break;
+                                default:
+                                    return;
                             }
-                            failedSamples++;
                         }
                     }
                 }
@@ -330,9 +336,8 @@ namespace KillerScan.Engine.SpeedTest
             token.ThrowIfCancellationRequested();
             if (counters.Failure != null) throw Normalize(counters.Failure);
             var (finalBytes, finalScheduled, finalElapsed) = counters.Snapshot();
-            // Upload bytes are counted as they leave the socket, so a stalled endpoint that
-            // never acknowledges any request would still register serialized bytes. Fail on
-            // the ack count instead of the sent count so a broken endpoint cannot fake a rate.
+            // Serialized payload can exist without a successful server exchange. Require an
+            // acknowledgment to establish endpoint validity while retaining sent-byte throughput.
             if (!warmup && (upload ? counters.Acknowledgments == 0 : finalBytes == 0))
                 throw new SpeedTestException(SpeedTestFailureKind.TransferFailed,
                     upload ? "No upload payload was acknowledged before the measurement ended."
@@ -366,6 +371,12 @@ namespace KillerScan.Engine.SpeedTest
 
         private static void ValidateResponse(HttpResponseMessage response)
         {
+            // Cloudflare marks challenge pages with this header whatever the status, so a bot or WAF
+            // challenge is named instead of reported as an unexplained HTTP error.
+            if (response.Headers.TryGetValues("cf-mitigated", out var mitigated) &&
+                mitigated.Any(value => value.IndexOf("challenge", StringComparison.OrdinalIgnoreCase) >= 0))
+                throw new SpeedTestException(SpeedTestFailureKind.Challenged,
+                    "Cloudflare challenged the request (HTTP " + (int)response.StatusCode + ").", statusCode: (int)response.StatusCode);
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new SpeedTestException((int)response.StatusCode == 429 ? SpeedTestFailureKind.RateLimited : SpeedTestFailureKind.HttpError,
                     "The speed-test endpoint returned HTTP " + (int)response.StatusCode + ".",
@@ -456,7 +467,8 @@ namespace KillerScan.Engine.SpeedTest
                                 System.Globalization.CultureInfo.InvariantCulture, out double duration) && duration >= 0 &&
                             !double.IsInfinity(duration) && !double.IsNaN(duration))));
                 if (body.Length != 0 || !timing || response.Content.Headers.ContentType?.MediaType != "text/plain")
-                    throw new SpeedTestException(SpeedTestFailureKind.InvalidResponse, "Cloudflare returned an unexpected upload acknowledgment.");
+                    throw new SpeedTestException(SpeedTestFailureKind.InvalidResponse,
+                        "Cloudflare returned an unexpected upload acknowledgment" + Received(response, body));
             }
             else
             {
@@ -466,13 +478,25 @@ namespace KillerScan.Engine.SpeedTest
                     if (json.RootElement.ValueKind != JsonValueKind.Object ||
                         !json.RootElement.TryGetProperty("bytes", out var value) || value.ValueKind != JsonValueKind.Number ||
                         !value.TryGetInt64(out long acknowledged) || acknowledged != expectedBytes)
-                        throw new SpeedTestException(SpeedTestFailureKind.InvalidResponse, "The endpoint did not acknowledge the exact upload size.");
+                        throw new SpeedTestException(SpeedTestFailureKind.InvalidResponse,
+                            "The endpoint did not acknowledge the exact upload size" + Received(response, body));
                 }
                 catch (JsonException ex)
                 {
-                    throw new SpeedTestException(SpeedTestFailureKind.InvalidResponse, "The endpoint returned an invalid upload acknowledgment.", ex);
+                    throw new SpeedTestException(SpeedTestFailureKind.InvalidResponse,
+                        "The endpoint returned an invalid upload acknowledgment" + Received(response, body), ex);
                 }
             }
+        }
+
+        /// <summary>What actually came back, on one bounded line, so a proxy or filter that rewrote the
+        /// reply can be identified from the error alone.</summary>
+        private static string Received(HttpResponseMessage response, string body)
+        {
+            string type = response.Content.Headers.ContentType?.MediaType ?? "no content type";
+            string text = new string(body.Select(c => char.IsControl(c) ? ' ' : c).ToArray()).Trim();
+            if (text.Length > 120) text = text.Substring(0, 120) + "...";
+            return ": HTTP " + (int)response.StatusCode + ", " + type + ", " + (text.Length == 0 ? "empty body" : "body \"" + text + "\"") + ".";
         }
 
         private static bool IsCloudflareEndpoint(Uri endpoint) => endpoint.Scheme == Uri.UriSchemeHttps && endpoint.Port == 443 &&
@@ -503,6 +527,16 @@ namespace KillerScan.Engine.SpeedTest
                 await LatencyAsync(client, options, token).ConfigureAwait(false);
             }
         }
+
+        internal enum LatencyFailureAction { CountSample, FailPhase, Ignore }
+
+        /// <summary>What a failed loaded-latency sample does to its phase. A failure that lands
+        /// after the phase stopped is ignored, so one late bad reply cannot throw away a finished
+        /// measurement; before that, a rate limit ends the phase and anything else is one failed sample.</summary>
+        internal static LatencyFailureAction LatencyFailure(SpeedTestException ex, bool phaseStopped) =>
+            phaseStopped ? LatencyFailureAction.Ignore
+            : ex.Kind == SpeedTestFailureKind.RateLimited ? LatencyFailureAction.FailPhase
+            : LatencyFailureAction.CountSample;
 
         private static async Task<double> LatencyAsync(HttpClient client, SpeedTestOptions options, CancellationToken token)
         {
@@ -555,8 +589,8 @@ namespace KillerScan.Engine.SpeedTest
                     int size = Math.Min(_buffer.Length, _length - sent);
                     await stream.WriteAsync(_buffer, 0, size, _token).ConfigureAwait(false);
                     Interlocked.Add(ref _serialized, size);
-                    // Count bytes as they leave the socket so in-flight uploads cut short by
-                    // the phase-end cancellation are still reflected in the measured rate.
+                    // Count successful HTTP transport writes before cutoff, including buffered
+                    // payload in requests that are still in flight when the phase ends.
                     _count(size);
                     sent += size;
                 }

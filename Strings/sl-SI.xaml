@@ -1,14 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-
-    <!-- ================================================================
-         KillerScan  -  Slovenian (sl-SI) strings.
-         x:Key values are looked up at runtime - never change them.
-         Other locales layer over this file; any key they omit falls back here.
-         ================================================================ -->
-
-    <!-- Title bar / chrome -->
     <sys:String x:Key="Str_Subtitle">Omrežni pregledovalnik</sys:String>
     <sys:String x:Key="Str_TT_Language">Jezik</sys:String>
     <sys:String x:Key="Str_TT_AppSize">Za spremembo velikosti programa zavrti kolešček nad logotipom</sys:String>
@@ -22,22 +14,17 @@
     <sys:String x:Key="Str_TT_Export">Izvozi</sys:String>
     <sys:String x:Key="Str_Lbl_Theme">TEMA</sys:String>
     <sys:String x:Key="Str_Lbl_Accent">POUDARJENA BARVA</sys:String>
-
-    <!-- Scan bar -->
     <sys:String x:Key="Str_Lbl_Subnet">Podomrežje</sys:String>
-    <sys:String x:Key="Str_Btn_Scan">Preglej</sys:String>
+    <sys:String x:Key="Str_Btn_Scan">Scan</sys:String>
     <sys:String x:Key="Str_Btn_DeepScanAll">Podroben pregled</sys:String>
     <sys:String x:Key="Str_Lbl_Local">Lokalni naslov</sys:String>
     <sys:String x:Key="Str_Lbl_Gateway">Prehod</sys:String>
     <sys:String x:Key="Str_Lbl_Dns">DNS</sys:String>
-
-    <!-- Status bar + counts ({0}/{1} are filled in by the app - keep them) -->
     <sys:String x:Key="Str_Btn_Stop">Ustavi</sys:String>
     <sys:String x:Key="Str_Status_Ready">Pripravljeno - naloženi proizvajalci OUI: {0}</sys:String>
     <sys:String x:Key="Str_Count_Found">Najdene naprave: {0}</sys:String>
+    <sys:String x:Key="Str_Count_FoundOne">Najdena naprava: {0}</sys:String>
     <sys:String x:Key="Str_Count_Shown">Prikazano: {0} od {1}</sys:String>
-
-    <!-- Results pane -->
     <sys:String x:Key="Str_DiscoveredDevices">Odkrite naprave</sys:String>
     <sys:String x:Key="Str_Topology_Title">Topologija omrežja</sys:String>
     <sys:String x:Key="Str_Topology_Role">Vloga</sys:String>
@@ -45,6 +32,8 @@
     <sys:String x:Key="Str_Sc_CycleTopologyOrder">Zamenjaj razporeditev topologije</sys:String>
     <sys:String x:Key="Str_History_Title">Zgodovina pregledov</sys:String>
     <sys:String x:Key="Str_History_Empty">Ni še dokončanih pregledov.</sys:String>
+    <sys:String x:Key="Str_History_Unreadable">Zgodovine pregledov ni bilo mogoče prebrati. Datoteka ni bila spremenjena.</sys:String>
+    <sys:String x:Key="Str_History_LoadFailed">Zgodovine pregledov ni bilo mogoče prebrati, zato ni prikazana in novi pregledi se vanjo ne dodajajo.&#10;&#10;{0}&#10;&#10;Datoteka ni bila spremenjena: {1}&#10;Zaprite druga okna KillerScan ali premaknite datoteko, da začnete novo zgodovino. Poskusim znova?</sys:String>
     <sys:String x:Key="Str_History_Change">Sprememba</sys:String>
     <sys:String x:Key="Str_History_Added">Dodano</sys:String>
     <sys:String x:Key="Str_History_Removed">Manjka</sys:String>
@@ -70,16 +59,12 @@
     <sys:String x:Key="Str_Filter_Text">Besedilna datoteka</sys:String>
     <sys:String x:Key="Str_Filter_Jpeg">Slika JPEG</sys:String>
     <sys:String x:Key="Str_Export_ServicesCsv">Izvozi storitve v CSV</sys:String>
-
-    <!-- Results columns -->
     <sys:String x:Key="Str_Col_Ip">Naslov IP</sys:String>
     <sys:String x:Key="Str_Col_Host">Ime gostitelja</sys:String>
     <sys:String x:Key="Str_Col_Mac">Naslov MAC</sys:String>
     <sys:String x:Key="Str_Col_Vendor">Proizvajalec</sys:String>
     <sys:String x:Key="Str_Col_Type">Vrsta</sys:String>
     <sys:String x:Key="Str_Col_Ports">Odprta vrata</sys:String>
-
-    <!-- Right-click device menu -->
     <sys:String x:Key="Str_Ctx_RescanOne">Ponovno preglej IP</sys:String>
     <sys:String x:Key="Str_Ctx_RescanMany">Ponovno preglej naslove IP</sys:String>
     <sys:String x:Key="Str_Ctx_CopyIp">Kopiraj naslov IP</sys:String>
@@ -92,17 +77,66 @@
     <sys:String x:Key="Str_Ctx_SshAs">Poveži se prek SSH kot...</sys:String>
     <sys:String x:Key="Str_Ctx_SetType">Nastavi vrsto naprave</sys:String>
     <sys:String x:Key="Str_Ctx_ClearOverride">Odstrani ročno nastavitev</sys:String>
-
-    <!-- SSH username prompt ({0} is the device, filled in by the app) -->
+    <!-- Access: each way into a device and what the scan actually saw there. -->
+    <sys:String x:Key="Str_Access_Menu">Dostop</sys:String>
+    <sys:String x:Key="Str_Access_None">Ni zabeleženih odprtih vrat</sys:String>
+    <sys:String x:Key="Str_Access_CopyMenu">Kopiraj naslov</sys:String>
+    <sys:String x:Key="Str_Access_Item">{0} {1}: {2}</sys:String>
+    <sys:String x:Key="Str_Access_Answered">odgovor {0}</sys:String>
+    <sys:String x:Key="Str_Access_LoginRequested">zahteva prijavo</sys:String>
+    <sys:String x:Key="Str_Access_LoginRequestedScheme">zahteva prijavo ({0})</sys:String>
+    <sys:String x:Key="Str_Access_LoginForm">stran za prijavo</sys:String>
+    <sys:String x:Key="Str_Access_Banner">prejeta pasica</sys:String>
+    <sys:String x:Key="Str_Access_PortOpen">vrata odprta</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Http">Spletni strežnik je na tem naslovu odgovoril s HTTP {0}.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Requested">Zahteval je poverilnice. KillerScan ni poslal nobenih.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_LoginForm">Stran ima polje za geslo, zato je to stran za prijavo. Ali bi prijava delovala, ni znano.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Unknown">Ali zahteva prijavo, ni znano.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Banner">Strežnik SSH je poslal svojo pasico. Prijava ni bila poskušena.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_PortOpen">Vrata so sprejela povezavo. Protokol je ocenjen glede na številko vrat.</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Seen">Zaznano {0}</sys:String>
+    <sys:String x:Key="Str_Access_Tip_Copy">Tega protokola ne odpre nobena aplikacija, zato klik kopira naslov.</sys:String>
+    <!-- Recognition evidence: why a device has its type. -->
+    <sys:String x:Key="Str_Rec_Menu">Zakaj ta vrsta?</sys:String>
+    <sys:String x:Key="Str_Rec_Heading">{0} ({1})</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_Low">Nizka zanesljivost</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_Medium">Srednja zanesljivost</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_High">Visoka zanesljivost</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_Manual">Nastavljeno ročno</sys:String>
+    <sys:String x:Key="Str_Rec_Conf_None">ni zabeleženih dokazov</sys:String>
+    <sys:String x:Key="Str_Rec_None">Za to napravo ni zabeleženih dokazov.</sys:String>
+    <sys:String x:Key="Str_Rec_Evidence">Dokazi</sys:String>
+    <sys:String x:Key="Str_Rec_Alternatives">Možno tudi</sys:String>
+    <sys:String x:Key="Str_Rec_More">in še {0}</sys:String>
+    <sys:String x:Key="Str_Rec_Conflict">Druga vrsta je dosegla podoben rezultat, zato je bila zanesljivost znižana.</sys:String>
+    <sys:String x:Key="Str_Rec_Automatic">Samodejni rezultat: {0} ({1})</sys:String>
+    <sys:String x:Key="Str_Rec_Caveat">Zanesljivost pove, kako dobro se dokazi ujemajo z vrsto. To ni verjetnost, naprava pa lahko o sebi sporoča karkoli.</sys:String>
+    <sys:String x:Key="Str_RecSrc_hostname">Ime</sys:String>
+    <sys:String x:Key="Str_RecSrc_vendor">Proizvajalec MAC</sys:String>
+    <sys:String x:Key="Str_RecSrc_ports">Odprta vrata</sys:String>
+    <sys:String x:Key="Str_RecSrc_ttl">TTL</sys:String>
+    <sys:String x:Key="Str_RecSrc_http">Spletna stran</sys:String>
+    <sys:String x:Key="Str_RecSrc_tls">Potrdilo TLS</sys:String>
+    <sys:String x:Key="Str_RecSrc_ssh">Pozdravno sporočilo SSH</sys:String>
+    <sys:String x:Key="Str_RecSrc_snmp">SNMP</sys:String>
+    <sys:String x:Key="Str_RecSrc_netbios">Ime NetBIOS</sys:String>
+    <sys:String x:Key="Str_RecSrc_mdns">Storitev mDNS</sys:String>
+    <sys:String x:Key="Str_RecSrc_ssdp">Strežnik UPnP</sys:String>
+    <sys:String x:Key="Str_RecRule_gateway">Windows ga uporablja kot privzeti prehod</sys:String>
+    <sys:String x:Key="Str_RecRule_gateway-dns">Windows ga uporablja kot privzeti prehod in strežnik DNS</sys:String>
+    <sys:String x:Key="Str_RecRule_private-mac-few-ports">Zasebni (naključni) naslov MAC in malo odprtih vrat, značilno za telefone in tablice</sys:String>
+    <sys:String x:Key="Str_RecRule_ssh-port">Vrata 22 (SSH) so odprta</sys:String>
+    <sys:String x:Key="Str_RecRule_windows-ports">Odprta so vrata za skupno rabo datotek Windows ali oddaljeno namizje</sys:String>
+    <sys:String x:Key="Str_RecRule_web-port">Odprta so spletna vrata</sys:String>
+    <sys:String x:Key="Str_RecRule_pc-vendor-no-ports">Naslov MAC proizvajalca osebnih računalnikov in brez odprtih vrat, značilno za računalnik v stanju spanja</sys:String>
+    <sys:String x:Key="Str_RecRule_no-ports-with-mac">Odziva se v omrežju, a nima odprtih vrat, značilno za naprave pametnega doma</sys:String>
+    <sys:String x:Key="Str_RecRule_no-evidence">Najdeno ni bilo nič prepoznavnega</sys:String>
+    <sys:String x:Key="Str_RecRule_open-ports-only">Ima odprta vrata, vendar se nobena ne ujemajo z znano vrsto</sys:String>
     <sys:String x:Key="Str_Ssh_Head">Poveži se z {0} prek SSH</sys:String>
     <sys:String x:Key="Str_Ssh_Detail">Uporabniški račun za prijavo. KillerScan si ga zapomni za to napravo, zato ga vneseš le enkrat. Pusti prazno, če želiš izbiro prepustiti odjemalcu SSH.</sys:String>
     <sys:String x:Key="Str_Ssh_User">UPORABNIŠKO IME</sys:String>
     <sys:String x:Key="Str_Ssh_Connect">Poveži</sys:String>
     <sys:String x:Key="Str_Btn_Cancel">Prekliči</sys:String>
-
-    <!-- Theme names, shown in the rail's theme flyout. Shared with KillerShell and KillerNotes
-         key for key, so the same thirteen themes read the same way across the family. SE98 is
-         listed here ahead of the theme itself landing, because the name is not translated. -->
     <sys:String x:Key="Str_Theme_Dark">Temna</sys:String>
     <sys:String x:Key="Str_Theme_Light">Svetla</sys:String>
     <sys:String x:Key="Str_Theme_Black">Črna</sys:String>
@@ -117,8 +151,6 @@
     <sys:String x:Key="Str_Theme_Delirium">Blodnja</sys:String>
     <sys:String x:Key="Str_Theme_Mourning">Žalovanje</sys:String>
     <sys:String x:Key="Str_Theme_FilmGrain">Filmsko zrno</sys:String>
-
-    <!-- About overlay -->
     <sys:String x:Key="Str_About_Version">RAZLIČICA</sys:String>
     <sys:String x:Key="Str_About_Publisher">IZDAJATELJ</sys:String>
     <sys:String x:Key="Str_About_Thumbprint">PRSTNI ODTIS</sys:String>
@@ -131,17 +163,19 @@
     <sys:String x:Key="Str_About_DbBundled">priloženo programu</sys:String>
     <sys:String x:Key="Str_About_DescA" xml:space="preserve">Pregled ARP in IP z iskanjem proizvajalcev, razvrščanjem naprav ter prilagodljivim izvozom HTML z razvrščanjem. Orodje iz zbirke </sys:String>
     <sys:String x:Key="Str_About_DescB" xml:space="preserve">.</sys:String>
-
-    <!-- Status bar messages (composed in code - {0}/{1} are filled in by the app) -->
     <sys:String x:Key="Str_St_Discovering">Odkrivanje gostiteljev v {0}...</sys:String>
     <sys:String x:Key="Str_St_ResolvingMacs">Pridobivanje naslovov MAC: {0}...</sys:String>
     <sys:String x:Key="Str_St_Probing">Preverjanje odzivnih gostiteljev: {0}...</sys:String>
     <sys:String x:Key="Str_St_ResolvingHosts">Prepoznavanje gostiteljev: {0}...</sys:String>
     <sys:String x:Key="Str_St_ScanComplete">Pregled je končan - najdene naprave: {0}</sys:String>
+    <sys:String x:Key="Str_St_ScanCompleteOne">Pregled je končan - najdena naprava: {0}</sys:String>
     <sys:String x:Key="Str_St_Ready">Pripravljeno</sys:String>
     <sys:String x:Key="Str_St_ScanCanceled">Pregled je preklican</sys:String>
     <sys:String x:Key="Str_St_Rescanning">Podroben pregled: {0} ...</sys:String>
     <sys:String x:Key="Str_St_RescanDone">Ponovni pregled je končan - osveženi gostitelji: {0}</sys:String>
+    <sys:String x:Key="Str_St_RescanPartial">Ponovni pregled je končan - osveženih {0} od {1} gostiteljev, brez odziva: {2}</sys:String>
+    <sys:String x:Key="Str_Rep_Refreshed">Osveženo pozneje</sys:String>
+    <sys:String x:Key="Str_Rep_RefreshPartial">Delna osvežitev</sys:String>
     <sys:String x:Key="Str_St_Exported">Izvoženo v {0}</sys:String>
     <sys:String x:Key="Str_St_OverrideSet">Ročna nastavitev: {0} = {1}</sys:String>
     <sys:String x:Key="Str_St_OverrideCleared">Ročna nastavitev za {0} je odstranjena</sys:String>
@@ -149,8 +183,6 @@
     <sys:String x:Key="Str_St_BadTarget">Neveljaven cilj: "{0}" - uporabi 192.168.1.0/24, 192.168.1.7 ali 192.168.1.10-50; več ciljev loči z vejicami</sys:String>
     <sys:String x:Key="Str_St_TooManyAddresses">Naslovov je {0} - preveč za en pregled (omejitev: {1}). Zmanjšaj obseg ali ga preglej po delih.</sys:String>
     <sys:String x:Key="Str_St_NoTarget">Vnesi podomrežje, naslov ali obseg za pregled</sys:String>
-
-    <!-- Portable footer badge + install dialog -->
     <sys:String x:Key="Str_Portable">PRENOSNO</sys:String>
     <sys:String x:Key="Str_TT_Portable">Prenosni način - namesti KillerScan</sys:String>
     <sys:String x:Key="Str_InstallBtn">Namesti KillerScan</sys:String>
@@ -160,16 +192,12 @@
     <sys:String x:Key="Str_Install_HeadAll">Namestim KillerScan za vse uporabnike tega računalnika?</sys:String>
     <sys:String x:Key="Str_Install_AlreadyAllUsers">KillerScan je že nameščen za vse uporabnike tega računalnika, zato bo posodobljena ta namestitev. Windows bo zahteval dovoljenje.</sys:String>
     <sys:String x:Key="Str_St_InstallCanceled">Namestitev je preklicana</sys:String>
-
-    <!-- Themed window system menu (right-click the title bar / Alt+Space) -->
     <sys:String x:Key="Str_Sys_Restore">Obnovi</sys:String>
     <sys:String x:Key="Str_Sys_Move">Premakni</sys:String>
     <sys:String x:Key="Str_Sys_Size">Velikost</sys:String>
     <sys:String x:Key="Str_Sys_Minimize">Pomanjšaj</sys:String>
     <sys:String x:Key="Str_Sys_Maximize">Povečaj</sys:String>
     <sys:String x:Key="Str_Sys_Close">Zapri</sys:String>
-
-    <!-- Keyboard shortcuts overlay (F1) -->
     <sys:String x:Key="Str_TT_Shortcuts">Bližnjice na tipkovnici (F1)</sys:String>
     <sys:String x:Key="Str_TT_ExpandSidebar">Prikaži zgodovino pregledov</sys:String>
     <sys:String x:Key="Str_TT_CollapseSidebar">Skrij zgodovino pregledov</sys:String>
@@ -212,8 +240,6 @@
     <sys:String x:Key="Str_Sc_About">Odpri okno o programu</sys:String>
     <sys:String x:Key="Str_Sc_Hint">Velikost programa lahko spremeniš tudi s koleščkom nad logotipom.</sys:String>
     <sys:String x:Key="Str_KS_HoldHint">Drži Ctrl / Shift / Alt za predogled dodatnih bližnjic</sys:String>
-
-    <!-- ==== DIALOGS, UPDATES AND ERRORS ==== -->
     <sys:String x:Key="Str_About_Title">O programu KillerScan</sys:String>
     <sys:String x:Key="Str_TT_About">O programu KillerScan</sys:String>
     <sys:String x:Key="Str_About_Aka" xml:space="preserve">ZNAN TUDI KOT </sys:String>
@@ -223,8 +249,6 @@
     <sys:String x:Key="Str_Btn_Install">Namesti</sys:String>
     <sys:String x:Key="Str_Install_BulletShortcut">- Bližnjica v meniju Start</sys:String>
     <sys:String x:Key="Str_Install_BulletArp">- Vnos na seznamu nameščenih programov</sys:String>
-
-    <!-- Vendor database. {0} is a count, already formatted with the locale's own separators. -->
     <sys:String x:Key="Str_Db_Checking">Preverjanje novejših podatkov o proizvajalcih...</sys:String>
     <sys:String x:Key="Str_Db_Downloading">Prenos podatkov o proizvajalcih...</sys:String>
     <sys:String x:Key="Str_Db_Fallback">Preizkušanje nadomestnega vira...</sys:String>
@@ -234,16 +258,17 @@
     <sys:String x:Key="Str_Db_Updated">Zbirka je posodobljena. Število vnosov: {0}.</sys:String>
     <sys:String x:Key="Str_Db_SaveFailed">Zbirke ni bilo mogoče shraniti: {0}</sys:String>
     <sys:String x:Key="Str_Db_Failed">Posodobitev ni uspela: {0}</sys:String>
-
-    <!-- Self-update. {0} is the release tag; in the heading {0} is the app name and {1} the tag. -->
-    <sys:String x:Key="Str_Upd_Available">Na voljo je posodobitev: {0}</sys:String>
-    <sys:String x:Key="Str_Upd_Downloading">Prenašanje...</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmHead">Prenesem in namestim {0} {1}?</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBody">Program se bo samodejno zaprl in ponovno odprl.</sys:String>
-    <sys:String x:Key="Str_Upd_ConfirmBtn">Posodobi</sys:String>
-
-    <!-- Install conflict, uninstall. Two whole sentences rather than one with the scope
-         substituted in: a language that inflects the noun cannot take a drop-in word. -->
+    <sys:String x:Key="Str_About_UpdateAvailable">Na voljo je posodobitev: {0}</sys:String>
+    <sys:String x:Key="Str_About_Downloading">Prenašanje...</sys:String>
+    <sys:String x:Key="Str_About_UpdateHeading">Prenesem in namestim {0} {1}?</sys:String>
+    <sys:String x:Key="Str_About_UpdateDetail">Program se bo samodejno zaprl in ponovno odprl.</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateCheck">Ob zagonu preveri posodobitve</sys:String>
+    <sys:String x:Key="Str_About_ShowShortcutsInMenus">Prikaži bližnjice v menijih</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateHeading">Na voljo je {0} {1}</sys:String>
+    <sys:String x:Key="Str_About_StartupUpdateDetail">Želiš posodobitev prenesti in namestiti zdaj? Program se bo samodejno zaprl in ponovno odprl.</sys:String>
+    <sys:String x:Key="Str_About_UpdateNow">Posodobi</sys:String>
+    <sys:String x:Key="Str_About_NotNow">Ne zdaj</sys:String>
+    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Vedno preveri ob zagonu</sys:String>
     <sys:String x:Key="Str_Conflict_Title">spor med namestitvama</sys:String>
     <sys:String x:Key="Str_Conflict_RemoveUser">KillerScan je nameščen dvakrat. Odstranim drugo namestitev za posameznega uporabnika?
 
@@ -258,25 +283,16 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Uninstall_NoAdmin">Za odstranitev ni bilo mogoče zahtevati skrbniških pravic:
 {0}</sys:String>
     <sys:String x:Key="Str_Uninstall_Done">KillerScan je odstranjen.</sys:String>
-
-    <!-- Errors and file dialogs. The text before the | in a save filter is what Windows shows
-         in its type dropdown; the *.ext pattern after it is not interface text. -->
     <sys:String x:Key="Str_Err_Export">Napaka pri izvozu: {0}</sys:String>
     <sys:String x:Key="Str_Err_Scan">Napaka pri pregledu: {0}</sys:String>
     <sys:String x:Key="Str_Filter_Csv">Datoteka CSV</sys:String>
     <sys:String x:Key="Str_Filter_Html">Poročilo HTML</sys:String>
     <sys:String x:Key="Str_Filter_Png">Slika PNG</sys:String>
-
-    <!-- Adapter kind and the randomized-MAC vendor placeholder. -->
     <sys:String x:Key="Str_Iface_WiFi">Wi-Fi</sys:String>
     <sys:String x:Key="Str_Iface_Ethernet">Ethernet</sys:String>
     <sys:String x:Key="Str_Vendor_Randomized">(Naključen naslov MAC)</sys:String>
-
-    <!-- ==== EXPORTED HTML REPORT ====
-         The report reuses the grid's Str_Col_* headers and the picker's Str_Theme_* names, so it
-         can never disagree with the app that produced it. Only these are its own. Accent names
-         are new: the app's accent dots are swatches with no text, but the report's need titles. -->
     <sys:String x:Key="Str_Rep_Theme">Tema</sys:String>
+    <sys:String x:Key="Str_Rep_Title">Poročilo KillerScan</sys:String>
     <sys:String x:Key="Str_Rep_Accent">Poudarjena barva</sys:String>
     <sys:String x:Key="Str_Rep_Subnet">Podomrežje</sys:String>
     <sys:String x:Key="Str_Rep_Scanned">Pregledano</sys:String>
@@ -290,19 +306,6 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Accent_Purple">Vijolična</sys:String>
     <sys:String x:Key="Str_Accent_Yellow">Rumena</sys:String>
     <sys:String x:Key="Str_Accent_Magenta">Škrlatna</sys:String>
-
-    <!-- ==== DEVICE TYPES ====================================================================
-         DISPLAY LABELS ONLY. The stored value stays English in every locale - it is written to
-         the override registry, matched by the Type column's color triggers, used as a CSS class
-         in the exported report and accepted by the CLI's /type filter. DeviceTypeConverter maps
-         one to the other on the way to the screen, and derives each key by stripping everything
-         that is not a letter or digit ("Switch/AP" -> Str_Dev_SwitchAP).
-
-         The list covers the classifier's whole vocabulary, not just the 21 rows in the "Set
-         device type" menu: a type the menu cannot set can still be detected and shown.
-
-         Product names (Windows, Linux, NAS, IoT, DNS, Apple, Android) are proper nouns and stay
-         as they are when translated - only the surrounding words change. -->
     <sys:String x:Key="Str_Dev_Router">Usmerjevalnik</sys:String>
     <sys:String x:Key="Str_Dev_RouterDNS">Usmerjevalnik/DNS</sys:String>
     <sys:String x:Key="Str_Dev_SwitchAP">Stikalo/dostopna točka</sys:String>
@@ -328,9 +331,9 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Dev_WebDevice">Spletna naprava</sys:String>
     <sys:String x:Key="Str_Dev_Other">Drugo</sys:String>
     <sys:String x:Key="Str_Dev_Unknown">Neznano</sys:String>
-
     <sys:String x:Key="Str_Btn_Open">Odpri</sys:String>
     <sys:String x:Key="Str_Btn_Save">Shrani</sys:String>
+    <sys:String x:Key="Str_Btn_Select">Izberi</sys:String>
     <sys:String x:Key="Str_Col_Modified">spremenjeno</sys:String>
     <sys:String x:Key="Str_Col_Name">ime</sys:String>
     <sys:String x:Key="Str_Col_DeviceName">Ime</sys:String>
@@ -338,6 +341,7 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Dlg_AllFiles">Vse datoteke</sys:String>
     <sys:String x:Key="Str_Dlg_FileName">Ime datoteke:</sys:String>
     <sys:String x:Key="Str_Dlg_FileType">Vrsta datoteke:</sys:String>
+    <sys:String x:Key="Str_Dlg_Places">Mesta</sys:String>
     <sys:String x:Key="Str_Dlg_NoMatchingFiles">Nobena datoteka ne ustreza izbrani vrsti.</sys:String>
     <sys:String x:Key="Str_Dlg_NoPreview">Predogled ni na voljo</sys:String>
     <sys:String x:Key="Str_Dlg_NoSuchFile">Ta datoteka ne obstaja.</sys:String>
@@ -365,24 +369,81 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Rename_Label">Ime:</sys:String>
     <sys:String x:Key="Str_Rename_Save">Shrani</sys:String>
     <sys:String x:Key="Str_Rename_Clear">Odstrani ročno ime</sys:String>
-    <sys:String x:Key="Str_Trust_Device">Zaupanja vredna naprava</sys:String>
-    <sys:String x:Key="Str_TT_TrustMark">Zelena: zaupanja vredna naprava. Jantarna: naprava ni na tvojem seznamu zaupanja.</sys:String>
+    <sys:String x:Key="Str_Trust_Device">Odobrena naprava</sys:String>
+    <sys:String x:Key="Str_TT_TrustMark">Zelena: odobrena. Jantarna: nova glede na osnovni seznam te Lokacije. Siva: znana, ni odobrena.</sys:String>
     <sys:String x:Key="Str_St_TrustedBaseline">Ustvarjen je osnovni seznam zaupanja vrednih naprav. Število naprav: {0}.</sys:String>
     <sys:String x:Key="Str_St_UnknownDevices">Opozorilo: število najdenih neznanih naprav: {0}.</sys:String>
-    <sys:String x:Key="Str_Tip_UnknownHead">Ni na tvojem seznamu zaupanja:</sys:String>
+    <sys:String x:Key="Str_St_UnknownDevicesOne">Opozorilo: število najdenih neznanih naprav: {0}.</sys:String>
+    <sys:String x:Key="Str_Tip_UnknownHead">Nove naprave glede na osnovni seznam te Lokacije:</sys:String>
     <sys:String x:Key="Str_Tip_AndMore">in še {0}</sys:String>
-    <sys:String x:Key="Str_Tip_TrustHint">Z desnim klikom označi napravo kot zaupanja vredno.</sys:String>
+    <sys:String x:Key="Str_Tip_TrustHint">Z desnim klikom odobri napravo.</sys:String>
+    <sys:String x:Key="Str_St_KnownBaseline">Osnovni seznam je nastavljen. Število znanih naprav: {0}. Nobena še ni odobrena.</sys:String>
+    <sys:String x:Key="Str_St_KnownBaselineOne">Osnovni seznam je nastavljen. Število znanih naprav: {0}. Še ni odobrena.</sys:String>
+    <sys:String x:Key="Str_Loc_Title">Lokacija</sys:String>
+    <sys:String x:Key="Str_Loc_Temporary">Začasni pregled</sys:String>
+    <sys:String x:Key="Str_Loc_Unassigned">Nedodeljeno</sys:String>
+    <sys:String x:Key="Str_Loc_New">Nova Lokacija...</sys:String>
+    <sys:String x:Key="Str_Loc_NewTitle">Nova Lokacija</sys:String>
+    <sys:String x:Key="Str_Loc_NewShort">+ Novo</sys:String>
+    <sys:String x:Key="Str_Loc_ImportedScans">Shranjeni pregledi</sys:String>
+    <sys:String x:Key="Str_Loc_SaveScan">Shrani pregled</sys:String>
+    <sys:String x:Key="Str_LocIcon_Pin">Žebljiček</sys:String>
+    <sys:String x:Key="Str_LocIcon_Home">Dom</sys:String>
+    <sys:String x:Key="Str_LocIcon_Office">Pisarna</sys:String>
+    <sys:String x:Key="Str_LocIcon_Shop">Trgovina</sys:String>
+    <sys:String x:Key="Str_LocIcon_School">Šola</sys:String>
+    <sys:String x:Key="Str_LocIcon_Server">Strežniška soba</sys:String>
+    <sys:String x:Key="Str_LocIcon_Cloud">Oblak</sys:String>
+    <sys:String x:Key="Str_LocIcon_Wifi">Točka Wi-Fi</sys:String>
+    <sys:String x:Key="Str_Loc_Edit">Uredi Lokacijo...</sys:String>
+    <sys:String x:Key="Str_Loc_Manage">Upravljaj Lokacije...</sys:String>
+    <sys:String x:Key="Str_Loc_ManageTitle">Lokacije</sys:String>
+    <sys:String x:Key="Str_Loc_Current">{0} (trenutna)</sys:String>
+    <sys:String x:Key="Str_Loc_Open">Preklopi na to Lokacijo</sys:String>
+    <sys:String x:Key="Str_Loc_Delete">Izbriši Lokacijo...</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteTitle">Izbriši Lokacijo</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteDetail">Izbrišem {0}? KillerScan ne bo več prikazoval njenih shranjenih pregledov, imen naprav, odobritev in zgodovine. Datoteke ostanejo v mapi Lokacij "deleted", zato jih je mogoče obnoviti.</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteButton">Izbriši</sys:String>
+    <sys:String x:Key="Str_Loc_DeleteScan">Izbriši pregled</sys:String>
+    <sys:String x:Key="Str_Loc_ScanNameTaken">Shranjen pregled z imenom {0} že obstaja. Izberite drugo ime.</sys:String>
+    <sys:String x:Key="Str_Loc_Busy">Pred menjavo Lokacije ustavi pregled.</sys:String>
+    <sys:String x:Key="Str_Loc_DeletedElsewhere">Lokacija {0} je bila izbrisana v drugem oknu. Če želiš obdržati te rezultate, izberi »Shrani rezultate v Lokacijo«.</sys:String>
+    <sys:String x:Key="Str_Loc_ImportTooLarge">Ta datoteka Lokacije je večja od {0} MB, kar je več, kot KillerScan uvozi.</sys:String>
+    <sys:String x:Key="Str_Loc_DiscardTitle">Želiš zavreči te rezultate?</sys:String>
+    <sys:String x:Key="Str_Loc_DiscardTemporary">Rezultati načina »Začasni pregled« niso nikjer shranjeni. Menjava Lokacije jih izbriše. Če jih želiš obdržati, raje izberi »Shrani rezultate v Lokacijo«.</sys:String>
+    <sys:String x:Key="Str_Loc_DiscardConfirm">Zavrzi</sys:String>
+    <sys:String x:Key="Str_Loc_LoadFailed">Lokacij ni bilo mogoče nastaviti, zato KillerScan uporablja tvoje obstoječe naprave, shranjene preglede in zgodovino kot doslej.&#10;&#10;{0}&#10;&#10;Nič ni bilo spremenjeno ali odstranjeno. KillerScan bo poskusil znova ob naslednjem zagonu.</sys:String>
+    <sys:String x:Key="Str_Loc_NotesLabel">Opombe (Ctrl+Enter shrani)</sys:String>
+    <sys:String x:Key="Str_Loc_RouterLabel">Usmerjevalnik (MAC prehoda):</sys:String>
+    <sys:String x:Key="Str_Loc_RouterNone">Še nobenega. Ko sem shranite pregled, si zapomni njegov usmerjevalnik.</sys:String>
+    <sys:String x:Key="Str_Loc_Export">Izvozi Lokacijo...</sys:String>
+    <sys:String x:Key="Str_Loc_ExportDetail">Shrani ime te Lokacije, opombe, shranjene preglede, imena naprav, odobritve, znane naprave, vrste naprav in zgodovino v eno datoteko, ki jo lahko uvoziš na drugem računalniku.</sys:String>
+    <sys:String x:Key="Str_Loc_ExportButton">Izvozi</sys:String>
+    <sys:String x:Key="Str_Loc_ExportUsernames">Vključi zapomnjena uporabniška imena SSH (gesla se nikoli ne shranjujejo)</sys:String>
+    <sys:String x:Key="Str_Loc_Import">Uvozi Lokacijo...</sys:String>
+    <sys:String x:Key="Str_Loc_Imported">Lokacija {0} je uvožena.</sys:String>
+    <sys:String x:Key="Str_Loc_ImportFailed">Lokacije ni bilo mogoče uvoziti. Nič ni bilo dodano.&#10;&#10;{0}</sys:String>
+    <sys:String x:Key="Str_Loc_FileFilter">Lokacija KillerScan</sys:String>
+    <sys:String x:Key="Str_Loc_Suggest">Prehod tega omrežja je bil zaznan v Lokaciji {0}. Preklopim na to Lokacijo?</sys:String>
+    <sys:String x:Key="Str_Loc_SuggestMany">Prehod tega omrežja je bil zaznan v več Lokacijah: {0}. Izberi eno z gumbom Lokacija.</sys:String>
+    <sys:String x:Key="Str_Loc_Switch">Preklopi</sys:String>
+    <sys:String x:Key="Str_Loc_Dismiss">Opusti</sys:String>
+    <sys:String x:Key="Str_Loc_AdapterTitle">Omrežni vmesnik ni povezan</sys:String>
+    <sys:String x:Key="Str_Loc_AdapterMissing">Ta pregled je nastavljen za uporabo vmesnika {0}, ki ni povezan. Namesto tega izvedem pregled z vmesnikom, ki ga izbere Windows?</sys:String>
+    <sys:String x:Key="Str_St_AdapterOffLink">{0} ni v omrežju vmesnika {1} ({2}) in Windows ga ne usmerja prek {1}. Za pregled izberi Samodejno pod Omrežni vmesnik.</sys:String>
+    <sys:String x:Key="Str_Rep_Location">Lokacija</sys:String>
+    <sys:String x:Key="Str_Rep_Adapter">Vmesnik</sys:String>
+    <sys:String x:Key="Str_Loc_TemporaryNotice">Začasni pregled ni shranjen. Če ga želiš obdržati, izberi »Shrani pregled«.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveGone">Lokacija {0} je bila izbrisana v drugem oknu, zato ni bilo nič premaknjeno. Izberi drugo Lokacijo.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveRetention">Nič ni bilo premaknjeno, ker bi omejitev zgodovine Lokacije {0} ta pregled takoj izbrisala. Povečaj omejitev ali shrani v drugo Lokacijo.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveIncomplete">V Lokacijo {0} ni bilo mogoče shraniti vsega, zato rezultati ostanejo tukaj. Za dokončanje jih shrani znova.</sys:String>
+    <sys:String x:Key="Str_Loc_SaveResults">Shrani rezultate v Lokacijo</sys:String>
+    <sys:String x:Key="Str_History_AllLocations">Prikaži vse Lokacije</sys:String>
     <sys:String x:Key="Str_Tip_Scan">Število naprav: {0}; z odprtimi vrati: {1}</sys:String>
     <sys:String x:Key="Str_Tip_Watch">Nadzorovani cilji: {0}; brez odziva: {1}</sys:String>
     <sys:String x:Key="Str_Tip_History">{0} ob {1}; zabeležene naprave: {2}</sys:String>
     <sys:String x:Key="Str_Services_Title">Storitve</sys:String>
     <sys:String x:Key="Str_Services_Service">Storitev</sys:String>
-    <sys:String x:Key="Str_Profiles_Title">Profili pregledov</sys:String>
-    <sys:String x:Key="Str_Profiles_Save">Shrani trenutni profil</sys:String>
-    <sys:String x:Key="Str_Profiles_Run">Zaženi profil</sys:String>
-    <sys:String x:Key="Str_Profiles_Load">Naloži cilj</sys:String>
-    <sys:String x:Key="Str_Profiles_Deep">Nato podrobno preglej vse naprave</sys:String>
-    <sys:String x:Key="Str_Profiles_Delete">Izbriši profil</sys:String>
     <sys:String x:Key="Str_Watch_Title">Nadzor povezave</sys:String>
     <sys:String x:Key="Str_Watch_Targets">Naslovi IP (največ 16, ločenih z vejicami)</sys:String>
     <sys:String x:Key="Str_Watch_Start">Začni</sys:String>
@@ -434,11 +495,18 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_View_Topology">Topologija</sys:String>
     <sys:String x:Key="Str_View_KeepAlive">Nadzor povezave</sys:String>
     <sys:String x:Key="Str_Workspace_Terminal">Terminal</sys:String>
+    <sys:String x:Key="Str_Layout_TabsTop">Zavihki zgoraj</sys:String>
+    <sys:String x:Key="Str_Layout_TabsBottom">Zavihki spodaj</sys:String>
+    <sys:String x:Key="Str_Term_InputRefused">Terminal ni mogel naenkrat sprejeti toliko vnosa, zato ni bil poslan.</sys:String>
     <sys:String x:Key="Str_Term_Copy">Kopiraj</sys:String>
     <sys:String x:Key="Str_Term_Paste">Prilepi</sys:String>
     <sys:String x:Key="Str_Term_SelectAll">Izberi vse</sys:String>
     <sys:String x:Key="Str_Term_CopyAll">Kopiraj vse</sys:String>
     <sys:String x:Key="Str_Term_Clear">Počisti</sys:String>
+    <sys:String x:Key="Str_Term_ReplaceRunning">V terminalu nekaj teče. To ustavim in zaženem {0}?</sys:String>
+    <sys:String x:Key="Str_Term_Replace">Ustavi in zaženi</sys:String>
+    <sys:String x:Key="Str_Term_PasteTitle">Prilepim več vrstic?</sys:String>
+    <sys:String x:Key="Str_Term_PasteDetail">To besedilo ima {0} vrstic. Ko ga prilepite sem, se vsaka vrstica izvede takoj, ko prispe.</sys:String>
     <sys:String x:Key="Str_Workspace_EscStop">Esc za ustavitev</sys:String>
     <sys:String x:Key="Str_Workspace_Split">Razdeli podokna</sys:String>
     <sys:String x:Key="Str_Workspace_Move">Premakni v drugo podokno</sys:String>
@@ -449,13 +517,6 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Workspace_OpenExternal">Odpri v ločenem oknu</sys:String>
     <sys:String x:Key="Str_Workspace_Exited">Proces je končan ({0})</sys:String>
     <sys:String x:Key="Str_Workspace_StartFailed">Terminala ni bilo mogoče zagnati: {0}</sys:String>
-    <sys:String x:Key="Str_Toolbar_Header">Orodna vrstica</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextNone">Brez besedila</sys:String>
-    <sys:String x:Key="Str_Toolbar_SmallIcons">Majhne ikone</sys:String>
-    <sys:String x:Key="Str_Toolbar_LargeIcons">Velike ikone</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextBeside">Besedilo ob ikonah</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextUnder">Besedilo pod ikonami</sys:String>
-    <sys:String x:Key="Str_Toolbar_TextOnly">Samo besedilo</sys:String>
     <sys:String x:Key="Str_Clipboard_Failed">Kopiranje v odložišče ni uspelo. Poskusi znova.</sys:String>
     <sys:String x:Key="Str_KS_Base">Osnovno</sys:String>
     <sys:String x:Key="Str_Speed_Title">KillerSpeed</sys:String>
@@ -497,6 +558,8 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Speed_Tls">Varne povezave s preizkusnim strežnikom ni bilo mogoče vzpostaviti.</sys:String>
     <sys:String x:Key="Str_Speed_RateLimited">Preizkusni strežnik je zaseden. Poskusi pozneje.</sys:String>
     <sys:String x:Key="Str_Speed_BadResponse">Preizkusni strežnik je vrnil neveljaven odgovor.</sys:String>
+    <sys:String x:Key="Str_Speed_Challenged">Cloudflare je preizkus blokiral z varnostnim preverjanjem.</sys:String>
+    <sys:String x:Key="Str_Speed_Detail">Podrobnosti: {0}</sys:String>
     <sys:String x:Key="Str_Speed_TransferFailed">Prenos ni uspel. Preveri povezavo in poskusi znova.</sys:String>
     <sys:String x:Key="Str_Speed_ClipboardFailed">Rezultatov ni bilo mogoče kopirati. Poskusi znova.</sys:String>
     <sys:String x:Key="Str_Speed_ReplaceRunning">V terminalu že poteka opravilo. Ga ustavim in zaženem preizkus hitrosti?</sys:String>
@@ -532,44 +595,44 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_History_SaveFailed">Nastavitev zgodovine ni bilo mogoče shraniti: {0}</sys:String>
     <sys:String x:Key="Str_History_ComparisonIdentity">Primerjava pregledov: {0} / {1}</sys:String>
     <sys:String x:Key="Str_History_Delete">Izbriši preglede</sys:String>
+    <sys:String x:Key="Str_History_Rename">Preimenuj pregled...</sys:String>
     <sys:String x:Key="Str_Scroll_Up">Pomakni navzgor</sys:String>
     <sys:String x:Key="Str_Scroll_Down">Pomakni navzdol</sys:String>
     <sys:String x:Key="Str_Scroll_Left">Pomakni levo</sys:String>
     <sys:String x:Key="Str_Scroll_Right">Pomakni desno</sys:String>
+    <sys:String x:Key="Str_Scroll_PageUp">Stran navzgor</sys:String>
+    <sys:String x:Key="Str_Scroll_PageDown">Stran navzdol</sys:String>
+    <sys:String x:Key="Str_Scroll_PageLeft">Stran levo</sys:String>
+    <sys:String x:Key="Str_Scroll_PageRight">Stran desno</sys:String>
+    <sys:String x:Key="Str_SaveFailed">Sprememb ni bilo mogoče shraniti. V tej seji so še vedno na voljo. Poskusim shraniti znova?
 
-    <!-- Per-scan probe choices; stable feature IDs also serve CLI /skip. -->
-    <sys:String x:Key="Str_Options_Title">Možnosti pregleda</sys:String>
-    <sys:String x:Key="Str_Options_Detail">Velja za zavihek; shrani se v profil. Manj poizvedb lahko zmanjša število rezultatov. HTTP/TLS/SSH potrebujejo pregled vrat; SNMP/NetBIOS sta neodvisna.</sys:String>
-    <sys:String x:Key="Str_Options_Defaults">Obnovi privzeto (vse vključeno)</sys:String>
+{0}</sys:String>
+    <sys:String x:Key="Str_History_Partial">Delni pregled</sys:String>
+
+    <!-- Scan settings -->
+    <sys:String x:Key="Str_Options_Title">Nastavitve pregleda</sys:String>
+    <sys:String x:Key="Str_Options_Detail">Veljajo za ta zavihek in se shranijo v profile. Manj preverjanj lahko pomeni manj rezultatov. HTTP, TLS in SSH zahtevajo pregled vrat; SNMP in NetBIOS ga ne.</sys:String>
+    <sys:String x:Key="Str_Options_Defaults">Obnovi privzeto (vse omogočeno)</sys:String>
     <sys:String x:Key="Str_Options_neighbor-cache">Preberi predpomnilnik sosedov</sys:String>
-    <sys:String x:Key="Str_Options_arp">Razreši MAC prek ARP</sys:String>
-    <sys:String x:Key="Str_Options_icmp">Odkrivanje ICMP in TTL</sys:String>
-    <sys:String x:Key="Str_Options_tcp-liveness">Dodatno odkrivanje prek TCP</sys:String>
-    <sys:String x:Key="Str_Options_dns">Preverjeni obratni DNS (in počisti lokalni predpomnilnik DNS)</sys:String>
-    <sys:String x:Key="Str_Options_mdns">Dopolnitev prek mDNS</sys:String>
-    <sys:String x:Key="Str_Options_ssdp">Dopolnitev prek SSDP</sys:String>
+    <sys:String x:Key="Str_Options_arp">Razreši naslov MAC prek ARP</sys:String>
+    <sys:String x:Key="Str_Options_icmp">Odkrivanje z ICMP in TTL</sys:String>
+    <sys:String x:Key="Str_Options_tcp-liveness">Nadomestno odkrivanje prek TCP</sys:String>
+    <sys:String x:Key="Str_Options_dns">Preverjeno povratno iskanje DNS (in izprazni lokalni predpomnilnik DNS)</sys:String>
+    <sys:String x:Key="Str_Options_mdns">Dodatne informacije prek mDNS</sys:String>
+    <sys:String x:Key="Str_Options_ssdp">Dodatne informacije prek SSDP</sys:String>
     <sys:String x:Key="Str_Options_ports">Pregled vrat TCP</sys:String>
-    <sys:String x:Key="Str_Options_http">Naslov in strežnik HTTP/HTTPS</sys:String>
-    <sys:String x:Key="Str_Options_tls">Podatki potrdila TLS</sys:String>
-    <sys:String x:Key="Str_Options_ssh">Pozdrav SSH</sys:String>
+    <sys:String x:Key="Str_Options_http">Naslov strani in strežnik HTTP/HTTPS</sys:String>
+    <sys:String x:Key="Str_Options_tls">Podrobnosti potrdila TLS</sys:String>
+    <sys:String x:Key="Str_Options_ssh">Pozdravno sporočilo SSH</sys:String>
     <sys:String x:Key="Str_Options_snmp">Opis SNMP</sys:String>
     <sys:String x:Key="Str_Options_netbios">Ime NetBIOS</sys:String>
-    <sys:String x:Key="Str_Interface_Title">Omrežni vmesnik</sys:String>
-    <sys:String x:Key="Str_Interface_Auto">Samodejno (sistemske poti)</sys:String>
-    <sys:String x:Key="Str_Interface_Unavailable">Izbrani vmesnik ali naslov ni na voljo. Znova izberi vmesnik.</sys:String>
-    <sys:String x:Key="Str_Interface_WifiIdentity">Identiteta omrežja Wi-Fi ni na voljo. Za izrecno vezavo mora Windows dovoliti branje identitete povezave Wi-Fi.</sys:String>
-    <sys:String x:Key="Str_Location_Title">Lokacija</sys:String>
-    <sys:String x:Key="Str_Location_Busy">Pred menjavo lokacije ustavi trenutni pregled ali ukaz v terminalu.</sys:String>
-    <sys:String x:Key="Str_Location_Legacy">Stari podatki (neuvrščeno)</sys:String>
-    <sys:String x:Key="Str_Location_New">Nova lokacija...</sys:String>
-    <sys:String x:Key="Str_Location_Rename">Preimenuj lokacijo...</sys:String>
-    <sys:String x:Key="Str_Location_Switch">Zamenjaj lokacijo</sys:String>
-    <sys:String x:Key="Str_Location_Explicit">Ime izberi sam. Lokacije se nikoli ne ugotavljajo iz obsega IP ali imena omrežja Wi-Fi.</sys:String>
-    <sys:String x:Key="Str_Location_Clear">Menjava lokacije počisti trenutne rezultate ter zapre nedejavni terminal in poglede nadzora povezave. Shranjeni podatki ostanejo pri prvotni lokaciji.</sys:String>
-    <sys:String x:Key="Str_Location_InvalidName">Ime lokacije naj vsebuje od 1 do 80 znakov brez krmilnih znakov.</sys:String>
-    <sys:String x:Key="Str_Location_DuplicateName">Lokacija s tem imenom že obstaja. Izberi drugo ime.</sys:String>
-    <sys:String x:Key="Str_Location_SelectionError">Ta lokacija ni na voljo ali je ni mogoče spremeniti. Izberi obstoječo lokacijo.</sys:String>
-    <sys:String x:Key="Str_Location_DataError">Podatkov lokacije ni bilo mogoče prebrati ali shraniti. Pred nadaljevanjem zapri druge kopije KillerScan in preveri dovoljenja za datoteke ali obnovi varnostno kopijo.</sys:String>
+    <sys:String x:Key="Str_Options_ProbeUnknownPorts">Globinsko skeniranje: prepoznaj neznana vrata (nikoli vrat tiskalnikov)</sys:String>
+    <sys:String x:Key="Str_Options_Adapter">Omrežni vmesnik</sys:String>
+    <sys:String x:Key="Str_Options_AdapterAuto">Samodejno (izbere Windows)</sys:String>
+    <sys:String x:Key="Str_Table_KeyboardHelp">Za pomikanje po tabeli uporabite puščične tipke.</sys:String>
+    <sys:String x:Key="Str_Sidebar_Left">Levo</sys:String>
+    <sys:String x:Key="Str_Sidebar_Right">Desno</sys:String>
+    <sys:String x:Key="Str_Sidebar">STRANSKA VRSTICA</sys:String>
     <sys:String x:Key="Str_Evidence_Title">Dokazi prepoznavanja</sys:String>
     <sys:String x:Key="Str_Evidence_Confidence">Zanesljivost</sys:String>
     <sys:String x:Key="Str_Evidence_None">Ni na voljo</sys:String>
@@ -592,7 +655,6 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Evidence_External">Uvoženo / obseg ni določen</sys:String>
     <sys:String x:Key="Str_Evidence_Candidates">Drugi kandidati</sys:String>
     <sys:String x:Key="Str_Access_Title">Dostop</sys:String>
-    <sys:String x:Key="Str_Access_None">Ni razpoložljivih naslovov za dostop.</sys:String>
     <sys:String x:Key="Str_Access_Authentication">Prijava</sys:String>
     <sys:String x:Key="Str_Access_Unknown">Neznano</sys:String>
     <sys:String x:Key="Str_Access_Required">Strežnik zahteva avtentikacijo</sys:String>
@@ -604,21 +666,6 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Access_Redirect">Odgovor preusmeritve; cilju nismo sledili</sys:String>
     <sys:String x:Key="Str_Access_Note">Odpri vzpostavi novo povezavo. HTTP 200 ne dokazuje dostopa brez prijave. Veljavnost certifikatov HTTPS ni preverjena. Dokaz prijave velja samo za zahtevani naslov.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Čas opažanja ni na voljo</sys:String>
-    <sys:String x:Key="Str_About_AlwaysCheckOnStartup">Vedno preveri ob zagonu</sys:String>
-    <sys:String x:Key="Str_About_Downloading">Prenašanje ...</sys:String>
-    <sys:String x:Key="Str_About_NotNow">Ne zdaj</sys:String>
-    <sys:String x:Key="Str_About_StartupUpdateCheck">Preveri posodobitve ob zagonu</sys:String>
-    <sys:String x:Key="Str_About_StartupUpdateDetail">Želiš posodobitev prenesti in namestiti zdaj? Program se bo zaprl in samodejno znova odprl.</sys:String>
-    <sys:String x:Key="Str_About_StartupUpdateHeading">Na voljo je {0} {1}</sys:String>
-    <sys:String x:Key="Str_About_UpdateAvailable">Na voljo je posodobitev: {0}</sys:String>
-    <sys:String x:Key="Str_About_UpdateDetail">Program se bo zaprl in samodejno znova odprl.</sys:String>
-    <sys:String x:Key="Str_About_UpdateHeading">Prenesem in namestim {0} {1}?</sys:String>
-    <sys:String x:Key="Str_About_UpdateNow">Posodobi</sys:String>
-    <sys:String x:Key="Str_Scroll_PageDown">Stran navzdol</sys:String>
-    <sys:String x:Key="Str_Scroll_PageLeft">Stran levo</sys:String>
-    <sys:String x:Key="Str_Scroll_PageRight">Stran desno</sys:String>
-    <sys:String x:Key="Str_Scroll_PageUp">Stran navzgor</sys:String>
-
     <sys:String x:Key="Str_HA_Title">Integracije Home Assistanta</sys:String>
     <sys:String x:Key="Str_HA_Note">Predlogi niso potrjena združljivost. Povezava ali nastavitev se ne izvede. Dodatni vnosi ostanejo v tem oknu; povezave do navodil ne vsebujejo podatkov naprave.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">V tem katalogu ni konkretnega ujemanja. To ne pomeni, da naprava ni podprta.</sys:String>
@@ -660,7 +707,6 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_HA_Oids">Podprti OID-i in bralni dostop; sysDescr sam ne določa entitet HA</sys:String>
     <sys:String x:Key="Str_HA_Radio">Združljiv radio/adapter/prehod in podpora točnemu modelu</sys:String>
     <sys:String x:Key="Str_HA_Conflict">Protislovni dokazi; najboljša integracija ni izbrana.</sys:String>
-
     <sys:String x:Key="Str_HA_AllTitle">Najboljše integracije HA za ta pregled</sys:String>
     <sys:String x:Key="Str_HA_BestChoice">Najboljša izbira integracije</sys:String>
     <sys:String x:Key="Str_HA_NoChoice">Potrebna je prepoznava</sys:String>
@@ -672,7 +718,6 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_HA_Inputs">Dopolni podatke o napravi</sys:String>
     <sys:String x:Key="Str_HA_Next">V HA odpri Dodaj integracijo in izberi to integracijo. Preveri podporo modela in spodnje predpogoje.</sys:String>
     <sys:String x:Key="Str_HA_NoDevices">Ta pregled še nima naprav. Najprej zaženi pregled.</sys:String>
-
     <sys:String x:Key="Str_HA_CheckChoice">Preveri: {0}</sys:String>
     <sys:String x:Key="Str_HA_ResearchChoice">Začni s to integracijo. Proizvajalec ali ime sta namig; preveri točen model, firmware in spodnje predpogoje.</sys:String>
     <sys:String x:Key="Str_HA_FirmwareChoice">ESP: preveri firmware</sys:String>
