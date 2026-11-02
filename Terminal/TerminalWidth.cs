@@ -313,4 +313,3 @@ namespace KillerScan.Terminal
         ];
     }
 }
-

@@ -35,6 +35,7 @@ internal static class RecognitionUiTests
             };
             printer.Recognition = NetworkScanner.AssessDevice(printer, null);
             printer.DeviceType = printer.Recognition.Type;
+            NetworkScanner.IdentifyDevice(printer); // Exercise retained fork metadata through native overrides too.
             var old = new NetworkDevice { IpAddress = "192.0.2.11", DeviceType = "Windows" };
 
             using var workspace = new ScanWorkspace("192.0.2.0/24", false);

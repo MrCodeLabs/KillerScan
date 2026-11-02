@@ -90,7 +90,7 @@ namespace KillerScan.Controls
                 // The automatic result stays on record next to the manual type.
                 d.Recognition = NetworkScanner.AssessDevice(d, mac => _location.Overrides.Get(mac));
                 d.DeviceType = type;
-                if (d.Identification != null) DeviceIdentification.ApplyManualType(d, type);
+                if (d.Identification != null) d.Identification = d.Identification with { ManualType = type };
                 _filteredView?.Refresh();
                 if (_showTopology) RefreshTopology();
                 StatusText.Text = string.Format(Loc("Str_St_OverrideSet"), d.MacAddress, type);
@@ -103,7 +103,7 @@ namespace KillerScan.Controls
             PersistenceFeedback.Check(_location.Overrides.Set(d.MacAddress, null), _location.Overrides.Save, () => _location.Overrides.SaveError);
             d.Recognition = NetworkScanner.AssessDevice(d, mac => _location.Overrides.Get(mac));
             d.DeviceType = d.Recognition.Type;
-            if (d.Identification != null) DeviceIdentification.ApplyManualType(d, null);
+            if (d.Identification != null) d.Identification = d.Identification with { ManualType = null };
             _filteredView?.Refresh();
             if (_showTopology) RefreshTopology();
             StatusText.Text = string.Format(Loc("Str_St_OverrideCleared"), d.MacAddress);
