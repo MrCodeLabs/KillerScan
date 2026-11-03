@@ -716,7 +716,7 @@
     <sys:String x:Key="Str_Access_Note">Открытие создаёт новое соединение. HTTP 200 не доказывает доступ без входа. Сертификаты HTTPS не проверены. Данные об аутентификации относятся только к запрошенному адресу.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Время наблюдения недоступно</sys:String>
     <sys:String x:Key="Str_HA_Title">Интеграции Home Assistant</sys:String>
-    <sys:String x:Key="Str_HA_Note">Предложения не подтверждают совместимость. Подключение и настройка не выполняются. Необязательные данные остаются в окне; ссылки не содержат данных устройства.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Предложения не подтверждают совместимость. Подключение и настройка не выполняются. Ручные данные сохраняются только после явного сохранения в описи объекта; ссылки на документацию не содержат данных устройства.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">В каталоге нет точного совпадения. Это не означает, что устройство не поддерживается.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Возможные интеграции</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Найти лучший путь интеграции</sys:String>
@@ -776,4 +776,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">Устройство должно быть связано с вашим аккаунтом Tuya Smart / Smart Life; проверьте функции</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Совместимая модель/прошивка go-e и включённый локальный HTTP API v2 или WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Поддерживаемое устройство с оригинальной прошивкой eWeLink; проверьте режим LAN/облако</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Опись объекта</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Текущее сканирование</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Добавить выбранные в опись</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Добавить устройство вручную</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Изменить устройство</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Удалить из описи</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Удалить эту запись? История сканирования сохранится.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Название (обязательно)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Помещение</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Прошивка</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Подключение / протокол</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Желаемые функции Home Assistant</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Примечания</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Сохранить</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Отмена</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Введите название устройства.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Ручные данные — сведения пользователя, а не подтверждённая совместимость. Рекомендации требуют проверки. Открытие описи не подключается к устройствам или Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Сохранённое наблюдение (не текущее состояние)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Нет сохранённого сетевого наблюдения</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Не удалось прочитать или сохранить опись. Имеющиеся данные сохранены. Проверьте папку данных и резервную копию.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Связать наблюдение</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Связать запись с найденным устройством? Изменится только сетевая привязка. Сначала проверьте идентичность устройства.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Создать отдельную запись</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP совпадает с записью, но идентичность не подтверждена. Выберите запись, создайте отдельную или отмените действие.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Использовать эти сведения</sys:String>
 </ResourceDictionary>

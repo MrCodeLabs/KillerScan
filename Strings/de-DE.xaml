@@ -691,7 +691,7 @@ Ihre Einstellungen bleiben erhalten.</sys:String>
     <sys:String x:Key="Str_Access_Note">Öffnen stellt eine neue Verbindung her. HTTP 200 belegt keinen Zugriff ohne Anmeldung. HTTPS-Zertifikate wurden nicht validiert. Anmeldebelege gelten nur für die angeforderte Adresse.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Beobachtungszeit nicht verfügbar</sys:String>
     <sys:String x:Key="Str_HA_Title">Home-Assistant-Integrationen</sys:String>
-    <sys:String x:Key="Str_HA_Note">Vorschläge sind kein Kompatibilitätsnachweis. Es wird nichts verbunden oder eingerichtet. Optionale Eingaben bleiben in diesem Fenster; Dokumentationslinks enthalten keine Gerätedaten.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Vorschläge sind keine bestätigte Kompatibilität. Es wird keine Verbindung oder Einrichtung durchgeführt. Manuelle Eingaben bleiben erst nach ausdrücklichem Speichern im Standortinventar erhalten; Dokumentationslinks enthalten keine Gerätedaten.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Kein konkreter Treffer in diesem Katalog. Das bedeutet nicht, dass das Gerät nicht unterstützt wird.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Mögliche Integrationen</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Den besten Integrationsweg finden</sys:String>
@@ -751,4 +751,31 @@ Ihre Einstellungen bleiben erhalten.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Gerät muss mit deinem Tuya-Smart-/Smart-Life-Konto verknüpft sein; Funktionen prüfen</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Kompatibles go-e-Modell/Firmware und aktivierte lokale HTTP API v2 oder WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Unterstütztes Gerät mit originaler eWeLink-Firmware; LAN-/Cloud-Modus prüfen</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Standortinventar</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Aktueller Scan</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Auswahl zum Inventar hinzufügen</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Gerät manuell hinzufügen</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Gerät bearbeiten</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Aus Inventar entfernen</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Diesen Inventareintrag entfernen? Der Scanverlauf bleibt erhalten.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Name (erforderlich)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Raum</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Firmware</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Verbindung / Protokoll</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Gewünschte Home-Assistant-Funktionen</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Notizen</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Speichern</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Abbrechen</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Geben Sie einen Gerätenamen ein.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Manuelle Eingaben sind Benutzerangaben, keine bestätigte Kompatibilität. Empfehlungen müssen geprüft werden. Beim Öffnen werden weder Geräte noch Home Assistant kontaktiert.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Gespeicherte Beobachtung (kein Live-Status)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Keine gespeicherte Netzwerkbeobachtung</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Das Inventar konnte nicht gelesen oder gespeichert werden. Vorhandene Daten bleiben erhalten. Prüfen Sie Datenordner und Sicherung.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Beobachtung verknüpfen</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Diesen Eintrag mit einem gefundenen Gerät verknüpfen? Nur die Netzwerkzuordnung wird geändert. Prüfen Sie zuerst die Geräteidentität.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Separaten Eintrag erstellen</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">Die IP stimmt mit einem Eintrag überein, die Identität ist jedoch unbestätigt. Wählen Sie einen Eintrag, erstellen Sie einen separaten oder brechen Sie ab.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Diese Hinweise übernehmen</sys:String>
 </ResourceDictionary>

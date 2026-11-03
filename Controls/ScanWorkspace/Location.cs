@@ -100,6 +100,12 @@ namespace KillerScan.Controls
                 if (!discard) return false;
             }
             if (clear) ClearResults();
+            if (keepResults)
+                foreach (var device in _active.Devices)
+                {
+                    device.LocationId = data.Info?.Id;
+                    device.LocationName = data.Info?.Name;
+                }
             EnterLocation(data);
             return true;
         }

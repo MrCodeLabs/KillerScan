@@ -690,7 +690,7 @@ Ayarlarınız silinmeyecek.</sys:String>
     <sys:String x:Key="Str_Access_Note">Aç yeni bir bağlantı kurar. HTTP 200, oturum açmadan erişimi kanıtlamaz. HTTPS sertifikaları doğrulanmadı. Kimlik doğrulama kanıtı yalnızca istenen adres için geçerlidir.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Gözlem zamanı kullanılamıyor</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant entegrasyonları</sys:String>
-    <sys:String x:Key="Str_HA_Note">Öneriler uyumluluğu doğrulamaz. Bağlantı veya kurulum yapılmaz. İsteğe bağlı bilgiler bu pencerede kalır; belge bağlantıları cihaz verisi içermez.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Öneriler uyumluluğu doğrulamaz. Bağlantı veya kurulum yapılmaz. Elle girilen bilgiler yalnızca konum envanterine açıkça kaydedilirse korunur; belge bağlantıları cihaz verisi içermez.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Bu katalogda belirli bir eşleşme yok. Bu, cihazın desteklenmediği anlamına gelmez.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Olası entegrasyonlar</sys:String>
     <sys:String x:Key="Str_HA_Workflow">En iyi entegrasyon yolunu bul</sys:String>
@@ -750,4 +750,31 @@ Ayarlarınız silinmeyecek.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Cihaz Tuya Smart / Smart Life hesabınıza bağlı olmalı; işlevleri doğrulayın</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Uyumlu go-e modeli/yazılımı ve etkin yerel HTTP API v2 veya WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Orijinal eWeLink yazılımlı desteklenen cihaz; LAN/bulut modunu doğrulayın</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Konum envanteri</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Geçerli tarama</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Seçilenleri envantere ekle</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Cihazı elle ekle</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Cihazı düzenle</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Envanterden kaldır</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Bu kayıt kaldırılsın mı? Tarama geçmişi korunacaktır.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Ad (zorunlu)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Oda</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Donanım yazılımı</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Bağlantı / protokol</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">İstenen Home Assistant işlevleri</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Notlar</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Kaydet</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">İptal</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Bir cihaz adı girin.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Elle girilen bilgiler kullanıcı verisidir, doğrulanmış uyumluluk değildir. Öneriler doğrulanmalıdır. Envanterin açılması cihazlara veya Home Assistant’a bağlanmaz.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Kaydedilmiş gözlem (canlı durum değil)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Kaydedilmiş ağ gözlemi yok</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Envanter okunamadı veya kaydedilemedi. Mevcut veriler korundu. Veri klasörünü ve yedeğini kontrol edin.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Gözlemi bağla</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Bu kayıt bulunan bir cihaza bağlansın mı? Yalnızca ağ bağlantısı değişir. Önce cihazın kimliğini doğrulayın.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Ayrı kayıt oluştur</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP bir kayıtla eşleşiyor ancak kimlik doğrulanmadı. Bağlanacak kaydı seçin, ayrı kayıt oluşturun veya iptal edin.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Bu ipuçlarını kullan</sys:String>
 </ResourceDictionary>

@@ -732,7 +732,7 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_Access_Note">Abrir cria uma nova conexão. HTTP 200 não comprova acesso sem login. Os certificados HTTPS não foram validados. A evidência de autenticação vale apenas para o endereço solicitado.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Horário da observação indisponível</sys:String>
     <sys:String x:Key="Str_HA_Title">Integrações do Home Assistant</sys:String>
-    <sys:String x:Key="Str_HA_Note">Sugestões não confirmam compatibilidade. Nenhuma conexão ou configuração é feita. As entradas opcionais ficam nesta janela; os links não incluem dados do dispositivo.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Sugestões não confirmam compatibilidade. Nenhuma conexão ou configuração é realizada. Os dados manuais só persistem após serem salvos explicitamente no inventário do local; os links de documentação não contêm dados do dispositivo.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Nenhuma correspondência específica neste catálogo. Isso não significa que o dispositivo não seja compatível.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Integrações possíveis</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Encontrar o melhor caminho de integração</sys:String>
@@ -792,4 +792,31 @@ Suas configurações não serão removidas.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Dispositivo vinculado à sua conta Tuya Smart / Smart Life; verifique as funções</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Modelo/firmware go-e compatível e HTTP API v2 local ou WebSocket ativado</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Dispositivo compatível com firmware eWeLink original; verifique modo LAN/nuvem</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Inventário do local</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Verificação atual</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Adicionar selecionados ao inventário</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Adicionar dispositivo manualmente</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Editar dispositivo</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Remover do inventário</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Remover esta entrada? O histórico de verificações será mantido.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Nome (obrigatório)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Cômodo</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Firmware</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Conexão / protocolo</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Funções desejadas no Home Assistant</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Observações</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Salvar</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Cancelar</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Informe um nome para o dispositivo.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Os dados manuais são informações do usuário, não compatibilidade verificada. As recomendações precisam ser verificadas. Abrir o inventário não contata dispositivos nem o Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Observação salva (não é estado ao vivo)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Nenhuma observação de rede salva</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Não foi possível ler ou salvar o inventário. Os dados existentes foram preservados. Verifique a pasta de dados e seu backup.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Vincular observação</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Vincular esta entrada a um dispositivo encontrado? Apenas o vínculo de rede será alterado. Confira primeiro a identidade do dispositivo.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Criar entrada separada</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">O IP corresponde a uma entrada, mas a identidade não foi confirmada. Escolha a entrada, crie uma separada ou cancele.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Usar estas indicações</sys:String>
 </ResourceDictionary>

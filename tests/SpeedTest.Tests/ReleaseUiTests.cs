@@ -160,6 +160,7 @@ internal static class ReleaseUiTests
             return;
         }
         ForkHaUiChecks.Run(window, (element, name) => Save(Render(element, 1050, 740), Path.Combine(output, name)));
+        SurveyUiChecks.Run((element, name) => Save(Render(element, 1050, 820), Path.Combine(output, name)));
         var samples = new List<(string Label, BitmapSource Image)>();
         int states = 0;
         foreach (string theme in Enum.GetNames(themeType))

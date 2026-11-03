@@ -732,7 +732,7 @@ Innstillingene dine fjernes ikke.</sys:String>
     <sys:String x:Key="Str_Access_Note">Åpne oppretter en ny tilkobling. HTTP 200 beviser ikke tilgang uten innlogging. HTTPS-sertifikater ble ikke validert. Innloggingsbevis gjelder bare den forespurte adressen.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Observasjonstid utilgjengelig</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant-integrasjoner</sys:String>
-    <sys:String x:Key="Str_HA_Note">Forslag bekrefter ikke kompatibilitet. Ingen tilkobling eller oppsett utføres. Valgfrie opplysninger blir i dette vinduet; lenker inneholder ikke enhetsdata.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Forslag bekrefter ikke kompatibilitet. Ingen tilkobling eller oppsett utføres. Manuelle opplysninger beholdes bare når de lagres uttrykkelig i stedsinventaret; dokumentasjonslenker inneholder ingen enhetsdata.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Ingen konkret treff i denne katalogen. Det betyr ikke at enheten mangler støtte.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Mulige integrasjoner</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Finn den beste integrasjonsveien</sys:String>
@@ -792,4 +792,31 @@ Innstillingene dine fjernes ikke.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Enheten må være koblet til Tuya Smart / Smart Life-kontoen din; sjekk funksjonene</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Kompatibel go-e-modell/fastvare og aktivert lokal HTTP API v2 eller WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Støttet enhet med original eWeLink-fastvare; sjekk LAN-/skymodus</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Stedsinventar</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Gjeldende skanning</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Legg valgte til inventaret</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Legg til enhet manuelt</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Rediger enhet</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Fjern fra inventaret</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Fjerne denne oppføringen? Skannehistorikken beholdes.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Navn (påkrevd)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Rom</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Fastvare</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Tilkobling / protokoll</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Ønskede funksjoner i Home Assistant</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Merknader</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Lagre</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Avbryt</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Skriv inn et enhetsnavn.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Manuelle opplysninger er brukerdata, ikke bekreftet kompatibilitet. Anbefalinger må kontrolleres. Å åpne inventaret kontakter verken enheter eller Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Lagret observasjon (ikke sanntidsstatus)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Ingen lagret nettverksobservasjon</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Inventaret kunne ikke leses eller lagres. Eksisterende data er bevart. Kontroller datamappen og sikkerhetskopien.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Koble observasjon</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Koble denne oppføringen til en funnet enhet? Bare nettverkskoblingen endres. Kontroller enhetens identitet først.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Opprett separat oppføring</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP-adressen samsvarer med en oppføring, men identiteten er ubekreftet. Velg oppføring, opprett en separat eller avbryt.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Bruk disse opplysningene</sys:String>
 </ResourceDictionary>

@@ -133,7 +133,10 @@ can still affect discovery. Physical-network validation remains necessary.
    which HA entities/functions are needed: reading state, control, or media.
 2. Optionally enter the model and known protocol in the window. These are manual
    research leads, never new observations or changes to saved identity. Inputs
-   stay in this window; **Copy integration plan** explicitly includes them.
+   stay in this window unless explicitly saved to the [location inventory](location-survey.md);
+   **Copy integration plan** explicitly includes them. Inventory edits require
+   **Save**; canceling discards them. Existing MAC-linked entries recover their
+   saved hints when their per-device advisor opens.
 3. Check [HA discovery and Add integration](https://www.home-assistant.io/getting-started/integration/)
    and the [official integration catalogue](https://www.home-assistant.io/integrations/).
    Prefer a supported integration with the required functions; compare local/cloud

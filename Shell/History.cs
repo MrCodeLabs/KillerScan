@@ -238,7 +238,8 @@ namespace KillerScan.Shell
                 _historyWorkspace = new HistoryWorkspace
                 {
                     LayoutTransform = new ScaleTransform(_appScale, _appScale),
-                    HistorySource = () => ShellLocation.History
+                    HistorySource = () => ShellLocation.History,
+                    SurveySource = history => ReferenceEquals(history, ShellLocation.History) ? ShellLocation.Survey : null
                 };
                 _historyWorkspace.UseTableHeaderStyle(((DataGrid)_scanWorkspace!.FindName("ResultsGrid")).ColumnHeaderStyle);
                 RegisterViewToolbar("history", _historyWorkspace.DetachToolbar());

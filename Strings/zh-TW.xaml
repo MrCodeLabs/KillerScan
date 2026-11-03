@@ -690,7 +690,7 @@
     <sys:String x:Key="Str_Access_Note">開啟會建立新連線。HTTP 200 無法證明不需登入即可存取。HTTPS 憑證未經驗證。身分驗證證據僅適用於要求的位址。</sys:String>
     <sys:String x:Key="Str_Access_NoTime">無可用的觀察時間</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant 整合</sys:String>
-    <sys:String x:Key="Str_HA_Note">建議不代表已驗證相容性。不會連線或設定裝置。選填資料只留在此視窗；文件連結不會包含裝置資料。</sys:String>
+    <sys:String x:Key="Str_HA_Note">建議並不代表已驗證的相容性。不會進行連線或設定。手動輸入僅在明確儲存至地點清單後保留；文件連結不包含裝置資料。</sys:String>
     <sys:String x:Key="Str_HA_Unknown">此目錄中沒有具體相符項目。這不表示裝置不受支援。</sys:String>
     <sys:String x:Key="Str_HA_Candidates">可能適用的整合</sys:String>
     <sys:String x:Key="Str_HA_Workflow">尋找最佳整合方式</sys:String>
@@ -750,4 +750,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">裝置須綁定至你的Tuya Smart / Smart Life帳戶；核對功能</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">相容的go-e型號/韌體，並啟用本機HTTP API v2或WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">使用原廠eWeLink韌體的受支援裝置；核對LAN/雲端模式</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">地點裝置清單</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">目前掃描</sys:String>
+    <sys:String x:Key="Str_Survey_Add">將所選裝置加入清單</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">手動新增裝置</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">編輯裝置</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">從清單移除</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">移除此項目？掃描歷程將保留。</sys:String>
+    <sys:String x:Key="Str_Survey_Name">名稱（必填）</sys:String>
+    <sys:String x:Key="Str_Survey_Room">房間</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">韌體</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">連線 / 通訊協定</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">希望在Home Assistant中使用的功能</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">備註</sys:String>
+    <sys:String x:Key="Str_Survey_Save">儲存</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">取消</sys:String>
+    <sys:String x:Key="Str_Survey_Required">請輸入裝置名稱。</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">手動輸入是使用者提供的資訊，並非已驗證的相容性。建議需要確認。開啟清單不會連線至裝置或Home Assistant。</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">已儲存的觀測（非即時狀態）</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">沒有已儲存的網路觀測</sys:String>
+    <sys:String x:Key="Str_Survey_Error">無法讀取或儲存清單。原有資料已保留。請檢查資料夾及其備份。</sys:String>
+    <sys:String x:Key="Str_Survey_Link">關聯觀測</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">將此項目關聯至找到的裝置？僅變更網路關聯。請先確認裝置身分。</sys:String>
+    <sys:String x:Key="Str_Survey_New">建立獨立項目</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP與清單項目相同，但裝置身分尚未確認。請選擇要關聯的項目、建立獨立項目或取消。</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">使用這些線索</sys:String>
 </ResourceDictionary>

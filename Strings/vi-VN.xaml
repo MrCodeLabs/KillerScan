@@ -671,7 +671,7 @@ Cài đặt của bạn sẽ không bị xóa.</sys:String>
     <sys:String x:Key="Str_Access_Note">Mở sẽ tạo kết nối mới. HTTP 200 không chứng minh có thể truy cập mà không đăng nhập. Chứng chỉ HTTPS chưa được xác thực. Bằng chứng xác thực chỉ áp dụng cho địa chỉ đã yêu cầu.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Không có thời gian quan sát</sys:String>
     <sys:String x:Key="Str_HA_Title">Tích hợp Home Assistant</sys:String>
-    <sys:String x:Key="Str_HA_Note">Gợi ý không xác nhận tương thích. Không kết nối hoặc thiết lập. Thông tin tùy chọn chỉ ở trong cửa sổ này; liên kết tài liệu không chứa dữ liệu thiết bị.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Đề xuất không xác nhận khả năng tương thích. Không thực hiện kết nối hay thiết lập. Dữ liệu thủ công chỉ được giữ sau khi lưu rõ ràng vào danh mục địa điểm; liên kết tài liệu không chứa dữ liệu thiết bị.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Không có kết quả cụ thể trong danh mục này. Điều đó không có nghĩa thiết bị không được hỗ trợ.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Các tích hợp có thể phù hợp</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Tìm cách tích hợp phù hợp nhất</sys:String>
@@ -731,4 +731,31 @@ Cài đặt của bạn sẽ không bị xóa.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Thiết bị phải thuộc tài khoản Tuya Smart / Smart Life của bạn; kiểm tra chức năng</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Mẫu/firmware go-e tương thích và HTTP API v2 cục bộ hoặc WebSocket được bật</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Thiết bị hỗ trợ với firmware eWeLink gốc; kiểm tra chế độ LAN/đám mây</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Danh mục thiết bị tại địa điểm</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Lần quét hiện tại</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Thêm mục đã chọn vào danh mục</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Thêm thiết bị thủ công</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Sửa thiết bị</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Xóa khỏi danh mục</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Xóa mục này? Lịch sử quét sẽ được giữ lại.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Tên (bắt buộc)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Phòng</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Phần sụn</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Kết nối / giao thức</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Chức năng mong muốn trong Home Assistant</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Ghi chú</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Lưu</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Hủy</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Nhập tên thiết bị.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Dữ liệu thủ công là thông tin người dùng, không phải khả năng tương thích đã xác minh. Cần kiểm tra các đề xuất. Mở danh mục không kết nối với thiết bị hoặc Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Quan sát đã lưu (không phải trạng thái trực tiếp)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Chưa có quan sát mạng đã lưu</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Không thể đọc hoặc lưu danh mục. Dữ liệu hiện có được giữ nguyên. Kiểm tra thư mục dữ liệu và bản sao lưu.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Liên kết quan sát</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Liên kết mục này với thiết bị tìm thấy? Chỉ liên kết mạng được thay đổi. Hãy xác minh thiết bị trước.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Tạo mục riêng</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP trùng với một mục, nhưng chưa xác minh danh tính. Chọn mục để liên kết, tạo mục riêng hoặc hủy.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Dùng các thông tin gợi ý này</sys:String>
 </ResourceDictionary>

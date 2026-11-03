@@ -7,7 +7,7 @@ One-click, fast network scanner built for field techs. Single portable EXE, free
 Part of [killertools.net](https://killertools.net).
 
 This fork additionally retains [Home Assistant integration advice](docs/home-assistant-advisor.md)
-per device and for the whole scan. [Fork synchronization and data compatibility](docs/fork-upstream-1.9.md)
+per device and for the whole scan, plus a [persistent location inventory](docs/location-survey.md). [Fork synchronization and data compatibility](docs/fork-upstream-1.9.md)
 describe its differences from upstream. Upstream downloads do not contain these fork additions.
 
 ## Features
