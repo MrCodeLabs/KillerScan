@@ -30,7 +30,7 @@ internal static class HomeAssistantText
         ["Inputs"] = "Refine device information",
         ["Next"] = "In HA, use Add integration and select this integration. Check its model support and prerequisites below.",
         ["NoDevices"] = "This scan has no devices yet. Run a scan first.",
-        ["Note"] = "Suggestions are not verified compatibility. No connection or setup is performed. Optional inputs stay in this window; documentation links never include device data.",
+        ["Note"] = "Suggestions are not verified compatibility. No connection or setup is performed. Manual inputs persist only after explicit saving to the location inventory; documentation links contain no device data.",
         ["Unknown"] = "No specific match in this catalogue. This does not mean the device is unsupported.",
         ["Candidates"] = "Integration candidates", ["Workflow"] = "Find the best integration path",
         ["Identity"] = "Manufacturer / exact model (optional, no credentials)",

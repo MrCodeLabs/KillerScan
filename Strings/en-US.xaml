@@ -732,7 +732,7 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_Access_Note">Opening makes a new connection. HTTP 200 does not prove access without login. HTTPS certificates were not validated. Login evidence applies only to the requested address.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Observation time unavailable</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant integrations</sys:String>
-    <sys:String x:Key="Str_HA_Note">Suggestions are not verified compatibility. No connection or setup is performed. Optional inputs stay in this window; documentation links never include device data.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Suggestions are not verified compatibility. No connection or setup is performed. Manual inputs persist only after explicit saving to the location inventory; documentation links contain no device data.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">No specific match in this catalogue. This does not mean the device is unsupported.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Integration candidates</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Find the best integration path</sys:String>
@@ -792,4 +792,31 @@ Your settings will not be removed.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Device must be linked to your Tuya Smart / Smart Life account; check exposed functions</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Compatible go-e model/firmware and enabled local HTTP API v2 or WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Supported device with original eWeLink firmware; check LAN/cloud mode</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Location inventory</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Current scan</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Add selected to inventory</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Add device manually</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Edit device</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Remove from inventory</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Remove this inventory entry? Scan history will be kept.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Name (required)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Room</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Firmware</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Connection / protocol</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Desired Home Assistant functions</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Notes</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Save</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Cancel</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Enter a device name.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Manual entries are user information, not verified compatibility. Recommendations require verification. Opening this inventory does not contact devices or Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Saved observation (not a live status)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">No saved network observation</sys:String>
+    <sys:String x:Key="Str_Survey_Error">The inventory could not be read or saved. Existing data was preserved. Check the data folder and its backup.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Link observation</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Link the selected inventory entry to a found device? This changes its network link only. Check the device identity first.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Create separate entry</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">The IP matches an inventory entry, but identity is unconfirmed. Select the entry to link, create a separate entry, or cancel.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Use these hints</sys:String>
 </ResourceDictionary>

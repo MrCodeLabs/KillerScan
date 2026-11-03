@@ -14,7 +14,7 @@
     "project": "tests/SpeedTest.Tests/SpeedTest.Tests.csproj",
     "program": "tests/SpeedTest.Tests/Program.cs",
     "ci": [
-      "--fork-upgrade", "--installation-cleanup", "--loopback-headers", "--transfer-sequence", "--empty-transfers",
+      "--survey", "--fork-upgrade", "--installation-cleanup", "--loopback-headers", "--transfer-sequence", "--empty-transfers",
       "--terminal-memory", "--terminal-unicode", "--terminal-accessibility", "--history-retention",
       "--preference-persistence", "--demo-stores", "--osc-parser", "--terminal-safety", "--terminal-paste", "--conpty-backpressure", "--scan-lifecycle",
       "--scan-presentation", "--menu-separators", "--startup-fade", "--release-ui", "--scan-options-ui",
@@ -33,6 +33,7 @@
       "--terminal-memory-child": "Child process started by --terminal-memory.",
       "--history-writer": "Child process started by --history-retention.",
       "--profile-lock-child": "Child process started by --preference-persistence and terminated while holding a lease.",
+      "--survey-phase": "Child process started by --survey to check fresh-process persistence.",
       "--observe-writer": "Child process started by --locations.",
       "--import-then-die": "Child process started by --locations, which kills itself mid-import.",
       "---": "Not a flag: a table-separator string in a check."

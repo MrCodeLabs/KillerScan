@@ -105,7 +105,8 @@ namespace KillerScan.Controls
             {
                 if (SelectedHistoryDevice is { } saved)
                 {
-                    var dialog = new HomeAssistantAdviceWindow(HomeAssistantText.FromHistory(saved), WebLink.Open, value => Clipboard.SetText(value));
+                    var dialog = new HomeAssistantAdviceWindow(HomeAssistantText.FromHistory(saved), WebLink.Open,
+                        value => Clipboard.SetText(value), surveyStore: SurveySource(StoreFor(_entry)));
                     dialog.Owner = Window.GetWindow(this); dialog.ShowDialog();
                 }
                 return;

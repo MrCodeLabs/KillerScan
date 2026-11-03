@@ -706,7 +706,7 @@ A beállítások nem törlődnek.</sys:String>
     <sys:String x:Key="Str_Access_Note">A megnyitás új kapcsolatot hoz létre. A HTTP 200 nem bizonyít bejelentkezés nélküli hozzáférést. A HTTPS-tanúsítványok nem lettek hitelesítve. A belépési bizonyíték csak a kért címre érvényes.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">A megfigyelés ideje nem érhető el</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant-integrációk</sys:String>
-    <sys:String x:Key="Str_HA_Note">A javaslatok nem igazolják a kompatibilitást. Nem történik kapcsolódás vagy beállítás. Az opcionális adatok az ablakban maradnak; a hivatkozások nem tartalmaznak eszközadatot.</sys:String>
+    <sys:String x:Key="Str_HA_Note">A javaslatok nem igazolják a kompatibilitást. Nem történik kapcsolódás vagy beállítás. A kézi adatok csak a helyszínleltárba történő kifejezett mentés után maradnak meg; a dokumentáció hivatkozásai nem tartalmaznak eszközadatot.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Nincs konkrét találat ebben a katalógusban. Ez nem jelenti azt, hogy az eszköz nem támogatott.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Lehetséges integrációk</sys:String>
     <sys:String x:Key="Str_HA_Workflow">A legjobb integrációs út kiválasztása</sys:String>
@@ -766,4 +766,31 @@ A beállítások nem törlődnek.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Az eszköz legyen a Tuya Smart / Smart Life fiókodban; ellenőrizd a funkciókat</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Kompatibilis go-e modell/firmware és engedélyezett helyi HTTP API v2 vagy WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Támogatott eszköz eredeti eWeLink firmware-rel; ellenőrizd a LAN/felhő módot</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Helyszínleltár</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Aktuális vizsgálat</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Kijelöltek hozzáadása a leltárhoz</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Eszköz kézi hozzáadása</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Eszköz szerkesztése</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Eltávolítás a leltárból</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Eltávolítja ezt a bejegyzést? A vizsgálati előzmények megmaradnak.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Név (kötelező)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Helyiség</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Firmware</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Kapcsolat / protokoll</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Kívánt Home Assistant-funkciók</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Megjegyzések</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Mentés</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Mégse</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Adjon meg egy eszköznevet.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">A kézi adatok felhasználói információk, nem igazolt kompatibilitás. Az ajánlásokat ellenőrizni kell. A leltár megnyitása nem kapcsolódik eszközökhöz vagy a Home Assistanthoz.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Mentett észlelés (nem élő állapot)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Nincs mentett hálózati észlelés</sys:String>
+    <sys:String x:Key="Str_Survey_Error">A leltár nem olvasható vagy menthető. A meglévő adatok megmaradtak. Ellenőrizze az adatmappát és a biztonsági mentést.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Észlelés összekapcsolása</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Összekapcsolja a bejegyzést egy megtalált eszközzel? Csak a hálózati kapcsolat módosul. Előbb ellenőrizze az eszköz azonosságát.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Külön bejegyzés létrehozása</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">Az IP egyezik egy bejegyzéssel, de az azonosság nem igazolt. Válasszon bejegyzést, hozzon létre külön bejegyzést vagy szakítsa meg.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Ezeknek az adatoknak a használata</sys:String>
 </ResourceDictionary>

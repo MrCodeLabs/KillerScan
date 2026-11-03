@@ -690,7 +690,7 @@
     <sys:String x:Key="Str_Access_Note">খুললে নতুন সংযোগ তৈরি হয়। HTTP 200 লগইন ছাড়া প্রবেশ প্রমাণ করে না। HTTPS সনদ যাচাই করা হয়নি। প্রমাণীকরণের তথ্য শুধু অনুরোধ করা ঠিকানার জন্য প্রযোজ্য।</sys:String>
     <sys:String x:Key="Str_Access_NoTime">পর্যবেক্ষণের সময় উপলব্ধ নেই</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant ইন্টিগ্রেশন</sys:String>
-    <sys:String x:Key="Str_HA_Note">পরামর্শ মানেই যাচাইকৃত সামঞ্জস্য নয়। কোনো সংযোগ বা সেটআপ করা হয় না। ঐচ্ছিক তথ্য এই উইন্ডোতেই থাকে; নথির লিংকে ডিভাইসের তথ্য যায় না।</sys:String>
+    <sys:String x:Key="Str_HA_Note">সুপারিশ সামঞ্জস্য নিশ্চিত করে না। কোনো সংযোগ বা সেটআপ করা হয় না। হাতে লেখা তথ্য অবস্থানের তালিকায় স্পষ্টভাবে সংরক্ষণ করলেই থাকে; নির্দেশনার লিংকে ডিভাইসের তথ্য থাকে না।</sys:String>
     <sys:String x:Key="Str_HA_Unknown">এই তালিকায় নির্দিষ্ট মিল নেই। এর মানে ডিভাইসটি অসমর্থিত নয়।</sys:String>
     <sys:String x:Key="Str_HA_Candidates">সম্ভাব্য ইন্টিগ্রেশন</sys:String>
     <sys:String x:Key="Str_HA_Workflow">সেরা ইন্টিগ্রেশন পথ খুঁজুন</sys:String>
@@ -750,4 +750,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">ডিভাইস আপনার Tuya Smart / Smart Life অ্যাকাউন্টে যুক্ত থাকতে হবে; সুবিধা যাচাই করুন</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">সামঞ্জস্যপূর্ণ go-e মডেল/ফার্মওয়্যার এবং সক্রিয় স্থানীয় HTTP API v2 বা WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">মূল eWeLink ফার্মওয়্যারসহ সমর্থিত ডিভাইস; LAN/ক্লাউড মোড যাচাই করুন</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">অবস্থানের তালিকা</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">বর্তমান স্ক্যান</sys:String>
+    <sys:String x:Key="Str_Survey_Add">নির্বাচিতগুলো তালিকায় যোগ করুন</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">হাতে ডিভাইস যোগ করুন</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">ডিভাইস সম্পাদনা</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">তালিকা থেকে সরান</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">এই এন্ট্রি সরাবেন? স্ক্যানের ইতিহাস রাখা হবে।</sys:String>
+    <sys:String x:Key="Str_Survey_Name">নাম (আবশ্যক)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">ঘর</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">ফার্মওয়্যার</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">সংযোগ / প্রোটোকল</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Home Assistant-এ কাঙ্ক্ষিত কাজ</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">নোট</sys:String>
+    <sys:String x:Key="Str_Survey_Save">সংরক্ষণ</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">বাতিল</sys:String>
+    <sys:String x:Key="Str_Survey_Required">ডিভাইসের নাম লিখুন।</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">হাতে লেখা তথ্য ব্যবহারকারীর দেওয়া, যাচাইকৃত সামঞ্জস্য নয়। সুপারিশ যাচাই করতে হবে। তালিকা খুললে ডিভাইস বা Home Assistant-এর সঙ্গে যোগাযোগ হয় না।</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">সংরক্ষিত পর্যবেক্ষণ (সরাসরি অবস্থা নয়)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">সংরক্ষিত নেটওয়ার্ক পর্যবেক্ষণ নেই</sys:String>
+    <sys:String x:Key="Str_Survey_Error">তালিকা পড়া বা সংরক্ষণ করা যায়নি। আগের তথ্য রাখা হয়েছে। ডেটা ফোল্ডার ও তার ব্যাকআপ পরীক্ষা করুন।</sys:String>
+    <sys:String x:Key="Str_Survey_Link">পর্যবেক্ষণ যুক্ত করুন</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">এই এন্ট্রিকে পাওয়া ডিভাইসের সঙ্গে যুক্ত করবেন? শুধু নেটওয়ার্কের সংযোগ বদলাবে। আগে ডিভাইসের পরিচয় যাচাই করুন।</sys:String>
+    <sys:String x:Key="Str_Survey_New">আলাদা এন্ট্রি তৈরি করুন</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP একটি এন্ট্রির সঙ্গে মেলে, কিন্তু পরিচয় নিশ্চিত নয়। এন্ট্রি বাছুন, আলাদা তৈরি করুন বা বাতিল করুন।</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">এই তথ্য ব্যবহার করুন</sys:String>
 </ResourceDictionary>

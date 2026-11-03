@@ -701,7 +701,7 @@
     <sys:String x:Key="Str_Access_Note">開く操作は新しい接続を開始します。HTTP 200はログイン不要の証拠ではありません。HTTPS証明書の有効性は未検証です。認証の証拠は要求したアドレスにのみ適用されます。</sys:String>
     <sys:String x:Key="Str_Access_NoTime">観測時刻不明</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant の連携</sys:String>
-    <sys:String x:Key="Str_HA_Note">候補は互換性の確認ではありません。接続や設定は行いません。任意入力はこのウィンドウ内にとどまり、資料へのリンクに機器情報は含まれません。</sys:String>
+    <sys:String x:Key="Str_HA_Note">推奨内容は互換性の確認結果ではありません。接続や設定は行いません。手動入力は拠点の台帳に明示的に保存した場合のみ保持されます。説明書へのリンクに機器の情報は含まれません。</sys:String>
     <sys:String x:Key="Str_HA_Unknown">このカタログに具体的な一致はありません。機器が非対応という意味ではありません。</sys:String>
     <sys:String x:Key="Str_HA_Candidates">連携の候補</sys:String>
     <sys:String x:Key="Str_HA_Workflow">最適な連携方法を探す</sys:String>
@@ -761,4 +761,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">Tuya Smart / Smart Lifeアカウントに登録された機器が必要。機能を確認</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">対応するgo-e型番とファームウェア、ローカルHTTP API v2またはWebSocketの有効化</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">純正eWeLinkファームウェアの対応機器。LAN/クラウド方式を確認</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">拠点の機器台帳</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">現在のスキャン</sys:String>
+    <sys:String x:Key="Str_Survey_Add">選択した機器を台帳に追加</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">機器を手動で追加</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">機器を編集</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">台帳から削除</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">この項目を削除しますか？スキャン履歴は保持されます。</sys:String>
+    <sys:String x:Key="Str_Survey_Name">名前（必須）</sys:String>
+    <sys:String x:Key="Str_Survey_Room">部屋</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">ファームウェア</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">接続 / プロトコル</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Home Assistantで利用したい機能</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">メモ</sys:String>
+    <sys:String x:Key="Str_Survey_Save">保存</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">キャンセル</sys:String>
+    <sys:String x:Key="Str_Survey_Required">機器名を入力してください。</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">手動入力は利用者の情報であり、互換性の確認結果ではありません。推奨内容は確認が必要です。台帳を開いても機器やHome Assistantには接続しません。</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">保存済みの観測（現在の状態ではありません）</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">保存済みのネットワーク観測なし</sys:String>
+    <sys:String x:Key="Str_Survey_Error">台帳を読み込みまたは保存できませんでした。既存のデータは保持されています。データフォルダーとバックアップを確認してください。</sys:String>
+    <sys:String x:Key="Str_Survey_Link">観測を関連付ける</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">この項目を検出された機器に関連付けますか？ネットワークの関連付けのみ変更します。先に機器の同一性を確認してください。</sys:String>
+    <sys:String x:Key="Str_Survey_New">別の項目を作成</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IPが台帳の項目と一致しますが、同じ機器かは未確認です。関連付ける項目を選ぶか、別の項目を作成するか、キャンセルしてください。</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">この手掛かりを使用</sys:String>
 </ResourceDictionary>

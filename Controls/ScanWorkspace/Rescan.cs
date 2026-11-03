@@ -62,6 +62,8 @@ namespace KillerScan.Controls
 
             var s = _active;
             var scanner = s.Scanner;
+            var location = _location;
+            var surveyObservations = new List<NetworkDevice>();
             _rescanCts = new CancellationTokenSource();
             var ct = _rescanCts.Token;
             UpdateDeepScanButton();
@@ -92,7 +94,12 @@ namespace KillerScan.Controls
                     catch { done++; ScanProgress.Value = done * 100.0 / targets.Count; continue; }
 
                     int idx = s.Devices.IndexOf(old);
-                    if (idx >= 0) { s.Devices[idx] = fresh; refreshed++; }
+                    if (idx >= 0)
+                    {
+                        s.Devices[idx] = fresh;
+                        surveyObservations.Add(fresh);
+                        refreshed++;
+                    }
 
                     done++;
                     ScanProgress.Value = done * 100.0 / targets.Count;
@@ -105,6 +112,7 @@ namespace KillerScan.Controls
                 NoteRefresh(s, refreshed, targets.Count - refreshed, canceled);
                 _rescanCts.Dispose();
                 _rescanCts = null;
+                if (!LeaveDeletedLocation()) RefreshSurvey(location, surveyObservations);
                 FinishRescanUi();
             }
         }
@@ -138,6 +146,8 @@ namespace KillerScan.Controls
 
             var s = _active;
             var scanner = s.Scanner;
+            var location = _location;
+            var surveyObservations = new List<NetworkDevice>();
             var targets = s.Devices.OrderBy(d => d.IpSortKey).ToList();
             // The automatic deep phase belongs to the run that already validated its adapter.
             if (!recordProfile)
@@ -173,6 +183,7 @@ namespace KillerScan.Controls
                         if (idx >= 0)
                         {
                             s.Devices[idx] = fresh;
+                            surveyObservations.Add(fresh);
                             refreshed++;
                         }
                     }
@@ -208,10 +219,11 @@ namespace KillerScan.Controls
             {
                 try
                 {
+                    bool left = LeaveDeletedLocation();
+                    if (!left) RefreshSurvey(location, surveyObservations);
                     if (recordProfile)
                     {
                         _scanCompleted = completion == ScanCompletion.Complete;
-                        LeaveDeletedLocation();
                         RecordCompletedRun(options, deep: true, completion);
                     }
                     // A manual Deep Scan All refreshes an existing snapshot; an automatic one is

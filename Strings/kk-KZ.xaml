@@ -732,7 +732,7 @@
     <sys:String x:Key="Str_Access_Note">Ашу жаңа қосылым орнатады. HTTP 200 кірусіз қол жеткізуді дәлелдемейді. HTTPS сертификаттары тексерілмеген. Аутентификация дәлелі тек сұралған мекенжайға қатысты.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Бақылау уақыты қолжетімсіз</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant интеграциялары</sys:String>
-    <sys:String x:Key="Str_HA_Note">Ұсыныстар үйлесімділікті растамайды. Қосылу не баптау орындалмайды. Қосымша деректер осы терезеде қалады; сілтемелерде құрылғы деректері жоқ.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Ұсыныстар үйлесімділікті растамайды. Қосылым не баптау орындалмайды. Қолмен енгізілген деректер орналасу тізіміне анық сақталғаннан кейін ғана қалады; құжаттама сілтемелерінде құрылғы деректері жоқ.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">Бұл каталогта нақты сәйкестік жоқ. Бұл құрылғы қолдау таппайды деген сөз емес.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Ықтимал интеграциялар</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Ең қолайлы интеграция жолын табу</sys:String>
@@ -792,4 +792,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">Құрылғы Tuya Smart / Smart Life тіркелгіңізге байланысуы керек; функцияларды тексеріңіз</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Үйлесімді go-e моделі/микробағдарламасы және қосылған жергілікті HTTP API v2 не WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Бастапқы eWeLink микробағдарламасы бар қолдау көрсетілетін құрылғы; LAN/бұлт режимін тексеріңіз</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Орналасу тізімі</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Ағымдағы сканерлеу</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Таңдалғандарды тізімге қосу</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Құрылғыны қолмен қосу</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Құрылғыны өңдеу</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Тізімнен жою</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Осы жазбаны жою керек пе? Сканерлеу тарихы сақталады.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Атауы (міндетті)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Бөлме</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Микробағдарлама</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Қосылым / протокол</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Қажетті Home Assistant функциялары</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Ескертпелер</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Сақтау</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Болдырмау</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Құрылғы атауын енгізіңіз.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Қолмен енгізілген деректер — пайдаланушы ақпараты, расталған үйлесімділік емес. Ұсыныстарды тексеру қажет. Тізімді ашу құрылғыларға не Home Assistant жүйесіне қосылмайды.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Сақталған бақылау (ағымдағы күй емес)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Сақталған желілік бақылау жоқ</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Тізімді оқу немесе сақтау мүмкін болмады. Бар деректер сақталды. Деректер қалтасы мен сақтық көшірмесін тексеріңіз.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Бақылауды байланыстыру</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Жазбаны табылған құрылғымен байланыстыру керек пе? Тек желілік байланысы өзгереді. Алдымен құрылғының сәйкестігін тексеріңіз.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Бөлек жазба жасау</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP жазбаға сәйкес келеді, бірақ сәйкестік расталмаған. Жазбаны таңдаңыз, бөлек жазба жасаңыз немесе болдырмаңыз.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Осы мәліметтерді қолдану</sys:String>
 </ResourceDictionary>

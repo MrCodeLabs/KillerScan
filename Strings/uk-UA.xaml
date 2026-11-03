@@ -732,7 +732,7 @@
     <sys:String x:Key="Str_Access_Note">Відкриття створює нове з’єднання. HTTP 200 не доводить доступ без входу. Сертифікати HTTPS не перевірено. Доказ автентифікації стосується лише запитаної адреси.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Час спостереження недоступний</sys:String>
     <sys:String x:Key="Str_HA_Title">Інтеграції Home Assistant</sys:String>
-    <sys:String x:Key="Str_HA_Note">Пропозиції не підтверджують сумісність. Підключення й налаштування не виконуються. Необов’язкові дані залишаються у вікні; посилання не містять даних пристрою.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Пропозиції не підтверджують сумісність. Підключення та налаштування не виконуються. Ручні дані зберігаються лише після явного збереження в описі об’єкта; посилання на документацію не містять даних пристрою.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">У каталозі немає конкретного збігу. Це не означає, що пристрій не підтримується.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Можливі інтеграції</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Знайти найкращий шлях інтеграції</sys:String>
@@ -792,4 +792,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">Пристрій має бути у вашому обліковому записі Tuya Smart / Smart Life; перевірте функції</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Сумісна модель/прошивка go-e та ввімкнений локальний HTTP API v2 або WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Підтримуваний пристрій з оригінальною прошивкою eWeLink; перевірте режим LAN/хмара</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Опис об’єкта</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Поточне сканування</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Додати вибрані до опису</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Додати пристрій вручну</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Редагувати пристрій</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Видалити з опису</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Видалити цей запис? Історія сканування збережеться.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Назва (обов’язково)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Приміщення</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Прошивка</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Підключення / протокол</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Бажані функції Home Assistant</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Примітки</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Зберегти</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Скасувати</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Введіть назву пристрою.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Ручні дані — відомості користувача, а не підтверджена сумісність. Рекомендації потребують перевірки. Відкриття опису не підключається до пристроїв чи Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Збережене спостереження (не поточний стан)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Немає збереженого мережевого спостереження</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Не вдалося прочитати або зберегти опис. Наявні дані збережено. Перевірте папку даних і резервну копію.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Пов’язати спостереження</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Пов’язати запис зі знайденим пристроєм? Зміниться лише мережева прив’язка. Спочатку перевірте ідентичність пристрою.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Створити окремий запис</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP збігається із записом, але ідентичність не підтверджена. Виберіть запис, створіть окремий або скасуйте дію.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Використати ці відомості</sys:String>
 </ResourceDictionary>

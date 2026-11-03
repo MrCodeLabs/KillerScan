@@ -688,7 +688,7 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_Access_Note">Otevření vytvoří nové spojení. HTTP 200 nedokazuje přístup bez přihlášení. Certifikáty HTTPS nebyly ověřeny. Doklad přihlášení platí jen pro požadovanou adresu.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Čas pozorování není dostupný</sys:String>
     <sys:String x:Key="Str_HA_Title">Integrace Home Assistant</sys:String>
-    <sys:String x:Key="Str_HA_Note">Návrhy nepotvrzují kompatibilitu. Nic se nepřipojuje ani nenastavuje. Volitelné údaje zůstávají v tomto okně; odkazy neobsahují údaje zařízení.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Návrhy nepotvrzují kompatibilitu. Neprobíhá připojení ani nastavení. Ruční údaje se zachovají až po výslovném uložení do soupisu lokality; odkazy na dokumentaci neobsahují údaje zařízení.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">V katalogu není konkrétní shoda. Neznamená to, že zařízení není podporováno.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Možné integrace</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Najít nejlepší cestu integrace</sys:String>
@@ -748,4 +748,31 @@ Vaše nastavení nebude odstraněno.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Zařízení musí být v účtu Tuya Smart / Smart Life; ověřte funkce</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Kompatibilní model/firmware go-e a povolené místní HTTP API v2 nebo WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Podporované zařízení s původním firmwarem eWeLink; ověřte režim LAN/cloud</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Soupis lokality</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Aktuální skenování</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Přidat vybrané do soupisu</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Přidat zařízení ručně</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Upravit zařízení</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Odebrat ze soupisu</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Odebrat tento záznam? Historie skenování zůstane zachována.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Název (povinný)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Místnost</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Firmware</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Připojení / protokol</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Požadované funkce v Home Assistant</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Poznámky</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Uložit</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Zrušit</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Zadejte název zařízení.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Ruční údaje jsou informace uživatele, nikoli ověřená kompatibilita. Doporučení je nutné ověřit. Otevření soupisu nekontaktuje zařízení ani Home Assistant.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Uložené pozorování (nejde o živý stav)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Žádné uložené síťové pozorování</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Soupis nelze přečíst nebo uložit. Existující data byla zachována. Zkontrolujte datovou složku a zálohu.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Propojit pozorování</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Propojit tento záznam s nalezeným zařízením? Změní se pouze síťové propojení. Nejprve ověřte totožnost zařízení.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Vytvořit samostatný záznam</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP odpovídá záznamu, ale totožnost není potvrzena. Vyberte záznam, vytvořte samostatný nebo akci zrušte.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Použít tyto údaje</sys:String>
 </ResourceDictionary>

@@ -17,6 +17,7 @@ namespace KillerScan.Controls
 
         /// <summary>The history the shown entry belongs to, which picks its baseline. Set by the shell.</summary>
         internal Func<HistoryStore> HistorySource { get; set; } = () => ScanHistory.Store;
+        internal Func<HistoryStore, SurveyStore?> SurveySource { get; set; } = _ => null;
 
         private HistoryStore StoreFor(ScanHistoryEntry? entry) => entry?.Owner ?? HistorySource();
         private string Loc(string key) => TryFindResource(key) as string ?? key;

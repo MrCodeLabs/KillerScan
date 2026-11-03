@@ -97,7 +97,11 @@ namespace KillerScan.Controls
                     if (left) location = _location;
                     if (!runDeep || _active.Devices.Count == 0) RecordCompletedRun(options, deep: false);
                     NoteKnownDevices(location);
-                    if (!left) NoteUnsaved(location);
+                    if (!left)
+                    {
+                        RefreshSurvey(location, _active.Devices);
+                        NoteUnsaved(location);
+                    }
                 }
             }
             catch (OperationCanceledException)

@@ -690,7 +690,7 @@
     <sys:String x:Key="Str_Access_Note">打开会建立新连接。HTTP 200 不能证明无需登录即可访问。HTTPS 证书未经验证。身份验证证据仅适用于请求的地址。</sys:String>
     <sys:String x:Key="Str_Access_NoTime">观察时间不可用</sys:String>
     <sys:String x:Key="Str_HA_Title">Home Assistant 集成</sys:String>
-    <sys:String x:Key="Str_HA_Note">建议不代表已验证兼容性。不会连接或配置设备。可选输入仅保留在此窗口中；文档链接不会包含设备数据。</sys:String>
+    <sys:String x:Key="Str_HA_Note">建议并不代表已验证的兼容性。不会进行连接或设置。手动输入仅在明确保存到地点清单后保留；文档链接不包含设备数据。</sys:String>
     <sys:String x:Key="Str_HA_Unknown">此目录中没有具体匹配项。这不表示设备不受支持。</sys:String>
     <sys:String x:Key="Str_HA_Candidates">可能适用的集成</sys:String>
     <sys:String x:Key="Str_HA_Workflow">寻找最佳集成路径</sys:String>
@@ -750,4 +750,31 @@
     <sys:String x:Key="Str_HA_TuyaAccount">设备须绑定到你的Tuya Smart / Smart Life账户；核对功能</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">兼容的go-e型号/固件，并启用本地HTTP API v2或WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">使用原厂eWeLink固件的受支持设备；核对LAN/云模式</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">地点设备清单</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">当前扫描</sys:String>
+    <sys:String x:Key="Str_Survey_Add">将所选设备加入清单</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">手动添加设备</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">编辑设备</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">从清单移除</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">移除此条目？扫描历史将保留。</sys:String>
+    <sys:String x:Key="Str_Survey_Name">名称（必填）</sys:String>
+    <sys:String x:Key="Str_Survey_Room">房间</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">固件</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">连接 / 协议</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">希望在Home Assistant中使用的功能</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">备注</sys:String>
+    <sys:String x:Key="Str_Survey_Save">保存</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">取消</sys:String>
+    <sys:String x:Key="Str_Survey_Required">请输入设备名称。</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">手动输入是用户提供的信息，并非已验证的兼容性。建议需要核实。打开清单不会连接设备或Home Assistant。</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">已保存的观测（非实时状态）</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">没有已保存的网络观测</sys:String>
+    <sys:String x:Key="Str_Survey_Error">无法读取或保存清单。原有数据已保留。请检查数据文件夹及其备份。</sys:String>
+    <sys:String x:Key="Str_Survey_Link">关联观测</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">将此条目关联到发现的设备？仅更改网络关联。请先核实设备身份。</sys:String>
+    <sys:String x:Key="Str_Survey_New">创建独立条目</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP与清单条目相同，但设备身份尚未确认。请选择要关联的条目、创建独立条目或取消。</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">使用这些线索</sys:String>
 </ResourceDictionary>

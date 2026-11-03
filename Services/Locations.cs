@@ -57,6 +57,7 @@ namespace KillerScan.Services
         public DeviceLoginStore Logins => _logins();
         public SavedScanStore SavedScans => _savedScans();
         public HistoryStore History => _history();
+        internal SurveyStore? Survey { get; }
 
         private LocationData(LocationInfo? info, string directory, bool memoryOnly)
         {
@@ -66,6 +67,7 @@ namespace KillerScan.Services
             var logins = new DeviceLoginStore(Path.Combine(directory, "logins.json"), memoryOnly);
             var savedScans = new SavedScanStore(Path.Combine(directory, "profiles.json"), memoryOnly);
             var history = new HistoryStore(Path.Combine(directory, "history.json"), memoryOnly);
+            if (info != null) Survey = new SurveyStore(Path.Combine(directory, "survey.json"), info.Id, memoryOnly);
             _devices = () => devices; _overrides = () => overrides; _logins = () => logins;
             _savedScans = () => savedScans; _history = () => history;
         }

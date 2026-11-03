@@ -667,7 +667,7 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_Access_Note">Odpri vzpostavi novo povezavo. HTTP 200 ne dokazuje dostopa brez prijave. Veljavnost certifikatov HTTPS ni preverjena. Dokaz prijave velja samo za zahtevani naslov.</sys:String>
     <sys:String x:Key="Str_Access_NoTime">Čas opažanja ni na voljo</sys:String>
     <sys:String x:Key="Str_HA_Title">Integracije Home Assistanta</sys:String>
-    <sys:String x:Key="Str_HA_Note">Predlogi niso potrjena združljivost. Povezava ali nastavitev se ne izvede. Dodatni vnosi ostanejo v tem oknu; povezave do navodil ne vsebujejo podatkov naprave.</sys:String>
+    <sys:String x:Key="Str_HA_Note">Predlogi niso potrjena združljivost. Povezava ali nastavitev se ne izvede. Ročni vnosi se ohranijo šele po izrecnem shranjevanju v popis lokacije; povezave do navodil ne vsebujejo podatkov naprave.</sys:String>
     <sys:String x:Key="Str_HA_Unknown">V tem katalogu ni konkretnega ujemanja. To ne pomeni, da naprava ni podprta.</sys:String>
     <sys:String x:Key="Str_HA_Candidates">Možne integracije</sys:String>
     <sys:String x:Key="Str_HA_Workflow">Poišči najboljšo pot do integracije</sys:String>
@@ -727,4 +727,31 @@ Tvoje nastavitve bodo ohranjene.</sys:String>
     <sys:String x:Key="Str_HA_TuyaAccount">Naprava mora biti v tvojem računu Tuya Smart / Smart Life; preveri razpoložljive funkcije</sys:String>
     <sys:String x:Key="Str_HA_GoeApi">Združljiv model/firmware go-e in omogočen lokalni HTTP API v2 ali WebSocket</sys:String>
     <sys:String x:Key="Str_HA_EwelinkFirmware">Podprta naprava z izvirnim firmwareom eWeLink; preveri način LAN/oblak</sys:String>
+
+    <!-- Persistent, explicitly saved initial-survey inventory. -->
+    <sys:String x:Key="Str_Survey_Title">Popis lokacije</sys:String>
+    <sys:String x:Key="Str_Survey_Scan">Trenutni pregled</sys:String>
+    <sys:String x:Key="Str_Survey_Add">Dodaj izbrane v popis</sys:String>
+    <sys:String x:Key="Str_Survey_Manual">Dodaj napravo ročno</sys:String>
+    <sys:String x:Key="Str_Survey_Edit">Uredi napravo</sys:String>
+    <sys:String x:Key="Str_Survey_Remove">Odstrani iz popisa</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmRemove">Odstranim ta zapis iz popisa? Zgodovina pregledov bo ohranjena.</sys:String>
+    <sys:String x:Key="Str_Survey_Name">Ime (obvezno)</sys:String>
+    <sys:String x:Key="Str_Survey_Room">Prostor</sys:String>
+    <sys:String x:Key="Str_Survey_Firmware">Firmware</sys:String>
+    <sys:String x:Key="Str_Survey_Connection">Povezava / protokol</sys:String>
+    <sys:String x:Key="Str_Survey_Functions">Želene funkcije v Home Assistantu</sys:String>
+    <sys:String x:Key="Str_Survey_Notes">Opombe</sys:String>
+    <sys:String x:Key="Str_Survey_Save">Shrani</sys:String>
+    <sys:String x:Key="Str_Survey_Cancel">Prekliči</sys:String>
+    <sys:String x:Key="Str_Survey_Required">Vnesi ime naprave.</sys:String>
+    <sys:String x:Key="Str_Survey_Notice">Ročni vnosi so uporabniški podatki, ne potrjena združljivost. Priporočila je treba preveriti. Odpiranje popisa ne vzpostavlja povezav z napravami ali Home Assistantom.</sys:String>
+    <sys:String x:Key="Str_Survey_Observation">Shranjeno opažanje (ni stanje v živo)</sys:String>
+    <sys:String x:Key="Str_Survey_NoObservation">Ni shranjenega omrežnega opažanja</sys:String>
+    <sys:String x:Key="Str_Survey_Error">Popisa ni bilo mogoče prebrati ali shraniti. Obstoječi podatki so ohranjeni. Preveri podatkovno mapo in njeno varnostno kopijo.</sys:String>
+    <sys:String x:Key="Str_Survey_Link">Poveži opažanje</sys:String>
+    <sys:String x:Key="Str_Survey_ConfirmLink">Povežem izbrani zapis z najdeno napravo? Spremeni se samo omrežna povezava zapisa. Najprej preveri identiteto naprave.</sys:String>
+    <sys:String x:Key="Str_Survey_New">Ustvari ločen zapis</sys:String>
+    <sys:String x:Key="Str_Survey_IpWarning">IP se ujema z zapisom v popisu, identiteta pa ni potrjena. Izberi zapis za povezavo, ustvari ločen zapis ali prekliči.</sys:String>
+    <sys:String x:Key="Str_Survey_Hints">Uporabi te namige</sys:String>
 </ResourceDictionary>

@@ -31,12 +31,16 @@ internal sealed class HomeAssistantOverviewWindow : Window
     }
     internal IReadOnlyList<Row> Rows { get; }
     internal readonly DataGrid Grid = new() { AutoGenerateColumns = false, IsReadOnly = true, CanUserAddRows = false,
-        SelectionMode = DataGridSelectionMode.Single, HeadersVisibility = DataGridHeadersVisibility.Column,
+        SelectionMode = DataGridSelectionMode.Extended, HeadersVisibility = DataGridHeadersVisibility.Column,
         RowHeaderWidth = 0, MinRowHeight = 54, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto };
     private readonly Action<string> _open, _copy;
-    internal HomeAssistantOverviewWindow(IEnumerable<NetworkDevice> devices, Action<string> open, Action<string> copy)
+    private readonly SurveyStore? _survey;
+
+    internal HomeAssistantOverviewWindow(IEnumerable<NetworkDevice> devices, Action<string> open, Action<string> copy, LocationData? location = null)
     {
         _open = open; _copy = copy;
+        _survey = location?.Survey;
+        SurveyPanel.Theme(this);
         Rows = devices.Select(HomeAssistantText.Freeze).OrderBy(device => device.IpSortKey).Select(device => new Row(device)).ToArray();
         Title = HomeAssistantText.L("AllTitle"); Width = 1180; Height = 720; MinWidth = 660; MinHeight = 380;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -61,7 +65,7 @@ internal sealed class HomeAssistantOverviewWindow : Window
             button.SetResourceReference(StyleProperty, "OutlineButton"); button.Click += (_, _) => action(); buttons.Children.Add(button); return button;
         }
         var detail = AddButton(HomeAssistantText.L("Details"), "detail", OpenSelected); detail.IsEnabled = false;
-        AddButton(HomeAssistantText.L("Copy"), "copy-all", () => _copy(Describe()));
+        var copyAll = AddButton(HomeAssistantText.L("Copy"), "copy-all", () => _copy(Describe()));
         AddButton(Application.Current.TryFindResource("Str_Sys_Close") as string ?? "Close", "close", Close);
         DockPanel.SetDock(buttons, Dock.Bottom); root.Children.Add(buttons);
         void Column(string title, string path, double width)
@@ -79,10 +83,46 @@ internal sealed class HomeAssistantOverviewWindow : Window
         Grid.ItemsSource = Rows;
         Grid.SelectionChanged += (_, _) => detail.IsEnabled = Grid.SelectedItem is Row;
         Grid.MouseDoubleClick += (_, e) => { if (ItemsControl.ContainerFromElement(Grid, e.OriginalSource as DependencyObject) is DataGridRow) OpenSelected(); };
-        root.Children.Add(Grid); Content = root;
+        var scan = new DockPanel();
+        var tabs = new TabControl();
+        SurveyPanel? survey = null;
+        if (_survey != null)
+        {
+            survey = new SurveyPanel(_survey, Rows.Select(row => row.Device), open, copy);
+            var add = SurveyPanel.Button(SurveyText.L("Add"), () =>
+            {
+                var selected = Grid.SelectedItems.Cast<Row>().Select(row => row.Device).ToArray();
+                tabs.SelectedIndex = 1;
+                survey.AddSelected(selected);
+            }, "survey-add");
+            add.IsEnabled = false;
+            Grid.SelectionChanged += (_, _) => add.IsEnabled = Grid.SelectedItems.Count > 0;
+            DockPanel.SetDock(add, Dock.Bottom);
+            scan.Children.Add(add);
+        }
+        scan.Children.Add(Grid);
+        tabs.SetResourceReference(Control.BackgroundProperty, "BackgroundBrush");
+        tabs.SetResourceReference(Control.ForegroundProperty, "TextBrush");
+        tabs.Items.Add(new TabItem { Header = SurveyText.L("Scan"), Content = scan });
+        var unavailable = location?.IsTemporary == true
+            ? Application.Current.TryFindResource("Str_Loc_TemporaryNotice") as string ?? SurveyText.L("Error")
+            : SurveyText.L("Error");
+        tabs.Items.Add(new TabItem
+        {
+            Header = SurveyText.L("Title") + (location?.Info is { } info ? " · " + info.Name : ""),
+            Content = (FrameworkElement?)survey ?? SurveyPanel.Text(unavailable)
+        });
+        tabs.SelectionChanged += (_, args) =>
+        {
+            if (!ReferenceEquals(args.Source, tabs)) return;
+            detail.IsEnabled = tabs.SelectedIndex == 0 && Grid.SelectedItem is Row;
+            copyAll.IsEnabled = tabs.SelectedIndex == 0;
+            if (tabs.SelectedIndex == 1) survey?.Reload();
+        };
+        root.Children.Add(tabs); Content = root;
     }
     internal HomeAssistantAdviceWindow? CreateSelected() => Grid.SelectedItem is Row row
-        ? new HomeAssistantAdviceWindow(row.Device, _open, _copy) : null;
+        ? new HomeAssistantAdviceWindow(row.Device, _open, _copy, surveyStore: _survey) : null;
     private void OpenSelected()
     {
         if (CreateSelected() is not { } dialog) return;

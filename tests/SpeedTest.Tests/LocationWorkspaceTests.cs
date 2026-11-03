@@ -96,7 +96,8 @@ internal static class LocationWorkspaceTests
                 !a.Devices.IsTrusted(device) && workspace.Location == a,
                 "Saving results adds the run and its names to the Location, approves nothing, and moves the tab there.");
             Require(!workspace.SaveResultsTo(b), "Only a Temporary scan's results can be saved to a Location.");
-            Require(workspace.Session.Devices.Count == 1, "Saved results stay on screen in the Location they moved to.");
+            Require(workspace.Session.Devices.Count == 1 && workspace.Session.Devices.Single().LocationId == a.Info!.Id,
+                "Saved results stay on screen and belong to the Location that now owns them.");
             ResultsFollowLocation(a, b, scanner);
             SaveResultsIsDurable(Path.Combine(root, "move"));
             SaveResultsEdges(Path.Combine(root, "edges"));

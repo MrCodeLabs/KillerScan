@@ -29,6 +29,8 @@ internal static class Program
     {
         try
         {
+            if (args.SequenceEqual(new[] { "--survey" })) { SurveyTests.Run(); return 0; }
+            if (args.Length == 3 && args[0] == "--survey-phase") { SurveyTests.Phase(args[1], args[2]); return 0; }
             if (args.SequenceEqual(new[] { "--fork-upgrade" })) { await ForkUpgradeTests.Run(); return 0; }
             if (args.SequenceEqual(new[] { "--installation-cleanup" }))
             {
